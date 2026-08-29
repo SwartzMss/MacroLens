@@ -1,0 +1,14 @@
+.data-note {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.data-note a {
+  color: var(--green);
+  font-weight: 700;
+}

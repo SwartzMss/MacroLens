@@ -1,8 +1,9 @@
 ---
-const { data, title } = Astro.props;
+import type { IndicatorDataset } from '../data/indicatorRegistry';
+const { indicator, title } = Astro.props as { indicator: IndicatorDataset; title: string };
 const id = `chart-${Math.random().toString(36).slice(2)}`;
 ---
-<div class="viz-card"><div class="viz-head"><h3>{title}</h3><span class="tag">同比增速 · %</span></div><div class="chart" id={id} data-chart={JSON.stringify(data)} role="img" aria-label={`${title}折线图`}></div></div>
+<div class="viz-card"><div class="viz-head"><h3>{title}</h3><span class="tag">同比增速 · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify(indicator.data)} role="img" aria-label={`${title}折线图`}></div><div class="data-note"><span>{indicator.comparabilityNote}</span><a href={indicator.sourceUrl} target="_blank" rel="noreferrer">查看 {indicator.source} 原始数据 ↗</a><span>更新：{indicator.updatedAt}</span></div></div>
 <script>
   import * as echarts from 'echarts';
   document.querySelectorAll<HTMLElement>('[data-chart]').forEach((element) => {

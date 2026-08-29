@@ -2,14 +2,14 @@
 import graph from '../../data/relations/macro.json';
 const id = `graph-${Math.random().toString(36).slice(2)}`;
 ---
-<div class="viz-card" id="relationships"><div class="viz-head"><h3>货币与实体经济关系图</h3><div class="relation-legend"><span>实线：机制</span><span>虚线：相关/反映</span></div></div><div class="graph" id={id} data-graph={JSON.stringify(graph)} role="img" aria-label="货币政策、M1 M2与实体经济关系图"></div></div>
+<div class="viz-card" id="relationships"><div class="viz-head"><h3>货币与实体经济关系图</h3><div class="relation-legend"><span>实线：实施 / 使用 / 影响</span><span>虚线：相关 / 反映</span></div></div><div class="graph" id={id} data-graph={JSON.stringify(graph)} role="img" aria-label="货币政策、M1 M2与实体经济关系图"></div></div>
 <script>
   import cytoscape from 'cytoscape';
   document.querySelectorAll<HTMLElement>('[data-graph]').forEach((element) => {
     if (element.dataset.ready) return;
     element.dataset.ready = 'true';
     const graph = JSON.parse(element.dataset.graph || '[]');
-    const cy=cytoscape({container:element,elements:graph,layout:{name:'breadthfirst',directed:true,padding:20,spacingFactor:1.15},style:[{selector:'node',style:{'background-color':'#e3eee8','border-color':'#0d6b50','border-width':1.5,label:'data(label)','font-size':12,color:'#15241f','text-wrap':'wrap','text-max-width':'90px',width:54,height:54}},{selector:'node[kind="indicator"]',style:{'background-color':'#0d6b50',color:'#fff'}},{selector:'edge',style:{width:2,'line-color':'#9caea5','target-arrow-color':'#9caea5','target-arrow-shape':'triangle','curve-style':'bezier'}},{selector:'edge[type="CORRELATES"],edge[type="REFLECTS"]',style:{'line-style':'dashed','line-color':'#d98e26','target-arrow-color':'#d98e26'}}]});
+    const cy=cytoscape({container:element,elements:graph,layout:{name:'breadthfirst',directed:true,padding:20,spacingFactor:1.15},style:[{selector:'node',style:{'background-color':'#e3eee8','border-color':'#0d6b50','border-width':1.5,label:'data(label)','font-size':12,color:'#15241f','text-wrap':'wrap','text-max-width':'90px',width:54,height:54}},{selector:'node[kind="indicator"]',style:{'background-color':'#0d6b50',color:'#fff'}},{selector:'edge',style:{width:2,'line-color':'#9caea5','target-arrow-color':'#9caea5','target-arrow-shape':'triangle','curve-style':'bezier',label:'data(type)','font-size':8,'text-background-color':'#fffef9','text-background-opacity':.9,'text-background-padding':'2px'}},{selector:'edge[type="CORRELATES"],edge[type="REFLECTS"]',style:{'line-style':'dashed','line-color':'#d98e26','target-arrow-color':'#d98e26'}}]});
     new ResizeObserver(()=>cy.resize()).observe(element);
   });
 </script>
