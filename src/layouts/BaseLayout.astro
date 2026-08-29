@@ -1,0 +1,8 @@
+---
+import '../styles/global.css';
+const { title = 'MacroLens｜用一个镜头理解宏观经济', description = '以概念、关系和数据，理解宏观经济如何运转。' } = Astro.props;
+---
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><meta name="description" content={description}><meta name="generator" content={Astro.generator}><title>{title}</title></head><body>
+<header class="site-header"><nav class="shell nav"><a class="brand" href="/"><i>Macro</i>Lens</a><a href="/concepts/m1">概念</a><a href="/#relationships">关系</a><a href="/search">搜索</a></nav></header><main><slot /></main>
+<footer class="site-footer"><div class="shell">MacroLens · 图谱用于导航，文档用于解释，数据用于校验。</div></footer>
+</body></html>

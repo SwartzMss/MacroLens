@@ -1,0 +1,16 @@
+---
+const { data, title } = Astro.props;
+const id = `chart-${Math.random().toString(36).slice(2)}`;
+---
+<div class="viz-card"><div class="viz-head"><h3>{title}</h3><span class="tag">同比增速 · %</span></div><div class="chart" id={id} data-chart={JSON.stringify(data)} role="img" aria-label={`${title}折线图`}></div></div>
+<script>
+  import * as echarts from 'echarts';
+  document.querySelectorAll<HTMLElement>('[data-chart]').forEach((element) => {
+    if (element.dataset.ready) return;
+    element.dataset.ready = 'true';
+    const data: {date:string,value:number}[] = JSON.parse(element.dataset.chart || '[]');
+    const chart = echarts.init(element);
+    chart.setOption({animationDuration:700,tooltip:{trigger:'axis'},grid:{left:44,right:20,top:28,bottom:38},xAxis:{type:'category',data:data.map(d=>d.date),axisLine:{lineStyle:{color:'#b9c2ba'}}},yAxis:{type:'value',name:'%',splitLine:{lineStyle:{color:'#e7e8e1'}}},series:[{type:'line',data:data.map(d=>d.value),smooth:.25,symbolSize:7,lineStyle:{width:3,color:'#0d6b50'},itemStyle:{color:'#0d6b50'},areaStyle:{color:'rgba(13,107,80,.09)'}}]});
+    new ResizeObserver(()=>chart.resize()).observe(element);
+  });
+</script>

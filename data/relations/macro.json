@@ -1,0 +1,18 @@
+[
+  {"data":{"id":"central","label":"中央银行"}},
+  {"data":{"id":"policy","label":"货币政策"}},
+  {"data":{"id":"tools","label":"利率 / 降准 / 公开市场"}},
+  {"data":{"id":"credit","label":"银行流动性与信贷"}},
+  {"data":{"id":"m1","label":"M1","kind":"indicator"}},
+  {"data":{"id":"m2","label":"M2","kind":"indicator"}},
+  {"data":{"id":"activity","label":"消费与投资"}},
+  {"data":{"id":"macro","label":"增长与通胀"}},
+  {"data":{"source":"central","target":"policy","type":"CAUSES"}},
+  {"data":{"source":"policy","target":"tools","type":"CAUSES"}},
+  {"data":{"source":"tools","target":"credit","type":"AFFECTS"}},
+  {"data":{"source":"credit","target":"m1","type":"AFFECTS"}},
+  {"data":{"source":"credit","target":"m2","type":"AFFECTS"}},
+  {"data":{"source":"m1","target":"activity","type":"REFLECTS"}},
+  {"data":{"source":"m2","target":"activity","type":"CORRELATES"}},
+  {"data":{"source":"activity","target":"macro","type":"AFFECTS"}}
+]

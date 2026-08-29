@@ -1,0 +1,10 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import IndicatorChart from '../../components/IndicatorChart.astro';
+import ConceptGraph from '../../components/ConceptGraph.astro';
+import m1 from '../../../data/indicators/m1.json'; import m2 from '../../../data/indicators/m2.json';
+export async function getStaticPaths(){return (await getCollection('concepts')).map(entry=>({params:{id:entry.id},props:{entry}}));}
+const { entry } = Astro.props; const { Content, headings } = await render(entry); const chartData=entry.data.chart==='m1'?m1:m2;
+---
+<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / 货币 / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span><span>口径版本：{entry.data.definitionVersion}</span><span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><Content /><IndicatorChart data={chartData} title={`${entry.data.name} 历史增速示例`} /><ConceptGraph /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>

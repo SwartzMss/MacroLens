@@ -1,0 +1,4 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="搜索｜MacroLens"><div class="shell search-wrap"><div class="eyebrow">Search the lens</div><h1>搜索概念</h1><p>查找定义、影响因素、典型情景和常见误区。</p><div id="search"></div></div><link href="/pagefind/pagefind-ui.css" rel="stylesheet"><script is:inline src="/pagefind/pagefind-ui.js"></script><script is:inline>window.addEventListener('DOMContentLoaded',()=>new PagefindUI({element:'#search',showSubResults:true,translations:{placeholder:'例如：M2 为什么不等于通胀？',zero_results:'没有找到相关内容'}}));</script></BaseLayout>
