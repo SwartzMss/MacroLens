@@ -6,7 +6,15 @@ import ConceptGraph from '../../components/ConceptGraph.astro';
 import RelatedConcepts from '../../components/RelatedConcepts.astro';
 import { getIndicatorData } from '../../data/indicatorRegistry';
 import { getGraphData } from '../../data/graphRegistry';
-export async function getStaticPaths(){return (await getCollection('concepts')).map(entry=>({params:{id:entry.id},props:{entry}}));}
+export async function getStaticPaths(){
+  const concepts = await getCollection('concepts');
+  const stableIds = new Set<string>();
+  return concepts.map(entry => {
+    if (stableIds.has(entry.data.id)) throw new Error(`Duplicate stable concept ID: ${entry.data.id}`);
+    stableIds.add(entry.data.id);
+    return { params: { id: entry.data.id }, props: { entry } };
+  });
+}
 const { entry } = Astro.props; const { Content, headings } = await render(entry);
 const indicator=entry.data.chart ? getIndicatorData(entry.data.chart) : null;
 const graph=entry.data.graph ? getGraphData(entry.data.graph, entry.data.id) : null;

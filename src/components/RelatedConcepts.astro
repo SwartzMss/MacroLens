@@ -1,4 +1,4 @@
 ---
 const { concepts } = Astro.props;
 ---
-{concepts.length > 0 && <section class="related-block"><div class="eyebrow">Keep exploring</div><h2>相关概念</h2><div class="related-links">{concepts.map((concept: any) => <a href={`/concepts/${concept.id}`}><span>{concept.data.name}</span><small>{concept.data.subtitle}</small><b aria-hidden="true">→</b></a>)}</div></section>}
+{concepts.length > 0 && <section class="related-block"><div class="eyebrow">Keep exploring</div><h2>相关概念</h2><div class="related-links">{concepts.map((concept: any) => <a href={`/concepts/${concept.data.id}`}><span>{concept.data.name}</span><small>{concept.data.subtitle}</small><b aria-hidden="true">→</b></a>)}</div></section>}
