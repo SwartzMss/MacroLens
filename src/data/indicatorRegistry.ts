@@ -3,8 +3,9 @@ import m2 from '../../data/indicators/m2.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
-  unit: string; metric: string; definitionVersion: string; source: string;
-  sourceUrl: string; updatedAt: string; comparabilityNote: string;
+  unit: string; metric: string; definitionEffectiveFrom: string; definitionAsOf: string; source: string;
+  calculation: string; updatedAt: string; comparabilityNote: string;
+  sources: Array<{ title: string; url: string; sourceDate: string; coverage: string }>;
   data: Array<{ date: string; value: number }>;
 }
 

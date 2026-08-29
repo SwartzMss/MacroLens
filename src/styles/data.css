@@ -12,3 +12,9 @@
   color: var(--green);
   font-weight: 700;
 }
+
+.data-note details { flex-basis: 100%; }
+.data-note summary { color: var(--green); cursor: pointer; font-weight: 700; }
+.data-note ul { margin: 8px 0 0; padding-left: 20px; }
+.data-note li { margin: 5px 0; }
+.data-note small { display: block; color: var(--muted); }
