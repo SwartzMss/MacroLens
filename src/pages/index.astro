@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ConceptGraph from '../components/ConceptGraph.astro';
+import { getGraphData } from '../data/graphRegistry';
+const macroGraph = getGraphData('macro');
 ---
 <BaseLayout><div class="shell"><section class="hero"><div><div class="eyebrow">Macroeconomics, made legible</div><h1>看懂钱，<br>如何流动。</h1><p class="lead">MacroLens 用清晰的概念、可追溯的关系和真实世界的数据，帮你建立宏观经济的直觉。</p></div><p class="hero-note">第一条学习路径从 M1 / M2 开始：它们是什么、为何变化，以及为什么“钱变多”不等于资产和物价必然上涨。</p></section>
 <section class="section"><div class="section-head"><div><div class="eyebrow">Start here</div><h2>先认识两种“钱”</h2></div><p>约 10 分钟完成</p></div><div class="grid"><a class="concept-card" href="/concepts/m1"><div class="number">M1</div><h3>交易中的钱</h3><p>理解高流动性货币如何反映企业与居民的资金活跃程度。</p><div class="tags"><span class="tag">定义口径</span><span class="tag">情景解读</span><span class="tag">历史数据</span></div></a><a class="concept-card" href="/concepts/m2"><div class="number">M2</div><h3>更宽的货币总量</h3><p>理解存款、信贷与广义货币，以及“水多”为什么不必然上涨。</p><div class="tags"><span class="tag">信用派生</span><span class="tag">传导机制</span><span class="tag">常见误区</span></div></a></div></section>
-<section class="section"><div class="section-head"><div><div class="eyebrow">Transmission</div><h2>不要跳过中间环节</h2></div></div><div class="path"><div class="path-step"><b>01 政策工具</b>利率、准备金率、公开市场操作</div><div class="path-step"><b>02 金融体系</b>银行流动性、信贷与融资条件</div><div class="path-step"><b>03 部门行为</b>企业投资、居民消费与储蓄</div><div class="path-step"><b>04 宏观结果</b>产出、就业、价格与资产</div></div></section><section class="section"><ConceptGraph /></section></div></BaseLayout>
+<section class="section"><div class="section-head"><div><div class="eyebrow">Transmission</div><h2>不要跳过中间环节</h2></div></div><div class="path"><div class="path-step"><b>01 政策工具</b>利率、准备金率、公开市场操作</div><div class="path-step"><b>02 金融体系</b>银行流动性、信贷与融资条件</div><div class="path-step"><b>03 部门行为</b>企业投资、居民消费与储蓄</div><div class="path-step"><b>04 宏观结果</b>产出、就业、价格与资产</div></div></section><section class="section"><ConceptGraph graph={macroGraph} title="货币与实体经济关系图" /></section></div></BaseLayout>

@@ -1,8 +1,10 @@
 ---
-import graph from '../../data/relations/macro.json';
+import type { getGraphData } from '../data/graphRegistry';
+type GraphData = ReturnType<typeof getGraphData>;
+const { graph, title = '概念关系图' } = Astro.props as { graph: GraphData; title?: string };
 const id = `graph-${Math.random().toString(36).slice(2)}`;
 ---
-<div class="viz-card" id="relationships"><div class="viz-head"><h3>货币与实体经济关系图</h3><div class="relation-legend"><span>实线：实施 / 使用 / 影响</span><span>虚线：相关 / 反映</span></div></div><div class="graph" id={id} data-graph={JSON.stringify(graph)} role="img" aria-label="货币政策、M1 M2与实体经济关系图"></div></div>
+<div class="viz-card" id="relationships"><div class="viz-head"><h3>{title}</h3><div class="relation-legend"><span>实线：实施 / 使用 / 影响</span><span>虚线：相关 / 反映</span></div></div><div class="graph" id={id} data-graph={JSON.stringify(graph)} role="img" aria-label={title}></div></div>
 <script>
   import cytoscape from 'cytoscape';
   document.querySelectorAll<HTMLElement>('[data-graph]').forEach((element) => {
