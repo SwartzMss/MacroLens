@@ -1,0 +1,12 @@
+{
+  "id": "m1", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy",
+  "definitionEffectiveFrom": "2025-01", "definitionAsOf": "2025-11", "source": "PBOC",
+  "calculation": "published",
+  "sources": [{"title":"中国人民银行货币供应量表（含 M1 可比口径回溯）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535682666.pdf","sourceDate":"2025-11-19","coverage":"2024-01 to 2025-10"}],
+  "updatedAt": "2025-11-19",
+  "comparabilityNote": "2024 年数据采用中国人民银行按 2025 年 1 月启用的新 M1 统计口径回溯后的可比数据；序列为央行直接公布值。",
+  "data": [
+    {"date":"2024-01","value":3.3},{"date":"2024-02","value":2.6},{"date":"2024-03","value":2.3},{"date":"2024-04","value":0.6},{"date":"2024-05","value":-0.8},{"date":"2024-06","value":-1.7},{"date":"2024-07","value":-2.6},{"date":"2024-08","value":-3.0},{"date":"2024-09","value":-3.3},{"date":"2024-10","value":-2.3},{"date":"2024-11","value":-0.7},{"date":"2024-12","value":1.2},
+    {"date":"2025-01","value":0.4},{"date":"2025-02","value":0.1},{"date":"2025-03","value":1.6},{"date":"2025-04","value":1.5},{"date":"2025-05","value":2.3},{"date":"2025-06","value":4.6},{"date":"2025-07","value":5.6},{"date":"2025-08","value":6.0},{"date":"2025-09","value":7.2},{"date":"2025-10","value":6.2}
+  ]
+}
