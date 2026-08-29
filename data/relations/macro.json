@@ -21,7 +21,6 @@
   {"data":{"source":"credit","target":"m2","type":"AFFECTS"}},
   {"data":{"source":"credit","target":"social-financing","type":"OVERLAPS_WITH"}},
   {"data":{"source":"social-financing","target":"financing-conditions","type":"REFLECTS"}},
-  {"data":{"source":"social-financing","target":"households-firms","type":"FINANCES"}},
   {"data":{"source":"m0","target":"m1","type":"COMPONENT_OF"}},
   {"data":{"source":"m1","target":"m2","type":"COMPONENT_OF"}},
   {"data":{"source":"m1","target":"activity","type":"REFLECTS"}},
