@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCategory } from '../../data/categories';
+import { getCategory, type CategoryId } from '../../data/categories';
 import '../../styles/concept-index.css';
 
 const concepts = await getCollection('concepts');
@@ -11,7 +11,7 @@ for (const concept of concepts) {
   stableIds.add(concept.data.id);
 }
 
-const grouped = new Map<string, typeof concepts>();
+const grouped = new Map<CategoryId, typeof concepts>();
 for (const concept of concepts) {
   const group = grouped.get(concept.data.category) ?? [];
   group.push(concept);
