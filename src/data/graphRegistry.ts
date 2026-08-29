@@ -13,12 +13,18 @@ export function getGraphData(graphId: string, conceptId?: string, hops = 2): Gra
   if (!nodeIds.has(conceptId)) throw new Error(`Concept "${conceptId}" is missing from graph "${graphId}"`);
 
   const included = new Set([conceptId]);
+  let frontier = new Set([conceptId]);
   for (let depth = 0; depth < hops; depth++) {
+    const next = new Set<string>();
     for (const item of graph) {
       const { source, target } = item.data;
       if (!source || !target) continue;
-      if (included.has(source) || included.has(target)) { included.add(source); included.add(target); }
+      if (frontier.has(source) && !included.has(target)) next.add(target);
+      if (frontier.has(target) && !included.has(source)) next.add(source);
     }
+    if (next.size === 0) break;
+    for (const id of next) included.add(id);
+    frontier = next;
   }
 
   return graph.filter(item => item.data.id ? included.has(item.data.id) : included.has(item.data.source!) && included.has(item.data.target!));
