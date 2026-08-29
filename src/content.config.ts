@@ -6,7 +6,7 @@ const concepts = defineCollection({
   schema: z.object({
     id: z.string(), name: z.string(), subtitle: z.string(), country: z.string(),
     category: z.string(), source: z.string(), definitionEffectiveFrom: z.string(), definitionAsOf: z.string(),
-    updatedAt: z.coerce.date(), related: z.array(z.string()), chart: z.string(), order: z.number()
+    updatedAt: z.coerce.date(), related: z.array(z.string()), chart: z.string().optional(), order: z.number()
   })
 });
 
