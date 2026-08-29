@@ -6,6 +6,7 @@ import ConceptGraph from '../../components/ConceptGraph.astro';
 import RelatedConcepts from '../../components/RelatedConcepts.astro';
 import { getIndicatorData } from '../../data/indicatorRegistry';
 import { getGraphData } from '../../data/graphRegistry';
+import { getCategory } from '../../data/categories';
 export async function getStaticPaths(){
   const concepts = await getCollection('concepts');
   const stableIds = new Set<string>();
@@ -18,8 +19,7 @@ export async function getStaticPaths(){
 const { entry } = Astro.props; const { Content, headings } = await render(entry);
 const indicator=entry.data.chart ? getIndicatorData(entry.data.chart) : null;
 const graph=entry.data.graph ? getGraphData(entry.data.graph, entry.data.id) : null;
-const categoryLabels: Record<string, string> = { money: '货币', inflation: '通胀', growth: '经济增长', fiscal: '财政', credit: '信用', exchange: '汇率' };
-const categoryLabel = categoryLabels[entry.data.category] ?? entry.data.category;
+const categoryLabel = getCategory(entry.data.category).label;
 const allConcepts = await getCollection('concepts');
 const conceptsByStableId = new Map(allConcepts.map(concept => [concept.data.id, concept]));
 const relatedConcepts = entry.data.related.map(id => conceptsByStableId.get(id)).filter(Boolean);

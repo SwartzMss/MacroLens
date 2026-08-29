@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCategory, type CategoryId } from '../../data/categories';
+import '../../styles/concept-index.css';
+
+const concepts = await getCollection('concepts');
+const stableIds = new Set<string>();
+for (const concept of concepts) {
+  if (stableIds.has(concept.data.id)) throw new Error(`Duplicate stable concept ID: ${concept.data.id}`);
+  stableIds.add(concept.data.id);
+}
+
+const grouped = new Map<CategoryId, typeof concepts>();
+for (const concept of concepts) {
+  const group = grouped.get(concept.data.category) ?? [];
+  group.push(concept);
+  grouped.set(concept.data.category, group);
+}
+
+const categoryGroups = [...grouped.entries()]
+  .map(([id, items]) => ({ id, ...getCategory(id), items: items.sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id)) }))
+  .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+---
+<BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
+  <header class="index-head"><div class="shell"><div class="eyebrow">Concept atlas</div><h1>从哪里开始理解宏观经济？</h1><p class="lead">按领域浏览现有概念。每篇内容都把定义、关系和数据放回同一张理解地图。</p><div class="index-summary"><b>{concepts.length}</b> 个概念 · <b>{categoryGroups.length}</b> 个领域</div></div></header>
+  <div class="shell concept-index">
+    {categoryGroups.map(group => <section class="category-section" id={group.id}>
+      <header><div><div class="eyebrow">{group.id}</div><h2>{group.label}</h2><p>{group.description}</p></div><span>{group.items.length} 个概念</span></header>
+      <div class="index-grid">{group.items.map(concept => <a class="index-card" href={`/concepts/${concept.data.id}`}>
+        <div><span class="category-chip">{group.label}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
+        <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">阅读概念 →</b>
+      </a>)}</div>
+    </section>)}
+  </div>
+</BaseLayout>
