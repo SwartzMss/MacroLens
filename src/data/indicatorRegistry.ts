@@ -1,5 +1,6 @@
 import m1 from '../../data/indicators/m1.json';
 import m2 from '../../data/indicators/m2.json';
+import m0 from '../../data/indicators/m0.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
@@ -9,7 +10,7 @@ export interface IndicatorDataset {
   data: Array<{ date: string; value: number }>;
 }
 
-const indicatorData = { m1, m2 } satisfies Record<string, IndicatorDataset>;
+const indicatorData = { m0, m1, m2 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {
   if (!Object.prototype.hasOwnProperty.call(indicatorData, id)) throw new Error(`Unknown indicator dataset: ${id}`);
