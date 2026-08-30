@@ -1,5 +1,5 @@
 {
-  "id": "m2", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速",
+  "id": "m2", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速", "chartTitle": "M2 历史同比增速",
   "definitionEffectiveFrom": "2018-01", "definitionAsOf": "2025-11", "source": "PBOC",
   "calculation": "derived_from_balance",
   "sources": [

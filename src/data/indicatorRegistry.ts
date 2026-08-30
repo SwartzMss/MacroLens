@@ -5,7 +5,7 @@ import pmi from '../../data/indicators/pmi.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
-  unit: string; metric: string; label: string; definitionEffectiveFrom: string; definitionAsOf: string; source: string;
+  unit: string; metric: string; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
   calculation: string; updatedAt: string; comparabilityNote: string;
   sources: Array<{ title: string; url: string; sourceDate: string; coverage: string }>;
   referenceValue?: number; referenceLabel?: string;

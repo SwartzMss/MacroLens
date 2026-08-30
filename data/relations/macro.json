@@ -38,7 +38,7 @@
   {"data":{"source":"cpi","target":"consumer-price-pressure","type":"REFLECTS"}},
   {"data":{"source":"core-cpi","target":"underlying-price-pressure","type":"REFLECTS"}},
   {"data":{"source":"ppi","target":"cpi","type":"CORRELATES"}},
-  {"data":{"source":"cpi","target":"core-cpi","type":"OVERLAPS_WITH"}},
+  {"data":{"source":"core-cpi","target":"cpi","type":"DERIVED_FROM"}},
   {"data":{"source":"pmi","target":"business-activity-conditions","type":"REFLECTS"}},
   {"data":{"source":"pmi","target":"activity","type":"CORRELATES"}},
   {"data":{"source":"real-economy-financing","target":"activity","type":"AFFECTS"}},

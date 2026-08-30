@@ -1,6 +1,6 @@
 {
-  "id":"pmi","country":"CN","frequency":"monthly","unit":"index","metric":"index","label":"制造业 PMI 指数",
-  "definitionEffectiveFrom":"2018-01","definitionAsOf":"2025-10","source":"NBS","calculation":"published","referenceValue":50,"referenceLabel":"荣枯线",
+  "id":"pmi","country":"CN","frequency":"monthly","unit":"index","metric":"index","label":"制造业 PMI 指数","chartTitle":"制造业 PMI 历史走势",
+  "definitionAsOf":"2025-10","source":"NBS","calculation":"published","referenceValue":50,"referenceLabel":"荣枯线",
   "sources":[
     {"title":"国家统计局：2024年12月中国采购经理指数运行情况","url":"https://www.stats.gov.cn/zwfwck/sjfb/202412/t20241231_1958118.html","sourceDate":"2024-12-31","coverage":"2024-01 to 2024-12"},
     {"title":"国家统计局：2025年10月中国采购经理指数运行情况","url":"https://www.stats.gov.cn/sj/zxfb/202510/t20251031_1961740.html","sourceDate":"2025-10-31","coverage":"2024-10 to 2025-10"}
