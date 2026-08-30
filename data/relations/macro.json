@@ -30,6 +30,12 @@
   {"data":{"id":"real-economy-financing","label":"实体经济融资"}},
   {"data":{"id":"activity","label":"消费与投资"}},
   {"data":{"id":"macro","label":"增长与通胀"}},
+  {"data":{"id":"government","label":"政府"}},
+  {"data":{"id":"fiscal-policy","label":"财政政策"}},
+  {"data":{"id":"fiscal-revenue","label":"全国一般公共预算收入","kind":"indicator"}},
+  {"data":{"id":"fiscal-expenditure","label":"全国一般公共预算支出","kind":"indicator"}},
+  {"data":{"id":"fiscal-deficit","label":"财政赤字"}},
+  {"data":{"id":"government-debt","label":"政府债务"}},
   {"data":{"source":"central-bank","target":"monetary-policy","type":"IMPLEMENTS"}},
   {"data":{"source":"monetary-policy","target":"policy-rate","type":"USES"}},
   {"data":{"source":"monetary-policy","target":"rrr","type":"USES"}},
@@ -64,5 +70,12 @@
   {"data":{"source":"investment-activity","target":"economic-activity","type":"COMPONENT_OF"}},
   {"data":{"source":"economic-activity","target":"macro","type":"AFFECTS"}},
   {"data":{"source":"real-economy-financing","target":"activity","type":"AFFECTS"}},
-  {"data":{"source":"activity","target":"macro","type":"AFFECTS"}}
+  {"data":{"source":"activity","target":"macro","type":"AFFECTS"}},
+  {"data":{"source":"government","target":"fiscal-policy","type":"IMPLEMENTS"}},
+  {"data":{"source":"fiscal-policy","target":"economic-activity","type":"AFFECTS"}},
+  {"data":{"source":"fiscal-policy","target":"financing-conditions","type":"AFFECTS"}},
+  {"data":{"source":"fiscal-deficit","target":"fiscal-revenue","type":"DERIVED_FROM"}},
+  {"data":{"source":"fiscal-deficit","target":"fiscal-expenditure","type":"DERIVED_FROM"}},
+  {"data":{"source":"fiscal-deficit","target":"government-debt","type":"AFFECTS"}},
+  {"data":{"source":"government-debt","target":"financing-conditions","type":"AFFECTS"}}
 ]
