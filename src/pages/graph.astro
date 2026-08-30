@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ConceptGraph from '../components/ConceptGraph.astro';
+import { getGraphData } from '../data/graphRegistry';
+const graph = getGraphData('macro');
+const conceptIds = (await getCollection('concepts')).map(concept => concept.data.id);
+---
+<BaseLayout title="宏观关系图｜MacroLens" description="探索 MacroLens 当前收录的宏观概念、指标与传导关系。">
+  <header class="graph-page-head"><div class="shell"><div class="eyebrow">Relationship explorer</div><h1>宏观关系图</h1><p>完整图谱用于探索；概念页保留更聚焦的局部关系。搜索、缩放或选择节点，查看它在系统中的位置。</p></div></header>
+  <div class="shell graph-page"><ConceptGraph graph={graph} title="完整宏观关系网络" mode="full" conceptIds={conceptIds} /></div>
+</BaseLayout>
+<style>
+  .graph-page-head{padding:52px 0 24px}.graph-page-head h1{font:800 clamp(40px,6vw,68px)/1.08 var(--serif);margin:10px 0}.graph-page-head p{max-width:760px;color:var(--muted)}.graph-page{padding-bottom:64px}
+</style>

@@ -4,6 +4,18 @@ interface GraphElement { data: { id?: string; source?: string; target?: string; 
 
 const graphs = { macro } satisfies Record<string, GraphElement[]>;
 
+export function getGraphOverview(graphId: string, stableIds: readonly string[]): GraphElement[] {
+  if (!Object.prototype.hasOwnProperty.call(graphs, graphId)) throw new Error(`Unknown graph dataset: ${graphId}`);
+  const graph = graphs[graphId as keyof typeof graphs] as GraphElement[];
+  const available = new Set(graph.filter(item => item.data.id).map(item => item.data.id as string));
+  const requested = new Set(stableIds);
+  const missing = stableIds.filter(id => !available.has(id));
+  if (missing.length) throw new Error(`Overview nodes missing from graph "${graphId}": ${missing.join(', ')}`);
+  return graph.filter(item => item.data.id
+    ? requested.has(item.data.id)
+    : requested.has(item.data.source!) && requested.has(item.data.target!));
+}
+
 export function getGraphData(graphId: string, conceptId?: string, hops = 2): GraphElement[] {
   if (!Object.prototype.hasOwnProperty.call(graphs, graphId)) throw new Error(`Unknown graph dataset: ${graphId}`);
   const graph = graphs[graphId as keyof typeof graphs] as GraphElement[];
