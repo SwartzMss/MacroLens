@@ -38,7 +38,7 @@ PUBLIC_SITE_URL=https://<实际的 Pages 域名或自定义域名>
 NODE_VERSION=20
 ```
 
-值必须是站点真实的 `http`/`https` origin，不带路径。它用于 sitemap、canonical 和 Open Graph URL。配置修改不需要改源码；若未显式设置，`main` 的 Cloudflare Pages 构建可回退到平台提供的 `CF_PAGES_URL`。Preview 构建不应冒充 production canonical。
+值必须是站点真实、稳定的 `http`/`https` origin，不带路径。它用于 sitemap、canonical 和 Open Graph URL，配置修改不需要改源码。Cloudflare Pages 的 `main` 构建缺少该变量时会直接失败；不会把当前 deployment 的 `CF_PAGES_URL` 静默用作 production canonical。Preview 构建不应冒充 production canonical。
 
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 `/MacroLens` base。首页、`/concepts`、stable-ID 详情页、`/search`、Pagefind 资源和图表资源均使用根路径。
 
