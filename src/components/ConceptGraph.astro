@@ -47,7 +47,13 @@ const nodes = graph.filter(item => item.data.id);
       {selector:'edge.selected',style:{width:4,'line-color':'#d98e26','target-arrow-color':'#d98e26',opacity:1}}
     ]});
     if (focusId) cy.getElementById(focusId).addClass('focus');
-    const describeEdge = (edge: cytoscape.EdgeSingular) => { if (status) status.textContent = `${edge.source().data('label')} — ${edge.data('type')} → ${edge.target().data('label')}`; };
+    const defaultStatus = '悬停或选择一条关系，可查看准确的 relation type。';
+    const symmetricTypes = new Set(['CORRELATES', 'OVERLAPS_WITH']);
+    const describeEdge = (edge: cytoscape.EdgeSingular) => {
+      const type = String(edge.data('type'));
+      const connector = symmetricTypes.has(type) ? '↔' : '→';
+      if (status) status.textContent = `${edge.source().data('label')} — ${type} ${connector} ${edge.target().data('label')}`;
+    };
     const clearSelection = () => cy.elements().removeClass('selected dimmed');
     cy.on('mouseover tap', 'edge', event => describeEdge(event.target));
     cy.on('tap', 'edge', event => { clearSelection(); event.target.addClass('selected'); });
@@ -67,6 +73,12 @@ const nodes = graph.filter(item => item.data.id);
     const searchInput = card?.querySelector<HTMLInputElement>('[data-graph-search]');
     searchInput?.addEventListener('input', () => {
       const query = searchInput.value.trim().toLocaleLowerCase();
+      if (!query) {
+        clearSelection();
+        fit();
+        if (status) status.textContent = defaultStatus;
+        return;
+      }
       const node = cy.nodes().filter(item => item.id().toLocaleLowerCase() === query || String(item.data('label')).toLocaleLowerCase().includes(query)).first();
       if (!node.length) { if (status) status.textContent = `未找到节点：${searchInput.value}`; return; }
       clearSelection(); cy.elements().not(node.closedNeighborhood()).addClass('dimmed'); node.closedNeighborhood().addClass('selected');
