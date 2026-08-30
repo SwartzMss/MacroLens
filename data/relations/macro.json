@@ -17,6 +17,7 @@
   {"data":{"id":"consumer-price-pressure","label":"居民消费价格压力"}},
   {"data":{"id":"underlying-price-pressure","label":"潜在消费价格压力"}},
   {"data":{"id":"business-activity-conditions","label":"企业经营活动状况"}},
+  {"data":{"id":"economic-activity","label":"经济活动"}},
   {"data":{"id":"real-economy-financing","label":"实体经济融资"}},
   {"data":{"id":"activity","label":"消费与投资"}},
   {"data":{"id":"macro","label":"增长与通胀"}},
@@ -40,7 +41,8 @@
   {"data":{"source":"ppi","target":"cpi","type":"CORRELATES"}},
   {"data":{"source":"core-cpi","target":"cpi","type":"DERIVED_FROM"}},
   {"data":{"source":"pmi","target":"business-activity-conditions","type":"REFLECTS"}},
-  {"data":{"source":"pmi","target":"activity","type":"CORRELATES"}},
+  {"data":{"source":"business-activity-conditions","target":"economic-activity","type":"CORRELATES"}},
+  {"data":{"source":"economic-activity","target":"macro","type":"AFFECTS"}},
   {"data":{"source":"real-economy-financing","target":"activity","type":"AFFECTS"}},
   {"data":{"source":"activity","target":"macro","type":"AFFECTS"}}
 ]
