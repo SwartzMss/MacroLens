@@ -1,0 +1,24 @@
+{
+  "id": "retail-sales",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "社会消费品零售总额名义同比增速",
+  "chartTitle": "社会消费品零售总额名义同比走势",
+  "definitionAsOf": "2025-10",
+  "source": "NBS",
+  "calculation": "published",
+  "updatedAt": "2025-11-14",
+  "comparabilityNote": "本序列是未扣除价格因素的名义同比。1—2月为合并发布值，不是2月单月值；2025年增速按第五次全国经济普查修订后的可比口径计算。",
+  "sources": [
+    {"title":"国家数据：社会消费品零售总额同比增长（A070103）","url":"https://data.stats.gov.cn/easyquery.htm?cn=A01&zb=A070103&sj=202510","sourceDate":"2025-11-14","coverage":"2024-03 to 2024-12; 2025-03 to 2025-10"},
+    {"title":"国家数据：社会消费品零售总额累计增长（A070104）","url":"https://data.stats.gov.cn/easyquery.htm?cn=A01&zb=A070104&sj=202502","sourceDate":"2025-03-17","coverage":"2024-01–02; 2025-01–02"},
+    {"title":"国家统计局：2024年12月份社会消费品零售总额增长3.7%","url":"https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202501/t20250117_1958327.html","sourceDate":"2025-01-17","coverage":"2024-12"},
+    {"title":"国家统计局：2025年10月份社会消费品零售总额增长2.9%","url":"https://www.stats.gov.cn/sj/zxfbhjd/202511/t20251114_1961852.html","sourceDate":"2025-11-14","coverage":"2025-10"}
+  ],
+  "data": [
+    {"date":"2024-01–02","value":5.5},{"date":"2024-03","value":3.1},{"date":"2024-04","value":2.3},{"date":"2024-05","value":3.7},{"date":"2024-06","value":2.0},{"date":"2024-07","value":2.7},{"date":"2024-08","value":2.1},{"date":"2024-09","value":3.2},{"date":"2024-10","value":4.8},{"date":"2024-11","value":3.0},{"date":"2024-12","value":3.7},
+    {"date":"2025-01–02","value":4.0},{"date":"2025-03","value":5.9},{"date":"2025-04","value":5.1},{"date":"2025-05","value":6.4},{"date":"2025-06","value":4.8},{"date":"2025-07","value":3.7},{"date":"2025-08","value":3.4},{"date":"2025-09","value":3.0},{"date":"2025-10","value":2.9}
+  ]
+}

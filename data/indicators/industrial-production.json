@@ -1,0 +1,24 @@
+{
+  "id": "industrial-production",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "规模以上工业增加值实际同比增速",
+  "chartTitle": "规模以上工业增加值同比走势",
+  "definitionAsOf": "2025-10",
+  "source": "NBS",
+  "calculation": "published",
+  "updatedAt": "2025-11-14",
+  "comparabilityNote": "增速为扣除价格因素的实际同比。国家统计局将1—2月合并发布，图中明确保留合并期，不虚构1月或2月单月同比；规上企业范围变化时按可比口径计算。",
+  "sources": [
+    {"title":"国家数据：规模以上工业增加值同比增长（A020101）","url":"https://data.stats.gov.cn/easyquery.htm?cn=A01&zb=A020101&sj=202510","sourceDate":"2025-11-14","coverage":"2024-03 to 2024-12; 2025-03 to 2025-10"},
+    {"title":"国家数据：规模以上工业增加值累计增长（A020102）","url":"https://data.stats.gov.cn/easyquery.htm?cn=A01&zb=A020102&sj=202502","sourceDate":"2025-03-17","coverage":"2024-01–02; 2025-01–02"},
+    {"title":"国家统计局：2024年12月份规模以上工业增加值增长6.2%","url":"https://www.stats.gov.cn/sj/zxfb/202501/t20250117_1958331.html","sourceDate":"2025-01-17","coverage":"2024-12"},
+    {"title":"国家统计局：2025年10月份规模以上工业增加值增长4.9%","url":"https://www.stats.gov.cn/sj/zxfbhjd/202511/t20251114_1961856.html","sourceDate":"2025-11-14","coverage":"2025-10"}
+  ],
+  "data": [
+    {"date":"2024-01–02","value":7.0},{"date":"2024-03","value":4.5},{"date":"2024-04","value":6.7},{"date":"2024-05","value":5.6},{"date":"2024-06","value":5.3},{"date":"2024-07","value":5.1},{"date":"2024-08","value":4.5},{"date":"2024-09","value":5.4},{"date":"2024-10","value":5.3},{"date":"2024-11","value":5.4},{"date":"2024-12","value":6.2},
+    {"date":"2025-01–02","value":5.9},{"date":"2025-03","value":7.7},{"date":"2025-04","value":6.1},{"date":"2025-05","value":5.8},{"date":"2025-06","value":6.8},{"date":"2025-07","value":5.7},{"date":"2025-08","value":5.2},{"date":"2025-09","value":6.5},{"date":"2025-10","value":4.9}
+  ]
+}
