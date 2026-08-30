@@ -1,0 +1,18 @@
+---
+import { isSymmetricRelation, type Relation, type RelationNode, type RelationType } from '../data/graphRegistry';
+type ConceptLink = { data: { id: string; name: string } };
+type Path = { title: string; description: string; relations: Relation[] };
+const { paths, nodes, concepts = [] } = Astro.props as { paths: Path[]; nodes: RelationNode[]; concepts?: ConceptLink[] };
+const nodesById = new Map(nodes.map(node => [node.id, node]));
+const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
+const labels: Record<RelationType,string> = { CAUSES:'导致',AFFECTS:'影响',REFLECTS:'反映',CORRELATES:'通常相关',COMPONENT_OF:'构成',IMPLEMENTS:'实施',USES:'使用',OVERLAPS_WITH:'范围重叠',MEASURES:'衡量',DERIVED_FROM:'派生自' };
+const nodeLabel = (id: string) => conceptsById.get(id)?.data.name ?? nodesById.get(id)?.label ?? id;
+---
+<div class="transmission-paths">{paths.map(path => <section class="transmission-path"><header><h3>{path.title}</h3><p>{path.description}</p></header><ol>{path.relations.map(relation => <li>
+  {conceptsById.has(relation.source) ? <a href={`/concepts/${relation.source}`}>{nodeLabel(relation.source)}</a> : <span>{nodeLabel(relation.source)}</span>}
+  <b class:list={[isSymmetricRelation(relation.type) && 'is-symmetric']}><small>{labels[relation.type]}</small>{isSymmetricRelation(relation.type) ? '↔' : '→'}</b>
+  {conceptsById.has(relation.target) ? <a href={`/concepts/${relation.target}`}>{nodeLabel(relation.target)}</a> : <span>{nodeLabel(relation.target)}</span>}
+</li>)}</ol></section>)}</div>
+<style>
+.transmission-paths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.transmission-path{padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--card)}.transmission-path header{min-height:112px}.transmission-path h3{margin:0;font:700 22px var(--serif)}.transmission-path p{margin:7px 0 18px;color:var(--muted);font-size:13px}.transmission-path ol{display:grid;gap:8px;margin:0;padding:0;list-style:none}.transmission-path li{display:grid;grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr);align-items:center;gap:6px;padding:9px 0;border-top:1px solid var(--line);font-size:12px}.transmission-path li>a{color:var(--green);font-weight:800}.transmission-path li>a:hover{text-decoration:underline}.transmission-path li>b{display:flex;align-items:center;justify-content:center;gap:4px;color:var(--green);font-size:14px}.transmission-path li>b.is-symmetric{color:var(--amber)}.transmission-path li small{font-size:9px;font-weight:600}.transmission-path li>span:last-child,.transmission-path li>a:last-child{text-align:right}@media(max-width:900px){.transmission-paths{grid-template-columns:1fr}.transmission-path header{min-height:0}.transmission-path li{grid-template-columns:minmax(0,1fr) 70px minmax(0,1fr);font-size:13px}}
+</style>
