@@ -10,7 +10,7 @@ definition:
   effectiveFrom: 2019-08
   asOf: 2025-08
 updatedAt: 2026-08-29
-related: [credit, monetary-policy]
+related: [policy-rate, monetary-policy, credit]
 graph: macro
 order: 6
 ---
