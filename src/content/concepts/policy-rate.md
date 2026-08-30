@@ -5,7 +5,7 @@ subtitle: 央行传递利率调控信号的基准，不是 LPR 或每笔贷款�
 country: CN
 category: policy
 source: 中国人民银行货币政策执行报告
-definition: { source: 中国人民银行, effectiveFrom: 2024-07, asOf: 2025-Q1 }
+definition: { source: 中国人民银行, asOf: 2025-Q1 }
 updatedAt: 2026-08-30
 related: [monetary-policy, lpr, omo, credit]
 graph: macro
@@ -50,4 +50,3 @@ order: 2
 
 - [中国人民银行：《2024年第二季度中国货币政策执行报告》专栏“进一步健全市场化的利率调控机制”](https://www.pbc.gov.cn/zhengcehuobisi/125207/125227/125957/5347949/2025100917195573922/2025081217013923839.pdf)
 - [中国人民银行：《2025年第一季度中国货币政策执行报告》](https://www.pbc.gov.cn/zhengcehuobisi/125207/125227/125957/f5c4690f2cbd40918bf24c2d39ac58af/2025091218344076234/2025081517321679368.pdf)
-
