@@ -1,0 +1,21 @@
+{
+  "id": "gdp",
+  "country": "CN",
+  "frequency": "quarterly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "实际 GDP 同比增速",
+  "chartTitle": "中国实际 GDP 季度同比增速",
+  "definitionAsOf": "2025-Q3",
+  "source": "NBS",
+  "calculation": "published",
+  "updatedAt": "2025-10-21",
+  "comparabilityNote": "季度同比增速由国家统计局按不变价核算；它不是现价 GDP 总量，也不是经季节调整的季度环比。初步核算结果可能修订。",
+  "sources": [
+    {"title":"国家统计局：2025年三季度国内生产总值初步核算结果","url":"https://www.stats.gov.cn/sj/zxfb/202510/t20251021_1961646.html","sourceDate":"2025-10-21","coverage":"2024-Q1 to 2025-Q3"}
+  ],
+  "data": [
+    {"date":"2024-Q1","value":5.3},{"date":"2024-Q2","value":4.7},{"date":"2024-Q3","value":4.6},{"date":"2024-Q4","value":5.4},
+    {"date":"2025-Q1","value":5.4},{"date":"2025-Q2","value":5.2},{"date":"2025-Q3","value":4.8}
+  ]
+}
