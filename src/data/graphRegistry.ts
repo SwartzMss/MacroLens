@@ -1,43 +1,64 @@
 import macro from '../../data/relations/macro.json';
 
-interface GraphElement { data: { id?: string; source?: string; target?: string; [key: string]: unknown } }
+export const relationTypes = [
+  'CAUSES', 'AFFECTS', 'REFLECTS', 'CORRELATES', 'COMPONENT_OF',
+  'IMPLEMENTS', 'USES', 'OVERLAPS_WITH', 'MEASURES', 'DERIVED_FROM'
+] as const;
 
-const graphs = { macro } satisfies Record<string, GraphElement[]>;
+export type RelationType = typeof relationTypes[number];
+export type RelationNode = { id: string; label: string; kind?: string };
+export type Relation = { source: string; target: string; type: RelationType };
+export type ConceptRelation = { relation: Relation; other: RelationNode; direction: 'incoming' | 'outgoing' | 'symmetric' };
 
-export function getGraphOverview(graphId: string, stableIds: readonly string[]): GraphElement[] {
-  if (!Object.prototype.hasOwnProperty.call(graphs, graphId)) throw new Error(`Unknown graph dataset: ${graphId}`);
-  const graph = graphs[graphId as keyof typeof graphs] as GraphElement[];
-  const available = new Set(graph.filter(item => item.data.id).map(item => item.data.id as string));
-  const requested = new Set(stableIds);
-  const missing = stableIds.filter(id => !available.has(id));
-  if (missing.length) throw new Error(`Overview nodes missing from graph "${graphId}": ${missing.join(', ')}`);
-  return graph.filter(item => item.data.id
-    ? requested.has(item.data.id)
-    : requested.has(item.data.source!) && requested.has(item.data.target!));
+const symmetricTypes = new Set<RelationType>(['CORRELATES', 'OVERLAPS_WITH']);
+
+function parseGraph(elements: typeof macro) {
+  const nodes = elements.filter(item => 'id' in item.data).map(item => item.data as RelationNode);
+  const relations = elements.filter(item => 'source' in item.data).map(item => item.data as Relation);
+  return { nodes, relations };
 }
 
-export function getGraphData(graphId: string, conceptId?: string, hops = 2): GraphElement[] {
-  if (!Object.prototype.hasOwnProperty.call(graphs, graphId)) throw new Error(`Unknown graph dataset: ${graphId}`);
-  const graph = graphs[graphId as keyof typeof graphs] as GraphElement[];
-  if (!conceptId) return graph;
+const graphs = { macro: parseGraph(macro) };
 
-  const nodeIds = new Set(graph.filter(item => item.data.id).map(item => item.data.id as string));
-  if (!nodeIds.has(conceptId)) throw new Error(`Concept "${conceptId}" is missing from graph "${graphId}"`);
+export function getRelationData(graphId: string) {
+  if (!Object.prototype.hasOwnProperty.call(graphs, graphId)) throw new Error(`Unknown relationship dataset: ${graphId}`);
+  return graphs[graphId as keyof typeof graphs];
+}
 
-  const included = new Set([conceptId]);
-  let frontier = new Set([conceptId]);
-  for (let depth = 0; depth < hops; depth++) {
-    const next = new Set<string>();
-    for (const item of graph) {
-      const { source, target } = item.data;
-      if (!source || !target) continue;
-      if (frontier.has(source) && !included.has(target)) next.add(target);
-      if (frontier.has(target) && !included.has(source)) next.add(source);
-    }
-    if (next.size === 0) break;
-    for (const id of next) included.add(id);
-    frontier = next;
-  }
+export function isSymmetricRelation(type: RelationType) { return symmetricTypes.has(type); }
 
-  return graph.filter(item => item.data.id ? included.has(item.data.id) : included.has(item.data.source!) && included.has(item.data.target!));
+export function getConceptRelations(graphId: string, conceptId: string): ConceptRelation[] {
+  const { nodes, relations } = getRelationData(graphId);
+  const nodesById = new Map(nodes.map(node => [node.id, node]));
+  if (!nodesById.has(conceptId)) throw new Error(`Concept "${conceptId}" is missing from relationship dataset "${graphId}"`);
+  return relations.flatMap(relation => {
+    if (relation.source !== conceptId && relation.target !== conceptId) return [];
+    const otherId = relation.source === conceptId ? relation.target : relation.source;
+    const other = nodesById.get(otherId);
+    if (!other) throw new Error(`Relation references missing node "${otherId}"`);
+    const direction = isSymmetricRelation(relation.type) ? 'symmetric' : relation.source === conceptId ? 'outgoing' : 'incoming';
+    return [{ relation, other, direction }];
+  });
+}
+
+export function getRelatedNodeIds(graphId: string, conceptId: string) {
+  return getConceptRelations(graphId, conceptId).map(item => item.other.id);
+}
+
+export function getIncomingRelations(graphId: string, conceptId: string) {
+  return getConceptRelations(graphId, conceptId).filter(item => item.direction === 'incoming');
+}
+
+export function getOutgoingRelations(graphId: string, conceptId: string) {
+  return getConceptRelations(graphId, conceptId).filter(item => item.direction === 'outgoing');
+}
+
+export function getSymmetricRelations(graphId: string, conceptId: string) {
+  return getConceptRelations(graphId, conceptId).filter(item => item.direction === 'symmetric');
+}
+
+export function requireRelation(graphId: string, source: string, target: string, type: RelationType): Relation {
+  const relation = getRelationData(graphId).relations.find(item => item.source === source && item.target === target && item.type === type);
+  if (!relation) throw new Error(`Missing canonical relation: ${source} --${type}--> ${target}`);
+  return relation;
 }

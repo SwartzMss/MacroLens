@@ -2,10 +2,10 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import IndicatorChart from '../../components/IndicatorChart.astro';
-import ConceptGraph from '../../components/ConceptGraph.astro';
+import RelationshipCards from '../../components/RelationshipCards.astro';
 import RelatedConcepts from '../../components/RelatedConcepts.astro';
 import { getIndicatorData } from '../../data/indicatorRegistry';
-import { getGraphData } from '../../data/graphRegistry';
+import { getConceptRelations } from '../../data/graphRegistry';
 import { getCategory } from '../../data/categories';
 export async function getStaticPaths(){
   const concepts = await getCollection('concepts');
@@ -18,10 +18,10 @@ export async function getStaticPaths(){
 }
 const { entry } = Astro.props; const { Content, headings } = await render(entry);
 const indicator=entry.data.chart ? getIndicatorData(entry.data.chart) : null;
-const graph=entry.data.graph ? getGraphData(entry.data.graph, entry.data.id) : null;
+const relations=entry.data.graph ? getConceptRelations(entry.data.graph, entry.data.id) : [];
 const categoryLabel = getCategory(entry.data.category).label;
 const allConcepts = await getCollection('concepts');
 const conceptsByStableId = new Map(allConcepts.map(concept => [concept.data.id, concept]));
 const relatedConcepts = entry.data.related.map(id => conceptsByStableId.get(id)).filter(Boolean);
 ---
-<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / {categoryLabel} / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span>{entry.data.definition?.effectiveFrom && <span>定义生效：{entry.data.definition.effectiveFrom}</span>}{entry.data.definition?.asOf && <span>定义确认至：{entry.data.definition.asOf}</span>}<span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><Content />{indicator && <IndicatorChart indicator={indicator} />}{graph && <ConceptGraph graph={graph} title={`${entry.data.name} 的局部关系`} mode="local" focusId={entry.data.id} conceptIds={[...conceptsByStableId.keys()]} exploreHref="/graph" />}<RelatedConcepts concepts={relatedConcepts} /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>
+<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / {categoryLabel} / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span>{entry.data.definition?.effectiveFrom && <span>定义生效：{entry.data.definition.effectiveFrom}</span>}{entry.data.definition?.asOf && <span>定义确认至：{entry.data.definition.asOf}</span>}<span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><Content />{indicator && <IndicatorChart indicator={indicator} />}<RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} /><RelatedConcepts concepts={relatedConcepts} /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>

@@ -1,0 +1,41 @@
+---
+import type { ConceptRelation, RelationType } from '../data/graphRegistry';
+type ConceptLink = { data: { id: string; name: string } };
+const { conceptId, conceptName, relations, concepts = [] } = Astro.props as { conceptId: string; conceptName: string; relations: ConceptRelation[]; concepts?: ConceptLink[] };
+const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
+const labels: Record<RelationType, string> = { CAUSES:'导致',AFFECTS:'影响',REFLECTS:'反映',CORRELATES:'通常相关',COMPONENT_OF:'构成',IMPLEMENTS:'实施',USES:'使用',OVERLAPS_WITH:'范围重叠',MEASURES:'衡量',DERIVED_FROM:'派生自' };
+function groupFor(item: ConceptRelation) {
+  if (item.direction === 'symmetric') return '与什么相互关联';
+  const { type } = item.relation;
+  if (item.direction === 'incoming') {
+    if (type === 'AFFECTS' || type === 'CAUSES') return '它受什么影响';
+    if (type === 'COMPONENT_OF') return '它由什么构成';
+    if (type === 'DERIVED_FROM') return '什么由它派生';
+    return '哪些关系指向它';
+  }
+  if (type === 'AFFECTS' || type === 'CAUSES') return '它影响什么';
+  if (type === 'REFLECTS' || type === 'MEASURES') return '它反映 / 衡量什么';
+  if (type === 'COMPONENT_OF') return '它构成什么';
+  if (type === 'DERIVED_FROM') return '它派生自什么';
+  return '它如何参与传导';
+}
+const grouped = new Map<string, ConceptRelation[]>();
+for (const relation of relations) {
+  const heading = groupFor(relation);
+  grouped.set(heading, [...(grouped.get(heading) ?? []), relation]);
+}
+const groups = [...grouped];
+---
+{relations.length > 0 && <section class="relationship-block" aria-labelledby={`${conceptId}-relationships`}><div class="eyebrow">Relationship context</div><h2 id={`${conceptId}-relationships`}>它与其他概念如何关联</h2><div class="relationship-groups">{groups.map(([heading, items]) => <section class="relationship-group"><h3>{heading}</h3><div class="relationship-list">{items.map(item => {
+  const linked = conceptsById.get(item.other.id);
+  const currentIsSource = item.relation.source === conceptId;
+  const otherNode = linked ? <a href={`/concepts/${linked.data.id}`}>{linked.data.name}<b aria-hidden="true">→</b></a> : <span class="relationship-abstract">{item.other.label}<small>图谱概念</small></span>;
+  return <div class:list={['relationship-card',item.direction === 'symmetric' && 'is-symmetric']}>
+    {currentIsSource ? <span class="relationship-current">{conceptName}</span> : otherNode}
+    <span class="relationship-kind"><small>{labels[item.relation.type]}</small>{item.direction === 'symmetric' ? '↔' : '→'}</span>
+    {currentIsSource ? otherNode : <span class="relationship-current">{conceptName}</span>}
+  </div>;
+})}</div></section>)}</div></section>}
+<style>
+.relationship-block{margin:54px 0}.relationship-block>h2{margin-top:8px}.relationship-groups{display:grid;gap:18px}.relationship-group{border-top:1px solid var(--line);padding-top:16px}.relationship-group h3{margin:0 0 12px;font-size:15px;color:var(--muted)}.relationship-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.relationship-card{display:grid;grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);align-items:center;gap:10px;min-height:82px;padding:14px;border:1px solid var(--line);border-radius:13px;background:var(--card);font-size:14px}.relationship-current{font-weight:700}.relationship-kind{display:flex;flex-direction:column;align-items:center;color:var(--green);font-size:15px;text-align:center}.relationship-kind small{font-size:9px}.relationship-card.is-symmetric .relationship-kind{color:var(--amber)}.relationship-card a,.relationship-abstract{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:700}.relationship-card a{color:var(--green)}.relationship-card a:hover{text-decoration:underline}.relationship-abstract{flex-direction:column;align-items:flex-start}.relationship-abstract small{color:var(--muted);font-size:10px;font-weight:400}.relationship-card a b{font-size:12px}@media(max-width:760px){.relationship-list{grid-template-columns:1fr}.relationship-card{padding:12px}.relationship-current,.relationship-card a,.relationship-abstract{overflow-wrap:anywhere}}
+</style>
