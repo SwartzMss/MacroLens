@@ -52,6 +52,14 @@
   {"data":{"id":"effective-exchange-rate","label":"有效汇率（NEER / REER）"}},
   {"data":{"id":"cross-border-financial-transactions","label":"跨境金融交易"}},
   {"data":{"id":"multilateral-currency-value","label":"货币多边价值"}},
+  {"data":{"id":"output-gap","label":"产出缺口","kind":"indicator"}},
+  {"data":{"id":"inventory-cycle","label":"库存周期","kind":"indicator"}},
+  {"data":{"id":"capacity-utilization","label":"工业产能利用率","kind":"indicator"}},
+  {"data":{"id":"industrial-profits","label":"规模以上工业企业利润","kind":"indicator"}},
+  {"data":{"id":"leading-indicators","label":"领先指标","kind":"indicator"}},
+  {"data":{"id":"economic-slack","label":"经济闲置程度"}},
+  {"data":{"id":"corporate-operating-conditions","label":"企业经营状况"}},
+  {"data":{"id":"future-activity-signals","label":"未来经济活动信号"}},
   {"data":{"id":"employment","label":"就业"}},
   {"data":{"id":"unemployment-rate","label":"城镇调查失业率"}},
   {"data":{"id":"youth-unemployment","label":"青年失业率 / 分年龄组失业率"}},
@@ -139,5 +147,10 @@
   {"data":{"source":"yield-curve","target":"rate-expectations-and-term-premium","type":"REFLECTS"}},
   {"data":{"source":"real-interest-rate","target":"economic-activity","type":"AFFECTS"}},
   {"data":{"source":"credit-spread","target":"credit-risk-and-risk-appetite","type":"REFLECTS"}},
-  {"data":{"source":"credit-spread","target":"financing-conditions","type":"AFFECTS"}}
+  {"data":{"source":"credit-spread","target":"financing-conditions","type":"AFFECTS"}},
+  {"data":{"source":"output-gap","target":"economic-slack","type":"REFLECTS"}},
+  {"data":{"source":"capacity-utilization","target":"industrial-activity","type":"REFLECTS"}},
+  {"data":{"source":"industrial-profits","target":"corporate-operating-conditions","type":"REFLECTS"}},
+  {"data":{"source":"inventory-cycle","target":"industrial-activity","type":"AFFECTS"}},
+  {"data":{"source":"leading-indicators","target":"future-activity-signals","type":"REFLECTS"}}
 ]
