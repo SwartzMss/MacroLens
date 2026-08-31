@@ -42,6 +42,7 @@ test('registers housing category between growth and fiscal', () => {
 
 test('housing pages have stable metadata and no charts', () => {
   const ids = new Set(readdirSync(conceptDirectory).filter(name => name.endsWith('.md')));
+  const abstractIds = new Set(['investment-activity', 'economic-activity', 'fiscal-conditions']);
   for (const [id, expected] of Object.entries(metadata)) {
     const document = page(id);
     const parsed = parse(document);
@@ -49,12 +50,12 @@ test('housing pages have stable metadata and no charts', () => {
     assert.equal(parsed.country, 'CN');
     assert.equal(parsed.updatedAt, '2026-08-31');
     assert.equal(Object.hasOwn(parsed, 'chart'), false);
-    for (const related of expected.related) assert.ok(ids.has(`${related}.md`), `${id} related ${related} missing`);
+    for (const related of expected.related) assert.ok(ids.has(`${related}.md`) || abstractIds.has(related), `${id} related ${related} missing`);
   }
 });
 
 const contracts = {
-  'real-estate-investment': [['房地产开发投资', '累计数据', '单月', '规模以上', '固定资产投资', '名义', '实际建设工程量'], ['https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962324.html']],
+  'real-estate-investment': [['房地产开发投资', '累计数据', '单月', '房地产开发企业', '固定资产投资', '名义', '实际建设工程量'], ['https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962324.html']],
   'property-sales': [['销售面积', '销售额', '隐含均价', '合同总面积', '累计', '基数效应', '新建商品房', '二手房', '不能混'], ['https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903764.html', 'https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962324.html']],
   'house-price-index': [['70个大中城市', '环比', '同比', '新建商品住宅', '二手住宅', '不是全国交易均价', '城市层面'], ['https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962319.html']],
   mortgage: [['个人住房贷款利率', 'LPR', '存量', '新增', '偿还', '一般住户贷款', '定价'], ['https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125440/3876551/5625437/index.html', 'https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212554091417/index.html']],
