@@ -19,6 +19,13 @@
   {"data":{"id":"industrial-production","label":"规模以上工业增加值","kind":"indicator"}},
   {"data":{"id":"retail-sales","label":"社会消费品零售总额","kind":"indicator"}},
   {"data":{"id":"fixed-asset-investment","label":"固定资产投资（不含农户）","kind":"indicator"}},
+  {"data":{"id":"real-estate-investment","label":"房地产开发投资","kind":"indicator"}},
+  {"data":{"id":"property-sales","label":"商品房销售","kind":"indicator"}},
+  {"data":{"id":"house-price-index","label":"房价指数 / 70城住宅价格指数","kind":"indicator"}},
+  {"data":{"id":"mortgage","label":"个人住房贷款 / 按揭","kind":"indicator"}},
+  {"data":{"id":"land-market","label":"土地市场与土地出让收入","kind":"indicator"}},
+  {"data":{"id":"housing-market-prices","label":"住房市场价格"}},
+  {"data":{"id":"fiscal-conditions","label":"财政条件"}},
   {"data":{"id":"producer-price-pressure","label":"工业生产端价格压力"}},
   {"data":{"id":"consumer-price-pressure","label":"居民消费价格压力"}},
   {"data":{"id":"underlying-price-pressure","label":"潜在消费价格压力"}},
@@ -152,5 +159,11 @@
   {"data":{"source":"capacity-utilization","target":"industrial-activity","type":"REFLECTS"}},
   {"data":{"source":"industrial-profits","target":"corporate-operating-conditions","type":"REFLECTS"}},
   {"data":{"source":"inventory-cycle","target":"industrial-activity","type":"AFFECTS"}},
-  {"data":{"source":"leading-indicators","target":"future-activity-signals","type":"REFLECTS"}}
+  {"data":{"source":"leading-indicators","target":"future-activity-signals","type":"REFLECTS"}},
+  {"data":{"source":"mortgage","target":"property-sales","type":"AFFECTS"}},
+  {"data":{"source":"property-sales","target":"real-estate-investment","type":"AFFECTS"}},
+  {"data":{"source":"house-price-index","target":"housing-market-prices","type":"REFLECTS"}},
+  {"data":{"source":"real-estate-investment","target":"investment-activity","type":"COMPONENT_OF"}},
+  {"data":{"source":"land-market","target":"fiscal-conditions","type":"AFFECTS"}},
+  {"data":{"source":"property-sales","target":"economic-activity","type":"AFFECTS"}}
 ]
