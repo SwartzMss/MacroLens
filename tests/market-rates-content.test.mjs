@@ -47,6 +47,7 @@ const approvedMetadata = {
   'government-bond-yield': { id: 'government-bond-yield', name: '国债收益率', subtitle: '由债券价格和现金流共同决定的市场贴现率，不是票面利率或债券价格', country: 'CN', category: 'markets', source: '财政部与中央国债登记结算有限责任公司', definition: { source: '财政部-中国国债收益率曲线编制说明', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['yield-curve', 'real-interest-rate', 'credit-spread', 'government-debt'], graph: 'macro', order: 2 },
   'yield-curve': { id: 'yield-curve', name: '收益率曲线', subtitle: '把可比债券的期限与收益率连接起来，曲线形态不是单一经济预测', country: 'CN', category: 'markets', source: '中央国债登记结算有限责任公司', definition: { source: '中债收益率曲线编制说明', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['government-bond-yield', 'real-interest-rate', 'credit-spread', 'policy-rate'], graph: 'macro', order: 3 },
   'real-interest-rate': { id: 'real-interest-rate', name: '实际利率', subtitle: '剔除通胀后的利率概念，必须说明预期或实现通胀及匹配期限', country: 'CN', category: 'markets', source: '中国人民银行与国际货币基金组织', definition: { source: 'Fisher relation and official monetary-policy usage', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['government-bond-yield', 'yield-curve', 'policy-rate', 'cpi'], graph: 'macro', order: 4 },
+  'credit-spread': { id: 'credit-spread', name: '信用利差', subtitle: '信用债收益率相对可比基准的差额，不只反映违约风险', country: 'CN', category: 'markets', source: '中央国债登记结算有限责任公司', definition: { source: '中债收益率曲线与估值方法', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['government-bond-yield', 'yield-curve', 'real-interest-rate', 'credit'], graph: 'macro', order: 5 },
 };
 
 function assertConcept(id, terms, sourceUrls) {
@@ -100,4 +101,24 @@ test('real rates distinguish ex-ante, ex-post, inflation measure, and horizon', 
     '事前实际利率', '预期通胀', '事后实际利率', '实现通胀', '费雪关系',
     '当前CPI', '近似', '期限匹配', '通胀指标', '年化',
   ], ['https://wzdt.pbc.gov.cn/rmyh/2025-07/20/article_2025072015162368621.html']);
+});
+
+test('all market related IDs resolve to stable concept pages', () => {
+  const conceptIds = new Set(readdirSync(conceptDirectory, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+    .map((entry) => parseFrontmatter(readFileSync(`${conceptDirectory}/${entry.name}`, 'utf8')).id));
+  for (const metadata of Object.values(approvedMetadata)) {
+    for (const relatedId of metadata.related) assert.ok(conceptIds.has(relatedId), `${metadata.id} related ID ${relatedId} must resolve`);
+  }
+});
+
+test('credit spread names a comparable benchmark and multiple drivers', () => {
+  assertConcept('credit-spread', [
+    '基准收益率', '相近剩余期限', '久期', '国债曲线', '政策性金融债',
+    '金融债', '企业债', '信用风险', '流动性', '风险偏好', '技术因素',
+    '不等于违约概率', '基点',
+  ], [
+    'https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/more?locale=cn_ZH',
+    'https://indices.chinabond.com.cn/cbweb-mn/int/int_yield_syl_doc',
+  ]);
 });
