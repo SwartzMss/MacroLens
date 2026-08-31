@@ -86,6 +86,9 @@ test('government bond yield separates coupon, price, issuance, and maturity', ()
     'https://indices.chinabond.com.cn/cbweb-czb-web/czb/bzcxsmDown?locale=',
     'https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/more?locale=cn_ZH',
   ]);
+  const document = readConcept('government-bond-yield');
+  assert.ok(document.includes('票息再投资不是到期收益率的定义条件'));
+  assert.doesNotMatch(document, /按约定再投资/);
 });
 
 test('yield curve interpretation remains conditional and methodology-aware', () => {
@@ -100,7 +103,10 @@ test('real rates distinguish ex-ante, ex-post, inflation measure, and horizon', 
   assertConcept('real-interest-rate', [
     '事前实际利率', '预期通胀', '事后实际利率', '实现通胀', '费雪关系',
     '当前CPI', '近似', '期限匹配', '通胀指标', '年化',
-  ], ['https://wzdt.pbc.gov.cn/rmyh/2025-07/20/article_2025072015162368621.html']);
+  ], [
+    'https://wzdt.pbc.gov.cn/rmyh/2025-07/20/article_2025072015162368621.html',
+    'https://www.imf.org/-/media/files/publications/weo/2023/april/english/ch2.pdf',
+  ]);
 });
 
 test('all market related IDs resolve to stable concept pages', () => {

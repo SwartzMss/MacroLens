@@ -51,3 +51,4 @@ order: 4
 
 - [中国人民银行：金融改革与发展记者会——实际利率与名义利率](https://wzdt.pbc.gov.cn/rmyh/2025-07/20/article_2025072015162368621.html)
 - [中国人民银行：货币政策执行报告](https://www.pbc.gov.cn/zhengcehuobisi/125207/125227/125957/index.html)
+- [IMF《世界经济展望》2023年4月第二章：事前与事后实际利率口径](https://www.imf.org/-/media/files/publications/weo/2023/april/english/ch2.pdf)
