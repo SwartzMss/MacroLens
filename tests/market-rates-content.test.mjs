@@ -45,6 +45,8 @@ function parseFrontmatter(document) {
 const approvedMetadata = {
   'interbank-rate': { id: 'interbank-rate', name: '银行间资金利率（DR007 / R007）', subtitle: '市场成交形成的短期资金价格，不等于央行政策操作利率', country: 'CN', category: 'markets', source: '中国人民银行与全国银行间同业拆借中心', definition: { source: 'CFETS 质押式回购指标口径', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['policy-rate', 'omo', 'lpr', 'credit'], graph: 'macro', order: 1 },
   'government-bond-yield': { id: 'government-bond-yield', name: '国债收益率', subtitle: '由债券价格和现金流共同决定的市场贴现率，不是票面利率或债券价格', country: 'CN', category: 'markets', source: '财政部与中央国债登记结算有限责任公司', definition: { source: '财政部-中国国债收益率曲线编制说明', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['yield-curve', 'real-interest-rate', 'credit-spread', 'government-debt'], graph: 'macro', order: 2 },
+  'yield-curve': { id: 'yield-curve', name: '收益率曲线', subtitle: '把可比债券的期限与收益率连接起来，曲线形态不是单一经济预测', country: 'CN', category: 'markets', source: '中央国债登记结算有限责任公司', definition: { source: '中债收益率曲线编制说明', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['government-bond-yield', 'real-interest-rate', 'credit-spread', 'policy-rate'], graph: 'macro', order: 3 },
+  'real-interest-rate': { id: 'real-interest-rate', name: '实际利率', subtitle: '剔除通胀后的利率概念，必须说明预期或实现通胀及匹配期限', country: 'CN', category: 'markets', source: '中国人民银行与国际货币基金组织', definition: { source: 'Fisher relation and official monetary-policy usage', asOf: '2026-08' }, updatedAt: '2026-08-31', related: ['government-bond-yield', 'yield-curve', 'policy-rate', 'cpi'], graph: 'macro', order: 4 },
 };
 
 function assertConcept(id, terms, sourceUrls) {
@@ -83,4 +85,19 @@ test('government bond yield separates coupon, price, issuance, and maturity', ()
     'https://indices.chinabond.com.cn/cbweb-czb-web/czb/bzcxsmDown?locale=',
     'https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/more?locale=cn_ZH',
   ]);
+});
+
+test('yield curve interpretation remains conditional and methodology-aware', () => {
+  assertConcept('yield-curve', [
+    '期限结构', '到期收益率曲线', '即期收益率曲线', '远期收益率曲线',
+    '陡峭化', '平坦化', '倒挂', '未来短期利率预期', '期限溢价', '流动性',
+    '供求', '不能保证经济衰退', '曲线编制方法',
+  ], ['https://indices.chinabond.com.cn/cbweb-mn/int/int_yield_syl_doc']);
+});
+
+test('real rates distinguish ex-ante, ex-post, inflation measure, and horizon', () => {
+  assertConcept('real-interest-rate', [
+    '事前实际利率', '预期通胀', '事后实际利率', '实现通胀', '费雪关系',
+    '当前CPI', '近似', '期限匹配', '通胀指标', '年化',
+  ], ['https://wzdt.pbc.gov.cn/rmyh/2025-07/20/article_2025072015162368621.html']);
 });
