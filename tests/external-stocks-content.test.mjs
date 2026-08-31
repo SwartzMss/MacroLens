@@ -45,14 +45,23 @@ test('external stock pages use external category, stable order, and no charts', 
 });
 
 const contracts = {
-  'international-investment-position': [['时点', '存量', '国际收支', '交易', '估值变化', '其他数量变化', '对外金融资产', '对外负债'], ['https://www.safe.gov.cn/safe/2026/0327/27298.html', 'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm']],
+  'international-investment-position': [['时点', '存量', '国际收支', '交易', '估值变化', '其他数量变化', '对外金融资产', '对外负债', '债务核销', '债务减免', '资本转移'], ['https://www.safe.gov.cn/safe/2026/0327/27298.html', 'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm']],
   'external-debt': [['全口径外债', '毛额', '债务人', '部门', '短期', '中长期', '原始期限', '剩余期限', '政府债务', '外币债务', '净外部头寸'], ['https://www.safe.gov.cn/safe/2026/0327/27301.html', 'https://data.imf.org/-/media/iData/External-Storage/Documents/73FBCD5B6CDE4D289C60B9B0CAA40622/en/2-bpm6.pdf']],
   'reserve-assets': [['储备资产', '外汇储备', '货币黄金', '特别提款权', '在国际货币基金组织的储备头寸', '更广', '子项'], ['https://www.safe.gov.cn/safe/2025/0206/25745.html', 'https://data.imf.org/-/media/iData/External-Storage/Documents/73FBCD5B6CDE4D289C60B9B0CAA40622/en/2-bpm6.pdf']],
-  'capital-account': [['资本转移', '非生产非金融资产', '金融账户', '国际收支', '通常较小', 'BPM6'], ['https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm', 'https://www.safe.gov.cn/safe/2015/1230/6080.html']],
+  'capital-account': [['资本转移', '非生产非金融资产', '金融账户', '国际收支', '通常较小', 'BPM6', '自然资源', '契约、租约和许可', '营销资产', '专利和版权', '研发成果', '服务项目'], ['https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm', 'https://www.safe.gov.cn/safe/2015/1230/6080.html']],
   'net-foreign-assets': [['对外金融资产减去对外负债', '净国际投资头寸', '净资产', '净负债', '国民财富', '不是直接衡量'], ['https://www.safe.gov.cn/safe/2026/0327/27298.html', 'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm']],
 };
 for (const [id, [terms, urls]] of Object.entries(contracts)) test(`${id} preserves stock-flow accounting semantics`, () => {
   const document = page(id);
   for (const term of terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
   for (const url of urls) assert.ok(document.includes(url), `${id} must cite ${url}`);
+});
+
+test('keeps debt forgiveness, debt write-off, and NIIP definitions distinct', () => {
+  const iip = page('international-investment-position');
+  assert.match(iip, /债务减免[^。]*交易/);
+  assert.match(iip, /债务核销[^。]*其他数量变化/);
+  const debt = page('external-debt');
+  assert.match(debt, /全部对外金融资产减去全部对外负债/);
+  assert.doesNotMatch(debt, /外债是负债毛额，扣除可识别的对外资产后才进入净外部头寸/);
 });
