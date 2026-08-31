@@ -30,4 +30,3 @@ USD/CNH 与 USD/CNY 受共同的美元和人民币因素影响，但资金流动
 
 - [香港金融管理局：人民币业务概览](https://www.hkma.gov.hk/eng/key-functions/international-financial-centre/rmb-business/)
 - [中国外汇交易中心：人民币外汇市场](https://www.chinamoney.com.cn/english/)
-

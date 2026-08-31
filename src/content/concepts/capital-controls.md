@@ -30,4 +30,3 @@ order: 11
 
 - [国际货币基金组织：资本流动管理的机构性观点](https://www.imf.org/en/Topics/Capital-Flows)
 - [国家外汇管理局：国际收支统计申报办法](https://www.safe.gov.cn/safe/2015/1230/6080.html)
-

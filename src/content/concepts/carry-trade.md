@@ -30,4 +30,3 @@ order: 9
 
 - [国际清算银行：Carry trades and exchange rates](https://www.bis.org/publ/work550.htm)
 - [国际货币基金组织：全球金融稳定与资本流动](https://www.imf.org/en/Publications/GFSR)
-
