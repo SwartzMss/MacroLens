@@ -88,6 +88,13 @@
   {"data":{"id":"credit-spread","label":"信用利差"}},
   {"data":{"id":"rate-expectations-and-term-premium","label":"利率预期与期限溢价"}},
   {"data":{"id":"credit-risk-and-risk-appetite","label":"信用风险与风险偏好"}},
+  {"data":{"id":"capital-controls","label":"资本流动管理","kind":"indicator"}},
+  {"data":{"id":"impossible-trinity","label":"不可能三角","kind":"indicator"}},
+  {"data":{"id":"interest-rate-parity","label":"利率平价（CIP / UIP）","kind":"indicator"}},
+  {"data":{"id":"usd-cnh","label":"USD/CNH","kind":"indicator"}},
+  {"data":{"id":"carry-trade","label":"套息交易","kind":"indicator"}},
+  {"data":{"id":"open-economy-policy-tradeoffs","label":"开放经济政策权衡"}},
+  {"data":{"id":"cross-currency-pricing-relations","label":"跨货币定价关系"}},
   {"data":{"source":"central-bank","target":"monetary-policy","type":"IMPLEMENTS"}},
   {"data":{"source":"monetary-policy","target":"policy-rate","type":"USES"}},
   {"data":{"source":"monetary-policy","target":"rrr","type":"USES"}},
@@ -178,5 +185,12 @@
   {"data":{"source":"house-price-index","target":"housing-market-prices","type":"REFLECTS"}},
   {"data":{"source":"real-estate-investment","target":"investment-activity","type":"COMPONENT_OF"}},
   {"data":{"source":"land-market","target":"fiscal-conditions","type":"AFFECTS"}},
-  {"data":{"source":"property-sales","target":"economic-activity","type":"AFFECTS"}}
+  {"data":{"source":"property-sales","target":"economic-activity","type":"AFFECTS"}},
+  {"data":{"source":"capital-controls","target":"cross-border-capital-flows","type":"AFFECTS"}},
+  {"data":{"source":"capital-controls","target":"exchange-rate-formation","type":"AFFECTS"}},
+  {"data":{"source":"impossible-trinity","target":"open-economy-policy-tradeoffs","type":"REFLECTS"}},
+  {"data":{"source":"interest-rate-parity","target":"cross-currency-pricing-relations","type":"REFLECTS"}},
+  {"data":{"source":"usd-cnh","target":"usd-cny","type":"CORRELATES"}},
+  {"data":{"source":"carry-trade","target":"cross-border-capital-flows","type":"AFFECTS"}},
+  {"data":{"source":"carry-trade","target":"exchange-rate","type":"AFFECTS"}}
 ]

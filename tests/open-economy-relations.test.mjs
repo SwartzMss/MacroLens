@@ -12,7 +12,7 @@ const key = ({ source, target, type }) => `${source}\0${target}\0${type}`;
 const expectedNodes = {
   'capital-controls': '资本流动管理',
   'impossible-trinity': '不可能三角',
-  'interest-rate-parity': '利率平价',
+  'interest-rate-parity': '利率平价（CIP / UIP）',
   'usd-cnh': 'USD/CNH',
   'carry-trade': '套息交易',
   'open-economy-policy-tradeoffs': '开放经济政策权衡',

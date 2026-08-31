@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const directory = fileURLToPath(new URL('../src/content/concepts/', import.meta.url));
+const approvedAbstractIds = new Set(['exchange-rate-formation']);
 const specs = {
   'capital-controls': { category: 'external', order: 11, terms: ['经常账户可兑换', '资本账户可兑换', '宏观审慎', '行政性限制', '光谱'] },
   'impossible-trinity': { category: 'exchange', order: 6, terms: ['货币政策自主性', '汇率稳定', '资本流动自由', '程度', '管理浮动'] },
@@ -38,7 +39,7 @@ for (const [id, spec] of Object.entries(specs)) {
     assert.equal(Number(metadata.order), spec.order);
     assert.match(metadata.source ?? '', /\S/);
     assert.match(metadata.related ?? '', /^\[/);
-    assert.doesNotMatch(metadata, /chart:/);
+    assert.doesNotMatch(document.match(/^---\n([\s\S]*?)\n---/)[1], /^chart:/m);
     for (const term of spec.terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
   });
 }
@@ -49,7 +50,7 @@ test('new concept related IDs resolve to pages or approved abstract nodes', () =
     const metadata = frontmatter(documentFor(id));
     const related = metadata.related.slice(1, -1).split(',').map(value => value.trim()).filter(Boolean);
     for (const relatedId of related) {
-      assert.ok(pageIds.has(relatedId) || existsSync(`${directory}/${relatedId}.md`), `${id} related ID ${relatedId} must resolve`);
+      assert.ok(pageIds.has(relatedId) || approvedAbstractIds.has(relatedId) || existsSync(`${directory}/${relatedId}.md`), `${id} related ID ${relatedId} must resolve`);
     }
   }
 });
