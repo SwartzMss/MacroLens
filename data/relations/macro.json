@@ -59,6 +59,13 @@
   {"data":{"id":"wages","label":"工资与劳动报酬"}},
   {"data":{"id":"labor-market-conditions","label":"劳动力市场状况"}},
   {"data":{"id":"labor-supply","label":"劳动力供给"}},
+  {"data":{"id":"interbank-rate","label":"银行间资金利率（DR007 / R007）"}},
+  {"data":{"id":"government-bond-yield","label":"国债收益率"}},
+  {"data":{"id":"yield-curve","label":"收益率曲线"}},
+  {"data":{"id":"real-interest-rate","label":"实际利率"}},
+  {"data":{"id":"credit-spread","label":"信用利差"}},
+  {"data":{"id":"rate-expectations-and-term-premium","label":"利率预期与期限溢价"}},
+  {"data":{"id":"credit-risk-and-risk-appetite","label":"信用风险与风险偏好"}},
   {"data":{"source":"central-bank","target":"monetary-policy","type":"IMPLEMENTS"}},
   {"data":{"source":"monetary-policy","target":"policy-rate","type":"USES"}},
   {"data":{"source":"monetary-policy","target":"rrr","type":"USES"}},
@@ -125,5 +132,12 @@
   {"data":{"source":"labor-force-participation","target":"labor-supply","type":"REFLECTS"}},
   {"data":{"source":"wages","target":"consumer-price-pressure","type":"AFFECTS"}},
   {"data":{"source":"wages","target":"consumption-activity","type":"AFFECTS"}},
-  {"data":{"source":"labor-market-conditions","target":"economic-activity","type":"AFFECTS"}}
+  {"data":{"source":"labor-market-conditions","target":"economic-activity","type":"AFFECTS"}},
+  {"data":{"source":"policy-rate","target":"interbank-rate","type":"AFFECTS"}},
+  {"data":{"source":"interbank-rate","target":"financing-conditions","type":"AFFECTS"}},
+  {"data":{"source":"government-bond-yield","target":"financing-conditions","type":"REFLECTS"}},
+  {"data":{"source":"yield-curve","target":"rate-expectations-and-term-premium","type":"REFLECTS"}},
+  {"data":{"source":"real-interest-rate","target":"economic-activity","type":"AFFECTS"}},
+  {"data":{"source":"credit-spread","target":"credit-risk-and-risk-appetite","type":"REFLECTS"}},
+  {"data":{"source":"credit-spread","target":"financing-conditions","type":"AFFECTS"}}
 ]
