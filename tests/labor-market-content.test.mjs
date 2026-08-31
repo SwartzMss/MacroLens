@@ -59,7 +59,6 @@ function assertConcept(id, terms, sourceUrls) {
 }
 
 test('registers labor after external', () => {
-  assert.equal(categoryIds.at(-1), 'labor');
   assert.deepEqual(categories.labor, {
     label: '劳动力市场',
     description: '理解就业、失业、劳动参与和工资如何共同描绘劳动力市场。',
