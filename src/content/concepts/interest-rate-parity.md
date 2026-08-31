@@ -29,4 +29,4 @@ Uncovered interest parity（UIP）不使用远期合约锁定汇率，而是把�
 ## 来源
 
 - [国际清算银行：Covered interest parity lost](https://www.bis.org/publ/qtrpdf/r_qt1809e.htm)
-- [国际货币基金组织：国际金融统计与汇率关系](https://www.imf.org/external/pubs/ft/fandd/2015/09/basics.htm)
+- [国际货币基金组织：Uncovered Interest Parity](https://www.imf.org/en/publications/wp/issues/2016/12/31/uncovered-interest-parity-19096)

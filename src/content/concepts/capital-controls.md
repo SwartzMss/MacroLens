@@ -29,5 +29,5 @@ order: 11
 ## 来源
 
 - [国际货币基金组织：资本流动管理的机构性观点](https://www.imf.org/en/Topics/Capital-Flows)
-- [国家外汇管理局：国际收支统计申报办法](https://www.safe.gov.cn/safe/2015/1230/6080.html)
+- [国家外汇管理局：《资本项目外汇业务指引（2024年版）》](https://www.safe.gov.cn/safe/2024/0412/24226.html)
 - [中国人民银行：跨境人民币业务](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/)
