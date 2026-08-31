@@ -99,11 +99,23 @@ test('cross-border-capital-flows names the dataset before interpreting a flow', 
 
 test('effective-exchange-rate distinguishes bilateral and multilateral indexes', () => {
   assertConcept('effective-exchange-rate', 5, [
-    'USD/CNY', 'CFETS', 'NEER', 'REER', '多边指数', '贸易权重',
-    '相对价格', '基期', '指数点位', 'BIS', '有效升值',
+    'NEER', 'REER', '多边指数',
+    '指数采用几何加权，并通过随时间变化的制造业贸易权重考虑直接贸易和第三方市场竞争',
+    'BIS 公布的 REER 使用居民消费价格指数（CPI）调整',
+    '不是一条通用算术公式',
+    'USD/CNY 是每美元对应多少人民币的双边价格',
+    'CFETS 人民币汇率指数是中国外汇交易中心按其货币篮子和规则编制的多边指数',
+    'BIS NEER 和 REER 则使用 BIS 的跨经济体统一方法',
+    '指数点位本身没有兑换含义',
+    '从 100 到 102 才可据此计算相对变化',
+    '基期、频率、宽口径或窄口径篮子以及方法版本',
+    'NEER 上升表示名义有效升值，REER 上升表示实际有效升值',
     '不等于竞争力按同一百分比恶化',
+    '不能从 REER 上升机械推出出口或经济活动必然下降',
+    '接入前需要把提供者、宽窄口径、频率、基期和更新方式写入数据注册表',
   ], [
     'https://data.bis.org/topics/EER',
     'https://www.bis.org/statistics/dataportal/exr.htm',
+    'https://www.chinamoney.com.cn/chinese/zxpl/20211231/2276204.html',
   ]);
 });
