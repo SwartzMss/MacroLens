@@ -68,6 +68,11 @@ test('financial-account explains functional categories, balance sides, and signs
   assertConcept('financial-account', 3, [
     '直接投资', '证券投资', '金融衍生工具', '其他投资', '储备资产',
     '资本账户', '净获得金融资产', '净发生负债', '总流量', '估值变化',
+    'BPM6 金融账户差额采用净获得金融资产减去净发生负债',
+    '对外金融资产净增加记为负值、净减少记为正值',
+    '对外负债净增加记为正值、净减少记为负值',
+    '总量指标在合并为净差额前保留资产侧和负债侧信息',
+    '总流入、总流出等标签必须遵循具体数据集的方向约定',
   ], [
     'https://www.safe.gov.cn/safe/2015/1230/6080.html',
     'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm',
@@ -78,9 +83,16 @@ test('cross-border-capital-flows names the dataset before interpreting a flow', 
   assertConcept('cross-border-capital-flows', 4, [
     '分析性总称', '国际收支金融账户', '直接投资', '证券投资',
     '银行结售汇', '银行代客涉外收付款', '总流入', '总流出',
-    '净流量', '居民增加境外资产', '非居民增加境内负债',
+    '净流量', '居民增加境外资产', '非居民增加对本经济体的金融资产',
+    '境内主体对非居民的负债增加',
   ], [
     'https://www.safe.gov.cn/safe/2018/0419/8806.html',
     'https://www.safe.gov.cn/safe/zggjszphb/index.html',
+    'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm',
   ]);
+  assert.doesNotMatch(
+    readConcept('cross-border-capital-flows'),
+    /非居民增加境内负债/,
+    'cross-border-capital-flows must not reverse the debtor perspective',
+  );
 });
