@@ -14,11 +14,14 @@ function readConcept(id) {
 
 function assertConcept(id, order, terms, sourceUrls) {
   const document = readConcept(id);
-  assert.match(document, new RegExp(`^id: ${id}$`, 'm'));
-  assert.match(document, /^category: external$/m);
-  assert.match(document, /^graph: macro$/m);
-  assert.match(document, new RegExp(`^order: ${order}$`, 'm'));
-  assert.doesNotMatch(document, /^chart:/m);
+  const frontmatterMatch = document.match(/^---\n([\s\S]*?)\n---/);
+  assert.ok(frontmatterMatch, `${id} must have leading YAML frontmatter`);
+  const frontmatter = frontmatterMatch[1];
+  assert.match(frontmatter, new RegExp(`^id: ${id}$`, 'm'));
+  assert.match(frontmatter, /^category: external$/m);
+  assert.match(frontmatter, /^graph: macro$/m);
+  assert.match(frontmatter, new RegExp(`^order: ${order}$`, 'm'));
+  assert.doesNotMatch(frontmatter, /^chart:/m);
   for (const term of terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
   for (const url of sourceUrls) assert.ok(document.includes(url), `${id} must cite ${url}`);
 }
@@ -38,6 +41,12 @@ test('balance-of-payments teaches the complete BPM6 accounting structure', () =>
     '居民与非居民', '国籍', '某一期间', '国际投资头寸', '估值变化',
     '经常账户', '资本账户', '金融账户', '净误差与遗漏',
     '净获得金融资产', '净发生负债', '会计恒等',
+    '居民按经济利益中心判断，不等于公民身份或国籍',
+    '国际收支记录某一期间的交易流量',
+    '国际投资头寸（IIP）记录某一时点的对外金融资产和负债存量',
+    '对外金融资产净增加记为负值、净减少记为正值',
+    '对外负债净增加记为正值、净减少记为负值',
+    'SAFE 可能使用“资本与金融账户”作为汇总标题',
   ], [
     'https://www.safe.gov.cn/safe/2015/1230/6080.html',
     'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm',
@@ -48,6 +57,7 @@ test('current-account separates BOP flows from customs trade data', () => {
   assertConcept('current-account', 2, [
     '货物和服务', '初次收入', '二次收入', '海关', '经济所有权',
     '离岸价格', '季度或年度流量', '并不保证人民币升值',
+    '经常账户不等于货物贸易差额', '自然资源租金', '产品和生产的税收与补贴',
   ], [
     'https://www.safe.gov.cn/safe/2015/1230/6080.html',
     'https://www.safe.gov.cn/safe/zggjszphb/index.html',
