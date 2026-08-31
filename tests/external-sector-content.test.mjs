@@ -96,3 +96,14 @@ test('cross-border-capital-flows names the dataset before interpreting a flow', 
     'cross-border-capital-flows must not reverse the debtor perspective',
   );
 });
+
+test('effective-exchange-rate distinguishes bilateral and multilateral indexes', () => {
+  assertConcept('effective-exchange-rate', 5, [
+    'USD/CNY', 'CFETS', 'NEER', 'REER', '多边指数', '贸易权重',
+    '相对价格', '基期', '指数点位', 'BIS', '有效升值',
+    '不等于竞争力按同一百分比恶化',
+  ], [
+    'https://data.bis.org/topics/EER',
+    'https://www.bis.org/statistics/dataportal/exr.htm',
+  ]);
+});
