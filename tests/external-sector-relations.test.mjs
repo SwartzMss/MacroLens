@@ -34,6 +34,7 @@ const expectedNodes = new Map([
 ]);
 
 const expectedRelations = [
+  ['capital-account', 'balance-of-payments', 'COMPONENT_OF'],
   ['current-account', 'balance-of-payments', 'COMPONENT_OF'],
   ['financial-account', 'balance-of-payments', 'COMPONENT_OF'],
   ['financial-account', 'cross-border-financial-transactions', 'MEASURES'],
@@ -61,8 +62,9 @@ test('registers external concept and abstract graph nodes', () => {
     assert.equal(existsSync(`${conceptsPath}${id}.md`), false, `${id} must not have a concept page`);
   }
 
-  assert.equal(nodes.has('capital-account'), false, 'capital-account must not be a graph node');
-  assert.equal(existsSync(`${conceptsPath}capital-account.md`), false, 'capital-account must not have a concept page');
+  assert.equal(nodes.get('capital-account')?.label, '资本账户', 'capital-account must be a standalone graph node');
+  assert.equal(nodes.get('capital-account')?.kind, 'indicator', 'capital-account must be an indicator node');
+  assert.equal(existsSync(`${conceptsPath}capital-account.md`), true, 'capital-account must have a concept page');
 });
 
 test('uses the canonical non-deterministic external-sector relationships', () => {
