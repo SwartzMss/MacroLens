@@ -42,4 +42,3 @@ order: 4
 - [国家统计局：调查失业率的计算方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/tcsyl/202411/t20241115_1957491.html)
 - [国家统计局劳动力调查制度（2024年统计年报和2025年定期统计报表）](https://zjzd.stats.gov.cn/gjtjjsxdcd/fgzd/dczd/art/2024/art_121593ee9bff4b5d921ffb4dfda0724a.html)
 - [ILOSTAT：Labour force participation rate](https://rshiny.ilo.org/dataexplorer18/?lang=en&id=EAP_2WAP_SEX_AGE_RT_A)
-

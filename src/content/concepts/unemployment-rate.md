@@ -44,4 +44,3 @@ order: 2
 - [国家统计局：调查失业率统计方法科学规范](https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896011.html)
 - [国家统计局：什么是调查失业率](https://www.stats.gov.cn/zs/tjws/zytjzbqs/tcsyl/202409/t20240910_1956360.html)
 - [国家统计局：调查失业率的计算方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/tcsyl/202411/t20241115_1957491.html)
-

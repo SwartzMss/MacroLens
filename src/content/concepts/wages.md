@@ -46,4 +46,3 @@ order: 5
 - [国家统计局：单位就业人员平均工资的计算方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/dwjyry/202411/t20241128_1957598.html)
 - [国家统计局：中国统计年鉴2025——就业和工资统计指标解释](https://www.stats.gov.cn/sj/ndsj/2025/html/zbe04.pdf)
 - [国家统计局：人口和就业统计常见问题](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902273.html)
-
