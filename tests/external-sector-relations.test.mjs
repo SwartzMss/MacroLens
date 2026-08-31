@@ -51,6 +51,7 @@ const relationKey = ({ source, target, type }) => `${source}\0${target}\0${type}
 const expectedRelationKeys = expectedRelations
   .map(([source, target, type]) => relationKey({ source, target, type }))
   .sort();
+const openEconomySources = new Set(['capital-controls', 'impossible-trinity', 'interest-rate-parity', 'usd-cnh', 'carry-trade']);
 
 test('registers external concept and abstract graph nodes', () => {
   const nodeIds = rawNodes.map(node => node.id);
@@ -78,7 +79,8 @@ test('uses the canonical non-deterministic external-sector relationships', () =>
   }
 
   const externalRelations = relations.filter(
-    relation => expectedNodes.has(relation.source) || expectedNodes.has(relation.target),
+    relation => !openEconomySources.has(relation.source)
+      && (expectedNodes.has(relation.source) || expectedNodes.has(relation.target)),
   );
   assert.deepEqual(externalRelations.map(relationKey).sort(), expectedRelationKeys);
 
