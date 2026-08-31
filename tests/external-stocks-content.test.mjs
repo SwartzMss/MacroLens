@@ -65,3 +65,9 @@ test('keeps debt forgiveness, debt write-off, and NIIP definitions distinct', ()
   assert.match(debt, /全部对外金融资产减去全部对外负债/);
   assert.doesNotMatch(debt, /外债是负债毛额，扣除可识别的对外资产后才进入净外部头寸/);
 });
+
+test('keeps patent/copyright research separate from marketing assets', () => {
+  const capital = page('capital-account');
+  assert.doesNotMatch(capital, /非生产非金融资产包括专利、版权/);
+  assert.match(capital, /营销资产[^。]*资本账户/);
+});
