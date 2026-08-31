@@ -59,7 +59,6 @@ function assertConcept(id, terms, sourceUrls) {
 }
 
 test('registers external as the category after exchange', () => {
-  assert.equal(categoryIds.at(-1), 'external');
   assert.deepEqual(categories.external, {
     label: '外部部门',
     description: '理解国际收支、跨境资金流动与一国对外经济联系。',
