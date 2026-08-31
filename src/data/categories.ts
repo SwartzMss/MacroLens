@@ -1,4 +1,4 @@
-export const categoryIds = ['money', 'policy', 'credit', 'inflation', 'growth', 'fiscal', 'exchange', 'external'] as const;
+export const categoryIds = ['money', 'policy', 'credit', 'inflation', 'growth', 'fiscal', 'exchange', 'external', 'labor'] as const;
 export type CategoryId = typeof categoryIds[number];
 
 export const categories: Record<CategoryId, { label: string; description: string; order: number }> = {
@@ -10,6 +10,7 @@ export const categories: Record<CategoryId, { label: string; description: string
   fiscal: { label: '财政', description: '理解政府收支、债务与宏观调节。', order: 50 },
   exchange: { label: '汇率', description: '理解货币之间的相对价格与跨境传导。', order: 60 },
   external: { label: '外部部门', description: '理解国际收支、跨境资金流动与一国对外经济联系。', order: 70 },
+  labor: { label: '劳动力市场', description: '理解就业、失业、劳动参与和工资如何共同描绘劳动力市场。', order: 80 },
 };
 
 export function getCategory(id: CategoryId) {
