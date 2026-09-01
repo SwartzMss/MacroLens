@@ -1,0 +1,13 @@
+---
+type ConceptLink = { data: { id: string; name: string; subtitle: string } };
+const { concepts = [] } = Astro.props as { concepts: ConceptLink[] };
+---
+{concepts.length > 0 && <section class="prerequisite-block" aria-labelledby="prerequisites-title">
+  <div class="eyebrow">Learning order</div><h2 id="prerequisites-title">建议先理解</h2>
+  <ol class="prerequisite-list">
+    {concepts.map((concept, index) => <li><span class="prerequisite-step">{index + 1}</span><a href={`/concepts/${concept.data.id}`}><b>{concept.data.name}</b><small>{concept.data.subtitle}</small></a>{index < concepts.length - 1 && <span class="prerequisite-arrow" aria-hidden="true">→</span>}</li>)}
+  </ol>
+</section>}
+<style>
+.prerequisite-block{margin:0 0 42px;padding:20px 0 28px;border-bottom:1px solid var(--line)}.prerequisite-block h2{margin:8px 0 18px}.prerequisite-list{display:flex;align-items:stretch;gap:10px;padding:0;margin:0;list-style:none}.prerequisite-list li{display:flex;align-items:center;min-width:0;gap:10px}.prerequisite-list a{display:grid;gap:2px;min-width:150px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}.prerequisite-list a:hover{border-color:#9fc2b4}.prerequisite-list small{color:var(--muted);line-height:1.4}.prerequisite-step{display:grid;place-items:center;width:24px;height:24px;flex:none;border-radius:50%;background:var(--mint);color:var(--green);font-size:12px;font-weight:800}.prerequisite-arrow{color:var(--green);font-size:20px}@media(max-width:680px){.prerequisite-list{display:grid;grid-template-columns:1fr;gap:8px}.prerequisite-list li{display:grid;grid-template-columns:24px minmax(0,1fr);align-items:start}.prerequisite-list a{min-width:0}.prerequisite-arrow{display:none}}
+</style>
