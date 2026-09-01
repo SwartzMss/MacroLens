@@ -5,6 +5,7 @@ subtitle: 通胀与经济松弛之间的经验关系，不是固定不变的自�
 country: CN
 category: inflation
 source: 经济学文献与国际货币基金组织
+updatedAt: 2026-09-02
 definition: { source: 国际货币基金组织, asOf: 2026-08 }
 related: [cpi, core-cpi, inflation-expectations, output-gap, unemployment-rate]
 graph: macro
@@ -52,4 +53,3 @@ featured: false
 
 - [国际货币基金组织：World Economic Outlook，通胀与劳动力市场章节](https://www.elibrary.imf.org/display/book/9798400235801/CH002.xml)
 - [国际货币基金组织：The Role of Exchange Rates in Inflation Dynamics](https://www.elibrary.imf.org/view/journals/001/2007/076/article-A001-en.xml)
-

@@ -5,6 +5,7 @@ subtitle: 名义GDP与实际GDP之比，反映国内生产最终产品与服务�
 country: CN
 category: inflation
 source: 国家统计局国民经济核算
+updatedAt: 2026-09-02
 definition: { source: 国家统计局, asOf: 2025-02 }
 related: [gdp, cpi, ppi]
 graph: macro
@@ -59,4 +60,3 @@ GDP数据往往先发布初步核算，随后随着更完整的行业、企业�
 ## 来源
 
 - [国家统计局：GDP 平减指数相关统计指标说明](https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903780.html)
-

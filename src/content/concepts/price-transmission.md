@@ -5,6 +5,7 @@ subtitle: 上游成本与其他冲击经过时间和市场结构传递到下游�
 country: CN
 category: inflation
 source: 国家统计局价格统计与宏观经济学文献
+updatedAt: 2026-09-02
 definition: { source: 国家统计局与国际货币基金组织, asOf: 2026-08 }
 related: [ppi, cpi, core-cpi, exchange-rate, wages]
 graph: macro
@@ -52,4 +53,3 @@ featured: false
 
 - [国际货币基金组织：Global Price Pressures and the Exchange Rate](https://www.elibrary.imf.org/view/journals/001/2016/023/article-A001-en.xml)
 - [欧洲中央银行：The impact of oil price shocks on euro area inflation](https://www.ecb.europa.eu/press/economic-bulletin/html/eb201607.en.html)
-

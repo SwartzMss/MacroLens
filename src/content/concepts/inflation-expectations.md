@@ -5,6 +5,7 @@ subtitle: 对未来价格增长的前瞻性判断，不是可以直接观测到�
 country: CN
 category: inflation
 source: 中国人民银行与国际货币基金组织
+updatedAt: 2026-09-02
 definition: { source: 中国人民银行与国际货币基金组织, asOf: 2026-08 }
 related: [cpi, core-cpi, real-interest-rate, phillips-curve]
 graph: macro
@@ -52,4 +53,3 @@ featured: false
 
 - [中国人民银行：城镇储户问卷调查报告](https://www.pbc.gov.cn/diaochatongjisi/fileDir/resource/cms/2025/03/2025032117142239782.pdf)
 - [国际货币基金组织：Are Household Inflation Expectations De-anchoring?](https://www.imf.org/en/news/articles/2022/05/17/sp05172022-are-household-inflation-expectations-deanchoring)
-
