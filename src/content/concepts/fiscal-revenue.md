@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [fiscal-policy, fiscal-expenditure, fiscal-deficit, government-debt]
 graph: macro
 order: 2
+level: basic
+topics: [fiscal-policy]
+prerequisites: []
+featured: false
 ---
 
 > 本页“财政收入”主要指全国一般公共预算收入。这是重要的官方统计口径，但不等于全部政府收入，也不等于政府当期可支配的所有资金。

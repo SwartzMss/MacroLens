@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [unemployment-rate, youth-unemployment, labor-force-participation, wages, gdp]
 graph: macro
 order: 1
+level: basic
+topics: [economic-activity,labor-market]
+prerequisites: []
+featured: false
 ---
 
 > 就业描述在特定时点或调查参考周处于就业状态的人口存量。它回答“有多少人被认定为就业”，不直接回答本月净新增了多少岗位。

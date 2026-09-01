@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [employment, unemployment-rate, labor-force-participation, cpi, retail-sales]
 graph: macro
 order: 5
+level: basic
+topics: [prices-inflation,economic-activity,labor-market]
+prerequisites: []
+featured: false
 ---
 
 > “工资上涨”可能指不同人群的平均工资、某位劳动者的工资、工资总额或经价格调整后的购买力变化。先确认统计对象和价格口径，再解释增长。

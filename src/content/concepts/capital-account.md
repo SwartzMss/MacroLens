@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [balance-of-payments, financial-account]
 graph: macro
 order: 9
+level: advanced
+topics: [balance-of-payments]
+prerequisites: [balance-of-payments]
+featured: false
 ---
 
 > 资本账户是 BPM6 国际收支中的独立账户，记录资本转移以及非生产非金融资产的取得或处置，通常较小，不能和金融账户合并。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [industrial-production, industrial-profits, pmi, gdp]
 graph: macro
 order: 7
+level: advanced
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 库存周期是企业面对需求、价格和生产变化时调整库存的分析框架，不是一条官方综合指数，也不是固定时钟。

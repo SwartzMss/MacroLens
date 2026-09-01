@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [monetary-policy, policy-rate, lpr, credit]
 graph: macro
 order: 4
+level: basic
+topics: [monetary-transmission]
+prerequisites: [monetary-policy]
+featured: false
 ---
 
 > 公开市场操作是央行与合格交易对手开展交易、调节银行体系流动性和引导市场利率的操作体系；必须同时看方向、利率、数量、期限和到期量。
@@ -49,4 +53,3 @@ OMO 改变短期流动性供求，并通过政策利率引导货币市场利率�
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》专栏“进一步完善央行公开市场操作体系”](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/5587716/2025022618190099812.pdf)
 - [中国人民银行：公开市场业务交易公告〔2024〕第257号](https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125431/125475/5545148/index.html)
-

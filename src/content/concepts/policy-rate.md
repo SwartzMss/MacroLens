@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [monetary-policy, lpr, omo, credit]
 graph: macro
 order: 2
+level: basic
+topics: [monetary-transmission,market-rates]
+prerequisites: [monetary-policy]
+featured: false
 ---
 
 > 政策利率是中央银行用来表达利率调控方向、引导短期市场利率的基准；在当前中国框架中，公开市场 7 天期逆回购操作利率承担主要政策利率功能。

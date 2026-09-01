@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [current-account, financial-account, cross-border-capital-flows, foreign-exchange-reserves]
 graph: macro
 order: 1
+level: basic
+topics: [balance-of-payments]
+prerequisites: []
+featured: false
 ---
 
 > 国际收支平衡表记录一个经济体的居民与非居民在某一期间发生的经济交易。这里的居民按经济利益中心判断，不等于公民身份或国籍。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [government-bond-yield, yield-curve, real-interest-rate, credit]
 graph: macro
 order: 5
+level: advanced
+topics: [credit-financing,market-rates]
+prerequisites: []
+featured: false
 ---
 
 > 信用利差是信用债收益率相对明确基准收益率的差额。没有基准曲线、期限和债券范围，就没有可复现的“信用利差”。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [property-sales, real-estate-investment, mortgage]
 graph: macro
 order: 3
+level: basic
+topics: [housing-market]
+prerequisites: []
+featured: false
 ---
 
 > 70个大中城市住宅销售价格指数是城市层面的官方价格调查结果，用于观察新建商品住宅和二手住宅的价格变动，不是把全国成交额除以成交面积所得的全国交易均价，也不是全国交易均价。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [employment, youth-unemployment, labor-force-participation, wages, gdp]
 graph: macro
 order: 2
+level: basic
+topics: [economic-activity,labor-market]
+prerequisites: []
+featured: false
 ---
 
 > 城镇调查失业率是城镇失业人口占城镇劳动力的比重。其分母是就业人口 + 失业人口，而不是所有16周岁以上人口或全部劳动年龄人口。

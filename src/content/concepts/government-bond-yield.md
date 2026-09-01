@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [yield-curve, real-interest-rate, credit-spread, government-debt]
 graph: macro
 order: 2
+level: advanced
+topics: [market-rates]
+prerequisites: []
+featured: false
 ---
 
 > 国债收益率是把未来利息和本金现金流折算到当前债券价格的回报率概念。它不是债券价格，也不等于票面利率。

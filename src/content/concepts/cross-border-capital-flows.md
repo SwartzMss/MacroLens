@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [financial-account, balance-of-payments, current-account, exchange-rate, foreign-exchange-reserves]
 graph: macro
 order: 4
+level: advanced
+topics: [balance-of-payments]
+prerequisites: []
+featured: false
 ---
 
 > “跨境资本流动”是分析性总称。新闻或研究必须先说明采用国际收支金融账户、直接投资、证券投资、银行收付还是结售汇等哪一套数据。

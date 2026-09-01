@@ -11,6 +11,10 @@ related: [gdp, cpi, core-cpi, credit]
 chart: retail-sales
 graph: macro
 order: 4
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 社会消费品零售总额统计企业、单位和个体户售给个人与社会集团的非生产、非经营用实物商品金额，以及餐饮收入，是重要的消费相关指标，但不是居民全部消费。
@@ -48,4 +52,3 @@ GDP 支出法中的最终消费支出范围和国民账户调整更广，包含�
 ## 来源
 
 - 国家统计局：月度《社会消费品零售总额》发布及指标解释
-

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [exchange-rate, rmb-exchange-rate-regime, usd-cny, cfets-rmb-index, monetary-policy]
 graph: macro
 order: 5
+level: basic
+topics: [exchange-rates,external-balance-sheets]
+prerequisites: []
+featured: false
 ---
 
 > 外汇储备是官方储备资产中的外币资产存量，通常按月末时点公布。余额变化不是单纯的资金流量，更不能直接一对一等同于汇率干预。
@@ -54,4 +58,3 @@ SAFE 提供清晰的官方月度序列，未来适合以“月末存量、十亿
 - [国家外汇管理局：官方储备资产](https://www.safe.gov.cn/safe/gfcbzc/)
 - [国家外汇管理局：国家外汇储备规模时间序列](https://www.safe.gov.cn/safe/gjwhcbgm/index.html)
 - [国家外汇管理局：2026年7月末外汇储备规模数据](https://www.safe.gov.cn/safe/2026/0806/27770.html)
-

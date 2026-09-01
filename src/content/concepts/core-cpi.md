@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [cpi, ppi, pmi]
 graph: macro
 order: 2
+level: advanced
+topics: [prices-inflation]
+prerequisites: [cpi]
+featured: false
 ---
 
 > 中国月度价格发布中常见的核心 CPI，指扣除食品和能源价格后的居民消费价格指数，用来降低高波动项目对总体趋势的遮蔽。

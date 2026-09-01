@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [industrial-production, output-gap, industrial-profits, ppi]
 graph: macro
 order: 8
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 工业产能利用率衡量报告期内工业实际产出相对既定条件下生产能力的使用程度，是调查指标，不等于全经济产出缺口。

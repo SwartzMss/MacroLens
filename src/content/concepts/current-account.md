@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [balance-of-payments, financial-account, cross-border-capital-flows, exchange-rate]
 graph: macro
 order: 2
+level: basic
+topics: [balance-of-payments]
+prerequisites: [balance-of-payments]
+featured: false
 ---
 
 > 经常账户是国际收支的一部分，由货物和服务、初次收入、二次收入组成。它不是“出口减进口”的完整同义词。

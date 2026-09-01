@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
+import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { buildConceptCatalog } from '../src/data/conceptCatalog.ts';
+import { topicRegistry } from '../src/data/topics.ts';
 
 const topics = [
   { id: 'money-supply', label: '货币供应与流动性', description: '理解货币层次。', category: 'money', order: 10 },
@@ -73,4 +76,40 @@ test('rejects unknown, self, duplicate, and cyclic prerequisites', () => {
     ], topics),
     /m1.*duplicate prerequisite/,
   );
+});
+
+const conceptsDirectory = fileURLToPath(new URL('../src/content/concepts/', import.meta.url));
+
+function parseFrontmatter(document) {
+  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  assert.ok(match, 'concept must have leading YAML frontmatter');
+  const values = {};
+  for (const line of match[1].split('\n')) {
+    const field = line.match(/^([a-zA-Z][\w]*):\s*(.*)$/);
+    if (!field) continue;
+    const [, key, rawValue] = field;
+    if (rawValue.startsWith('[') && rawValue.endsWith(']')) {
+      values[key] = rawValue.slice(1, -1).split(',').map((value) => value.trim()).filter(Boolean);
+    } else if (rawValue === 'true' || rawValue === 'false') {
+      values[key] = rawValue === 'true';
+    } else {
+      values[key] = rawValue;
+    }
+  }
+  return values;
+}
+
+test('every concept declares validated browsing metadata', () => {
+  const entries = readdirSync(conceptsDirectory)
+    .filter((name) => name.endsWith('.md'))
+    .sort()
+    .map((name) => ({ data: parseFrontmatter(readFileSync(`${conceptsDirectory}/${name}`, 'utf8')) }));
+
+  for (const entry of entries) {
+    assert.match(entry.data.level ?? '', /^(basic|advanced)$/, `${entry.data.id} must declare level`);
+    assert.ok(Array.isArray(entry.data.topics) && entry.data.topics.length > 0, `${entry.data.id} must declare topics`);
+    assert.equal(typeof entry.data.featured, 'boolean', `${entry.data.id} must declare featured`);
+    assert.ok(Array.isArray(entry.data.prerequisites), `${entry.data.id} must declare prerequisites`);
+  }
+  buildConceptCatalog(entries, topicRegistry);
 });

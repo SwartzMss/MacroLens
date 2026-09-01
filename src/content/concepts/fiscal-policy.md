@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [fiscal-revenue, fiscal-expenditure, fiscal-deficit, government-debt, monetary-policy, gdp]
 graph: macro
 order: 1
+level: basic
+topics: [fiscal-policy]
+prerequisites: []
+featured: false
 ---
 
 > 财政政策是政府围绕公共服务、收入分配和宏观稳定，对税费、支出、转移支付、预算结余与融资作出的制度和政策安排。它不等于“政府多花钱”，也不等于每一项公共支出都是短期刺激。

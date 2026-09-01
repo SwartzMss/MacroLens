@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [fiscal-policy, fiscal-revenue, fiscal-expenditure, government-debt]
 graph: macro
 order: 4
+level: basic
+topics: [fiscal-policy]
+prerequisites: []
+featured: false
 ---
 
 > “财政赤字”至少可能指预算批准的赤字规模、预算执行后的官方赤字，或分析者按更广范围估算的财政缺口。使用前必须先说明口径和时间基础。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [policy-rate, omo, lpr, credit]
 graph: macro
 order: 1
+level: advanced
+topics: [monetary-transmission,market-rates]
+prerequisites: [policy-rate]
+featured: false
 ---
 
 > 银行间资金利率是金融机构在货币市场融入或融出短期资金的市场价格。DR007、R007 与央行7天期逆回购操作利率互相关联，但不是同一类利率。

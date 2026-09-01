@@ -11,6 +11,10 @@ related: [pmi, ppi, gdp, fixed-asset-investment]
 chart: industrial-production
 graph: macro
 order: 3
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 规模以上工业增加值衡量统计范围内工业企业生产活动新增价值的变化，不代表整个工业部门，更不代表整个经济。
@@ -48,4 +52,3 @@ PMI 是企业回答“改善或恶化”的扩散指数，工业增加值是实�
 ## 来源
 
 - 国家统计局：月度《规模以上工业增加值》发布及指标解释
-

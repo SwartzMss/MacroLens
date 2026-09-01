@@ -50,7 +50,8 @@ const approvedMetadata = {
 
 function assertConcept(id, terms, urls) {
   const document = readConcept(id);
-  assert.deepEqual(parseFrontmatter(document), approvedMetadata[id]);
+  const metadata = parseFrontmatter(document);
+  for (const [key, value] of Object.entries(approvedMetadata[id])) assert.deepEqual(metadata[key], value);
   assert.doesNotMatch(document, /^chart:/m);
   for (const term of terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
   for (const url of urls) assert.ok(document.includes(url), `${id} must cite ${url}`);

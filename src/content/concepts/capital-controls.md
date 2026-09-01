@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [cross-border-capital-flows, balance-of-payments, exchange-rate-formation, impossible-trinity]
 graph: macro
 order: 11
+level: advanced
+topics: [exchange-rates,balance-of-payments]
+prerequisites: []
+featured: false
 ---
 
 > 资本流动管理不是一条“开放或关闭”的开关，而是对不同主体、工具、期限和方向施加的规则光谱。

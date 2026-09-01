@@ -11,6 +11,10 @@ related: [gdp, industrial-production, credit, social-financing]
 chart: fixed-asset-investment
 graph: macro
 order: 5
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 全国固定资产投资（不含农户）反映以货币形式表现的建造和购置固定资产工作量，本页采用官方 headline 的年初至当期累计同比。
@@ -53,4 +57,3 @@ order: 5
 ## 来源
 
 - 国家统计局：月度《全国固定资产投资（不含农户）基本情况》及指标解释
-

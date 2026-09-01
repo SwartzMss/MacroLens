@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [property-sales, house-price-index, mortgage, land-market, investment-activity]
 graph: macro
 order: 1
+level: basic
+topics: [housing-market]
+prerequisites: []
+featured: false
 ---
 
 > 房地产开发投资是房地产开发企业报告期内完成的房屋建设工程、土地开发工程、公益性建筑和土地购置费等投资额，首先是货币计价的完成工作量。

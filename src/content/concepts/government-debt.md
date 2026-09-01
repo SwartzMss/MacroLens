@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [fiscal-policy, fiscal-deficit, fiscal-revenue, fiscal-expenditure, social-financing]
 graph: macro
 order: 5
+level: basic
+topics: [fiscal-policy]
+prerequisites: []
+featured: false
 ---
 
 > 政府债务余额是某个时点尚未偿还的债务存量。新发行、偿还本金和利息支出都是期间流量，不能与债务余额混用。
