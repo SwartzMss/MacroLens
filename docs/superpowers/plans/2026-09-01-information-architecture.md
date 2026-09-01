@@ -333,4 +333,3 @@ Closes #38"
 - [ ] **Step 5: Report the PR URL and verification evidence**
 
 Include the created PR URL, branch name, commit summary, and exact successful commands/output counts. If any external check is still running, report that state instead of claiming the PR is fully green.
-
