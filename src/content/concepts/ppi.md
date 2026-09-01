@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [cpi, core-cpi, pmi]
 graph: macro
 order: 3
+level: basic
+topics: [prices-inflation]
+prerequisites: []
+featured: false
 ---
 
 > 中国通常所说的 PPI，是工业生产者出厂价格指数，反映工业企业产品第一次出售时价格水平的总体变动。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [policy-rate, rrr, omo, lpr, credit, m2]
 graph: macro
 order: 1
+level: basic
+topics: [monetary-transmission]
+prerequisites: []
+featured: false
 ---
 
 > 货币政策是中央银行为实现政策目标，对利率、流动性和金融条件进行调节的整体框架；一次降准、降息或公开市场操作只是其中一个动作。
@@ -51,4 +55,3 @@ order: 1
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/5587716/2025022618190099812.pdf)
 - [中国人民银行：建设现代中央银行制度 更好服务中国式现代化](https://xining.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212553168670/index.html)
-

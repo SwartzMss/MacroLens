@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [fiscal-policy, fiscal-revenue, fiscal-deficit, government-debt, gdp]
 graph: macro
 order: 3
+level: basic
+topics: [fiscal-policy]
+prerequisites: []
+featured: false
 ---
 
 > 本页“财政支出”主要指全国一般公共预算支出。它记录预算执行中的支出流量，但不能把每一元支出都机械理解为新增宏观刺激。

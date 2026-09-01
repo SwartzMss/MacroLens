@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [exchange-rate, usd-cny, cfets-rmb-index, current-account]
 graph: macro
 order: 5
+level: advanced
+topics: [exchange-rates]
+prerequisites: []
+featured: false
 ---
 
 > 名义有效汇率（NEER）和实际有效汇率（REER）是多边指数，不是人民币兑美元等双边汇率。不同提供者的篮子、权重、价格指标和基期可能不同。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [international-investment-position, external-liabilities, balance-of-payments]
 graph: macro
 order: 10
+level: advanced
+topics: [external-balance-sheets]
+prerequisites: [international-investment-position]
+featured: false
 ---
 
 > 对外净资产 = 对外金融资产减去对外负债。在 IIP 语境下，这个净额就是净国际投资头寸（net IIP）：正值为净资产，负值为净负债。

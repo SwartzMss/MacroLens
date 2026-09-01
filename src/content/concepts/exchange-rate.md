@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [rmb-exchange-rate-regime, usd-cny, cfets-rmb-index, foreign-exchange-reserves, cpi]
 graph: macro
 order: 1
+level: basic
+topics: [exchange-rates,balance-of-payments]
+prerequisites: []
+featured: false
 ---
 
 > 汇率是一种货币用另一种货币表示的价格。讨论“升值”或“贬值”前，必须先说清货币对和报价方向。
@@ -57,4 +61,3 @@ USD/CNY：7.10 → 7.30
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212554550369/index.html)
 - [中国外汇交易中心：人民币汇率中间价发布说明](https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?contentId=384571&mode=open&priority=0)
-

@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [monetary-policy, credit, m2, social-financing]
 graph: macro
 order: 3
+level: basic
+topics: [monetary-transmission]
+prerequisites: [monetary-policy]
+featured: false
 ---
 
 > 存款准备金率规定金融机构吸收存款后需按一定比例缴存央行；降准减少受影响机构的法定准备金占用，释放较长期可用资金，但不是向贷款和 M2 写入同额增量。
@@ -46,4 +50,3 @@ order: 3
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/5587716/2025022618190099812.pdf)
 - [中国人民银行：人民银行解读降低存款准备金率](https://wzdt.pbc.gov.cn/rmyh/2025-07/21/article_2025072114315499937.html)
-

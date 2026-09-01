@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [real-estate-investment, house-price-index, mortgage, economic-activity]
 graph: macro
 order: 2
+level: basic
+topics: [housing-market]
+prerequisites: []
+featured: false
 ---
 
 > 商品房销售是交易流量；面积、金额和价格是不同统计量。国家统计局的商品房销售面积是房地产开发企业出售新建商品房的合同总面积，不是所有住房交易的面积。

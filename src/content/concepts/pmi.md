@@ -11,6 +11,10 @@ related: [cpi, ppi, credit, social-financing]
 chart: pmi
 graph: macro
 order: 1
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > PMI 汇总采购经理对经营状况“改善、持平或恶化”的月度回答，是扩散指数，不是产出增长率。

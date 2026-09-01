@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [balance-of-payments, current-account, cross-border-capital-flows, foreign-exchange-reserves]
 graph: macro
 order: 3
+level: advanced
+topics: [balance-of-payments]
+prerequisites: [balance-of-payments]
+featured: false
 ---
 
 > 金融账户记录居民与非居民之间涉及金融资产和负债的交易。它与 BPM6 中规模通常较小的资本账户不同，不能把二者混为一项。

@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildConceptCatalog } from '../../data/conceptCatalog';
+import { topicRegistry } from '../../data/topics';
+
+const concepts = await getCollection('concepts');
+const catalog = buildConceptCatalog(concepts, topicRegistry);
+const orderedTopics = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+---
+<BaseLayout title="主题地图｜MacroLens" description="按理解目标浏览 MacroLens 的宏观经济主题。">
+  <header class="index-head"><div class="shell"><div class="eyebrow">Topic hubs</div><h1>按问题理解宏观经济</h1><p class="lead">主题把相关概念组织成可进入、可继续探索的理解路径。一个概念可以属于多个主题。</p><div class="index-summary"><b>{orderedTopics.length}</b> 个主题 · <b>{concepts.length}</b> 个概念</div></div></header>
+  <div class="shell topic-index"><div class="topic-grid">
+    {orderedTopics.map(topic => <a class="topic-card" href={`/topics/${topic.id}`}>
+      <div class="eyebrow">{topic.category}</div><h2>{topic.label}</h2><p>{topic.description}</p>
+      <b>{catalog.topics.get(topic.id)?.length ?? 0} 个概念 <span aria-hidden="true">→</span></b>
+    </a>)}
+  </div></div>
+</BaseLayout>
+<style>
+.topic-index{padding:42px 0 90px}.topic-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.topic-card{display:flex;min-height:220px;flex-direction:column;padding:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;transition:.2s}.topic-card:hover{transform:translateY(-3px);border-color:#9fc2b4;box-shadow:0 14px 30px #174a3820}.topic-card h2{font:700 27px/1.2 var(--serif);margin:16px 0 10px}.topic-card p{color:var(--muted);margin:0 0 20px}.topic-card>b{margin-top:auto;color:var(--green);font-size:13px}@media(max-width:800px){.topic-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.topic-grid{grid-template-columns:1fr}}
+</style>

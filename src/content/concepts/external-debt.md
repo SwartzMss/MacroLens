@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [international-investment-position, external-liabilities, government-debt, net-foreign-assets]
 graph: macro
 order: 7
+level: advanced
+topics: [external-balance-sheets]
+prerequisites: [international-investment-position]
+featured: false
 ---
 
 > 外债是居民对非居民承担的未来支付本金或利息的债务性负债。它是毛额概念，不能直接等同于政府债务、外币债务或净外部头寸。

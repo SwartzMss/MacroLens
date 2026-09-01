@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [government-bond-yield, real-interest-rate, credit-spread, policy-rate]
 graph: macro
 order: 3
+level: advanced
+topics: [market-rates]
+prerequisites: []
+featured: false
 ---
 
 > 收益率曲线描述同一币种、相近信用和其他条件下，不同期限与收益率之间的关系，也称利率期限结构。比较前必须先确认债券品种和曲线类型。

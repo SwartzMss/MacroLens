@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [industrial-production, inventory-cycle, capacity-utilization, ppi]
 graph: macro
 order: 9
+level: advanced
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 该指标汇总年主营业务收入2000万元及以上工业法人单位的财务情况，主要读累计利润、收入和利润率，不能代表全部企业部门。

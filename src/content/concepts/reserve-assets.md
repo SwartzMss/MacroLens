@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [international-investment-position, foreign-exchange-reserves, balance-of-payments]
 graph: macro
 order: 8
+level: advanced
+topics: [balance-of-payments,external-balance-sheets]
+prerequisites: []
+featured: false
 ---
 
 > BPM6 的储备资产是由货币当局控制、可随时动用、用于满足国际收支融资需要或干预外汇市场等目的的外部资产类别。

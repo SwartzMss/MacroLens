@@ -10,6 +10,10 @@ updatedAt: 2026-08-30
 related: [core-cpi, ppi, pmi, m2]
 graph: macro
 order: 1
+level: basic
+topics: [prices-inflation]
+prerequisites: []
+featured: false
 ---
 
 > CPI 衡量居民购买的一篮子消费品和服务价格随时间的平均变动。篮子及权重来自居民消费结构，并会按统计制度更新。

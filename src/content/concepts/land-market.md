@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [real-estate-investment, property-sales, fiscal-revenue, fiscal-conditions]
 graph: macro
 order: 5
+level: advanced
+topics: [fiscal-policy,housing-market]
+prerequisites: []
+featured: false
 ---
 
 > 土地市场同时包含土地供应、成交和财政收支等不同流量。土地成交价款、土地出让收入和房地产开发投资并不是同一个指标。

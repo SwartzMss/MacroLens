@@ -12,6 +12,10 @@ updatedAt: 2026-08-29
 related: [credit, m2, lpr]
 graph: macro
 order: 5
+level: basic
+topics: [credit-financing]
+prerequisites: [credit]
+featured: true
 ---
 
 > 一句话理解：社会融资规模（社融、AFRE/TSF）衡量一定时期内实体经济从金融体系获得的资金，范围比银行贷款更广。

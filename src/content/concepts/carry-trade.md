@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [interest-rate-parity, exchange-rate, cross-border-capital-flows, usd-cnh]
 graph: macro
 order: 9
+level: advanced
+topics: [exchange-rates,balance-of-payments]
+prerequisites: [interest-rate-parity]
+featured: false
 ---
 
 > 套息交易的基本结构是借入低息货币、投资高收益资产，但正利差不是免费的确定回报。

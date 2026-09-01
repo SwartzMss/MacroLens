@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [capital-controls, rmb-exchange-rate-regime, exchange-rate-formation, interest-rate-parity]
 graph: macro
 order: 6
+level: advanced
+topics: [exchange-rates]
+prerequisites: []
+featured: false
 ---
 
 > 不可能三角是分析框架，不是要求经济体只能选择三个角中的两个的机械规则。

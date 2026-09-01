@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [unemployment-rate, employment, labor-force-participation, wages]
 graph: macro
 order: 3
+level: basic
+topics: [economic-activity,labor-market]
+prerequisites: []
+featured: false
 ---
 
 > 分年龄组调查失业率的分母仍是相应年龄组的劳动力，不是该年龄组全部人口。比较青年数据前必须确认年龄边界和是否包含在校学生。

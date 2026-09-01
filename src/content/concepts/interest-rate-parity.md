@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [exchange-rate, usd-cny, usd-cnh, carry-trade]
 graph: macro
 order: 7
+level: advanced
+topics: [exchange-rates,balance-of-payments]
+prerequisites: []
+featured: false
 ---
 
 > “利率平价”至少要拆成有套期保值的 CIP 和无套期保值的 UIP，不能把两者当作同一条预测公式。

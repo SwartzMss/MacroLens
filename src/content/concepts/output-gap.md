@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [gdp, capacity-utilization, unemployment-rate, cpi]
 graph: macro
 order: 6
+level: advanced
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > 产出缺口描述实际产出相对潜在产出的偏离，用于判断经济闲置或需求压力；潜在产出无法直接观测，所以它始终是模型估计，不是另一套 GDP 统计。

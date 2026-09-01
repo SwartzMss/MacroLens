@@ -12,6 +12,10 @@ updatedAt: 2026-08-29
 related: [m2, social-financing, lpr]
 graph: macro
 order: 4
+level: basic
+topics: [credit-financing,monetary-transmission]
+prerequisites: [m2]
+featured: true
 ---
 
 > 本页所称“信贷”主要指人民银行金融统计中的金融机构人民币各项贷款；分析社融时，则要进一步区分其中投向实体经济的人民币贷款。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [exchange-rate, rmb-exchange-rate-regime, cfets-rmb-index, foreign-exchange-reserves]
 graph: macro
 order: 3
+level: basic
+topics: [exchange-rates]
+prerequisites: [exchange-rate]
+featured: false
 ---
 
 > 本页 USD/CNY 指境内人民币对美元汇率，按 `1 USD = x CNY` 报价。数值上升表示人民币兑美元贬值，数值下降表示人民币兑美元升值。
@@ -46,4 +50,3 @@ CNY 是境内市场惯例，CNH 是离岸市场惯例。两者都表达人民币
 
 - [中国外汇交易中心：人民币汇率中间价发布说明](https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?contentId=384571&mode=open&priority=0)
 - [中国人民银行：《银行间外汇市场管理规定》](https://www.pbc.gov.cn/zhengwugongkai/attachDir/2025/12/2025122910541412031.pdf)
-

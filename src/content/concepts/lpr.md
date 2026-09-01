@@ -13,6 +13,10 @@ updatedAt: 2026-08-29
 related: [policy-rate, monetary-policy, credit]
 graph: macro
 order: 6
+level: basic
+topics: [credit-financing,monetary-transmission,market-rates]
+prerequisites: [policy-rate]
+featured: false
 ---
 
 > 一句话理解：LPR 是报价行对最优质客户贷款利率报价形成的市场化参考利率，实际贷款利率通常在其基础上加减点。

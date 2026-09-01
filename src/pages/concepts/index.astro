@@ -1,18 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCategory, type CategoryId } from '../../data/categories';
+import { categories, categoryIds, getCategory, type CategoryId } from '../../data/categories';
+import { buildConceptCatalog } from '../../data/conceptCatalog';
+import { topicRegistry } from '../../data/topics';
 import '../../styles/concept-index.css';
 
 const concepts = await getCollection('concepts');
-const stableIds = new Set<string>();
-for (const concept of concepts) {
-  if (stableIds.has(concept.data.id)) throw new Error(`Duplicate stable concept ID: ${concept.data.id}`);
-  stableIds.add(concept.data.id);
-}
+const catalog = buildConceptCatalog(concepts, topicRegistry);
 
 const grouped = new Map<CategoryId, typeof concepts>();
-for (const concept of concepts) {
+for (const concept of catalog.concepts) {
   const group = grouped.get(concept.data.category) ?? [];
   group.push(concept);
   grouped.set(concept.data.category, group);
@@ -21,16 +19,24 @@ for (const concept of concepts) {
 const categoryGroups = [...grouped.entries()]
   .map(([id, items]) => ({ id, ...getCategory(id), items: items.sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id)) }))
   .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id] }));
+const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
 <BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
-  <header class="index-head"><div class="shell"><div class="eyebrow">Concept atlas</div><h1>从哪里开始理解宏观经济？</h1><p class="lead">按领域浏览现有概念。每篇内容都把定义、关系和数据放回同一张理解地图。</p><div class="index-summary"><b>{concepts.length}</b> 个概念 · <b>{categoryGroups.length}</b> 个领域</div></div></header>
+  <header class="index-head"><div class="shell"><div class="eyebrow">Concept atlas</div><h1>从哪里开始理解宏观经济？</h1><p class="lead">按领域、主题和难度浏览现有概念。每篇内容都把定义、关系和数据放回同一张理解地图。</p><div class="index-summary"><b data-filter-count>{concepts.length} 个概念</b> · <b>{categoryGroups.length}</b> 个领域</div></div></header>
   <div class="shell concept-index">
-    {categoryGroups.map(group => <section class="category-section" id={group.id}>
+    <form class="concept-filters" data-concept-filters>
+      <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
+      <div class="filter-field"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
+      <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
+    </form>
+    {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
       <header><div><div class="eyebrow">{group.id}</div><h2>{group.label}</h2><p>{group.description}</p></div><span>{group.items.length} 个概念</span></header>
-      <div class="index-grid">{group.items.map(concept => <a class="index-card" href={`/concepts/${concept.data.id}`}>
+      <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
         <div><span class="category-chip">{group.label}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
         <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">阅读概念 →</b>
       </a>)}</div>
     </section>)}
   </div>
+  <script>import '../../scripts/concept-filters';</script>
 </BaseLayout>

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [pmi, credit, social-financing, yield-curve, industrial-production]
 graph: macro
 order: 10
+level: advanced
+topics: [economic-activity]
+prerequisites: []
+featured: false
 ---
 
 > “领先”是一项指标相对明确预测目标、领先期和历史样本呈现的经验角色，不是永远领先所有经济活动的固定属性。

@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [property-sales, house-price-index, lpr, credit]
 graph: macro
 order: 4
+level: basic
+topics: [credit-financing,housing-market]
+prerequisites: []
+featured: false
 ---
 
 > 个人住房贷款是以住房抵押等方式发放的家庭住房融资。阅读时要把个人住房贷款利率、存量余额、新增贷款和偿还额分开，它们分别反映价格、存量和流量。

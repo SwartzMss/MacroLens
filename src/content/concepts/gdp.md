@@ -11,6 +11,10 @@ related: [pmi, industrial-production, retail-sales, fixed-asset-investment, cpi]
 chart: gdp
 graph: macro
 order: 2
+level: basic
+topics: [economic-activity]
+prerequisites: []
+featured: true
 ---
 
 > GDP 是一个国家所有常住单位在一定时期内生产活动的最终成果，用来观察总体经济规模与增长，而不是每个行业、企业或家庭的共同体感。
@@ -54,4 +58,3 @@ GDP 覆盖第一、第二和第三产业，既包括工业，也包括农业、�
 ## 来源
 
 - 国家统计局：《季度国内生产总值初步核算结果》及季度 GDP 核算说明
-

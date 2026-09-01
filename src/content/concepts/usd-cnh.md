@@ -10,6 +10,10 @@ updatedAt: 2026-08-31
 related: [usd-cny, exchange-rate, rmb-exchange-rate-regime, interest-rate-parity]
 graph: macro
 order: 8
+level: advanced
+topics: [exchange-rates]
+prerequisites: [exchange-rate]
+featured: false
 ---
 
 > USD/CNH 是离岸人民币市场的报价：1 美元对应多少离岸人民币；CNH 不是另一种货币。
