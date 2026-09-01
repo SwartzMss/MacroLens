@@ -30,6 +30,39 @@ export function sortConcepts<T extends ConceptEntry>(concepts: readonly T[]): T[
   return [...concepts].sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id));
 }
 
+export function sortTopicConcepts<T extends ConceptEntry>(members: readonly T[], byId: ReadonlyMap<string, T>): T[] {
+  const memberIds = new Set(members.map((entry) => entry.data.id));
+  const indegree = new Map(members.map((entry) => [entry.data.id, 0]));
+  const dependents = new Map<string, T[]>();
+
+  for (const member of members) {
+    const prerequisites = byId.get(member.data.id)?.data.prerequisites ?? member.data.prerequisites;
+    for (const prerequisiteId of prerequisites) {
+      if (!memberIds.has(prerequisiteId)) continue;
+      indegree.set(member.data.id, (indegree.get(member.data.id) ?? 0) + 1);
+      dependents.set(prerequisiteId, [...(dependents.get(prerequisiteId) ?? []), member]);
+    }
+  }
+
+  let layer = sortConcepts(members.filter((entry) => indegree.get(entry.data.id) === 0));
+  const ordered: T[] = [];
+  while (layer.length > 0) {
+    const next: T[] = [];
+    for (const entry of layer) {
+      ordered.push(entry);
+      for (const dependent of dependents.get(entry.data.id) ?? []) {
+        const remaining = (indegree.get(dependent.data.id) ?? 0) - 1;
+        indegree.set(dependent.data.id, remaining);
+        if (remaining === 0) next.push(dependent);
+      }
+    }
+    layer = sortConcepts(next);
+  }
+
+  if (ordered.length !== members.length) throw new Error('prerequisite cycle in topic members');
+  return ordered;
+}
+
 function assertUnique(values: readonly string[], conceptId: string, field: string) {
   const seen = new Set<string>();
   for (const value of values) {
@@ -90,7 +123,7 @@ export function buildConceptCatalog<T extends ConceptEntry>(
   for (const entry of entries) {
     for (const topicId of entry.data.topics) topicMembers.get(topicId)?.push(entry);
   }
-  for (const [topicId, members] of topicMembers) topicMembers.set(topicId, sortConcepts(members));
+  for (const [topicId, members] of topicMembers) topicMembers.set(topicId, sortTopicConcepts(members, byId));
 
   return { concepts: sortConcepts(entries), byId, topics: topicMembers };
 }

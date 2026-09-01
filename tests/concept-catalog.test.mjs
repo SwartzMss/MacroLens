@@ -38,6 +38,18 @@ test('builds stable lookup and topic membership for valid concepts', () => {
   assert.deepEqual(catalog.topics.get('credit-financing').map((item) => item.data.id), ['m2']);
 });
 
+test('sorts topic concepts by prerequisite layers before order and ID', () => {
+  const catalog = buildConceptCatalog([
+    entry('a', { order: 10 }),
+    entry('b', { order: 1, prerequisites: ['a'] }),
+    entry('c', { order: 2 }),
+  ], topics);
+
+  const topicIds = catalog.topics.get('money-supply').map((item) => item.data.id);
+  assert.deepEqual(topicIds, ['c', 'a', 'b']);
+  assert.ok(topicIds.indexOf('a') < topicIds.indexOf('b'));
+});
+
 test('rejects duplicate concept IDs and unknown topic IDs', () => {
   assert.throws(
     () => buildConceptCatalog([entry('m1'), entry('m1')], topics),
@@ -111,5 +123,12 @@ test('every concept declares validated browsing metadata', () => {
     assert.equal(typeof entry.data.featured, 'boolean', `${entry.data.id} must declare featured`);
     assert.ok(Array.isArray(entry.data.prerequisites), `${entry.data.id} must declare prerequisites`);
   }
-  buildConceptCatalog(entries, topicRegistry);
+  const catalog = buildConceptCatalog(entries, topicRegistry);
+  const moneySupplyIds = catalog.topics.get('money-supply').map((item) => item.data.id);
+  assert.deepEqual(moneySupplyIds, ['m0', 'm1', 'm2']);
+
+  const marketRatesIds = catalog.topics.get('market-rates').map((item) => item.data.id);
+  assert.ok(marketRatesIds.indexOf('policy-rate') < marketRatesIds.indexOf('interbank-rate'));
+  assert.deepEqual(catalog.byId.get('cpi').data.prerequisites, []);
+  assert.deepEqual(catalog.byId.get('core-cpi').data.prerequisites, ['cpi']);
 });

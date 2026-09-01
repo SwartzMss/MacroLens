@@ -12,7 +12,7 @@ graph: macro
 order: 1
 level: basic
 topics: [prices-inflation]
-prerequisites: [m2]
+prerequisites: []
 featured: false
 ---
 
