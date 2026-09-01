@@ -51,5 +51,5 @@ featured: false
 
 ## 来源
 
-- [国际货币基金组织：Global Price Pressures and the Exchange Rate](https://www.elibrary.imf.org/view/journals/001/2016/023/article-A001-en.xml)
+- [国际货币基金组织：Pass-Through of Imported Input Prices to Domestic Producer Prices](https://www.imf.org/-/media/websites/imf/imported-full-text-pdf/external/pubs/ft/wp/2016/_wp1623.pdf)
 - [欧洲中央银行：The impact of oil price shocks on euro area inflation](https://www.ecb.europa.eu/press/economic-bulletin/html/eb201607.en.html)
