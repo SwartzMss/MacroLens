@@ -117,7 +117,7 @@ In \`src/content.config.ts\`, import \`topicIds\` and add these fields while kee
 
 ~~~ts
 level: z.enum(['basic', 'advanced']).default('basic'),
-topics: z.array(z.enum(topicIds)).min(1),
+topics: z.array(z.enum(topicIds)).default([]),
 prerequisites: z.array(z.string()).default([]),
 featured: z.boolean().default(false),
 ~~~

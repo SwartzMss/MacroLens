@@ -10,7 +10,7 @@ const concepts = defineCollection({
     category: z.enum(categoryIds), source: z.string(),
     definition: z.object({ source: z.string(), effectiveFrom: z.string().optional(), asOf: z.string().optional() }).optional(),
     updatedAt: z.coerce.date(), related: z.array(z.string()), chart: z.string().optional(), graph: z.string().optional(), order: z.number(),
-    level: z.enum(['basic', 'advanced']).default('basic'), topics: z.array(z.enum(topicIds)).min(1),
+    level: z.enum(['basic', 'advanced']).default('basic'), topics: z.array(z.enum(topicIds)).default([]),
     prerequisites: z.array(z.string()).default([]), featured: z.boolean().default(false)
   })
 });
