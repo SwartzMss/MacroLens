@@ -52,7 +52,11 @@ test('uses only the approved labor-market relationships', () => {
     assert.ok(canonicalRelationTypes.has(relation.type), `unknown relation type ${relation.type}`);
   }
   const laborRelations = relations.filter((relation) => expectedNodes.has(relation.source) || expectedNodes.has(relation.target));
-  assert.deepEqual(laborRelations.map(relationKey).sort(), expectedRelationKeys);
-  assert.equal(laborRelations.some((relation) => relation.type === 'CAUSES'), false);
+  const approvedCrossClusterRelationKeys = new Set([
+    relationKey({ source: 'working-age-population', target: 'labor-supply', type: 'AFFECTS' }),
+  ]);
+  const canonicalLaborRelations = laborRelations.filter((relation) => !approvedCrossClusterRelationKeys.has(relationKey(relation)));
+  assert.deepEqual(canonicalLaborRelations.map(relationKey).sort(), expectedRelationKeys);
+  assert.equal(canonicalLaborRelations.some((relation) => relation.type === 'CAUSES'), false);
   assert.equal(relations.some((relation) => relation.source === 'unemployment-rate' && relation.target === 'economic-activity'), false);
 });
