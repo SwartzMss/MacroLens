@@ -1,13 +1,167 @@
 {
-  "id":"pmi","country":"CN","frequency":"monthly","unit":"index","metric":"index","label":"制造业 PMI 指数","chartTitle":"制造业 PMI 历史走势",
-  "definitionAsOf":"2025-10","source":"NBS","calculation":"published","referenceValue":50,"referenceLabel":"荣枯线",
-  "sources":[
-    {"title":"国家统计局：2024年12月中国采购经理指数运行情况","url":"https://www.stats.gov.cn/zwfwck/sjfb/202412/t20241231_1958118.html","sourceDate":"2024-12-31","coverage":"2024-01 to 2024-12"},
-    {"title":"国家统计局：2025年10月中国采购经理指数运行情况","url":"https://www.stats.gov.cn/sj/zxfb/202510/t20251031_1961740.html","sourceDate":"2025-10-31","coverage":"2024-10 to 2025-10"}
+  "id": "pmi",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "index",
+  "metric": "index",
+  "label": "制造业 PMI 指数",
+  "chartTitle": "制造业 PMI 历史走势",
+  "definitionAsOf": "2025-10",
+  "source": "NBS",
+  "calculation": "published",
+  "methodologyFingerprint": "nbs-pmi|scope=31-industry-classes|sample=3200-manufacturing-enterprises|sampling=PPS|weights=new-orders:30,production:25,employment:20,supplier-delivery:15-inverse,raw-materials-inventory:10|seasonally-adjusted",
+  "referenceValue": 50,
+  "referenceLabel": "荣枯线",
+  "sources": [
+    {
+      "title": "国家统计局：2024年12月中国采购经理指数运行情况",
+      "url": "https://www.stats.gov.cn/zwfwck/sjfb/202412/t20241231_1958118.html",
+      "sourceDate": "2024-12-31",
+      "coverage": "2024-01 to 2024-12"
+    },
+    {
+      "title": "国家统计局：2025年10月中国采购经理指数运行情况",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202510/t20251031_1961740.html",
+      "sourceDate": "2025-10-31",
+      "coverage": "2024-10 to 2025-10"
+    },
+    {
+      "title": "国家统计局：2026年8月中国采购经理指数运行情况",
+      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260831_1965154.html",
+      "sourceDate": "2026-08-31",
+      "coverage": "2025-08 to 2026-08"
+    }
   ],
-  "updatedAt":"2025-10-31","comparabilityNote":"国家统计局经季节调整的官方制造业 PMI 月度值；50 为扩张与收缩的临界点，不是增长率。",
-  "data":[
-    {"date":"2024-01","value":49.2},{"date":"2024-02","value":49.1},{"date":"2024-03","value":50.8},{"date":"2024-04","value":50.4},{"date":"2024-05","value":49.5},{"date":"2024-06","value":49.5},{"date":"2024-07","value":49.4},{"date":"2024-08","value":49.1},{"date":"2024-09","value":49.8},{"date":"2024-10","value":50.1},{"date":"2024-11","value":50.3},{"date":"2024-12","value":50.1},
-    {"date":"2025-01","value":49.1},{"date":"2025-02","value":50.2},{"date":"2025-03","value":50.5},{"date":"2025-04","value":49.0},{"date":"2025-05","value":49.5},{"date":"2025-06","value":49.7},{"date":"2025-07","value":49.3},{"date":"2025-08","value":49.4},{"date":"2025-09","value":49.8},{"date":"2025-10","value":49.0}
+  "updatedAt": "2026-08-31",
+  "comparabilityNote": "国家统计局经季节调整的官方制造业 PMI 月度值；50 为扩张与收缩的临界点，不是增长率。",
+  "data": [
+    {
+      "date": "2024-01",
+      "value": 49.2
+    },
+    {
+      "date": "2024-02",
+      "value": 49.1
+    },
+    {
+      "date": "2024-03",
+      "value": 50.8
+    },
+    {
+      "date": "2024-04",
+      "value": 50.4
+    },
+    {
+      "date": "2024-05",
+      "value": 49.5
+    },
+    {
+      "date": "2024-06",
+      "value": 49.5
+    },
+    {
+      "date": "2024-07",
+      "value": 49.4
+    },
+    {
+      "date": "2024-08",
+      "value": 49.1
+    },
+    {
+      "date": "2024-09",
+      "value": 49.8
+    },
+    {
+      "date": "2024-10",
+      "value": 50.1
+    },
+    {
+      "date": "2024-11",
+      "value": 50.3
+    },
+    {
+      "date": "2024-12",
+      "value": 50.1
+    },
+    {
+      "date": "2025-01",
+      "value": 49.1
+    },
+    {
+      "date": "2025-02",
+      "value": 50.2
+    },
+    {
+      "date": "2025-03",
+      "value": 50.5
+    },
+    {
+      "date": "2025-04",
+      "value": 49
+    },
+    {
+      "date": "2025-05",
+      "value": 49.5
+    },
+    {
+      "date": "2025-06",
+      "value": 49.7
+    },
+    {
+      "date": "2025-07",
+      "value": 49.3
+    },
+    {
+      "date": "2025-08",
+      "value": 49.4
+    },
+    {
+      "date": "2025-09",
+      "value": 49.8
+    },
+    {
+      "date": "2025-10",
+      "value": 49
+    },
+    {
+      "date": "2025-11",
+      "value": 49.2
+    },
+    {
+      "date": "2025-12",
+      "value": 50.1
+    },
+    {
+      "date": "2026-01",
+      "value": 49.3
+    },
+    {
+      "date": "2026-02",
+      "value": 49
+    },
+    {
+      "date": "2026-03",
+      "value": 50.4
+    },
+    {
+      "date": "2026-04",
+      "value": 50.3
+    },
+    {
+      "date": "2026-05",
+      "value": 50
+    },
+    {
+      "date": "2026-06",
+      "value": 50.3
+    },
+    {
+      "date": "2026-07",
+      "value": 49.2
+    },
+    {
+      "date": "2026-08",
+      "value": 49.8
+    }
   ]
 }
