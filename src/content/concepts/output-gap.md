@@ -7,12 +7,12 @@ category: growth
 source: 国际货币基金组织与国家统计局
 definition: { source: IMF output-gap methodology and NBS GDP, asOf: 2026-08 }
 updatedAt: 2026-08-31
-related: [gdp, capacity-utilization, unemployment-rate, cpi]
+related: [gdp, potential-output, capacity-utilization, unemployment-rate, cpi]
 graph: macro
 order: 6
 level: advanced
-topics: [economic-activity]
-prerequisites: []
+topics: [economic-activity,structural-growth]
+prerequisites: [potential-output]
 featured: false
 ---
 
