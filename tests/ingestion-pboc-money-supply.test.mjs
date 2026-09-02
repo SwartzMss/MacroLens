@@ -15,6 +15,7 @@ import {
   HistoricalMismatchError,
   MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS,
 } from '../scripts/ingest/types.ts';
+import { runMoneySupply } from '../scripts/ingest/money-supply-cli.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => fs.readFileSync(path.join(here, 'fixtures', 'pboc', name), 'utf8');
@@ -93,3 +94,66 @@ test('rejects incoming gaps, final gaps, and historical mismatches', () => {
   const mismatch = { ...rawReports[0], publication: { ...rawReports[0].publication, month: '2025-10' } };
   assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingWithFingerprint, 'm1'), HistoricalMismatchError);
 });
+
+function seedTargets(directory) {
+  fs.mkdirSync(directory, { recursive: true });
+  for (const id of ['m0', 'm1', 'm2']) {
+    const dataset = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
+    dataset.methodologyFingerprint = MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id];
+    fs.writeFileSync(path.join(directory, `${id}.json`), `${JSON.stringify(dataset, null, 2)}\n`);
+  }
+}
+
+test('runs the fixture CLI for all three targets and is idempotent', async () => {
+  const directory = fs.mkdtempSync(path.join('/tmp', 'macrolens-pboc-cli-'));
+  seedTargets(directory);
+  const args = [
+    '--fixture-index', path.join(here, 'fixtures', 'pboc', 'publication-index.html'),
+    '--fixture-dir', path.join(here, 'fixtures', 'pboc'),
+    '--target-dir', directory,
+  ];
+  const firstOutput = await captureOutput(() => runMoneySupply(args));
+  assert.match(firstOutput, /m0.*Changed: true/s);
+  assert.match(firstOutput, /m1.*Changed: true/s);
+  assert.match(firstOutput, /m2.*Changed: true/s);
+  for (const id of ['m0', 'm1', 'm2']) {
+    assert.equal(JSON.parse(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')).data.at(-1).date, '2026-01');
+  }
+  const snapshots = new Map(['m0', 'm1', 'm2'].map((id) => [id, fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')]));
+  const secondOutput = await captureOutput(() => runMoneySupply(args));
+  assert.match(secondOutput, /m0.*Changed: false/s);
+  assert.match(secondOutput, /m1.*Changed: false/s);
+  assert.match(secondOutput, /m2.*Changed: false/s);
+  for (const id of ['m0', 'm1', 'm2']) assert.equal(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8'), snapshots.get(id));
+});
+
+test('does not write any target when one fetched series has a historical mismatch', async () => {
+  const directory = fs.mkdtempSync(path.join('/tmp', 'macrolens-pboc-atomic-'));
+  const fixtures = fs.mkdtempSync(path.join('/tmp', 'macrolens-pboc-fixture-'));
+  for (const name of ['publication-index.html', 'report-2025-11.html', 'report-2025-12.html', 'report-2026-01.html']) {
+    fs.copyFileSync(path.join(here, 'fixtures', 'pboc', name), path.join(fixtures, name));
+  }
+  seedTargets(directory);
+  const args = ['--fixture-index', path.join(fixtures, 'publication-index.html'), '--fixture-dir', fixtures, '--target-dir', directory];
+  await runMoneySupply(args);
+  const before = new Map(['m0', 'm1', 'm2'].map((id) => [id, fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')]));
+  fs.writeFileSync(path.join(fixtures, 'report-2026-01.html'), fixture('report-2026-01.html').replace('同比下降1.0%', '同比下降9.9%'));
+  await assert.rejects(() => runMoneySupply(args), HistoricalMismatchError);
+  for (const id of ['m0', 'm1', 'm2']) assert.equal(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8'), before.get(id));
+});
+
+test('help exits before reading or writing indicator data', async () => {
+  await assert.doesNotReject(() => runMoneySupply(['--help']));
+});
+
+async function captureOutput(callback) {
+  const originalLog = console.log;
+  const lines = [];
+  console.log = (...args) => lines.push(args.join(' '));
+  try {
+    await callback();
+    return lines.join('\n');
+  } finally {
+    console.log = originalLog;
+  }
+}
