@@ -15,7 +15,7 @@ Add a first-class `household-sector` topic rather than scattering the five conce
 | Concept | Primary topic | Secondary topics | Prerequisites |
 | --- | --- | --- | --- |
 | `disposable-income` | household-sector | labor-market, economic-activity | `wages` |
-| `income-expectations` | household-sector | labor-market, economic-activity | `wages` |
+| `income-expectations` | household-sector | labor-market, economic-activity | `disposable-income` |
 | `household-consumption` | household-sector | economic-activity | `disposable-income`, `income-expectations` |
 | `household-saving-rate` | household-sector | economic-activity, market-rates | `disposable-income`, `household-consumption` |
 | `propensity-to-consume` | household-sector | economic-activity | `household-consumption` |

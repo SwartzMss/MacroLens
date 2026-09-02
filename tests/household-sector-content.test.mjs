@@ -9,7 +9,7 @@ const homepagePath = `${root}src/pages/index.astro`;
 
 const expectedMetadata = {
   'disposable-income': { name: '居民人均可支配收入', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['wages'], order: 11 },
-  'income-expectations': { name: '收入预期', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['wages'], order: 12 },
+  'income-expectations': { name: '收入预期', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['disposable-income'], order: 12 },
   'household-consumption': { name: '居民消费支出', category: 'growth', topics: ['household-sector', 'economic-activity'], prerequisites: ['disposable-income', 'income-expectations'], order: 13 },
   'household-saving-rate': { name: '居民储蓄率', category: 'growth', topics: ['household-sector', 'economic-activity', 'market-rates'], prerequisites: ['disposable-income', 'household-consumption'], order: 14 },
   'propensity-to-consume': { name: '消费倾向', category: 'growth', topics: ['household-sector', 'economic-activity'], prerequisites: ['household-consumption'], order: 15 },
@@ -17,7 +17,7 @@ const expectedMetadata = {
 
 const requiredTerms = {
   'disposable-income': ['工资性收入', '经营净收入', '财产净收入', '转移净收入', '工资与劳动报酬', '国民经济核算', '名义', '实际', '人均', '总量'],
-  'income-expectations': ['收入预期', '调查', '期限', '分布', '实现收入', '消费', '不等于', '不保证'],
+  'income-expectations': ['收入预期', '调查', '期限', '分布', '实现收入', '消费', '不等于', '不保证', '收入信心指数', '扩散指数', '不是预期收入增长率', '增加', '基本不变', '减少', '难以预计', '1、0.5、0', '剔除', '0—100%', '50%以上'],
   'household-consumption': ['居民人均消费支出', '居民消费支出', '社会消费品零售总额', '不等于', '服务', '名义', '实际', '人均', '总量'],
   'household-saving-rate': ['住户部门总储蓄', '可支配收入', '居民消费支出', '居民储蓄', '居民存款余额', '流量', '金融资产', '财富'],
   'propensity-to-consume': ['平均消费倾向', '边际消费倾向', '消费水平', '可支配收入', '名义', '实际', '人均', '总量'],
@@ -49,6 +49,16 @@ function readConcept(id) {
   assert.equal(existsSync(path), true, `${id} concept page is missing`);
   return readFileSync(path, 'utf8');
 }
+
+test('income expectations explains the PBOC income confidence index', () => {
+  const document = readConcept('income-expectations');
+
+  assert.match(document, /收入信心指数[\s\S]{0,160}扩散指数[\s\S]{0,100}不是预期收入增长率/);
+  assert.match(document, /增加[\s\S]{0,120}基本不变[\s\S]{0,120}减少[\s\S]{0,120}难以预计/);
+  assert.match(document, /1、0\.5、0/);
+  assert.match(document, /剔除[“"]难以预计[”"]/);
+  assert.match(document, /0—100%[\s\S]{0,80}50%以上/);
+});
 
 function parseFrontmatter(document) {
   const match = document.match(/^---\n([\s\S]*?)\n---/);

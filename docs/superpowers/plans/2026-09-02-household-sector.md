@@ -21,7 +21,7 @@ Create a test using the existing frontmatter parsing pattern. It must require th
 ```js
 const expected = {
   'disposable-income': { name: '居民人均可支配收入', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['wages'], order: 11 },
-  'income-expectations': { name: '收入预期', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['wages'], order: 12 },
+  'income-expectations': { name: '收入预期', category: 'growth', topics: ['household-sector', 'labor-market', 'economic-activity'], prerequisites: ['disposable-income'], order: 12 },
   'household-consumption': { name: '居民消费支出', category: 'growth', topics: ['household-sector', 'economic-activity'], prerequisites: ['disposable-income', 'income-expectations'], order: 13 },
   'household-saving-rate': { name: '居民储蓄率', category: 'growth', topics: ['household-sector', 'economic-activity', 'market-rates'], prerequisites: ['disposable-income', 'household-consumption'], order: 14 },
   'propensity-to-consume': { name: '消费倾向', category: 'growth', topics: ['household-sector', 'economic-activity'], prerequisites: ['household-consumption'], order: 15 },
@@ -33,7 +33,7 @@ Require every page to have `country: CN`, `graph: macro`, `level`, `featured: fa
 ```js
 const terms = {
   'disposable-income': ['工资性收入', '经营净收入', '财产净收入', '转移净收入', '工资与劳动报酬', '国民经济核算', '名义', '实际', '人均', '总量'],
-  'income-expectations': ['收入预期', '调查', '期限', '分布', '实现收入', '消费', '不等于', '不保证'],
+  'income-expectations': ['收入预期', '调查', '期限', '分布', '实现收入', '消费', '不等于', '不保证', '收入信心指数', '扩散指数', '不是预期收入增长率', '增加', '基本不变', '减少', '难以预计', '1、0.5、0', '剔除', '0—100%', '50%以上'],
   'household-consumption': ['居民人均消费支出', '居民消费支出', '社会消费品零售总额', '不等于', '服务', '名义', '实际', '人均', '总量'],
   'household-saving-rate': ['住户部门总储蓄', '可支配收入', '居民消费支出', '居民储蓄', '居民存款余额', '流量', '金融资产', '财富'],
   'propensity-to-consume': ['平均消费倾向', '边际消费倾向', '消费水平', '可支配收入', '名义', '实际', '人均', '总量'],
@@ -61,7 +61,7 @@ Extend the IA test to require one `household-sector` topic with label `居民部
 - [ ] **Step 2: Add each page with the exact metadata from Task 1.** Use `updatedAt: 2026-09-02`, `graph: macro`, `featured: false`, and no `chart`.
 
   - `disposable-income`: define NBS household-survey per-capita disposable income and its wage, net operating, property, and transfer components; distinguish wages/labor compensation, survey income, and national-accounts household income; cover nominal/real and per-capita/aggregate.
-  - `income-expectations`: define forward-looking household beliefs rather than realized income or a guaranteed forecast; cover survey population, horizon, question form, distribution, revisions, and conditional consumption effects.
+  - `income-expectations`: define forward-looking household beliefs rather than realized income or a guaranteed forecast; cover survey population, horizon, question form, distribution, revisions, conditional consumption effects, and the PBOC income confidence diffusion index without treating it as an expected income growth rate.
   - `household-consumption`: define resident per-capita consumption expenditure; explicitly state `社会消费品零售总额 ≠ 居民消费支出`; explain goods/services, in-kind and imputed consumption, resident/domestic coverage, nominal/real, and per-capita/aggregate.
   - `household-saving-rate`: state `住户部门总储蓄 = 住户部门可支配收入 − 居民消费支出`; distinguish `居民储蓄 ≠ 居民存款余额`, saving flows, deposit stocks, financial assets, and wealth; explain denominator and nominal/real limits.
   - `propensity-to-consume`: define average propensity as `C / disposable income` and marginal propensity as `ΔC / ΔY`; distinguish level, ratio, and incremental response, including nominal/real and per-capita/aggregate choices.
