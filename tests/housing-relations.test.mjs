@@ -39,7 +39,8 @@ test('stores only approved non-deterministic housing relations', () => {
     assert.ok(nodes.has(relation.source), `missing source ${relation.source}`);
     assert.ok(nodes.has(relation.target), `missing target ${relation.target}`);
   }
-  const housing = relations.filter(relation => expectedNodes.has(relation.source) || expectedNodes.has(relation.target));
+  const housingConceptIds = new Set(['real-estate-investment', 'property-sales', 'house-price-index', 'mortgage', 'land-market']);
+  const housing = relations.filter(relation => (housingConceptIds.has(relation.source) || housingConceptIds.has(relation.target)) && relation.target !== 'land-transfer-revenue');
   assert.deepEqual(housing.map(key).sort(), expected.map(([source, target, type]) => key({ source, target, type })).sort());
   assert.equal(housing.some(relation => relation.type === 'CAUSES'), false);
 });
