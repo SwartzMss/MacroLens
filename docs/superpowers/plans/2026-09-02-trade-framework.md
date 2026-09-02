@@ -77,6 +77,8 @@ Extend `expectedNodes` with these abstract nodes:
 ['trade-pricing-and-competitiveness', '贸易定价与竞争力'],
 ```
 
+Also register the five new concept nodes as indicator nodes in the graph contract: `exports` / `出口`, `imports` / `进口`, `trade-balance` / `贸易差额`, `trade-volume-and-price` / `贸易数量与价格拆分`, and `terms-of-trade` / `贸易条件`.
+
 Extend `expectedRelations` with exactly:
 
 ```js
@@ -97,7 +99,7 @@ Add all six abstract IDs to the no-concept-page assertion. Keep the existing uni
 Run:
 
 ```bash
-node --import tsx tests/external-sector-content.test.mjs tests/external-sector-relations.test.mjs
+node --import tsx --test tests/external-sector-content.test.mjs tests/external-sector-relations.test.mjs
 ```
 
 Expected: failures for missing concept files, metadata, and graph nodes/relations; no test-loader or syntax error.
@@ -136,7 +138,7 @@ Define terms of trade as an export-price index relative to an import-price index
 Run:
 
 ```bash
-node --import tsx tests/external-sector-content.test.mjs tests/external-sector-relations.test.mjs
+node --import tsx --test tests/external-sector-content.test.mjs tests/external-sector-relations.test.mjs
 ```
 
 Expected: content tests pass for all five pages; relation tests still fail only because graph nodes and relations have not yet been added.
@@ -149,7 +151,7 @@ Expected: content tests pass for all five pages; relation tests still fail only 
 
 - [ ] **Step 1: Add six abstract nodes**
 
-Add the six labels from Task 1 to the node section of `data/relations/macro.json` without a `kind` property and without creating concept pages.
+Add the five indicator nodes and six abstract nodes from Task 1 to the node section of `data/relations/macro.json`. The five concept nodes use `kind: "indicator"`; the six abstract nodes have no `kind` property and do not receive concept pages.
 
 - [ ] **Step 2: Add the eight approved relation triples**
 
