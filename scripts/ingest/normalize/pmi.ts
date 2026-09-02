@@ -45,14 +45,15 @@ export function normalizePmiDataset(raw: RawPmiPublication, existing: IndicatorD
     throw new MethodologyMismatchError('PMI methodology fingerprint differs from the existing dataset');
   }
   const data = mergePmiObservations(existing.data, raw.observations);
-  const lastObservation = data.at(-1);
-  if (!lastObservation) throw new IngestionContractError('Normalized PMI dataset contains no observations');
+  const firstIncoming = raw.observations[0];
+  const lastIncoming = raw.observations.at(-1);
+  if (!firstIncoming || !lastIncoming) throw new IngestionContractError('Fetched PMI publication contains no observations');
   if (!existing.sources.at(-1)) throw new IngestionContractError('Existing PMI dataset has no latest source');
   const latestSource: IndicatorSource = {
     title: `国家统计局：${raw.publication.title}`,
     url: raw.publication.url,
     sourceDate: raw.publication.sourceDate,
-    coverage: `${raw.observations[0].date} to ${lastObservation.date}`,
+    coverage: `${firstIncoming.date} to ${lastIncoming.date}`,
   };
   const candidates = [
     ...existing.sources.filter((source) => source.url !== latestSource.url),

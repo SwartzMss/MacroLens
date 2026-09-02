@@ -209,6 +209,18 @@ test('rejects a merged dataset with a missing month between existing and incomin
   );
 });
 
+test('uses the incoming publication range for source coverage even when existing data is newer', () => {
+  const publication = discoverLatestPmiPublication(fixture('publication-index.html'));
+  const parsed = parsePmiPublication(publication, fixture('pmi-2026-08.html'));
+  const raw = {
+    ...parsed,
+    publication: { ...parsed.publication, sourceDate: '2026-09-01' },
+    observations: parsed.observations.filter(({ date }) => date <= '2026-07'),
+  };
+  const normalized = normalizePmiDataset(raw, existingDataset);
+  assert.equal(normalized.sources.at(-1).coverage, '2025-08 to 2026-07');
+});
+
 test('writes stable two-space JSON and reports unchanged output on the second run', () => {
   const target = path.join(fs.mkdtempSync(path.join('/tmp', 'macrolens-pmi-')), 'pmi.json');
   const first = writeIndicatorDataset(target, existingDataset);
