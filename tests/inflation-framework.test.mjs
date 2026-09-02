@@ -44,7 +44,10 @@ const expectedMetadata = {
 
 const requiredTerms = {
   'gdp-deflator': ['名义GDP', '实际GDP', '国内生产', '权重', '不等于CPI'],
-  'inflation-expectations': ['预期通胀', '调查', '市场价格', '实现通胀', '锚定'],
+  'inflation-expectations': [
+    '预期通胀', '调查', '市场价格', '实现通胀', '锚定', '扩散指数', '不是预期通胀率',
+    '上升', '基本不变', '下降', '看不准', '1、0.5、0', '剔除“看不准”的样本',
+  ],
   'phillips-curve': ['失业率', '产出缺口', '通胀', '预期', '不是稳定的因果定律'],
   'price-transmission': ['上游', '下游', '成本', '需求', '传导时滞', 'PPI上涨不必然带来CPI上涨'],
 };
@@ -89,7 +92,7 @@ const expectedRelations = [
   ['inflation-expectations', 'real-interest-rate', 'AFFECTS'],
   ['output-gap', 'inflation-pressure', 'CORRELATES'],
   ['phillips-curve', 'inflation-slack-relationship', 'REFLECTS'],
-  ['ppi', 'downstream-price-pressure', 'AFFECTS'],
+  ['producer-price-pressure', 'downstream-price-pressure', 'AFFECTS'],
   ['price-transmission', 'upstream-downstream-price-pass-through', 'REFLECTS'],
 ];
 
@@ -200,6 +203,18 @@ test('uses exactly the approved non-causal inflation framework relations', () =>
 
   assert.deepEqual(clusterRelations.map(relationKey).sort(), expectedRelationKeys.sort());
   assert.equal(clusterRelations.some((relation) => relation.type === 'CAUSES'), false, 'inflation relations must not claim causality');
+});
+
+test('routes PPI measurement through producer-price pressure before downstream transmission', () => {
+  const elements = JSON.parse(readFileSync(graphPath, 'utf8'));
+  const relations = elements.filter((item) => 'source' in item.data).map((item) => item.data);
+  const hasRelation = (source, target, type) => relations.some(
+    (relation) => relation.source === source && relation.target === target && relation.type === type,
+  );
+
+  assert.equal(hasRelation('ppi', 'producer-price-pressure', 'REFLECTS'), true);
+  assert.equal(hasRelation('producer-price-pressure', 'downstream-price-pressure', 'AFFECTS'), true);
+  assert.equal(hasRelation('ppi', 'downstream-price-pressure', 'AFFECTS'), false);
 });
 
 test('keeps the curated homepage free of inflation framework concept IDs', () => {

@@ -131,7 +131,7 @@
   {"data":{"source":"inflation-expectations","target":"real-interest-rate","type":"AFFECTS"}},
   {"data":{"source":"output-gap","target":"inflation-pressure","type":"CORRELATES"}},
   {"data":{"source":"phillips-curve","target":"inflation-slack-relationship","type":"REFLECTS"}},
-  {"data":{"source":"ppi","target":"downstream-price-pressure","type":"AFFECTS"}},
+  {"data":{"source":"producer-price-pressure","target":"downstream-price-pressure","type":"AFFECTS"}},
   {"data":{"source":"price-transmission","target":"upstream-downstream-price-pass-through","type":"REFLECTS"}},
   {"data":{"source":"ppi","target":"cpi","type":"CORRELATES"}},
   {"data":{"source":"core-cpi","target":"cpi","type":"DERIVED_FROM"}},
