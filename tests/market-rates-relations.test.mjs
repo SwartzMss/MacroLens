@@ -52,6 +52,7 @@ test('uses only the approved directional market-rate relationships', () => {
   // Approved cross-cluster relation: inflation-expectations -> real-interest-rate (AFFECTS).
   const approvedCrossClusterRelationKeys = new Set([
     relationKey({ source: 'inflation-expectations', target: 'real-interest-rate', type: 'AFFECTS' }),
+    relationKey({ source: 'real-interest-rate', target: 'saving-consumption-choice', type: 'AFFECTS' }),
   ]);
   const marketRelations = relations.filter(
     (relation) =>

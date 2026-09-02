@@ -22,11 +22,13 @@ const expectedNodes = new Map([
 ]);
 const expectedRelations = [
   ['employment', 'labor-market-conditions', 'REFLECTS'],
+  ['employment', 'household-income-conditions', 'AFFECTS'],
   ['unemployment-rate', 'labor-market-conditions', 'REFLECTS'],
   ['youth-unemployment', 'labor-market-conditions', 'REFLECTS'],
   ['labor-force-participation', 'labor-supply', 'REFLECTS'],
   ['wages', 'consumer-price-pressure', 'AFFECTS'],
   ['wages', 'consumption-activity', 'AFFECTS'],
+  ['wages', 'household-income-conditions', 'AFFECTS'],
   ['labor-market-conditions', 'economic-activity', 'AFFECTS'],
 ];
 const relationKey = ({ source, target, type }) => `${source}\0${target}\0${type}`;

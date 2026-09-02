@@ -19,6 +19,15 @@ test('topic registry has stable unique IDs and complete topic metadata', () => {
     assert.match(topic.description, /\S/);
     assert.match(topic.category, /\S/);
   }
+
+  const householdTopic = topicRegistry.find((topic) => topic.id === 'household-sector');
+  assert.deepEqual(householdTopic, {
+    id: 'household-sector',
+    label: '居民部门',
+    description: '理解劳动收入、可支配收入、消费、储蓄与预期之间的统计边界和传导关系。',
+    category: 'growth',
+    order: 55,
+  });
 });
 
 test('topic pages and prerequisite component exist as static route sources', () => {
