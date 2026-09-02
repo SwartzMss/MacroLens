@@ -10,7 +10,7 @@ import {
 import { normalizePmiDataset } from '../scripts/ingest/normalize/pmi.ts';
 import { validateIndicatorDataset } from '../scripts/ingest/validate/dataset.ts';
 import { mergePmiObservations } from '../scripts/ingest/validate/overlap.ts';
-import { HistoricalMismatchError } from '../scripts/ingest/types.ts';
+import { HistoricalMismatchError, MethodologyMismatchError } from '../scripts/ingest/types.ts';
 import { writeIndicatorDataset } from '../scripts/ingest/write/indicator.ts';
 import { run as runPmiCli } from '../scripts/ingest/cli.ts';
 
@@ -65,6 +65,15 @@ test('accepts the spaced month labels used in the official table markup', () => 
   const html = fixture('pmi-2026-08.html').replace('2026年8月</td>', '2026 年 8 月</td>');
   const raw = parsePmiPublication(publication, html);
   assert.deepEqual(raw.observations.at(-1), { date: '2026-08', value: 49.8 });
+});
+
+test('rejects a PMI methodology change even when the table shape is unchanged', () => {
+  const publication = discoverLatestPmiPublication(fixture('publication-index.html'));
+  const changedMethodology = fixture('pmi-2026-08.html').replace('新订单指数，权数为30%', '新订单指数，权数为35%');
+  assert.throws(
+    () => parsePmiPublication(publication, changedMethodology),
+    MethodologyMismatchError,
+  );
 });
 
 test('rejects an index containing only an interpretation link', () => {
@@ -147,10 +156,12 @@ test('normalizes the publication into the existing indicator contract', () => {
   assert.equal(normalized.definitionAsOf, existingDataset.definitionAsOf);
   assert.equal(normalized.updatedAt, '2026-08-31');
   assert.deepEqual(normalized.data.slice(-1), [{ date: '2026-08', value: 49.8 }]);
-  assert.equal(normalized.sources.length, 2);
+  assert.equal(normalized.sources.length, 3);
+  assert.equal(normalized.sources[1].sourceDate, '2025-10-31');
   assert.equal(normalized.sources.at(-1).sourceDate, '2026-08-31');
-  assert.equal(normalized.sources.at(-1).coverage, '2024-10 to 2026-08');
+  assert.equal(normalized.sources.at(-1).coverage, '2025-08 to 2026-08');
   assert.equal(normalized.sources.at(-1).url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260831_1965154.html');
+  assert.equal(normalized.methodologyFingerprint, raw.methodologyFingerprint);
 });
 
 test('validates the normalized indicator dataset', () => {
@@ -171,6 +182,30 @@ test('rejects an indicator dataset with an invalid series contract', () => {
   assert.throws(
     () => validateIndicatorDataset({ ...existingDataset, sources: [] }),
     /source/i,
+  );
+  assert.throws(
+    () => validateIndicatorDataset({ ...existingDataset, data: [{ date: '2025-10', value: 49 }, { date: '2025-12', value: 50 }] }),
+    /continuous|连续|month|月份/i,
+  );
+});
+
+test('rejects a publication older than the existing dataset update', () => {
+  const publication = discoverLatestPmiPublication(fixture('publication-index.html'));
+  const raw = parsePmiPublication(publication, fixture('pmi-2026-08.html'));
+  const oldRaw = { ...raw, publication: { ...raw.publication, sourceDate: '2025-09-30' } };
+  assert.throws(
+    () => normalizePmiDataset(oldRaw, existingDataset),
+    /older|source date|updatedAt/i,
+  );
+});
+
+test('rejects a merged dataset with a missing month between existing and incoming data', () => {
+  const publication = discoverLatestPmiPublication(fixture('publication-index.html'));
+  const raw = parsePmiPublication(publication, fixture('pmi-2026-08.html'));
+  const gapRaw = { ...raw, observations: raw.observations.filter(({ date }) => date >= '2025-12') };
+  assert.throws(
+    () => validateIndicatorDataset(normalizePmiDataset(gapRaw, baselineDataset)),
+    /continuous|连续|month|月份/i,
   );
 });
 
@@ -210,7 +245,7 @@ test('runs the fixture CLI idempotently and appends only the missing months', as
     { date: '2026-07', value: 49.2 },
     { date: '2026-08', value: 49.8 },
   ]);
-  assert.equal(firstDataset.sources.length, 2);
+  assert.equal(firstDataset.sources.length, 3);
   const afterFirst = fs.readFileSync(target, 'utf8');
   const secondOutput = await captureOutput(() => runPmiCli(args));
   assert.match(secondOutput, /Changed: false/);

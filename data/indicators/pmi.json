@@ -9,6 +9,7 @@
   "definitionAsOf": "2025-10",
   "source": "NBS",
   "calculation": "published",
+  "methodologyFingerprint": "nbs-pmi|scope=31-industry-classes|sample=3200-manufacturing-enterprises|sampling=PPS|weights=new-orders:30,production:25,employment:20,supplier-delivery:15-inverse,raw-materials-inventory:10|seasonally-adjusted",
   "referenceValue": 50,
   "referenceLabel": "荣枯线",
   "sources": [
@@ -19,10 +20,16 @@
       "coverage": "2024-01 to 2024-12"
     },
     {
+      "title": "国家统计局：2025年10月中国采购经理指数运行情况",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202510/t20251031_1961740.html",
+      "sourceDate": "2025-10-31",
+      "coverage": "2024-10 to 2025-10"
+    },
+    {
       "title": "国家统计局：2026年8月中国采购经理指数运行情况",
       "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260831_1965154.html",
       "sourceDate": "2026-08-31",
-      "coverage": "2024-10 to 2026-08"
+      "coverage": "2025-08 to 2026-08"
     }
   ],
   "updatedAt": "2026-08-31",

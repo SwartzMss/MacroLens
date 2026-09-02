@@ -1,7 +1,7 @@
-import { IngestionContractError } from '../types.ts';
+import { IngestionContractError, MethodologyMismatchError } from '../types.ts';
 import type { IndicatorDataset, RawPmiPublication, Observation, IndicatorSource } from '../types.ts';
 import { mergePmiObservations } from '../validate/overlap.ts';
-import { validateIndicatorDataset } from '../validate/dataset.ts';
+import { coverageCoversDates, validateIndicatorDataset } from '../validate/dataset.ts';
 
 function validateIncomingObservations(observations: Observation[]): void {
   if (!Array.isArray(observations) || observations.length === 0) {
@@ -18,31 +18,52 @@ function validateIncomingObservations(observations: Observation[]): void {
   }
 }
 
-function coverageStart(source: IndicatorSource, existing: IndicatorDataset): string {
-  const match = source.coverage.match(/^(\d{4}-\d{2})\s+to\s+\d{4}-\d{2}$/);
-  return match?.[1] ?? existing.data[0].date;
+function pruneSources(sources: IndicatorSource[], dates: string[]): IndicatorSource[] {
+  let result = [...sources];
+  let removed = true;
+  while (removed && result.length > 1) {
+    removed = false;
+    for (let index = 0; index < result.length; index += 1) {
+      const candidate = result.filter((_, candidateIndex) => candidateIndex !== index);
+      if (coverageCoversDates(candidate, dates)) {
+        result = candidate;
+        removed = true;
+        break;
+      }
+    }
+  }
+  return result;
 }
 
 export function normalizePmiDataset(raw: RawPmiPublication, existing: IndicatorDataset): IndicatorDataset {
   validateIndicatorDataset(existing);
   validateIncomingObservations(raw.observations);
+  if (raw.publication.sourceDate < existing.updatedAt) {
+    throw new IngestionContractError(`Fetched PMI publication is older than existing updatedAt: ${raw.publication.sourceDate} < ${existing.updatedAt}`);
+  }
+  if (raw.methodologyFingerprint !== existing.methodologyFingerprint) {
+    throw new MethodologyMismatchError('PMI methodology fingerprint differs from the existing dataset');
+  }
   const data = mergePmiObservations(existing.data, raw.observations);
   const lastObservation = data.at(-1);
   if (!lastObservation) throw new IngestionContractError('Normalized PMI dataset contains no observations');
-  const previousLatest = existing.sources.at(-1);
-  if (!previousLatest) throw new IngestionContractError('Existing PMI dataset has no latest source');
-  const baselineSources = existing.sources.length > 1 ? existing.sources.slice(0, -1) : existing.sources;
+  if (!existing.sources.at(-1)) throw new IngestionContractError('Existing PMI dataset has no latest source');
   const latestSource: IndicatorSource = {
     title: `国家统计局：${raw.publication.title}`,
     url: raw.publication.url,
     sourceDate: raw.publication.sourceDate,
-    coverage: `${coverageStart(previousLatest, existing)} to ${lastObservation.date}`,
+    coverage: `${raw.observations[0].date} to ${lastObservation.date}`,
   };
+  const candidates = [
+    ...existing.sources.filter((source) => source.url !== latestSource.url),
+    latestSource,
+  ];
 
   return {
     ...existing,
     updatedAt: raw.publication.sourceDate,
-    sources: [...baselineSources, latestSource],
+    methodologyFingerprint: raw.methodologyFingerprint,
+    sources: pruneSources(candidates, data.map((observation) => observation.date)),
     data,
   };
 }

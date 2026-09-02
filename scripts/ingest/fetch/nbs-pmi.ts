@@ -1,10 +1,23 @@
-import { IngestionContractError } from '../types.ts';
+import { IngestionContractError, MethodologyMismatchError, PMI_METHODOLOGY_FINGERPRINT } from '../types.ts';
 import type { Observation, PmiPublication, RawPmiPublication } from '../types.ts';
 
 const NBS_ORIGIN = 'https://www.stats.gov.cn/';
 const NBS_PUBLICATION_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
 const PUBLICATION_TITLE = '中国采购经理指数运行情况';
 const TABLE_HEADING = '表1 中国制造业PMI及构成指数';
+
+const METHODOLOGY_CONTRACTS: Array<[string, RegExp]> = [
+  ['manufacturing industry scope', /31个行业大类/],
+  ['manufacturing sample size', /3200家调查样本/],
+  ['PPS sampling', /PPS/],
+  ['new orders weight', /新订单指数[^。；]*30%/],
+  ['production weight', /生产指数[^。；]*25%/],
+  ['employment weight', /从业人员指数[^。；]*20%/],
+  ['supplier delivery weight', /供应商配送时间指数[^。；]*15%/],
+  ['raw materials inventory weight', /原材料库存指数[^。；]*10%/],
+  ['supplier delivery inverse treatment', /供应商配送时间指数为逆指数/],
+  ['seasonal adjustment', /季节调整/],
+];
 
 function textOf(html: string): string {
   return html
@@ -47,6 +60,14 @@ function ensureContinuousMonths(observations: Observation[]): void {
   }
 }
 
+export function validatePmiMethodology(html: string): string {
+  const canonical = textOf(html).replace(/\s+/g, '');
+  for (const [name, pattern] of METHODOLOGY_CONTRACTS) {
+    if (!pattern.test(canonical)) throw new MethodologyMismatchError(`PMI methodology contract missing or changed: ${name}`);
+  }
+  return PMI_METHODOLOGY_FINGERPRINT;
+}
+
 export function discoverLatestPmiPublication(indexHtml: string): PmiPublication {
   const candidates: PmiPublication[] = [];
   const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
@@ -79,6 +100,7 @@ export function parsePmiPublication(publication: PmiPublication, html: string): 
     return beforeTable.includes(canonicalHeading);
   });
   if (!tableMatch) throw new IngestionContractError(`Missing required table heading: ${TABLE_HEADING}`);
+  const methodologyFingerprint = validatePmiMethodology(html);
   const tableHtml = tableMatch[0];
   const rows = [...tableHtml.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((match) => cellsOf(match[1]));
   const header = rows.find((row) => row.includes('PMI'));
@@ -106,5 +128,5 @@ export function parsePmiPublication(publication: PmiPublication, html: string): 
   if (observations.length === 0) throw new IngestionContractError('No monthly PMI observations found');
   observations.sort((left, right) => left.date.localeCompare(right.date));
   ensureContinuousMonths(observations);
-  return { publication, observations };
+  return { publication, observations, methodologyFingerprint };
 }
