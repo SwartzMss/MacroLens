@@ -51,5 +51,5 @@ featured: false
 
 ## 来源
 
-- [国际货币基金组织：World Economic Outlook，通胀与劳动力市场章节](https://www.elibrary.imf.org/display/book/9798400235801/CH002.xml)
-- [国际货币基金组织：The Role of Exchange Rates in Inflation Dynamics](https://www.elibrary.imf.org/view/journals/001/2007/076/article-A001-en.xml)
+- [国际货币基金组织：Managing Expectations: Inflation and Monetary Policy](https://www.elibrary.imf.org/display/book/9798400235801/CH002.xml)
+- [国际货币基金组织：Flattening of the Phillips Curve: Implications for Monetary Policy](https://www.elibrary.imf.org/view/journals/001/2007/076/article-A001-en.xml)

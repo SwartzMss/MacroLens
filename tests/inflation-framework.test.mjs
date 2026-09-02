@@ -49,6 +49,24 @@ const requiredTerms = {
   'price-transmission': ['上游', '下游', '成本', '需求', '传导时滞', 'PPI上涨不必然带来CPI上涨'],
 };
 
+const approvedSources = {
+  'gdp-deflator': [
+    '[国家统计局：GDP 平减指数相关统计指标说明](https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903780.html)',
+  ],
+  'inflation-expectations': [
+    '[中国人民银行：城镇储户问卷调查报告](https://www.pbc.gov.cn/diaochatongjisi/fileDir/resource/cms/2025/03/2025032117142239782.pdf)',
+    '[国际货币基金组织：Are Household Inflation Expectations De-anchoring?](https://www.imf.org/en/news/articles/2022/05/17/sp05172022-are-household-inflation-expectations-deanchoring)',
+  ],
+  'phillips-curve': [
+    '[国际货币基金组织：Managing Expectations: Inflation and Monetary Policy](https://www.elibrary.imf.org/display/book/9798400235801/CH002.xml)',
+    '[国际货币基金组织：Flattening of the Phillips Curve: Implications for Monetary Policy](https://www.elibrary.imf.org/view/journals/001/2007/076/article-A001-en.xml)',
+  ],
+  'price-transmission': [
+    '[国际货币基金组织：Pass-Through of Imported Input Prices to Domestic Producer Prices](https://www.imf.org/-/media/websites/imf/imported-full-text-pdf/external/pubs/ft/wp/2016/_wp1623.pdf)',
+    '[欧洲中央银行：The impact of oil price shocks on euro area inflation](https://www.ecb.europa.eu/press/economic-bulletin/html/eb201607.en.html)',
+  ],
+};
+
 const expectedIndicatorLabels = new Map([
   ['gdp-deflator', 'GDP 平减指数'],
   ['inflation-expectations', '通胀预期'],
@@ -137,6 +155,9 @@ for (const [id, metadataExpectation] of Object.entries(expectedMetadata)) {
 
     for (const term of requiredTerms[id]) {
       assert.ok(document.includes(term), `${id} must explain ${term}`);
+    }
+    for (const source of approvedSources[id]) {
+      assert.ok(document.includes(source), `${id} must include approved source ${source}`);
     }
   });
 }
