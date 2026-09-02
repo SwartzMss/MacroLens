@@ -17,7 +17,7 @@
 - Modify `src/data/topics.ts` to register `structural-growth`.
 - Modify `data/relations/macro.json` with five indicator nodes, four abstract nodes, and six approved relations.
 - Create `tests/structural-growth-content.test.mjs` and `tests/structural-growth-relations.test.mjs`.
-- Modify `tests/information-architecture.test.mjs` for the new topic contract.
+- Modify `tests/information-architecture.test.mjs`, `tests/business-cycle-content.test.mjs`, `tests/business-cycle-relations.test.mjs`, and `tests/labor-market-relations.test.mjs` for the new contracts and approved cross-cluster edges.
 
 ## Task 1: Lock content, IA, and prerequisite contracts
 
@@ -25,7 +25,7 @@
 - Create: `tests/structural-growth-content.test.mjs`
 - Modify: `tests/information-architecture.test.mjs`
 
-- [ ] **Step 1: Write the failing content contract.**
+- [x] **Step 1: Write the failing content contract.**
 
 Create the test using the frontmatter parser in `tests/household-sector-content.test.mjs`. Use this exact metadata map:
 
@@ -53,7 +53,7 @@ const requiredTerms = {
 
 Require source URLs covering NBS national accounts/population/labor, IMF output-gap methodology, OECD productivity methodology, World Bank `SP.POP.DPND`, and the existing NBS/ILO labor-force methodology. Assert all `related` IDs resolve and the homepage contains none of the five new IDs.
 
-- [ ] **Step 2: Add IA and prerequisite assertions.**
+- [x] **Step 2: Add IA and prerequisite assertions.**
 
 In `tests/information-architecture.test.mjs`, assert:
 
@@ -69,13 +69,13 @@ assert.deepEqual(topicRegistry.find((topic) => topic.id === 'structural-growth')
 
 Parse `output-gap.md` and assert `prerequisites` equals `['potential-output']`.
 
-- [ ] **Step 3: Run the focused tests and confirm the red state.**
+- [x] **Step 3: Run the focused tests and confirm the red state.**
 
 Run `node --import tsx tests/structural-growth-content.test.mjs tests/information-architecture.test.mjs`.
 
 Expected: FAIL because the five pages, topic, and prerequisite are absent.
 
-- [ ] **Step 4: Commit the failing contracts.**
+- [x] **Step 4: Commit the failing contracts.**
 
 ```bash
 git add tests/structural-growth-content.test.mjs tests/information-architecture.test.mjs
@@ -93,7 +93,7 @@ git commit -m "test: define structural growth content contracts"
 - Create: `src/content/concepts/demographic-dependency-ratio.md`
 - Create: `src/content/concepts/potential-output.md`
 
-- [ ] **Step 1: Register the topic.**
+- [x] **Step 1: Register the topic.**
 
 Insert `'structural-growth'` after `'economic-activity'` in `topicIds`, and add this record to `topics`:
 
@@ -101,7 +101,7 @@ Insert `'structural-growth'` after `'economic-activity'` in `topicIds`, and add 
 'structural-growth': { label: '结构性增长', description: '理解生产率、人口结构、劳动供给与潜在产出如何共同决定长期增长能力。', category: 'growth', order: 52 },
 ```
 
-- [ ] **Step 2: Add exact metadata and related IDs.**
+- [x] **Step 2: Add exact metadata and related IDs.**
 
 Use `updatedAt: 2026-09-02`, `graph: macro`, `featured: false`, the Task 1 metadata, no `chart`, and these related sets:
 
@@ -120,7 +120,7 @@ related: [gdp, productivity, total-factor-productivity, output-gap, labor-supply
 
 Use `definition.asOf: 2026-08` and cite primary or methodological sources before interpretation.
 
-- [ ] **Step 3: Write `productivity.md`.**
+- [x] **Step 3: Write `productivity.md`.**
 
 Include the following claims verbatim or equivalently: labor productivity is output per labor input; level answers output per unit of input while growth answers change in that ratio; productivity can rise while total output falls; actual rather than nominal output is normally used; labor input may be people, hours, or quality-adjusted labor; and productivity is not synonymous with an individual worker's wage. Add industry composition, coverage, comparability, and NBS/OECD sources.
 
@@ -140,7 +140,7 @@ Include the following claims verbatim or equivalently: labor productivity is out
 劳动生产率上升可能支持工资和利润，但工资还受到议价能力、行业结构、利润分配和价格变化影响；生产率不是单个劳动者工资的同义词。
 ```
 
-- [ ] **Step 4: Write `total-factor-productivity.md`.**
+- [x] **Step 4: Write `total-factor-productivity.md`.**
 
 Define TFP as the residual/efficiency estimate left after a production function accounts for capital, labor, and their weights. Explicitly distinguish it from labor productivity and state that it is not a directly observed physical technology quantity; capital stocks, labor quality, production-function form, weights, revisions, and identification assumptions make it model-dependent, estimated, and revisable.
 
@@ -156,7 +156,7 @@ Define TFP as the residual/efficiency estimate left after a production function 
 TFP 不是直接观察到的物理技术数量。资本存量、劳动质量、生产函数形式、要素权重、数据修订和识别假设都会影响结果。因此 TFP 是模型依赖、可估计、可修订的残差；TFP 上升也不直接证明某项具体技术造成了变化。
 ```
 
-- [ ] **Step 5: Write the two demographic pages.**
+- [x] **Step 5: Write the two demographic pages.**
 
 In `working-age-population.md`, include the age-defined denominator and the identities `劳动力 = 就业人口 + 失业人口` and `劳动参与率 = 劳动力 / 劳动年龄人口`. Explain that age boundaries and survey coverage vary, and that study, retirement, care, or stopped-searching status can keep a person in the age denominator without placing them in the labor force.
 
@@ -166,7 +166,7 @@ In `working-age-population.md`, include the age-defined denominator and the iden
 
 In `demographic-dependency-ratio.md`, define the common `(children + older population) / working-age population` ratio, explain it as a demographic-structure measure rather than fiscal spending, household burden, or productivity, and state that population decline does not automatically imply GDP decline. Cite NBS population materials and World Bank `SP.POP.DPND`.
 
-- [ ] **Step 6: Write `potential-output.md` and update `output-gap.md`.**
+- [x] **Step 6: Write `potential-output.md` and update `output-gap.md`.**
 
 Explain actual GDP growth versus potential growth, potential output as a model-dependent estimate, production-function/filter/multivariate methods, sample and revision risk, and the output-gap formula. Include:
 
@@ -188,11 +188,11 @@ Explain actual GDP growth versus potential growth, potential output as a model-d
 
 In `output-gap.md`, add `prerequisites: [potential-output]` and add `potential-output` to `related`, without weakening the existing estimated/revisable boundary.
 
-- [ ] **Step 7: Run focused content and IA tests.**
+- [x] **Step 7: Run focused content and IA tests.**
 
 Run `node --import tsx tests/structural-growth-content.test.mjs tests/information-architecture.test.mjs`; expected result is all focused assertions passing.
 
-- [ ] **Step 8: Commit the content cluster.**
+- [x] **Step 8: Commit the content cluster.**
 
 ```bash
 git add src/data/topics.ts src/content/concepts/output-gap.md src/content/concepts/productivity.md src/content/concepts/total-factor-productivity.md src/content/concepts/working-age-population.md src/content/concepts/demographic-dependency-ratio.md src/content/concepts/potential-output.md tests/structural-growth-content.test.mjs tests/information-architecture.test.mjs
@@ -204,8 +204,9 @@ git commit -m "feat: add structural growth concepts"
 **Files:**
 - Create: `tests/structural-growth-relations.test.mjs`
 - Modify: `data/relations/macro.json`
+- Modify: `tests/business-cycle-content.test.mjs`, `tests/business-cycle-relations.test.mjs`, `tests/labor-market-relations.test.mjs` for approved cross-cluster relations.
 
-- [ ] **Step 1: Write the failing graph contract.**
+- [x] **Step 1: Write the failing graph contract.**
 
 Follow `tests/business-cycle-relations.test.mjs`. Require indicator nodes `productivity: 劳动生产率`, `total-factor-productivity: 全要素生产率（TFP）`, `working-age-population: 劳动年龄人口`, `demographic-dependency-ratio: 人口抚养比`, `potential-output: 潜在产出与潜在增长`, and existing `output-gap: 产出缺口`.
 
@@ -226,23 +227,23 @@ const expectedRelations = [
 
 Assert endpoint existence, canonical relation types, unique triples, and no cluster relation with type `CAUSES`.
 
-- [ ] **Step 2: Run the graph test and confirm the red state.**
+- [x] **Step 2: Run the graph test and confirm the red state.**
 
 Run `node --import tsx tests/structural-growth-relations.test.mjs`; expected result is FAIL because the new nodes and triples are absent.
 
-- [ ] **Step 3: Add the graph nodes.**
+- [x] **Step 3: Add the graph nodes.**
 
 Add five indicator nodes and four abstract nodes to `data/relations/macro.json`, preserving its one-object-per-line style. Indicator objects must use `kind: indicator`; abstract objects must omit `kind`.
 
-- [ ] **Step 4: Add only the six approved relation objects.**
+- [x] **Step 4: Add only the six approved relation objects.**
 
 Append the six `expectedRelations` triples from Step 1. Do not add a second `labor-force-participation → labor-supply` edge; the existing `REFLECTS` relation remains the measurement representation documented in the spec.
 
-- [ ] **Step 5: Run graph and full tests.**
+- [x] **Step 5: Run graph and full tests.**
 
 Run `node --import tsx tests/structural-growth-relations.test.mjs` and `npm test`; both must pass, including the prerequisite DAG and all existing relation contracts.
 
-- [ ] **Step 6: Commit graph changes.**
+- [x] **Step 6: Commit graph changes.**
 
 ```bash
 git add tests/structural-growth-relations.test.mjs data/relations/macro.json
@@ -253,7 +254,7 @@ git commit -m "feat: connect structural growth graph relations"
 
 **Files:** Verify all changed files above against `docs/superpowers/specs/2026-09-02-structural-growth-design.md`.
 
-- [ ] **Step 1: Run diff and full verification.**
+- [x] **Step 1: Run diff and full verification.**
 
 ```bash
 git diff --check origin/main...HEAD
@@ -265,7 +266,7 @@ git status --short
 
 Expected: no whitespace errors, all tests pass, Astro reports 0 errors/0 warnings/0 hints, static build and Pagefind succeed, and the worktree has no generated/untracked files.
 
-- [ ] **Step 2: Review scope against the spec.**
+- [x] **Step 2: Review scope against the spec.**
 
 Confirm `src/pages/index.astro` is unchanged, the five pages contain no charts or forecasts, potential-output/TFP claims remain estimated and revisable, and no new `CAUSES` relation exists.
 
