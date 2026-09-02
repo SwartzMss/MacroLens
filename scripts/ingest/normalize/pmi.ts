@@ -1,7 +1,8 @@
 import { IngestionContractError, MethodologyMismatchError } from '../types.ts';
 import type { IndicatorDataset, RawPmiPublication, Observation, IndicatorSource } from '../types.ts';
 import { mergePmiObservations } from '../validate/overlap.ts';
-import { coverageCoversDates, validateIndicatorDataset } from '../validate/dataset.ts';
+import { coverageCoversDates } from '../validate/dataset.ts';
+import { validatePmiDataset } from '../validate/pmi.ts';
 
 function validateIncomingObservations(observations: Observation[]): void {
   if (!Array.isArray(observations) || observations.length === 0) {
@@ -36,7 +37,7 @@ function pruneSources(sources: IndicatorSource[], dates: string[]): IndicatorSou
 }
 
 export function normalizePmiDataset(raw: RawPmiPublication, existing: IndicatorDataset): IndicatorDataset {
-  validateIndicatorDataset(existing);
+  validatePmiDataset(existing);
   validateIncomingObservations(raw.observations);
   if (raw.publication.sourceDate < existing.updatedAt) {
     throw new IngestionContractError(`Fetched PMI publication is older than existing updatedAt: ${raw.publication.sourceDate} < ${existing.updatedAt}`);
