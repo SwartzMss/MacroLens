@@ -14,16 +14,16 @@ const expectedMetadata = {
   lgfv: { name: '地方政府融资平台（LGFV / 城投平台）', order: 10, level: 'advanced', prerequisites: ['local-government-finance'] },
 };
 const requiredTerms = {
-  'local-government-finance': ['一般公共预算', '政府性基金预算', '税收收入', '非税收入', '土地出让收入', '不属于一般公共预算', '存量', '流量'],
+  'local-government-finance': ['一般公共预算', '政府性基金预算', '税收收入', '非税收入', '土地出让收入', '不属于一般公共预算', '债务融资', '一般债务收入', '专项债务收入', '预算管理', '收入合计线下', '存量', '流量'],
   'local-government-debt': ['地方政府债务', '一般债务', '专项债务', '债务限额', '债务余额', '发行额', '还本', 'LGFV', '隐性债务', '企业债务'],
-  'local-government-special-bonds': ['一般债券', '专项债券', '一般公共预算', '政府性基金收入', '专项收入', '项目收益', '不等于 GDP'],
+  'local-government-special-bonds': ['一般债券', '专项债券', '省级政府', '市县', '转贷', '全国汇总', '有一定收益的公益性项目', '政府性基金收入', '专项收入', '还本付息资金来源', '项目收益', '不等于 GDP'],
   'land-transfer-revenue': ['国有土地使用权出让收入', '政府性基金预算', '土地成交价款', '不是税收收入', '缴款进度', '土地交易额'],
   lgfv: ['独立法人', '企业债券', '地方政府法定债务', '不等于', '谁借谁还', '风险自担', '政府担保', '市场化'],
 };
 const requiredSources = {
   'local-government-finance': ['https://www.npc.gov.cn/rdxwzx/xwzx2026/xwzx2026019/202601/t20260116_451162.html'],
   'local-government-debt': ['https://yss.mof.gov.cn/2026zyczys/202603/t20260324_3986005.htm', 'https://yss.mof.gov.cn/zhuantilanmu/zfzw/201611/t20161122_2463933.htm'],
-  'local-government-special-bonds': ['https://yss.mof.gov.cn/2026zyczys/202603/t20260324_3986005.htm'],
+  'local-government-special-bonds': ['https://yss.mof.gov.cn/2026zyczys/202603/t20260324_3985998.htm', 'https://www.mof.gov.cn/jrttts/202107/t20210702_3729620.htm'],
   'land-transfer-revenue': ['https://yss.mof.gov.cn/xiazaizhongxin/202510/P020251022648527813584.pdf'],
   lgfv: ['https://zfxxgk.ndrc.gov.cn/web/iteminfo.jsp?id=1232', 'https://www.gov.cn/zhengce/content/2010-06/13/content_1942.htm'],
 };
@@ -101,4 +101,17 @@ test('local-government-finance related IDs resolve and homepage stays curated', 
 test('does not collapse LGFV liabilities into statutory local-government debt', () => {
   const document = readConcept('lgfv');
   assert.doesNotMatch(document, /LGFV(?:债务|负债)?(?:属于|构成|就是)地方政府(?:法定)?债务/);
+});
+
+test('keeps debt financing distinct from recurrent revenue while preserving budget treatment', () => {
+  const document = readConcept('local-government-finance');
+  assert.match(document, /政府债券发行在经济性质上属于债务融资/);
+  assert.match(document, /一般债务收入[\s\S]*一般公共预算[\s\S]*专项债务收入[\s\S]*政府性基金预算/);
+  assert.doesNotMatch(document, /政府债券发行则是融资流量，不是财政收入/);
+});
+
+test('special bonds use the special-debt sources and issuer-level wording', () => {
+  const document = readConcept('local-government-special-bonds');
+  assert.doesNotMatch(document, /中央代发/);
+  assert.match(document, /省级统一发行[\s\S]*转贷/);
 });
