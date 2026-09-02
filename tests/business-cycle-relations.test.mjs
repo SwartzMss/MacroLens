@@ -64,8 +64,14 @@ test('uses only the approved non-deterministic business-cycle relationships', ()
     assert.ok(canonicalRelationTypes.has(relation.type), `unknown relation type ${relation.type}`);
   }
 
+  // Approved cross-cluster relation: output-gap -> inflation-pressure (CORRELATES).
+  const approvedCrossClusterRelationKeys = new Set([
+    relationKey({ source: 'output-gap', target: 'inflation-pressure', type: 'CORRELATES' }),
+  ]);
   const clusterRelations = relations.filter(
-    relation => expectedNodes.has(relation.source) || expectedNodes.has(relation.target),
+    relation =>
+      (expectedNodes.has(relation.source) || expectedNodes.has(relation.target)) &&
+      !approvedCrossClusterRelationKeys.has(relationKey(relation)),
   );
   assert.deepEqual(clusterRelations.map(relationKey).sort(), expectedRelationKeys);
   assert.equal(clusterRelations.some(relation => relation.type === 'CAUSES'), false, 'business-cycle relations must not claim causality');

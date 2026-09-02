@@ -49,7 +49,15 @@ test('uses only the approved directional market-rate relationships', () => {
     assert.ok(nodes.has(relation.target), `missing target node ${relation.target}`);
     assert.ok(canonicalRelationTypes.has(relation.type), `unknown relation type ${relation.type}`);
   }
-  const marketRelations = relations.filter((relation) => expectedNodes.has(relation.source) || expectedNodes.has(relation.target));
+  // Approved cross-cluster relation: inflation-expectations -> real-interest-rate (AFFECTS).
+  const approvedCrossClusterRelationKeys = new Set([
+    relationKey({ source: 'inflation-expectations', target: 'real-interest-rate', type: 'AFFECTS' }),
+  ]);
+  const marketRelations = relations.filter(
+    (relation) =>
+      (expectedNodes.has(relation.source) || expectedNodes.has(relation.target)) &&
+      !approvedCrossClusterRelationKeys.has(relationKey(relation)),
+  );
   assert.deepEqual(marketRelations.map(relationKey).sort(), expectedRelationKeys);
   assert.equal(marketRelations.some((relation) => relation.type === 'CAUSES'), false);
   assert.equal(relations.some((relation) => relation.source === 'yield-curve' && relation.target === 'economic-activity'), false);
