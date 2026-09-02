@@ -7,11 +7,27 @@ import {
   discoverPBOCMoneySupplyPublications,
   parsePBOCMoneySupplyReport,
 } from '../scripts/ingest/fetch/pboc-money-supply.ts';
-import { IngestionContractError, MethodologyMismatchError } from '../scripts/ingest/types.ts';
+import { normalizeMoneySupplyDataset } from '../scripts/ingest/normalize/money-supply.ts';
+import { validateMoneySupplyDataset } from '../scripts/ingest/validate/money-supply.ts';
+import {
+  IngestionContractError,
+  MethodologyMismatchError,
+  HistoricalMismatchError,
+  MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS,
+} from '../scripts/ingest/types.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => fs.readFileSync(path.join(here, 'fixtures', 'pboc', name), 'utf8');
 const publications = discoverPBOCMoneySupplyPublications(fixture('publication-index.html'));
+const rawReports = publications.map((publication) => parsePBOCMoneySupplyReport(
+  publication,
+  fixture(`report-${publication.month}.html`),
+));
+const existing = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', 'm1.json'), 'utf8'));
+const existingWithFingerprint = {
+  ...existing,
+  methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1,
+};
 
 test('discovers only monthly PBOC financial-statistics reports', () => {
   assert.deepEqual(publications.map(({ month }) => month), ['2025-11', '2025-12', '2026-01']);
@@ -45,4 +61,35 @@ test('rejects invalid publication metadata', () => {
   assert.throws(() => discoverPBOCMoneySupplyPublications('<a href="/report.html">2025年金融统计数据报告</a><span>2025-12-12</span>'), /monthly|月份|报告/i);
   assert.throws(() => parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html').replace('2025年11月金融统计数据报告', '2025年12月金融统计数据报告')), /month|月份|title|标题/i);
   assert.throws(() => parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html').replace('流通中货币（M0）余额13.74万亿元，同比增长10.8%', '流通中货币（M0）余额13.74万亿元')), IngestionContractError);
+});
+
+test('normalizes one PBOC report sequence into the existing M1 dataset contract', () => {
+  const normalized = normalizeMoneySupplyDataset(rawReports, existingWithFingerprint, 'm1');
+  assert.equal(normalized.unit, '%');
+  assert.equal(normalized.metric, 'yoy');
+  assert.equal(normalized.calculation, existing.calculation);
+  assert.equal(normalized.methodologyFingerprint, MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1);
+  assert.deepEqual(normalized.data.at(-1), { date: '2026-01', value: -1.0 });
+  assert.equal(normalized.sources.at(-1).coverage, '2026-01 to 2026-01');
+  assert.equal(normalized.sources.some(({ coverage }) => coverage === '2024-01 to 2025-10'), true);
+});
+
+test('validates normalized PBOC dataset values without applying the PMI range', () => {
+  const normalized = normalizeMoneySupplyDataset(rawReports, existingWithFingerprint, 'm1');
+  assert.doesNotThrow(() => validateMoneySupplyDataset(normalized, 'm1'));
+  assert.doesNotThrow(() => validateMoneySupplyDataset({ ...normalized, data: [{ ...normalized.data[0], value: -1.2 }] }, 'm1'));
+});
+
+test('rejects money-supply field and methodology mismatches before merging', () => {
+  assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, unit: 'index' }, 'm1'), /unit/i);
+  assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, frequency: 'quarterly' }, 'm1'), /frequency/i);
+  assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, metric: 'index' }, 'm1'), /metric/i);
+  assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, methodologyFingerprint: 'changed' }, 'm1'), MethodologyMismatchError);
+});
+
+test('rejects incoming gaps, final gaps, and historical mismatches', () => {
+  assert.throws(() => normalizeMoneySupplyDataset([rawReports[0], rawReports[2]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
+  assert.throws(() => normalizeMoneySupplyDataset([rawReports[1]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
+  const mismatch = { ...rawReports[0], publication: { ...rawReports[0].publication, month: '2025-10' } };
+  assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingWithFingerprint, 'm1'), HistoricalMismatchError);
 });
