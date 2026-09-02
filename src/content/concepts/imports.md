@@ -1,7 +1,7 @@
 ---
 id: imports
 name: 进口
-subtitle: 从非居民取得的货物或服务交易，金额变化必须与数量、价格和估价口径分开阅读
+subtitle: 货物或服务自境外流入的贸易概念，必须先区分海关统计与国际收支口径
 country: CN
 category: external
 source: 海关总署、国家外汇管理局与国际货币基金组织

@@ -36,7 +36,7 @@ const expectedNodes = new Map([
   ['terms-of-trade', '贸易条件'],
   ['cross-border-financial-transactions', '跨境金融交易'],
   ['multilateral-currency-value', '货币多边价值'],
-  ['merchandise-trade', '货物贸易'],
+  ['external-trade', '对外贸易'],
   ['domestic-demand-and-input-demand', '国内需求与投入需求'],
   ['exports-and-imports', '出口与进口'],
   ['current-account-goods-balance', '经常账户货物差额'],
@@ -58,8 +58,8 @@ const expectedRelations = [
   ['effective-exchange-rate', 'economic-activity', 'AFFECTS'],
   ['exports', 'economic-activity', 'AFFECTS'],
   ['imports', 'domestic-demand-and-input-demand', 'REFLECTS'],
-  ['exports', 'merchandise-trade', 'COMPONENT_OF'],
-  ['imports', 'merchandise-trade', 'COMPONENT_OF'],
+  ['exports', 'external-trade', 'COMPONENT_OF'],
+  ['imports', 'external-trade', 'COMPONENT_OF'],
   ['trade-balance', 'exports-and-imports', 'DERIVED_FROM'],
   ['trade-balance', 'current-account-goods-balance', 'OVERLAPS_WITH'],
   ['terms-of-trade', 'export-import-relative-prices', 'REFLECTS'],
@@ -79,7 +79,7 @@ test('registers external concept and abstract graph nodes', () => {
 
   for (const id of [
     'cross-border-financial-transactions', 'multilateral-currency-value',
-    'merchandise-trade', 'domestic-demand-and-input-demand', 'exports-and-imports',
+    'external-trade', 'domestic-demand-and-input-demand', 'exports-and-imports',
     'current-account-goods-balance', 'export-import-relative-prices',
     'trade-pricing-and-competitiveness',
   ]) {

@@ -1,7 +1,7 @@
 ---
 id: exports
 name: 出口
-subtitle: 向非居民出售的货物或服务交易，必须先区分海关货物统计与国际收支口径
+subtitle: 货物或服务向境外流出的贸易概念，必须先区分海关统计与国际收支口径
 country: CN
 category: external
 source: 海关总署、国家外汇管理局与国际货币基金组织
