@@ -29,8 +29,19 @@ const expectedNodes = new Map([
   ['financial-account', '金融账户'],
   ['cross-border-capital-flows', '跨境资本流动'],
   ['effective-exchange-rate', '有效汇率（NEER / REER）'],
+  ['exports', '出口'],
+  ['imports', '进口'],
+  ['trade-balance', '贸易差额'],
+  ['trade-volume-and-price', '贸易数量与价格拆分'],
+  ['terms-of-trade', '贸易条件'],
   ['cross-border-financial-transactions', '跨境金融交易'],
   ['multilateral-currency-value', '货币多边价值'],
+  ['merchandise-trade', '货物贸易'],
+  ['domestic-demand-and-input-demand', '国内需求与投入需求'],
+  ['exports-and-imports', '出口与进口'],
+  ['current-account-goods-balance', '经常账户货物差额'],
+  ['export-import-relative-prices', '进出口相对价格'],
+  ['trade-pricing-and-competitiveness', '贸易定价与竞争力'],
 ]);
 
 const expectedRelations = [
@@ -45,6 +56,14 @@ const expectedRelations = [
   ['effective-exchange-rate', 'multilateral-currency-value', 'MEASURES'],
   ['effective-exchange-rate', 'cfets-rmb-index', 'CORRELATES'],
   ['effective-exchange-rate', 'economic-activity', 'AFFECTS'],
+  ['exports', 'economic-activity', 'AFFECTS'],
+  ['imports', 'domestic-demand-and-input-demand', 'REFLECTS'],
+  ['exports', 'merchandise-trade', 'COMPONENT_OF'],
+  ['imports', 'merchandise-trade', 'COMPONENT_OF'],
+  ['trade-balance', 'exports-and-imports', 'DERIVED_FROM'],
+  ['trade-balance', 'current-account-goods-balance', 'OVERLAPS_WITH'],
+  ['terms-of-trade', 'export-import-relative-prices', 'REFLECTS'],
+  ['exchange-rate', 'trade-pricing-and-competitiveness', 'AFFECTS'],
 ];
 
 const relationKey = ({ source, target, type }) => `${source}\0${target}\0${type}`;
@@ -58,7 +77,12 @@ test('registers external concept and abstract graph nodes', () => {
   assert.equal(new Set(nodeIds).size, rawNodes.length, 'graph node IDs must be unique');
   for (const [id, label] of expectedNodes) assert.equal(nodes.get(id)?.label, label, `missing graph node ${id}`);
 
-  for (const id of ['cross-border-financial-transactions', 'multilateral-currency-value']) {
+  for (const id of [
+    'cross-border-financial-transactions', 'multilateral-currency-value',
+    'merchandise-trade', 'domestic-demand-and-input-demand', 'exports-and-imports',
+    'current-account-goods-balance', 'export-import-relative-prices',
+    'trade-pricing-and-competitiveness',
+  ]) {
     assert.equal(Object.hasOwn(nodes.get(id), 'kind'), false, `${id} must remain an abstract node`);
     assert.equal(existsSync(`${conceptsPath}${id}.md`), false, `${id} must not have a concept page`);
   }
