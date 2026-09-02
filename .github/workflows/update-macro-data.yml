@@ -1,0 +1,46 @@
+name: Update macro data
+
+# The CLI fetches the official NBS publication index at stats.gov.cn.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 1 * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-pmi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fetch and validate NBS PMI
+        run: npm run ingest:pmi -- --target data/indicators/pmi.json
+
+      - name: Open data update pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: data/indicators/pmi.json
+          branch: automation/update-pmi
+          delete-branch: true
+          commit-message: 'data: update NBS manufacturing PMI'
+          title: 'data: update NBS manufacturing PMI'
+          body: |
+            Automated NBS manufacturing PMI update.
+
+            The ingestion adapter validates the official publication structure,
+            checks historical overlaps, and updates only the main PMI series.

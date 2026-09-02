@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "test": "node --import tsx --test tests/*.test.mjs",
+    "ingest:pmi": "node --import tsx scripts/ingest/cli.ts",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check"
