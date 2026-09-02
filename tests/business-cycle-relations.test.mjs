@@ -67,6 +67,7 @@ test('uses only the approved non-deterministic business-cycle relationships', ()
   // Approved cross-cluster relation: output-gap -> inflation-pressure (CORRELATES).
   const approvedCrossClusterRelationKeys = new Set([
     relationKey({ source: 'output-gap', target: 'inflation-pressure', type: 'CORRELATES' }),
+    relationKey({ source: 'output-gap', target: 'actual-vs-potential-output', type: 'DERIVED_FROM' }),
   ]);
   const clusterRelations = relations.filter(
     relation =>

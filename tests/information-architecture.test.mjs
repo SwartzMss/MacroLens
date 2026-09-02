@@ -28,6 +28,15 @@ test('topic registry has stable unique IDs and complete topic metadata', () => {
     category: 'growth',
     order: 55,
   });
+
+  const structuralGrowthTopic = topicRegistry.find((topic) => topic.id === 'structural-growth');
+  assert.deepEqual(structuralGrowthTopic, {
+    id: 'structural-growth',
+    label: '结构性增长',
+    description: '理解生产率、人口结构、劳动供给与潜在产出如何共同决定长期增长能力。',
+    category: 'growth',
+    order: 52,
+  });
 });
 
 test('topic pages and prerequisite component exist as static route sources', () => {
