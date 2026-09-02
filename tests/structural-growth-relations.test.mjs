@@ -33,6 +33,7 @@ const abstractNodes = new Map([
 
 const newIndicatorIds = new Set([...indicatorNodes.keys()].filter((id) => id !== 'output-gap'));
 const abstractIds = new Set(abstractNodes.keys());
+const newNodeIds = new Set([...newIndicatorIds, ...abstractIds]);
 const expectedRelations = [
   ['working-age-population', 'labor-supply', 'AFFECTS'],
   ['productivity', 'potential-output', 'AFFECTS'],
@@ -74,7 +75,7 @@ test('uses only the approved non-causal structural-growth relations', () => {
   }
 
   const structuralRelations = relations.filter(
-    (relation) => newIndicatorIds.has(relation.source) || abstractIds.has(relation.source) || abstractIds.has(relation.target),
+    (relation) => newNodeIds.has(relation.source) || newNodeIds.has(relation.target),
   );
   assert.deepEqual(structuralRelations.map(relationKey).sort(), expectedRelationKeys);
   assert.equal(structuralRelations.some((relation) => relation.type === 'CAUSES'), false, 'structural-growth relations must not claim causality');
