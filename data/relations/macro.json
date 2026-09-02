@@ -228,7 +228,7 @@
   {"data":{"source":"working-age-population","target":"labor-supply","type":"AFFECTS"}},
   {"data":{"source":"productivity","target":"potential-output","type":"AFFECTS"}},
   {"data":{"source":"total-factor-productivity","target":"efficiency-and-technology-residual","type":"REFLECTS"}},
-  {"data":{"source":"potential-output","target":"sustainable-growth-capacity","type":"AFFECTS"}},
+  {"data":{"source":"potential-output","target":"sustainable-growth-capacity","type":"REFLECTS"}},
   {"data":{"source":"output-gap","target":"actual-vs-potential-output","type":"DERIVED_FROM"}},
   {"data":{"source":"demographic-dependency-ratio","target":"demographic-structure","type":"REFLECTS"}},
   {"data":{"source":"mortgage","target":"property-sales","type":"AFFECTS"}},

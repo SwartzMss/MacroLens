@@ -38,7 +38,7 @@ const expectedRelations = [
   ['working-age-population', 'labor-supply', 'AFFECTS'],
   ['productivity', 'potential-output', 'AFFECTS'],
   ['total-factor-productivity', 'efficiency-and-technology-residual', 'REFLECTS'],
-  ['potential-output', 'sustainable-growth-capacity', 'AFFECTS'],
+  ['potential-output', 'sustainable-growth-capacity', 'REFLECTS'],
   ['output-gap', 'actual-vs-potential-output', 'DERIVED_FROM'],
   ['demographic-dependency-ratio', 'demographic-structure', 'REFLECTS'],
 ];

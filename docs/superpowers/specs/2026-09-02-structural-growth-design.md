@@ -88,7 +88,7 @@ The approved new relation triples are:
 working-age-population --AFFECTS--> labor-supply
 productivity --AFFECTS--> potential-output
 total-factor-productivity --REFLECTS--> efficiency-and-technology-residual
-potential-output --AFFECTS--> sustainable-growth-capacity
+potential-output --REFLECTS--> sustainable-growth-capacity
 output-gap --DERIVED_FROM--> actual-vs-potential-output
 demographic-dependency-ratio --REFLECTS--> demographic-structure
 ```
