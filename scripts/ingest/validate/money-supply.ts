@@ -14,6 +14,14 @@ export function validateMoneySupplyDataset(dataset: IndicatorDataset, id: MoneyS
   if (dataset.methodologyFingerprint !== MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id]) {
     throw new MethodologyMismatchError(`Money-supply methodology fingerprint mismatch for ${id}`);
   }
+  if (id === 'm0' || id === 'm2') {
+    if (dataset.calculation !== 'published' || dataset.calculationEffectiveFrom !== '2025-11') {
+      throw new MethodologyMismatchError(`${id} calculation must be published from 2025-11 onward`);
+    }
+    if (!dataset.comparabilityNote.includes('2025-11')) {
+      throw new MethodologyMismatchError(`${id} comparability note must document the 2025-11 calculation boundary`);
+    }
+  }
   for (const source of dataset.sources) {
     if (!/^https:\/\/www\.pbc\.gov\.cn\//.test(source.url)) {
       throw new IngestionContractError(`Invalid official PBOC source: ${source.url}`);

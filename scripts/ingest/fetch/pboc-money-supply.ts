@@ -3,8 +3,8 @@ import type { MoneySupplyPublication, RawMoneySupplyPublication } from '../types
 
 const PBOC_INDEX = 'https://www.pbc.gov.cn/diaochatongjisi/116219/116225/index.html';
 const PBOC_ORIGIN = 'https://www.pbc.gov.cn';
-const MONTHLY_REPORT_PATTERN = /^(\d{4})年(\d{1,2})月金融统计数据报告$/;
-const M1_REVISION_NOTE = '修订后的M1包括：流通中货币（M0）、单位活期存款、个人活期存款、非银行支付机构客户备付金';
+const REPORT_TITLE_PATTERN = /^\d{4}年(?:\d{1,2}月|一季度|上半年|前三季度)?金融统计数据报告$/;
+const M1_REVISION_NOTE = '修订后的M1包括：流通中货币(M0)、单位活期存款、个人活期存款、非银行支付机构客户备付金';
 
 function textOf(html: string): string {
   return html
@@ -18,7 +18,7 @@ function textOf(html: string): string {
 }
 
 function canonicalText(html: string): string {
-  return textOf(html).replace(/\s+/g, '');
+  return textOf(html).replace(/（/g, '(').replace(/）/g, ')').replace(/\s+/g, '');
 }
 
 function validIsoDate(value: string): boolean {
@@ -28,11 +28,17 @@ function validIsoDate(value: string): boolean {
 }
 
 function monthOfTitle(title: string): string {
-  const match = title.match(MONTHLY_REPORT_PATTERN);
-  if (!match) throw new IngestionContractError(`Invalid PBOC monthly report title: ${title}`);
-  const month = Number(match[2]);
-  if (month < 1 || month > 12) throw new IngestionContractError(`Invalid PBOC report month: ${title}`);
-  return `${match[1]}-${String(month).padStart(2, '0')}`;
+  const monthlyMatch = title.match(/^(\d{4})年(\d{1,2})月金融统计数据报告$/);
+  if (monthlyMatch) {
+    const month = Number(monthlyMatch[2]);
+    if (month < 1 || month > 12) throw new IngestionContractError(`Invalid PBOC report month: ${title}`);
+    return `${monthlyMatch[1]}-${String(month).padStart(2, '0')}`;
+  }
+  const periodMatch = title.match(/^(\d{4})年(一季度|上半年|前三季度)?金融统计数据报告$/);
+  const periodMonths = { 一季度: '03', 上半年: '06', 前三季度: '09', undefined: '12' } as const;
+  if (!periodMatch) throw new IngestionContractError(`Invalid PBOC financial-statistics report title: ${title}`);
+  const period = periodMatch[2] as keyof typeof periodMonths | undefined;
+  return `${periodMatch[1]}-${periodMonths[period ?? 'undefined']}`;
 }
 
 export function discoverPBOCMoneySupplyPublications(indexHtml: string): MoneySupplyPublication[] {
@@ -40,7 +46,7 @@ export function discoverPBOCMoneySupplyPublications(indexHtml: string): MoneySup
   const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   for (const match of indexHtml.matchAll(anchorPattern)) {
     const title = textOf(match[2]);
-    if (!MONTHLY_REPORT_PATTERN.test(title)) continue;
+    if (!REPORT_TITLE_PATTERN.test(title)) continue;
     const afterAnchor = indexHtml.slice((match.index ?? 0) + match[0].length, (match.index ?? 0) + match[0].length + 300);
     const dateMatch = afterAnchor.match(/\b(\d{4}-\d{2}-\d{2})\b/);
     if (!dateMatch || !validIsoDate(dateMatch[1])) {
@@ -63,7 +69,8 @@ export function discoverPBOCMoneySupplyPublications(indexHtml: string): MoneySup
 }
 
 function parseGrowth(text: string, label: string): number {
-  const pattern = new RegExp(`${label}余额[^。；]*?同比(增长|下降)([^%。；]+)%`, 'g');
+  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`${escapedLabel}余额[^。；]*?同比(增长|下降)([^%。；]+)%`, 'g');
   const matches = [...text.matchAll(pattern)];
   if (matches.length === 0) throw new IngestionContractError(`Missing ${label} YoY growth value`);
   if (matches.length > 1) throw new IngestionContractError(`Duplicate ${label} YoY growth value`);
@@ -77,8 +84,12 @@ export function parsePBOCMoneySupplyReport(
   publication: MoneySupplyPublication,
   html: string,
 ): RawMoneySupplyPublication {
-  const title = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
-  const pageTitle = title ? textOf(title) : '';
+  const titleCandidates = [
+    ...[...html.matchAll(/<h[1-6]\b[^>]*>([\s\S]*?)<\/h[1-6]>/gi)].map((match) => textOf(match[1])),
+    ...[...html.matchAll(/<title\b[^>]*>([\s\S]*?)<\/title>/gi)].map((match) => textOf(match[1])),
+    ...[...html.matchAll(/<meta\b[^>]*name=["']ArticleTitle["'][^>]*content=["']([^"']*)["'][^>]*>/gi)].map((match) => textOf(match[1])),
+  ];
+  const pageTitle = titleCandidates.find((candidate) => candidate === publication.title) ?? '';
   if (pageTitle !== publication.title) throw new IngestionContractError(`PBOC report title mismatch: ${pageTitle} != ${publication.title}`);
   const canonical = canonicalText(html);
   if (!canonical.includes(publication.sourceDate)) {
@@ -86,7 +97,7 @@ export function parsePBOCMoneySupplyReport(
   }
   const pageMonth = monthOfTitle(pageTitle);
   if (pageMonth !== publication.month) throw new IngestionContractError(`PBOC report month mismatch: ${pageMonth} != ${publication.month}`);
-  for (const label of ['广义货币（M2）', '狭义货币（M1）', '流通中货币（M0）']) {
+  for (const label of ['广义货币(M2)', '狭义货币(M1)', '流通中货币(M0)']) {
     if (!canonical.includes(label)) throw new IngestionContractError(`Missing required PBOC series: ${label}`);
   }
   if (!canonical.includes(M1_REVISION_NOTE)) {
@@ -95,9 +106,9 @@ export function parsePBOCMoneySupplyReport(
   return {
     publication,
     values: {
-      m0: parseGrowth(canonical, '流通中货币（M0）'),
-      m1: parseGrowth(canonical, '狭义货币（M1）'),
-      m2: parseGrowth(canonical, '广义货币（M2）'),
+      m0: parseGrowth(canonical, '流通中货币(M0)'),
+      m1: parseGrowth(canonical, '狭义货币(M1)'),
+      m2: parseGrowth(canonical, '广义货币(M2)'),
     },
     methodologyFingerprints: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS,
   };

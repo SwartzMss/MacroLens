@@ -30,37 +30,53 @@ const existingWithFingerprint = {
   methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1,
 };
 
-test('discovers only monthly PBOC financial-statistics reports', () => {
-  assert.deepEqual(publications.map(({ month }) => month), ['2025-11', '2025-12', '2026-01']);
-  assert.equal(publications[1].url, 'https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025121216000000002/index.html');
+test('discovers monthly, annual, quarterly, and half-year PBOC reports', () => {
+  assert.deepEqual(publications.map(({ month }) => month), [
+    '2025-10', '2025-11', '2025-12', '2026-01', '2026-02',
+    '2026-03', '2026-04', '2026-05', '2026-06', '2026-07',
+  ]);
+  assert.equal(publications[2].title, '2025年金融统计数据报告');
+  assert.equal(publications[2].month, '2025-12');
+  assert.equal(publications[5].title, '2026年一季度金融统计数据报告');
+  assert.equal(publications[5].month, '2026-03');
+  assert.equal(publications[8].title, '2026年上半年金融统计数据报告');
+  assert.equal(publications[8].month, '2026-06');
+  assert.equal(publications[2].url, 'https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026011515015720511/index.html');
 });
 
 test('parses M0 M1 and M2 from one official report', () => {
-  const parsed = parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html'));
-  assert.deepEqual(parsed.values, { m0: 10.8, m1: -0.7, m2: 8.0 });
+  const parsed = parsePBOCMoneySupplyReport(publications[1], fixture('report-2025-11.html'));
+  assert.deepEqual(parsed.values, { m0: 10.6, m1: 4.9, m2: 8.0 });
   assert.deepEqual(parsed.methodologyFingerprints, MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS);
 });
 
-test('parses a positive and negative published growth rate', () => {
-  const parsed = parsePBOCMoneySupplyReport(publications[1], fixture('report-2025-12.html'));
-  assert.equal(parsed.values.m0, 10.0);
+test('maps the annual report to December and parses real punctuation variants', () => {
+  const parsed = parsePBOCMoneySupplyReport(publications[2], fixture('report-2025-12.html'));
+  assert.deepEqual(parsed.values, { m0: 10.2, m1: 3.8, m2: 8.5 });
+  const fullWidth = parsePBOCMoneySupplyReport(publications[9], fixture('report-2026-07.html'));
+  assert.deepEqual(fullWidth.values, { m0: 11.6, m1: 4.0, m2: 7.7 });
+});
+
+test('preserves the sign of a published decline without reading the M1 history note', () => {
+  const html = fixture('report-2025-12.html').replace('同比增长3.8%', '同比下降1.2%');
+  const parsed = parsePBOCMoneySupplyReport(publications[2], html);
   assert.equal(parsed.values.m1, -1.2);
 });
 
 test('rejects missing, malformed, duplicate, and methodology-changed series', () => {
   const html = fixture('report-2025-11.html');
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], html.replace('流通中货币（M0）余额', '现金余额')), /M0|series/i);
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], html.replace('同比增长8.0%', '同比增长待定%')), /numeric|数值/i);
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], `${html}<p>广义货币（M2）余额335.13万亿元，同比增长8.0%。</p>`), /duplicate|重复|M2/i);
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], html.replace('单位活期存款', '单位活期及结构性存款')), MethodologyMismatchError);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], html.replace('流通中货币(M0)余额', '现金余额')), /M0|series/i);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], html.replace('同比增长10.6%', '同比增长待定%')), /numeric|数值/i);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], `${html}<p>广义货币(M2)余额335.13万亿元，同比增长8.0%。</p>`), /duplicate|重复|M2/i);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], html.replace('单位活期存款', '单位活期及结构性存款')), MethodologyMismatchError);
 });
 
 test('rejects invalid publication metadata', () => {
   assert.throws(() => discoverPBOCMoneySupplyPublications('<a href="/report.html">2025年11月金融统计数据报告</a><span>待定</span>'), /date|日期/i);
   assert.throws(() => discoverPBOCMoneySupplyPublications('<a href="https://example.com/report.html">2025年11月金融统计数据报告</a><span>2025-12-12</span>'), /PBOC|official|官方/i);
-  assert.throws(() => discoverPBOCMoneySupplyPublications('<a href="/report.html">2025年金融统计数据报告</a><span>2025-12-12</span>'), /monthly|月份|报告/i);
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html').replace('2025年11月金融统计数据报告', '2025年12月金融统计数据报告')), /month|月份|title|标题/i);
-  assert.throws(() => parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html').replace('流通中货币（M0）余额13.74万亿元，同比增长10.8%', '流通中货币（M0）余额13.74万亿元')), IngestionContractError);
+  assert.throws(() => discoverPBOCMoneySupplyPublications('<a href="/report.html">2025年二季度金融统计数据报告</a><span>2025-12-12</span>'), /monthly|月份|报告/i);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], fixture('report-2025-11.html').replace('2025年11月金融统计数据报告', '2025年12月金融统计数据报告')), /month|月份|title|标题/i);
+  assert.throws(() => parsePBOCMoneySupplyReport(publications[1], fixture('report-2025-11.html').replace('流通中货币(M0)余额13.74万亿元，同比增长10.6%', '流通中货币(M0)余额13.74万亿元')), IngestionContractError);
 });
 
 test('normalizes one PBOC report sequence into the existing M1 dataset contract', () => {
@@ -69,9 +85,20 @@ test('normalizes one PBOC report sequence into the existing M1 dataset contract'
   assert.equal(normalized.metric, 'yoy');
   assert.equal(normalized.calculation, existing.calculation);
   assert.equal(normalized.methodologyFingerprint, MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1);
-  assert.deepEqual(normalized.data.at(-1), { date: '2026-01', value: -1.0 });
-  assert.equal(normalized.sources.at(-1).coverage, '2026-01 to 2026-01');
+  assert.deepEqual(normalized.data.at(-1), { date: '2026-07', value: 4.0 });
+  assert.equal(normalized.sources.at(-1).coverage, '2026-07 to 2026-07');
   assert.equal(normalized.sources.some(({ coverage }) => coverage === '2024-01 to 2025-10'), true);
+});
+
+test('makes the published YoY calculation boundary explicit for M0 and M2', () => {
+  for (const id of ['m0', 'm2']) {
+    const dataset = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
+    dataset.methodologyFingerprint = MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id];
+    const normalized = normalizeMoneySupplyDataset(rawReports, dataset, id);
+    assert.equal(normalized.calculation, 'published');
+    assert.equal(normalized.calculationEffectiveFrom, '2025-11');
+    assert.match(normalized.comparabilityNote, /2025-11/);
+  }
 });
 
 test('validates normalized PBOC dataset values without applying the PMI range', () => {
@@ -95,15 +122,15 @@ test('rejects money-supply field and methodology mismatches before merging', () 
 test('accepts an index that includes the existing latest month before new reports', () => {
   const overlap = { ...publications[0], month: '2025-10' };
   assert.deepEqual(
-    selectPublications([overlap, ...publications], '2025-10').map(({ month }) => month),
-    ['2025-10', '2025-11', '2025-12', '2026-01'],
+    selectPublications([overlap, ...publications.slice(1)], '2025-10').map(({ month }) => month),
+    publications.map(({ month }) => month),
   );
 });
 
 test('rejects incoming gaps, final gaps, and historical mismatches', () => {
   assert.throws(() => normalizeMoneySupplyDataset([rawReports[0], rawReports[2]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
-  assert.throws(() => normalizeMoneySupplyDataset([rawReports[1]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
-  const mismatch = { ...rawReports[0], publication: { ...rawReports[0].publication, month: '2025-10' } };
+  assert.throws(() => normalizeMoneySupplyDataset([rawReports[2]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
+  const mismatch = { ...rawReports[1], publication: { ...rawReports[1].publication, month: '2025-10' } };
   assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingWithFingerprint, 'm1'), HistoricalMismatchError);
 });
 
@@ -120,7 +147,7 @@ test('allows an older publication date when the report only verifies an existing
         coverage: '2025-11 to 2025-11',
       },
     ],
-    data: [...existingWithFingerprint.data, { date: '2025-11', value: -0.7 }],
+    data: [...existingWithFingerprint.data, { date: '2025-11', value: 4.9 }],
   };
   const overlap = {
     ...rawReports[0],
@@ -151,7 +178,7 @@ test('runs the fixture CLI for all three targets and is idempotent', async () =>
   assert.match(firstOutput, /m1.*Changed: true/s);
   assert.match(firstOutput, /m2.*Changed: true/s);
   for (const id of ['m0', 'm1', 'm2']) {
-    assert.equal(JSON.parse(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')).data.at(-1).date, '2026-01');
+    assert.equal(JSON.parse(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')).data.at(-1).date, '2026-07');
   }
   const snapshots = new Map(['m0', 'm1', 'm2'].map((id) => [id, fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')]));
   const secondOutput = await captureOutput(() => runMoneySupply(args));
@@ -164,14 +191,18 @@ test('runs the fixture CLI for all three targets and is idempotent', async () =>
 test('does not write any target when one fetched series has a historical mismatch', async () => {
   const directory = fs.mkdtempSync(path.join('/tmp', 'macrolens-pboc-atomic-'));
   const fixtures = fs.mkdtempSync(path.join('/tmp', 'macrolens-pboc-fixture-'));
-  for (const name of ['publication-index.html', 'report-2025-11.html', 'report-2025-12.html', 'report-2026-01.html']) {
+  for (const name of [
+    'publication-index.html',
+    ...['2025-10', '2025-11', '2025-12', '2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07']
+      .map((month) => `report-${month}.html`),
+  ]) {
     fs.copyFileSync(path.join(here, 'fixtures', 'pboc', name), path.join(fixtures, name));
   }
   seedTargets(directory);
   const args = ['--fixture-index', path.join(fixtures, 'publication-index.html'), '--fixture-dir', fixtures, '--target-dir', directory];
   await runMoneySupply(args);
   const before = new Map(['m0', 'm1', 'm2'].map((id) => [id, fs.readFileSync(path.join(directory, `${id}.json`), 'utf8')]));
-  fs.writeFileSync(path.join(fixtures, 'report-2026-01.html'), fixture('report-2026-01.html').replace('同比下降1.0%', '同比下降9.9%'));
+  fs.writeFileSync(path.join(fixtures, 'report-2026-07.html'), fixture('report-2026-07.html').replace('同比增长11.6%', '同比增长9.9%'));
   await assert.rejects(() => runMoneySupply(args), HistoricalMismatchError);
   for (const id of ['m0', 'm1', 'm2']) assert.equal(fs.readFileSync(path.join(directory, `${id}.json`), 'utf8'), before.get(id));
 });

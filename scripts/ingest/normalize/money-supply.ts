@@ -47,13 +47,14 @@ export function normalizeMoneySupplyDataset(
     ...existing.sources.filter((source) => !incomingSources.some((incomingSource) => incomingSource.url === source.url)),
     ...incomingSources,
   ];
-  const latestReport = rawReports.at(-1);
-  if (!latestReport) throw new IngestionContractError('Fetched PBOC reports contain no latest report');
+  const sources = pruneSources(candidates, data.map((observation) => observation.date));
+  const latestSource = sources.at(-1);
+  if (!latestSource) throw new IngestionContractError('PBOC dataset contains no latest source after normalization');
   const normalized: IndicatorDataset = {
     ...existing,
-    updatedAt: latestReport.publication.sourceDate,
+    updatedAt: latestSource.sourceDate,
     methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id],
-    sources: pruneSources(candidates, data.map((observation) => observation.date)),
+    sources,
     data,
   };
   validateMoneySupplyDataset(normalized, id);

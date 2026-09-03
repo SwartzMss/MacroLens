@@ -19,6 +19,7 @@ export type IndicatorDataset = {
   definitionAsOf?: string;
   source: string;
   calculation: string;
+  calculationEffectiveFrom?: string;
   updatedAt: string;
   comparabilityNote: string;
   methodologyFingerprint: string;

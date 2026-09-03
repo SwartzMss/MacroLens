@@ -1,13 +1,13 @@
 {
   "id": "m0", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速", "chartTitle": "M0 历史同比增速",
-  "definitionEffectiveFrom": "2022-12", "definitionAsOf": "2025-11", "source": "PBOC", "calculation": "derived_from_balance", "methodologyFingerprint": "pboc-m0|currency-in-circulation|month-end-balance-yoy|e-cny-included-from-2022-12",
+  "definitionEffectiveFrom": "2022-12", "definitionAsOf": "2025-11", "source": "PBOC", "calculation": "published", "calculationEffectiveFrom": "2025-11", "methodologyFingerprint": "pboc-m0|currency-in-circulation|month-end-balance-yoy|e-cny-included-from-2022-12",
   "sources": [
     {"title":"中国人民银行货币供应量表（2023）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025110416490190973.pdf","sourceDate":"2024-01-17","coverage":"2023-01 to 2023-12"},
     {"title":"中国人民银行货币供应量表（2024）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111416484293445.pdf","sourceDate":"2025-01-14","coverage":"2024-01 to 2024-12"},
     {"title":"中国人民银行货币供应量表（2025）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535682666.pdf","sourceDate":"2025-11-19","coverage":"2025-01 to 2025-10"}
   ],
   "updatedAt": "2025-11-19",
-  "comparabilityNote": "同比增速由央行月末余额按（本期余额 ÷ 上年同期余额 − 1）计算并四舍五入至一位小数；自 2022 年 12 月起 M0 含流通中数字人民币。",
+  "comparabilityNote": "2025-10 及之前同比增速由央行月末余额按（本期余额 ÷ 上年同期余额 − 1）计算并四舍五入至一位小数；自 2025-11 起直接采用央行发布的同比增速。自 2022 年 12 月起 M0 含流通中数字人民币。",
   "data": [
     {"date":"2024-01","value":5.9},{"date":"2024-02","value":12.5},{"date":"2024-03","value":11.0},{"date":"2024-04","value":10.8},{"date":"2024-05","value":11.7},{"date":"2024-06","value":11.7},{"date":"2024-07","value":12.0},{"date":"2024-08","value":12.2},{"date":"2024-09","value":11.5},{"date":"2024-10","value":12.8},{"date":"2024-11","value":12.7},{"date":"2024-12","value":13.0},
     {"date":"2025-01","value":17.2},{"date":"2025-02","value":9.7},{"date":"2025-03","value":11.5},{"date":"2025-04","value":12.0},{"date":"2025-05","value":12.1},{"date":"2025-06","value":12.0},{"date":"2025-07","value":11.8},{"date":"2025-08","value":11.7},{"date":"2025-09","value":11.5},{"date":"2025-10","value":10.6}
