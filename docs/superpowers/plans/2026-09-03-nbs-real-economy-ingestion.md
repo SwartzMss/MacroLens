@@ -140,3 +140,29 @@ git commit -m 'feat: schedule NBS real-economy updates'
 - [ ] Confirm the fixture CLI performs no live network calls in tests and that no file is written when any dataset fails.
 - [ ] Request a code review against origin/main and address every Critical/Important finding.
 - [ ] Push codex/issue-53-nbs-real-economy and create a PR that references issue #53, includes the summary, test commands, and workflow behavior.
+
+### Task 7: Address live-query and provenance review blockers
+
+**Files:**
+- Modify scripts/ingest/types.ts
+- Modify scripts/ingest/fetch/nbs-real-economy.ts
+- Modify scripts/ingest/normalize/real-economy.ts
+- Modify scripts/ingest/real-economy-cli.ts
+- Modify tests/fixtures/nbs/real-economy/industrial-production.json
+- Modify tests/fixtures/nbs/real-economy/retail-sales.json
+- Modify tests/fixtures/nbs/real-economy/fixed-asset-investment.json
+- Modify tests/ingestion-nbs-real-economy.test.mjs
+
+- [ ] Add a failing parser test whose industrial and retail fixtures include cumulative `202503`/`202504` nodes as well as the `202502` node, and assert that only the combined `202502` node and monthly `202503+` nodes become observations.
+- [ ] Add a failing query-construction test asserting that industrial and retail use separate stable URLs for each source code, with one URL for the combined code and one for the monthly code; retain a fixed-code URL for investment.
+- [ ] Add a failing normalization test asserting that National Data sources cover the actual returned periods while the release-page methodology source covers only its current published period and remains in the dataset provenance.
+- [ ] Run the focused test file and confirm these tests fail because the current implementation sends one multi-code URL, rejects cumulative rows outside Jan-Feb, and records only the release page as the incoming source.
+- [ ] Implement `buildNbsQueryUrls` to emit one deterministic EasyQuery URL per source code, update live fetching to fetch all URLs, and make period routing ignore out-of-scope rows while requiring the selected rows to be present and numeric.
+- [ ] Extend the raw NBS result with explicit data-source provenance; create one source per fetched National Data URL with exact selected-period coverage and a methodology/publication source whose coverage is derived from the official publication's relevant current period.
+- [ ] Preserve methodology sources during source pruning and normalize both source classes without assigning the release page coverage to historical National Data observations.
+- [ ] Run the focused tests, then npm test, npm run check, npm run build, and git diff --check origin/main...HEAD.
+- [ ] Commit with:
+~~~sh
+git add scripts/ingest/types.ts scripts/ingest/fetch/nbs-real-economy.ts scripts/ingest/normalize/real-economy.ts scripts/ingest/real-economy-cli.ts tests/fixtures/nbs/real-economy tests/ingestion-nbs-real-economy.test.mjs docs/superpowers/plans/2026-09-03-nbs-real-economy-ingestion.md
+git commit -m 'fix: separate NBS series queries and provenance'
+~~~
