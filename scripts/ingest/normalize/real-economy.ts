@@ -4,11 +4,12 @@ import { mergeObservations } from '../validate/overlap.ts';
 import { realEconomyCoverageCoversDates, validateRealEconomyDataset, validateRealEconomyObservations } from '../validate/real-economy.ts';
 
 function pruneRealEconomySources(sources: IndicatorSource[], dates: string[], id: RealEconomyDatasetId): IndicatorSource[] {
-  let result = [...sources].sort((left, right) => left.sourceDate.localeCompare(right.sourceDate));
+  let result = [...sources].sort((left, right) => left.sourceDate.localeCompare(right.sourceDate) || Number(left.role === 'methodology') - Number(right.role === 'methodology'));
   let removed = true;
   while (removed && result.length > 1) {
     removed = false;
     for (let index = 0; index < result.length; index += 1) {
+      if (result[index].role === 'methodology') continue;
       const candidate = result.filter((_, candidateIndex) => candidateIndex !== index);
       if (realEconomyCoverageCoversDates(candidate, dates, id)) {
         result = candidate;
@@ -50,15 +51,19 @@ export function normalizeRealEconomyDataset(
   const first = raw.observations[0];
   const last = raw.observations.at(-1);
   if (!first || !last) throw new IngestionContractError('Fetched NBS publication contains no observations: ' + id);
-  const latestSource: IndicatorSource = {
+  const publicationIsDataSource = raw.dataSources.some((source) => source.url === raw.publication.url);
+  const methodologySource: IndicatorSource | undefined = publicationIsDataSource ? undefined : {
     title: '国家统计局：' + raw.publication.title,
     url: raw.publication.url,
     sourceDate: raw.publication.sourceDate,
-    coverage: first.date + ' to ' + last.date,
+    coverage: raw.publication.coverage,
+    role: 'methodology',
   };
+  const incomingSources = [...raw.dataSources, ...(methodologySource ? [methodologySource] : [])];
+  const incomingUrls = new Set(incomingSources.map((source) => source.url));
   const candidates = [
-    ...existing.sources.filter((source) => source.url !== latestSource.url),
-    latestSource,
+    ...existing.sources.filter((source) => !incomingUrls.has(source.url)),
+    ...incomingSources,
   ];
   const sources = pruneRealEconomySources(candidates, data.map((observation) => observation.date), id);
   const source = sources.at(-1);

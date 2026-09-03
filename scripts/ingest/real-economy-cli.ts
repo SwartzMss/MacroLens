@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  buildNbsQueryUrl,
+  buildNbsQueryUrls,
   discoverLatestRealEconomyPublication,
   fetchNbsGdpPublication,
   fetchNbsRealEconomySeries,
@@ -63,7 +63,7 @@ async function fetchText(url: string): Promise<string> {
 async function livePublication(id: RealEconomyDatasetId) {
   const publication = discoverLatestRealEconomyPublication(await fetchText(nbsPublicationIndex), id);
   if (id === 'gdp') return publication;
-  return { ...publication, dataUrl: buildNbsQueryUrl(REAL_ECONOMY_CONTRACTS[id]) };
+  return { ...publication, dataUrls: buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS[id]) };
 }
 
 async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions) {

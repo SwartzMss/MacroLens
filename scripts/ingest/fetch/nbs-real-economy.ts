@@ -3,6 +3,7 @@ import {
   REAL_ECONOMY_METHODOLOGY_FINGERPRINTS,
 } from '../types.ts';
 import type {
+  IndicatorSource,
   NbsRealEconomyPublication,
   Observation,
   RawNbsRealEconomySeries,
@@ -93,23 +94,40 @@ export function discoverLatestRealEconomyPublication(
     if (!dateMatch || !validIsoDate(dateMatch[1])) fail(`Publication date missing or invalid for: ${title}`);
     const url = new URL(match[1], NBS_INDEX).toString();
     if (new URL(url).origin !== NBS_ORIGIN) fail(`NBS publication is not hosted by stats.gov.cn: ${url}`);
-    candidates.push({ title, url, sourceDate: dateMatch[1], coverage: '' });
+    candidates.push({ title, url, sourceDate: dateMatch[1], coverage: publicationCoverageFromTitle(title, id) });
   }
   if (candidates.length === 0) fail(`No NBS publication matching ${id}`);
   return candidates.sort((left, right) => right.sourceDate.localeCompare(left.sourceDate))[0];
 }
 
-export function buildNbsQueryUrl(contract: RealEconomyContract): string {
-  if (contract.sourceKind !== 'national-data') fail(`National Data URL requested for ${contract.id}`);
+function buildNbsQueryUrlForCode(code: string): string {
   const query = new URL('https://data.stats.gov.cn/easyquery.htm');
   query.searchParams.set('m', 'QueryData');
   query.searchParams.set('dbcode', 'hgyd');
   query.searchParams.set('rowcode', 'sj');
   query.searchParams.set('colcode', 'zb');
   query.searchParams.set('wds', '[]');
-  query.searchParams.set('dfwds', JSON.stringify([{ wdcode: 'zb', valuecode: contract.sourceCodes.join(',') }]));
+  query.searchParams.set('dfwds', JSON.stringify([{ wdcode: 'zb', valuecode: code }]));
   query.searchParams.set('h', '1');
   return query.toString();
+}
+
+export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string, string> {
+  if (contract.sourceKind !== 'national-data') fail(`National Data URL requested for ${contract.id}`);
+  return Object.fromEntries(contract.sourceCodes.map((code) => [code, buildNbsQueryUrlForCode(code)]));
+}
+
+function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
+  if (id === 'gdp') return '';
+  const match = canonical(title).match(/^(\d{4})年(?:\d{1,2}-(\d{1,2})|\d{1,2})月份/);
+  if (!match) fail(`NBS publication title has no period: ${title}`);
+  const year = match[1];
+  const month = Number(match[2] ?? canonical(title).match(/^(\d{4})年(\d{1,2})月份/)?.[2]);
+  if (!Number.isInteger(month) || month < 1 || month > 12) fail(`NBS publication title has invalid period: ${title}`);
+  const period = id === 'fixed-asset-investment'
+    ? `${year}-01–${String(month).padStart(2, '0')}`
+    : `${year}-${String(month).padStart(2, '0')}`;
+  return `${period} to ${period}`;
 }
 
 function metadataText(payload: NbsPayload, officialMethodologyText: string): string {
@@ -148,7 +166,7 @@ function nodeDisplayValue(node: NbsDataNode, code: string): string {
   return node.wds?.find((wd) => wd.wdcode === code)?.value ?? '';
 }
 
-function normalizeMonthlyWirePeriod(valuecode: string, display: string, rule: RealEconomySeriesRule): string {
+function normalizeMonthlyWirePeriod(valuecode: string, display: string, rule: RealEconomySeriesRule): string | undefined {
   const compactCode = canonical(valuecode);
   const yearMatch = compactCode.match(/^(\d{4})/);
   const monthMatch = compactCode.match(/^(\d{4})(0[1-9]|1[0-2])$/);
@@ -157,13 +175,13 @@ function normalizeMonthlyWirePeriod(valuecode: string, display: string, rule: Re
   const month = monthMatch ? Number(monthMatch[2]) : displayMatch ? Number(displayMatch[2]) : undefined;
   const lastMonth = displayMatch?.[3] ? Number(displayMatch[3]) : month;
   if (!year || month === undefined) fail('Invalid NBS month wire value: ' + valuecode);
-  const combinedDisplay = displayMatch?.[3] !== undefined && month === 1 && lastMonth === 2;
+  const combinedDisplay = displayMatch?.[3] !== undefined && lastMonth === 2;
   if (rule === 'combined') {
-    if (month !== 2 && !combinedDisplay) fail('Combined NBS series returned a non-Jan-Feb period: ' + valuecode);
+    if (month !== 2 && !combinedDisplay) return undefined;
     return year + '-01–02';
   }
   if (rule === 'monthly') {
-    if (month < 3 || combinedDisplay) fail('Monthly NBS series returned a Jan-Feb period: ' + valuecode);
+    if (month < 3 || combinedDisplay) return undefined;
     return year + '-' + String(month).padStart(2, '0');
   }
   const cumulativeEnd = lastMonth ?? month;
@@ -180,60 +198,76 @@ export function parseNbsRealEconomyResponse(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
   officialMethodologyText = '',
+  dataUrls: Record<string, string> = buildNbsQueryUrls(contract),
 ): RawNbsRealEconomySeries {
-  if (!payload || typeof payload !== 'object') fail('NBS response must be an object');
   if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
   const parsedUrl = new URL(publication.url);
   if (!['data.stats.gov.cn', 'www.stats.gov.cn'].includes(parsedUrl.hostname)) {
     fail('NBS publication is not hosted by an official NBS origin: ' + publication.url);
   }
   if (contract.sourceKind !== 'national-data') fail('National Data parser cannot parse ' + contract.id);
-  const candidate = payload as NbsPayload;
-  const nodes = candidate.returndata?.datanodes;
-  if (!Array.isArray(nodes) || nodes.length === 0) fail('NBS response is missing data nodes');
-  requireNationalDataMethodology(candidate, contract, officialMethodologyText);
-
-  const declaredCodes = candidate.series?.code ? metadataCodeSet(candidate.series.code) : new Set(contract.sourceCodes);
-  if (![...declaredCodes].every((code) => contract.sourceCodes.includes(code))) {
-    fail('NBS series declares unsupported code: ' + [...declaredCodes].join(','));
-  }
+  const payloads = Array.isArray(payload) ? payload : [payload];
   const observations: Observation[] = [];
   const seen = new Set<string>();
   const codes = new Set<string>();
-  for (const node of nodes) {
-    const periodValue = nodeValue(node, 'sj');
-    const seriesCode = nodeValue(node, 'zb');
-    if (!periodValue || !seriesCode || !contract.sourceCodes.includes(seriesCode)) {
-      fail('NBS data node does not match the ' + contract.id + ' series contract');
+  const sourcePeriods = new Map<string, Set<string>>();
+  let firstSeries: NbsPayload['series'];
+  for (const rawPayload of payloads) {
+    if (!rawPayload || typeof rawPayload !== 'object') fail('NBS response must be an object');
+    const candidate = rawPayload as NbsPayload;
+    const nodes = candidate.returndata?.datanodes;
+    if (!Array.isArray(nodes) || nodes.length === 0) fail('NBS response is missing data nodes');
+    requireNationalDataMethodology(candidate, contract, officialMethodologyText);
+    firstSeries ??= candidate.series;
+    const declaredCodes = candidate.series?.code ? metadataCodeSet(candidate.series.code) : new Set(contract.sourceCodes);
+    if (![...declaredCodes].every((code) => contract.sourceCodes.includes(code))) {
+      fail('NBS series declares unsupported code: ' + [...declaredCodes].join(','));
     }
-    const rule = contract.sourceCodeRules[seriesCode];
-    if (!rule) fail('NBS series code has no period rule: ' + seriesCode);
-    if (!node.data?.hasdata) fail('NBS value is missing for ' + periodValue);
-    const rawValue = node.data.data;
-    const valueText = String(rawValue ?? '').trim();
-    if (!/^-?\d+(?:\.\d+)?$/.test(valueText)) fail('Invalid numeric NBS value for ' + periodValue + ': ' + valueText);
-    const date = normalizeMonthlyWirePeriod(periodValue, nodeDisplayValue(node, 'sj'), rule);
-    if (seen.has(date)) fail('Duplicate NBS period: ' + date);
-    seen.add(date);
-    codes.add(seriesCode);
-    observations.push({ date, value: Number(valueText) });
+    for (const node of nodes) {
+      const periodValue = nodeValue(node, 'sj');
+      const seriesCode = nodeValue(node, 'zb');
+      if (!periodValue || !seriesCode || !contract.sourceCodes.includes(seriesCode)) {
+        fail('NBS data node does not match the ' + contract.id + ' series contract');
+      }
+      const rule = contract.sourceCodeRules[seriesCode];
+      if (!rule) fail('NBS series code has no period rule: ' + seriesCode);
+      const date = normalizeMonthlyWirePeriod(periodValue, nodeDisplayValue(node, 'sj'), rule);
+      if (!date) continue;
+      if (!node.data?.hasdata) fail('NBS value is missing for ' + periodValue);
+      const rawValue = node.data.data;
+      const valueText = String(rawValue ?? '').trim();
+      if (!/^-?\d+(?:\.\d+)?$/.test(valueText)) fail('Invalid numeric NBS value for ' + periodValue + ': ' + valueText);
+      if (seen.has(date)) fail('Duplicate NBS period: ' + date);
+      seen.add(date);
+      codes.add(seriesCode);
+      const periods = sourcePeriods.get(seriesCode) ?? new Set<string>();
+      periods.add(date);
+      sourcePeriods.set(seriesCode, periods);
+      observations.push({ date, value: Number(valueText) });
+    }
   }
+  if (observations.length === 0) fail('NBS response contains no selected observations');
   observations.sort((left, right) => left.date.localeCompare(right.date));
   validateRealEconomyObservations(observations, contract.id, { requireYearStart: false });
   const first = observations[0];
   const last = observations.at(-1);
   if (!first || !last) fail('NBS response contains no observations');
-  if (publication.coverage && publication.coverage !== `${first.date} to ${last.date}`) {
-    fail('NBS publication coverage does not match returned observations: ' + publication.coverage);
-  }
+  const dataSources: IndicatorSource[] = [...sourcePeriods.entries()].map(([code, periods]) => ({
+    title: `国家统计局：国家数据（${code}）`,
+    url: dataUrls[code] ?? buildNbsQueryUrlForCode(code),
+    sourceDate: publication.sourceDate,
+    coverage: [...periods].sort().map((date) => `${date} to ${date}`).join('; '),
+    role: 'data',
+  }));
   return {
     publication,
     id: contract.id,
     seriesCode: [...codes].join(','),
-    seriesTitle: candidate.series?.title ?? contract.sourceTitle,
-    unit: candidate.series?.unit ?? contract.unit,
-    frequency: candidate.series?.frequency ?? contract.frequency,
+    seriesTitle: firstSeries?.title ?? contract.sourceTitle,
+    unit: firstSeries?.unit ?? contract.unit,
+    frequency: firstSeries?.frequency ?? contract.frequency,
     methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS[contract.id],
+    dataSources,
     observations,
   };
 }
@@ -293,6 +327,13 @@ export function parseNbsGdpPublication(
     unit: '%',
     frequency: 'quarterly',
     methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS.gdp,
+    dataSources: [{
+      title: '国家统计局：' + publication.title,
+      url: publication.url,
+      sourceDate: publication.sourceDate,
+      coverage: `${first.date} to ${last.date}`,
+      role: 'data',
+    }],
     observations,
   };
 }
@@ -313,11 +354,12 @@ export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
 ): Promise<RawNbsRealEconomySeries> {
+  const dataUrls = publication.dataUrls ?? buildNbsQueryUrls(contract);
   const [payload, officialMethodologyText] = await Promise.all([
-    fetchJson(publication.dataUrl ?? buildNbsQueryUrl(contract)),
+    Promise.all(Object.values(dataUrls).map((url) => fetchJson(url))),
     fetchText(publication.url),
   ]);
-  return parseNbsRealEconomyResponse(payload, publication, contract, officialMethodologyText);
+  return parseNbsRealEconomyResponse(payload, publication, contract, officialMethodologyText, dataUrls);
 }
 
 export async function fetchNbsGdpPublication(

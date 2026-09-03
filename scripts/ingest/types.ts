@@ -3,6 +3,7 @@ export type IndicatorSource = {
   url: string;
   sourceDate: string;
   coverage: string;
+  role?: 'data' | 'methodology';
 };
 
 export type Observation = { date: string; value: number };
@@ -71,7 +72,7 @@ export type RealEconomyContract = {
 export type NbsRealEconomyPublication = {
   title: string;
   url: string;
-  dataUrl?: string;
+  dataUrls?: Record<string, string>;
   sourceDate: string;
   coverage: string;
 };
@@ -83,6 +84,7 @@ export type RawNbsRealEconomySeries = {
   unit: string;
   frequency: string;
   methodologyFingerprint: string;
+  dataSources: IndicatorSource[];
   observations: Observation[];
 };
 

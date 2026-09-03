@@ -10,7 +10,7 @@ This change is limited to the offline-testable ingestion pipeline, the four exis
 
 ## Architecture
 
-The implementation adds one real-economy CLI beside the existing PMI and PBOC adapters. The series contracts distinguish the official NBS National Data codes for monthly/cumulative data from GDP's official quarterly release-page table; each contract identifies expected dataset fields, wire-period parser, sequence validator, source URL, and observable methodology anchors.
+The implementation adds one real-economy CLI beside the existing PMI and PBOC adapters. The series contracts distinguish the official NBS National Data codes for monthly/cumulative data from GDP's official quarterly release-page table; each contract identifies expected dataset fields, wire-period parser, sequence validator, source URL, and observable methodology anchors. Industrial and retail National Data requests are split into one stable URL per semantic code, with cumulative rows selected only for each year's Jan–Feb period and monthly rows selected only from March onward.
 
 The adapter pipeline is:
 
@@ -36,7 +36,7 @@ The generic dataset validator will support monthly, quarterly, combined Jan–Fe
 | Retail sales | `A070103`, `A070104` | monthly | yoy | `YYYY-01–02`, then `YYYY-03` through `YYYY-12`; nominal YoY |
 | Fixed-asset investment | `A040102` | monthly | cumulative_yoy | `YYYY-01–02`, `YYYY-01–03` through `YYYY-01–12`; cumulative values are preserved |
 
-Each normalized dataset must retain `id`, `country=CN`, expected frequency/unit/metric/source/calculation, truthful source coverage, ordered unique observations, and the existing dataset metadata. Methodology checks only assert labels, units, codes, and definition text present in the fetched official response.
+Each normalized dataset must retain `id`, `country=CN`, expected frequency/unit/metric/source/calculation, truthful source coverage, ordered unique observations, and the existing dataset metadata. National Data URLs are the data provenance and cover only the selected periods actually returned by each query. The discovered official release page is retained separately as a methodology/publication anchor and covers only the current period represented by that page. Methodology checks only assert labels, units, codes, and definition text present in the fetched official response.
 
 ## Failure and write behavior
 

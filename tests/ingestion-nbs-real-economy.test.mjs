@@ -5,7 +5,7 @@ import {
   validateRealEconomyObservations,
 } from '../scripts/ingest/validate/real-economy.ts';
 import {
-  buildNbsQueryUrl,
+  buildNbsQueryUrls,
   discoverLatestRealEconomyPublication,
   parseNbsGdpPublication,
   parseNbsRealEconomyResponse,
@@ -187,10 +187,21 @@ test('discovers a latest official publication and builds a stable National Data 
   const publication = discoverLatestRealEconomyPublication(index, 'industrial-production');
   assert.equal(publication.sourceDate, '2026-08-17');
   assert.equal(publication.url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965055.html');
-  const first = buildNbsQueryUrl(REAL_ECONOMY_CONTRACTS['industrial-production']);
-  const second = buildNbsQueryUrl(REAL_ECONOMY_CONTRACTS['industrial-production']);
-  assert.equal(first, second);
-  assert.doesNotMatch(first, /k1=/);
+  assert.equal(publication.coverage, '2026-07 to 2026-07');
+  const first = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
+  const second = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
+  assert.deepEqual(first, second);
+});
+
+test('builds one stable National Data URL per semantic source code', () => {
+  const urls = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
+  assert.deepEqual(Object.keys(urls), ['A020101', 'A020102']);
+  assert.notEqual(urls.A020101, urls.A020102);
+  for (const [code, url] of Object.entries(urls)) {
+    const filters = JSON.parse(new URL(url).searchParams.get('dfwds'));
+    assert.deepEqual(filters, [{ wdcode: 'zb', valuecode: code }]);
+    assert.doesNotMatch(url, /k1=/);
+  }
 });
 
 test('rejects missing, malformed, duplicate, and invalid NBS observations', () => {
@@ -203,13 +214,31 @@ test('rejects missing, malformed, duplicate, and invalid NBS observations', () =
   assert.throws(() => parseNbsRealEconomyResponse({ ...payload, publication: { ...payload.publication, sourceDate: '2026-02-31' } }, { ...payload.publication, sourceDate: '2026-02-31' }, contract), IngestionContractError);
 });
 
-test('rejects cumulative code rows outside Jan-Feb instead of mixing them with monthly YoY rows', () => {
+test('selects Jan-Feb from cumulative code while ignoring later cumulative rows', () => {
   const payload = fixture('industrial-production');
   const cumulativeMarch = {
     ...payload.returndata.datanodes[0],
     wds: payload.returndata.datanodes[0].wds.map((wd) => wd.wdcode === 'sj' ? { ...wd, valuecode: '202503', value: '2025年1—3月' } : wd),
   };
-  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, returndata: { ...payload.returndata, datanodes: [cumulativeMarch] } }, payload.publication, REAL_ECONOMY_CONTRACTS['industrial-production']), IngestionContractError);
+  const parsed = parseNbsRealEconomyResponse({ ...payload, returndata: { ...payload.returndata, datanodes: [...payload.returndata.datanodes, cumulativeMarch] } }, payload.publication, REAL_ECONOMY_CONTRACTS['industrial-production']);
+  assert.deepEqual(parsed.observations.map(({ date }) => date), ['2025-01–02', '2025-03', '2025-04']);
+});
+
+test('merges the separate monthly and combined National Data responses', () => {
+  const payload = fixture('retail-sales');
+  const split = (code) => ({
+    ...payload,
+    returndata: {
+      ...payload.returndata,
+      datanodes: payload.returndata.datanodes.filter((node) => node.wds.find((wd) => wd.wdcode === 'zb').valuecode === code),
+    },
+  });
+  const parsed = parseNbsRealEconomyResponse([
+    split('A070104'),
+    split('A070103'),
+  ], payload.publication, REAL_ECONOMY_CONTRACTS['retail-sales']);
+  assert.deepEqual(parsed.observations.map(({ date }) => date), ['2025-01–02', '2025-03', '2025-04']);
+  assert.deepEqual(parsed.dataSources.map((source) => source.url.includes('A070104') || source.url.includes('A070103')), [true, true]);
 });
 
 test('rejects NBS source, code, and observable methodology mismatches', () => {
@@ -231,11 +260,12 @@ test('rejects NBS source, code, and observable methodology mismatches', () => {
   assert.throws(() => parseNbsRealEconomyResponse(changedMethod, payload.publication, contract), MethodologyMismatchError);
 });
 
-test('rejects publication metadata whose declared coverage differs from returned observations', () => {
+test('does not use release-page coverage as National Data coverage', () => {
   const payload = fixture('retail-sales');
   const contract = REAL_ECONOMY_CONTRACTS['retail-sales'];
-  const publication = { ...payload.publication, coverage: '2025-01–02 to 2025-03' };
-  assert.throws(() => parseNbsRealEconomyResponse(payload, publication, contract), IngestionContractError);
+  const raw = parseNbsRealEconomyResponse(payload, payload.publication, contract);
+  assert.equal(raw.publication.coverage, '2026-07 to 2026-07');
+  assert.ok(raw.dataSources.every((source) => source.coverage !== raw.publication.coverage));
 });
 
 function existingFor(id) {
@@ -253,9 +283,21 @@ test('normalizes all four NBS datasets while preserving period semantics and tru
     const normalized = normalizeRealEconomyDataset(raw, existingFor(id), id);
     assert.equal(normalized.id, id);
     assert.equal(normalized.updatedAt, raw.publication.sourceDate);
-    assert.equal(normalized.sources.at(-1).coverage, `${raw.observations[0].date} to ${raw.observations.at(-1).date}`);
+    assert.ok(normalized.sources.some((source) => source.coverage.includes(raw.observations[0].date)));
     assert.deepEqual(normalized.data.at(-1), raw.observations.at(-1));
   }
+});
+
+test('keeps National Data coverage separate from the release-page methodology anchor', () => {
+  const raw = parseFixture('industrial-production');
+  const normalized = normalizeRealEconomyDataset(raw, existingFor('industrial-production'), 'industrial-production');
+  const dataSources = normalized.sources.filter((source) => new URL(source.url).hostname === 'data.stats.gov.cn');
+  const releaseSource = normalized.sources.find((source) => new URL(source.url).hostname === 'www.stats.gov.cn');
+  assert.equal(dataSources.length, 2);
+  assert.ok(dataSources.some((source) => source.coverage.includes('2025-01–02')));
+  assert.ok(dataSources.some((source) => source.coverage.includes('2025-03')));
+  assert.equal(releaseSource?.coverage, '2026-07 to 2026-07');
+  assert.notEqual(releaseSource?.coverage, '2025-01–02 to 2025-04');
 });
 
 test('fails loudly when an NBS observation disagrees with historical data', () => {
