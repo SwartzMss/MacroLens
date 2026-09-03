@@ -43,7 +43,7 @@ export function validateIndicatorDataset(dataset: IndicatorDataset, options: Dat
   if (!Array.isArray(dataset.sources) || dataset.sources.length === 0) fail('Indicator dataset requires source provenance');
   for (const source of dataset.sources) {
     const coverage = source.coverage.match(options.coveragePattern ?? COVERAGE_PATTERN);
-    if (!source.title || !/^https:\/\//.test(source.url) || !coverage || coverage[1] > coverage[2]) {
+    if (!source.title || !/^https:\/\//.test(source.url) || !coverage || (coverage[2] !== undefined && coverage[1] > coverage[2])) {
       fail(`Invalid indicator source: ${source.url}`);
     }
     if (!ISO_DATE_PATTERN.test(source.sourceDate)) fail(`Invalid indicator source date: ${source.sourceDate}`);

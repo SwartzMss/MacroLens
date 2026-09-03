@@ -9,6 +9,7 @@
   "definitionAsOf": "2025-10",
   "source": "NBS",
   "calculation": "published",
+  "methodologyFingerprint": "nbs-fixed-asset-investment|excluding-rural-households|cumulative-yoy",
   "updatedAt": "2025-11-14",
   "comparabilityNote": "每个点均为年初至标示月份的累计同比，不是当月同比。国家统计局从1—2月开始发布，图中不补造1月值；2025年增速按统计制度改革、五经普和执法检查后的可比口径计算。",
   "sources": [

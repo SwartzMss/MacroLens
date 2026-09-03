@@ -9,6 +9,7 @@
   "definitionAsOf": "2025-10",
   "source": "NBS",
   "calculation": "published",
+  "methodologyFingerprint": "nbs-industrial-production|above-designated-size|real-yoy",
   "updatedAt": "2025-11-14",
   "comparabilityNote": "增速为扣除价格因素的实际同比。国家统计局将1—2月合并发布，图中明确保留合并期，不虚构1月或2月单月同比；规上企业范围变化时按可比口径计算。",
   "sources": [

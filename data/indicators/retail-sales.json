@@ -9,6 +9,7 @@
   "definitionAsOf": "2025-10",
   "source": "NBS",
   "calculation": "published",
+  "methodologyFingerprint": "nbs-retail-sales|total-retail-sales|nominal-yoy",
   "updatedAt": "2025-11-14",
   "comparabilityNote": "本序列是未扣除价格因素的名义同比。1—2月为合并发布值，不是2月单月值；2025年增速按第五次全国经济普查修订后的可比口径计算。",
   "sources": [

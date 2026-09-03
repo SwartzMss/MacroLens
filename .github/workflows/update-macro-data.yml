@@ -34,6 +34,9 @@ jobs:
       - name: Fetch and validate PBOC money supply
         run: npm run ingest:pboc-money-supply -- --target-dir data/indicators
 
+      - name: Fetch and validate NBS real-economy indicators
+        run: npm run ingest:nbs-real-economy -- --target-dir data/indicators
+
       - name: Open macro data update pull request
         uses: peter-evans/create-pull-request@v7
         with:
@@ -43,6 +46,10 @@ jobs:
             data/indicators/m0.json
             data/indicators/m1.json
             data/indicators/m2.json
+            data/indicators/gdp.json
+            data/indicators/industrial-production.json
+            data/indicators/retail-sales.json
+            data/indicators/fixed-asset-investment.json
           branch: automation/update-macro-data
           delete-branch: true
           commit-message: 'data: update macro indicators'

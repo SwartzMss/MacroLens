@@ -151,6 +151,17 @@ test('parses official-shaped NBS responses for all four target series', () => {
   }
 });
 
+test('parses National Data responses that expose only official data nodes', () => {
+  const payload = fixture('industrial-production');
+  const parsed = parseNbsRealEconomyResponse(
+    { returndata: payload.returndata },
+    { ...payload.publication, coverage: '' },
+    REAL_ECONOMY_CONTRACTS['industrial-production'],
+  );
+  assert.equal(parsed.seriesCode, 'A020102,A020101');
+  assert.deepEqual(parsed.observations.at(-1), { date: '2025-04', value: 6.1 });
+});
+
 test('rejects missing, malformed, duplicate, and invalid NBS observations', () => {
   const payload = fixture('industrial-production');
   const contract = REAL_ECONOMY_CONTRACTS['industrial-production'];
@@ -168,6 +179,13 @@ test('rejects NBS source, code, and observable methodology mismatches', () => {
   const wrongCode = { ...payload, returndata: { datanodes: payload.returndata.datanodes.map((node) => ({ ...node, wds: node.wds.map((wd) => wd.wdcode === 'zb' ? { ...wd, valuecode: 'A040102' } : wd) })) } };
   assert.throws(() => parseNbsRealEconomyResponse(wrongCode, payload.publication, contract), IngestionContractError);
   assert.throws(() => parseNbsRealEconomyResponse({ ...payload, series: { ...payload.series, priceTreatment: '按现价计算' } }, payload.publication, contract), MethodologyMismatchError);
+});
+
+test('rejects publication metadata whose declared coverage differs from returned observations', () => {
+  const payload = fixture('retail-sales');
+  const contract = REAL_ECONOMY_CONTRACTS['retail-sales'];
+  const publication = { ...payload.publication, coverage: '2025-01–02 to 2025-03' };
+  assert.throws(() => parseNbsRealEconomyResponse(payload, publication, contract), IngestionContractError);
 });
 
 function existingFor(id) {
@@ -286,4 +304,17 @@ test('does not write any target when one NBS series has a historical mismatch', 
 
 test('help exits before reading or writing real-economy targets', async () => {
   await assert.doesNotReject(() => runRealEconomy(['--help']));
+});
+
+test('wires NBS real-economy ingestion into the reviewable scheduled workflow', () => {
+  const workflow = fs.readFileSync(path.join(here, '..', '.github', 'workflows', 'update-macro-data.yml'), 'utf8');
+  assert.match(workflow, /workflow_dispatch/);
+  assert.match(workflow, /schedule:/);
+  assert.match(workflow, /npm run ingest:pmi/);
+  assert.match(workflow, /npm run ingest:pboc-money-supply/);
+  assert.match(workflow, /npm run ingest:nbs-real-economy/);
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
+  }
+  assert.match(workflow, /create-pull-request/);
 });

@@ -38,7 +38,6 @@ function parseArgs(args: string[]): CliOptions {
   if (fixtureCount !== 0 && fixtureCount !== 2) throw new Error('--fixture-index and --fixture-dir must be provided together');
   return options;
 }
-
 async function loadExisting(targetDir: string): Promise<Map<RealEconomyDatasetId, IndicatorDataset>> {
   const existing = new Map<RealEconomyDatasetId, IndicatorDataset>();
   for (const id of IDS) {
@@ -103,4 +102,3 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.exitCode = 1;
   });
 }
-

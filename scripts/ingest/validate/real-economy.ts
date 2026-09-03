@@ -6,7 +6,7 @@ import {
 import type { IndicatorDataset, IndicatorSource, Observation, RealEconomyDatasetId } from '../types.ts';
 import { validateIndicatorDataset } from './dataset.ts';
 
-const REAL_COVERAGE_PATTERN = /^(.+)\s+to\s+(.+)$/;
+const REAL_COVERAGE_PATTERN = /^.+$/;
 
 function fail(message: string): never {
   throw new IngestionContractError(message);
@@ -45,9 +45,13 @@ function nextPeriod(date: string, id: RealEconomyDatasetId): string {
   return id === 'fixed-asset-investment' ? `${year}-01–${String(month + 1).padStart(2, '0')}` : `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
-export function validateRealEconomyObservations(observations: Observation[], id: RealEconomyDatasetId): void {
+export function validateRealEconomyObservations(
+  observations: Observation[],
+  id: RealEconomyDatasetId,
+  options: { requireYearStart?: boolean } = {},
+): void {
   if (!Array.isArray(observations) || observations.length === 0) fail(`${id} dataset requires observations`);
-  if (id !== 'gdp' && observations[0]?.date.match(/^\d{4}-01–02$/) === null) {
+  if (options.requireYearStart !== false && id !== 'gdp' && observations[0]?.date.match(/^\d{4}-01–02$/) === null) {
     fail(`${id} observations must start with the official Jan-Feb combined period`);
   }
   let previous = '';
@@ -61,17 +65,26 @@ export function validateRealEconomyObservations(observations: Observation[], id:
   }
 }
 
-export function realEconomyCoverageCoversDates(sources: IndicatorSource[], dates: string[]): boolean {
+function coverageRanges(source: IndicatorSource, id: RealEconomyDatasetId): Array<[string, string]> {
+  const ranges = source.coverage.split(';').map((part) => {
+    const range = part.trim().match(/^(.+?)\s+to\s+(.+)$/);
+    return (range ? [range[1], range[2]] : [part.trim(), part.trim()]) as [string, string];
+  });
+  if (ranges.some(([start, end]) => !validPeriod(start, id) || !validPeriod(end, id) || periodRank(start, id) > periodRank(end, id))) {
+    return [];
+  }
+  return ranges;
+}
+
+export function realEconomyCoverageCoversDates(
+  sources: IndicatorSource[],
+  dates: string[],
+  id: RealEconomyDatasetId,
+): boolean {
   return dates.every((date) => sources.some((source) => {
-    const match = source.coverage.match(REAL_COVERAGE_PATTERN);
-    if (!match) return false;
-    const id = dates.some((candidate) => candidate.includes('Q'))
-      ? 'gdp'
-      : dates.some((candidate) => candidate.match(/^\d{4}-01–(?:0[3-9]|1[0-2])$/))
-        ? 'fixed-asset-investment'
-        : 'industrial-production';
-    if (!validPeriod(match[1], id) || !validPeriod(match[2], id)) return false;
-    return periodRank(match[1], id) <= periodRank(date, id) && periodRank(date, id) <= periodRank(match[2], id);
+    return coverageRanges(source, id).some(([start, end]) => (
+      periodRank(start, id) <= periodRank(date, id) && periodRank(date, id) <= periodRank(end, id)
+    ));
   }));
 }
 
@@ -80,8 +93,11 @@ export function validateRealEconomyDataset(dataset: IndicatorDataset, id: RealEc
   validateIndicatorDataset(dataset, {
     coveragePattern: REAL_COVERAGE_PATTERN,
     validateObservations: (observations) => validateRealEconomyObservations(observations, id),
-    coverageCoversDates: realEconomyCoverageCoversDates,
+    coverageCoversDates: (sources, dates) => realEconomyCoverageCoversDates(sources, dates, id),
   });
+  if (dataset.sources.some((source) => coverageRanges(source, id).length === 0)) {
+    fail(`Invalid ${id} source coverage`);
+  }
   if (dataset.id !== id) fail(`Real-economy dataset id mismatch: ${dataset.id} != ${id}`);
   if (dataset.country !== 'CN') fail(`Real-economy country must be CN, got ${dataset.country}`);
   if (dataset.frequency !== contract.frequency) fail(`${id} frequency must be ${contract.frequency}, got ${dataset.frequency}`);

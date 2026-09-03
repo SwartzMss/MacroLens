@@ -41,6 +41,8 @@ function normalizePeriod(value: string, contract: RealEconomyContract): string {
   if (contract.periodKind === 'quarterly') {
     const canonical = compact.match(/^(\d{4})-Q([1-4])$/);
     if (canonical) return canonical[0];
+    const compactQuarter = compact.match(/^(\d{4})Q([1-4])$/);
+    if (compactQuarter) return compactQuarter[1] + '-Q' + compactQuarter[2];
     const chinese = compact.match(/^(\d{4})年([1-4])季度$/);
     if (chinese) return chinese[1] + '-Q' + chinese[2];
     fail('Invalid NBS quarter: ' + value);
@@ -120,9 +122,15 @@ export function parseNbsRealEconomyResponse(
     fail('NBS publication is not hosted by an official NBS origin: ' + publication.url);
   }
   const candidate = payload as NbsPayload;
-  const series = candidate.series;
+  const hasSeriesMetadata = Boolean(candidate.series);
+  const series = candidate.series ?? {
+    title: contract.sourceTitle,
+    code: contract.sourceCodes.join(','),
+    unit: contract.unit,
+    frequency: contract.frequency,
+  };
   const nodes = candidate.returndata?.datanodes;
-  if (!series || !Array.isArray(nodes) || nodes.length === 0) fail('NBS response is missing series metadata or data nodes');
+  if (!Array.isArray(nodes) || nodes.length === 0) fail('NBS response is missing data nodes');
   if (!series.title || !series.code || series.unit !== contract.unit || series.frequency !== contract.frequency) {
     fail('NBS series metadata does not match the ' + contract.id + ' contract');
   }
@@ -130,7 +138,7 @@ export function parseNbsRealEconomyResponse(
   if (![...declaredCodes].every((code) => contract.sourceCodes.includes(code))) {
     fail('NBS series declares unsupported code: ' + series.code);
   }
-  requireObservableMethodology(series, contract);
+  if (hasSeriesMetadata) requireObservableMethodology(series, contract);
 
   const observations: Observation[] = [];
   const seen = new Set<string>();
@@ -152,7 +160,13 @@ export function parseNbsRealEconomyResponse(
     observations.push({ date, value: Number(valueText) });
   }
   observations.sort((left, right) => left.date.localeCompare(right.date));
-  validateRealEconomyObservations(observations, contract.id);
+  validateRealEconomyObservations(observations, contract.id, { requireYearStart: false });
+  const first = observations[0];
+  const last = observations.at(-1);
+  if (!first || !last) fail('NBS response contains no observations');
+  if (publication.coverage && publication.coverage !== `${first.date} to ${last.date}`) {
+    fail('NBS publication coverage does not match returned observations: ' + publication.coverage);
+  }
   return {
     publication,
     id: contract.id,

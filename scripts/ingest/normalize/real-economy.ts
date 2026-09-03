@@ -1,16 +1,16 @@
-import { IngestionContractError } from '../types.ts';
+import { IngestionContractError, MethodologyMismatchError } from '../types.ts';
 import type { IndicatorDataset, IndicatorSource, RawNbsRealEconomySeries, RealEconomyDatasetId } from '../types.ts';
 import { mergeObservations } from '../validate/overlap.ts';
 import { realEconomyCoverageCoversDates, validateRealEconomyDataset, validateRealEconomyObservations } from '../validate/real-economy.ts';
 
-function pruneRealEconomySources(sources: IndicatorSource[], dates: string[]): IndicatorSource[] {
+function pruneRealEconomySources(sources: IndicatorSource[], dates: string[], id: RealEconomyDatasetId): IndicatorSource[] {
   let result = [...sources].sort((left, right) => left.sourceDate.localeCompare(right.sourceDate));
   let removed = true;
   while (removed && result.length > 1) {
     removed = false;
     for (let index = 0; index < result.length; index += 1) {
       const candidate = result.filter((_, candidateIndex) => candidateIndex !== index);
-      if (realEconomyCoverageCoversDates(candidate, dates)) {
+      if (realEconomyCoverageCoversDates(candidate, dates, id)) {
         result = candidate;
         removed = true;
         break;
@@ -34,9 +34,9 @@ export function normalizeRealEconomyDataset(
   validateRealEconomyDataset(existing, id);
   if (raw.id !== id) throw new IngestionContractError('Fetched NBS dataset id mismatch: ' + raw.id + ' != ' + id);
   if (raw.methodologyFingerprint !== existing.methodologyFingerprint) {
-    throw new IngestionContractError('Fetched NBS methodology differs from existing dataset: ' + id);
+    throw new MethodologyMismatchError('Fetched NBS methodology differs from existing dataset: ' + id);
   }
-  validateRealEconomyObservations(raw.observations, id);
+  validateRealEconomyObservations(raw.observations, id, { requireYearStart: false });
 
   const existingLatest = latestPeriod(existing);
   const incomingAddsNewPeriod = raw.observations.some(({ date }) => date > existingLatest);
@@ -60,7 +60,7 @@ export function normalizeRealEconomyDataset(
     ...existing.sources.filter((source) => source.url !== latestSource.url),
     latestSource,
   ];
-  const sources = pruneRealEconomySources(candidates, data.map((observation) => observation.date));
+  const sources = pruneRealEconomySources(candidates, data.map((observation) => observation.date), id);
   const source = sources.at(-1);
   if (!source) throw new IngestionContractError('NBS dataset contains no source after normalization: ' + id);
   const normalized: IndicatorDataset = {
@@ -73,4 +73,3 @@ export function normalizeRealEconomyDataset(
   validateRealEconomyDataset(normalized, id);
   return normalized;
 }
-
