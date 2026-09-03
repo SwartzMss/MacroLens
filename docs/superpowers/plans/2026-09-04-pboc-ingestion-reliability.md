@@ -1,6 +1,6 @@
 # PBOC Money Supply Ingestion Reliability Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Make official NBS and PBOC ingestion requests observable and resilient to bounded transient network failures while preserving all existing dataset and safety contracts.
 
@@ -24,7 +24,7 @@
 - Create: `scripts/ingest/fetch-text.ts`
 - Create: `tests/ingestion-fetch-text.test.mjs`
 
-- [ ] **Step 1: Write the failing tests for the public fetch behavior.**
+- [x] **Step 1: Write the failing tests for the public fetch behavior.**
 
 Create `tests/ingestion-fetch-text.test.mjs` with fake `Response` values and a fake sleep function. The tests must assert observable behavior rather than implementation details:
 
@@ -186,7 +186,7 @@ test('does not retry an accepted response whose body read fails', async () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused test and verify it fails for the missing module.**
+- [x] **Step 2: Run the focused test and verify it fails for the missing module.**
 
 Run:
 
@@ -196,7 +196,7 @@ node --import tsx --test tests/ingestion-fetch-text.test.mjs
 
 Expected: FAIL because `scripts/ingest/fetch-text.ts` does not exist yet; do not change the tests to make this initial failure pass.
 
-- [ ] **Step 3: Implement the minimal shared fetcher.**
+- [x] **Step 3: Implement the minimal shared fetcher.**
 
 Create `scripts/ingest/fetch-text.ts` with the exact contract used by the tests:
 
@@ -328,7 +328,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
 }
 ```
 
-- [ ] **Step 4: Run the focused tests and the type checker.**
+- [x] **Step 4: Run the focused tests and the type checker.**
 
 Run:
 
@@ -339,7 +339,7 @@ npm run check
 
 Expected: all focused fetch tests pass and `astro check` exits 0. If TypeScript rejects the fake response type, update only the test helper or the `FetchImplementation` type while preserving the public behavior above.
 
-- [ ] **Step 5: Commit the shared fetch contract.**
+- [x] **Step 5: Commit the shared fetch contract.**
 
 ```bash
 git add scripts/ingest/fetch-text.ts tests/ingestion-fetch-text.test.mjs
@@ -352,7 +352,7 @@ git commit -m "test: define resilient ingestion fetch contract"
 - Modify: `scripts/ingest/cli.ts`
 - Modify: `scripts/ingest/money-supply-cli.ts`
 
-- [ ] **Step 1: Replace the duplicated NBS fetch helper.**
+- [x] **Step 1: Replace the duplicated NBS fetch helper.**
 
 In `scripts/ingest/cli.ts`, add:
 
@@ -362,7 +362,7 @@ import { fetchText } from './fetch-text.ts';
 
 Delete the local `async function fetchText(url: string)` implementation. Keep `loadPublication` unchanged except that its existing `fetchText(NBS_PUBLICATION_INDEX)` and `fetchText(publication.url)` calls now resolve to the imported helper.
 
-- [ ] **Step 2: Replace the duplicated PBOC fetch helper.**
+- [x] **Step 2: Replace the duplicated PBOC fetch helper.**
 
 In `scripts/ingest/money-supply-cli.ts`, add:
 
@@ -372,7 +372,7 @@ import { fetchText } from './fetch-text.ts';
 
 Delete the local `async function fetchText(url: string)` implementation. Keep `loadIndex` and `loadReports` unchanged so fixtures still use local files and live mode uses the official PBOC index and publication URLs.
 
-- [ ] **Step 3: Run ingestion regression tests against fixtures.**
+- [x] **Step 3: Run ingestion regression tests against fixtures.**
 
 Run:
 
@@ -382,7 +382,7 @@ node --import tsx --test tests/ingestion-fetch-text.test.mjs tests/ingestion-pbo
 
 Expected: all fetch, PBOC, and PMI tests pass; the fixture CLI still reports `Changed: true` on the first run and `Changed: false` on the idempotent second run, and historical mismatch tests still leave all targets unchanged.
 
-- [ ] **Step 4: Commit the CLI integration.**
+- [x] **Step 4: Commit the CLI integration.**
 
 ```bash
 git add scripts/ingest/cli.ts scripts/ingest/money-supply-cli.ts
@@ -394,7 +394,7 @@ git commit -m "fix: harden official macro data fetches"
 **Files:**
 - Modify: none beyond the files above unless verification exposes a concrete regression.
 
-- [ ] **Step 1: Run the complete automated checks.**
+- [x] **Step 1: Run the complete automated checks.**
 
 Run:
 
@@ -408,7 +408,7 @@ git status --short
 
 Expected: all Node tests pass, Astro check passes, the production build completes, the diff check is clean, and the branch contains only the intended design/plan, fetch utility, tests, and CLI integration files.
 
-- [ ] **Step 2: Run the fixture PBOC CLI explicitly.**
+- [x] **Step 2: Run the fixture PBOC CLI explicitly.**
 
 Run:
 
@@ -425,7 +425,7 @@ npm run ingest:pboc-money-supply -- \
 
 Expected: the command succeeds and does not modify tracked `data/indicators` files.
 
-- [ ] **Step 3: Run one live PBOC verification into a temporary directory.**
+- [x] **Step 3: Run one live PBOC verification into a temporary directory.**
 
 Run:
 
@@ -439,7 +439,7 @@ npm run ingest:pboc-money-supply -- --target-dir "$target_dir"
 
 Expected: the official index and report URLs either ingest successfully or fail with a message naming the exact URL, status/timeout, attempt count, and underlying cause. No tracked data file may change during this check.
 
-- [ ] **Step 4: Push the branch and create the pull request.**
+- [x] **Step 4: Push the branch and create the pull request.**
 
 ```bash
 git push -u https://github.com/SwartzMss/MacroLens.git codex/issue-55-pboc-reliability
