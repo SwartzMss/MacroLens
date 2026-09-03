@@ -9,6 +9,7 @@
   "definitionAsOf": "2025-Q3",
   "source": "NBS",
   "calculation": "published",
+  "methodologyFingerprint": "nbs-gdp|quarterly-real-yoy",
   "updatedAt": "2025-10-21",
   "comparabilityNote": "季度同比增速由国家统计局按不变价核算；它不是现价 GDP 总量，也不是经季节调整的季度环比。初步核算结果可能修订。",
   "sources": [

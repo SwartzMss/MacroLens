@@ -3,6 +3,7 @@ export type IndicatorSource = {
   url: string;
   sourceDate: string;
   coverage: string;
+  role?: 'data' | 'methodology';
 };
 
 export type Observation = { date: string; value: number };
@@ -49,6 +50,104 @@ export type RawMoneySupplyPublication = {
   publication: MoneySupplyPublication;
   values: MoneySupplyValues;
   methodologyFingerprints: typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
+};
+
+export type RealEconomyDatasetId = 'gdp' | 'industrial-production' | 'retail-sales' | 'fixed-asset-investment';
+export type RealEconomyPeriodKind = 'quarterly' | 'monthly-yoy' | 'cumulative-yoy';
+export type RealEconomySourceKind = 'release-page' | 'national-data';
+export type RealEconomySeriesRule = 'combined' | 'monthly' | 'cumulative';
+export type RealEconomyContract = {
+  id: RealEconomyDatasetId;
+  sourceCodes: string[];
+  sourceCodeRules: Record<string, RealEconomySeriesRule>;
+  sourceTitle: string;
+  sourceKind: RealEconomySourceKind;
+  frequency: 'quarterly' | 'monthly';
+  unit: '%';
+  metric: 'yoy' | 'cumulative_yoy';
+  calculation: 'published';
+  periodKind: RealEconomyPeriodKind;
+  methodologyFingerprint: string;
+};
+export type NbsRealEconomyPublication = {
+  title: string;
+  url: string;
+  dataUrls?: Record<string, string>;
+  sourceDate: string;
+  coverage: string;
+};
+export type RawNbsRealEconomySeries = {
+  publication: NbsRealEconomyPublication;
+  id: RealEconomyDatasetId;
+  seriesCode: string;
+  seriesTitle: string;
+  unit: string;
+  frequency: string;
+  methodologyFingerprint: string;
+  dataSources: IndicatorSource[];
+  observations: Observation[];
+};
+
+export const REAL_ECONOMY_METHODOLOGY_FINGERPRINTS = {
+  gdp: 'nbs-gdp|quarterly-real-yoy',
+  'industrial-production': 'nbs-industrial-production|above-designated-size|real-yoy',
+  'retail-sales': 'nbs-retail-sales|total-retail-sales|nominal-yoy',
+  'fixed-asset-investment': 'nbs-fixed-asset-investment|excluding-rural-households|cumulative-yoy',
+} as const;
+
+export const REAL_ECONOMY_CONTRACTS: Record<RealEconomyDatasetId, RealEconomyContract> = {
+  gdp: {
+    id: 'gdp',
+    sourceCodes: [],
+    sourceCodeRules: {},
+    sourceTitle: '国内生产总值（GDP）同比增长速度',
+    sourceKind: 'release-page',
+    frequency: 'quarterly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    periodKind: 'quarterly',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS.gdp,
+  },
+  'industrial-production': {
+    id: 'industrial-production',
+    sourceCodes: ['A020101', 'A020102'],
+    sourceCodeRules: { A020101: 'monthly', A020102: 'combined' },
+    sourceTitle: '规模以上工业增加值同比增长',
+    sourceKind: 'national-data',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    periodKind: 'monthly-yoy',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS['industrial-production'],
+  },
+  'retail-sales': {
+    id: 'retail-sales',
+    sourceCodes: ['A070103', 'A070104'],
+    sourceCodeRules: { A070103: 'monthly', A070104: 'combined' },
+    sourceTitle: '社会消费品零售总额同比增长',
+    sourceKind: 'national-data',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    periodKind: 'monthly-yoy',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS['retail-sales'],
+  },
+  'fixed-asset-investment': {
+    id: 'fixed-asset-investment',
+    sourceCodes: ['A040102'],
+    sourceCodeRules: { A040102: 'cumulative' },
+    sourceTitle: '固定资产投资（不含农户）累计增长',
+    sourceKind: 'national-data',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'cumulative_yoy',
+    calculation: 'published',
+    periodKind: 'cumulative-yoy',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS['fixed-asset-investment'],
+  },
 };
 
 export class HistoricalMismatchError extends Error {

@@ -1,0 +1,28 @@
+{
+  "publication": {
+    "title": "2026年7月份规模以上工业增加值增长4.5%",
+    "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965055.html",
+    "sourceDate": "2026-08-17",
+    "coverage": "2026-07 to 2026-07"
+  },
+  "returndata": {
+    "wdnodes": [
+      {"wdcode":"zb","wdname":"指标","nodes":[
+        {"code":"A020101","name":"规模以上工业增加值同比增长（扣除价格因素）"},
+        {"code":"A020102","name":"规模以上工业增加值1—2月同比增长（扣除价格因素）"}
+      ]},
+      {"wdcode":"sj","wdname":"时间","nodes":[
+        {"code":"202502","name":"2025年1—2月"},
+        {"code":"202503","name":"2025年3月"},
+        {"code":"202504","name":"2025年4月"}
+      ]}
+    ],
+    "datanodes": [
+      {"wds":[{"wdcode":"zb","valuecode":"A020102"},{"wdcode":"sj","valuecode":"202502","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"5.9"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020101"},{"wdcode":"sj","valuecode":"202503","value":"2025年3月"}],"data":{"hasdata":true,"data":"7.7"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020101"},{"wdcode":"sj","valuecode":"202504","value":"2025年4月"}],"data":{"hasdata":true,"data":"6.1"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020102"},{"wdcode":"sj","valuecode":"202503","value":"2025年1—3月"}],"data":{"hasdata":true,"data":"6.7"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020102"},{"wdcode":"sj","valuecode":"202504","value":"2025年1—4月"}],"data":{"hasdata":true,"data":"6.5"}}
+    ]
+  }
+}

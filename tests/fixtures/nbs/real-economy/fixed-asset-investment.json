@@ -1,0 +1,25 @@
+{
+  "publication": {
+    "title": "2026年1—7月份全国固定资产投资基本情况",
+    "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965054.html",
+    "sourceDate": "2026-08-17",
+    "coverage": "2026-01–07 to 2026-01–07"
+  },
+  "returndata": {
+    "wdnodes": [
+      {"wdcode":"zb","wdname":"指标","nodes":[
+        {"code":"A040102","name":"固定资产投资（不含农户）累计增长（可比口径）"}
+      ]},
+      {"wdcode":"sj","wdname":"时间","nodes":[
+        {"code":"202502","name":"2025年1—2月"},
+        {"code":"202503","name":"2025年1—3月"},
+        {"code":"202504","name":"2025年1—4月"}
+      ]}
+    ],
+    "datanodes": [
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202502","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.1"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202503","value":"2025年1—3月"}],"data":{"hasdata":true,"data":"4.2"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202504","value":"2025年1—4月"}],"data":{"hasdata":true,"data":"4.0"}}
+    ]
+  }
+}
