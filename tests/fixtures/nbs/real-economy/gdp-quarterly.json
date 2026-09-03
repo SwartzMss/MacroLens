@@ -3,25 +3,6 @@
     "title": "2026年二季度和上半年国内生产总值初步核算结果",
     "url": "https://www.stats.gov.cn/sj/zxfbhjd/202607/t20260716_1964142.html",
     "sourceDate": "2026-07-16",
-    "coverage": "2025-Q1 to 2026-Q2"
-  },
-  "series": {
-    "title": "国内生产总值（GDP）同比增长速度",
-    "code": "A010101",
-    "unit": "%",
-    "frequency": "quarterly",
-    "scope": "全国国内生产总值",
-    "priceTreatment": "按不变价格计算",
-    "publicationPattern": "季度同比增长速度"
-  },
-  "returndata": {
-    "datanodes": [
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2025-Q1","value":"2025年1季度"}],"data":{"hasdata":true,"data":"5.4"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2025-Q2","value":"2025年2季度"}],"data":{"hasdata":true,"data":"5.2"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2025-Q3","value":"2025年3季度"}],"data":{"hasdata":true,"data":"4.8"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2025-Q4","value":"2025年4季度"}],"data":{"hasdata":true,"data":"4.5"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2026-Q1","value":"2026年1季度"}],"data":{"hasdata":true,"data":"5.0"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A010101"},{"wdcode":"sj","valuecode":"2026-Q2","value":"2026年2季度"}],"data":{"hasdata":true,"data":"4.3"}}
-    ]
+    "coverage": ""
   }
 }

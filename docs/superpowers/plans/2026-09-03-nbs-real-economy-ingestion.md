@@ -4,7 +4,7 @@
 
 **Goal:** Add deterministic, reviewable NBS ingestion for the existing GDP, industrial-production, retail-sales, and fixed-asset-investment datasets while preserving official period and methodology semantics.
 
-**Architecture:** Use one NBS National Data response adapter with explicit per-series contracts. Normalize and validate all four candidates before writing any file; reuse the existing stable JSON writer and workflow PR action. Extend period validation only through explicit series rules so PMI and PBOC contracts remain unchanged.
+**Architecture:** Use explicit per-series contracts: parse GDP from the official quarterly release page, and parse the other three datasets from National Data responses with separate monthly/cumulative code rules. Normalize and validate all four candidates before writing any file; reuse the existing stable JSON writer and workflow PR action. Extend period validation only through explicit series rules so PMI and PBOC contracts remain unchanged.
 
 **Tech Stack:** TypeScript via tsx, Node test runner, JSON fixtures, Astro project, GitHub Actions.
 
@@ -21,7 +21,7 @@
 - Modify package.json: add ingest:nbs-real-economy.
 - Modify .github/workflows/update-macro-data.yml: run the new CLI and include the four JSON targets in the existing reviewable PR.
 - Create tests/ingestion-nbs-real-economy.test.mjs: fixture-driven contract, normalization, CLI, idempotency, and atomicity tests.
-- Create tests/fixtures/nbs/real-economy/*.json: official-shaped response/index fixtures and controlled malformed variants.
+- Create tests/fixtures/nbs/real-economy/*.json and gdp-quarterly.html: official-shaped National Data/release-page fixtures and controlled malformed variants.
 - Modify data/indicators/gdp.json, industrial-production.json, retail-sales.json, fixed-asset-investment.json: update canonical data/provenance only after the adapter passes against fixtures and official latest release metadata.
 
 ### Task 1: Define typed contracts and failing validator tests
@@ -56,9 +56,9 @@ git commit -m 'test: define NBS real-economy contracts'
 
 - [ ] Add official-shaped fixture payloads containing response status, dataset/series code, title, unit, frequency, publication date, source URL, coverage metadata, and values. Include overlap with committed data and one new period per target.
 - [ ] Write parser tests that extract numeric values only when the official response marks a node as present, reject missing/non-numeric values, reject duplicate periods, reject malformed publication dates, and reject non-stats.gov.cn source URLs.
-- [ ] Write tests that verify series-code/label matching: A020101 and A020102 may feed industrial production only, A070103 and A070104 may feed retail sales only, A040102 feeds investment, and GDP accepts only the configured official quarterly real-YoY source.
+- [ ] Write tests that verify series-code/label matching: A020101/A020102 route industrial monthly vs Jan-Feb data, A070103/A070104 route retail monthly vs Jan-Feb data, A040102 feeds cumulative investment, and GDP is read only from the official quarterly release table.
 - [ ] Run the focused parser tests; expect failure because parseNbsRealEconomyResponse and the fetch loader are absent.
-- [ ] Implement parseNbsRealEconomyResponse(payload, publication, contract) with strict JSON shape checks, code/title/unit checks, finite-number parsing, period normalization, source-origin validation, and observable methodology anchors. Export loadNbsRealEconomySeries that fetches the official URL in live mode and reads the checked-in payload in fixture mode.
+- [ ] Implement strict GDP release-page and National Data parsers with wire-period normalization, source-origin validation, official methodology anchors, and stable publication discovery. Live National Data fetches use a deterministic query URL and the discovered official release page as provenance/methodology source.
 - [ ] Run the focused parser tests and npm test; expect all tests to pass.
 - [ ] Commit with:
 ~~~sh

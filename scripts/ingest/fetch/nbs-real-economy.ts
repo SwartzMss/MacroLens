@@ -1,16 +1,36 @@
 import { IngestionContractError, MethodologyMismatchError } from '../types.ts';
-import { REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../types.ts';
+import {
+  REAL_ECONOMY_METHODOLOGY_FINGERPRINTS,
+} from '../types.ts';
 import type {
   NbsRealEconomyPublication,
   Observation,
   RawNbsRealEconomySeries,
   RealEconomyContract,
+  RealEconomyDatasetId,
+  RealEconomySeriesRule,
 } from '../types.ts';
 import { validateRealEconomyObservations } from '../validate/real-economy.ts';
+
+const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
+const NBS_ORIGIN = 'https://www.stats.gov.cn';
 
 type NbsDataNode = {
   wds?: Array<{ wdcode?: string; valuecode?: string; value?: string }>;
   data?: { hasdata?: boolean; data?: string | number };
+};
+
+type NbsDimensionNode = {
+  code?: string;
+  valuecode?: string;
+  name?: string;
+  value?: string;
+};
+
+type NbsDimension = {
+  wdcode?: string;
+  wdname?: string;
+  nodes?: NbsDimensionNode[];
 };
 
 type NbsPayload = {
@@ -19,11 +39,8 @@ type NbsPayload = {
     code?: string;
     unit?: string;
     frequency?: string;
-    scope?: string;
-    priceTreatment?: string;
-    publicationPattern?: string;
   };
-  returndata?: { datanodes?: NbsDataNode[] };
+  returndata?: { datanodes?: NbsDataNode[]; wdnodes?: NbsDimension[] };
 };
 
 function fail(message: string): never {
@@ -36,74 +53,122 @@ function validIsoDate(value: string): boolean {
   return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
 }
 
-function normalizePeriod(value: string, contract: RealEconomyContract): string {
-  const compact = value.replace(/\s+/g, '');
-  if (contract.periodKind === 'quarterly') {
-    const canonical = compact.match(/^(\d{4})-Q([1-4])$/);
-    if (canonical) return canonical[0];
-    const compactQuarter = compact.match(/^(\d{4})Q([1-4])$/);
-    if (compactQuarter) return compactQuarter[1] + '-Q' + compactQuarter[2];
-    const chinese = compact.match(/^(\d{4})年([1-4])季度$/);
-    if (chinese) return chinese[1] + '-Q' + chinese[2];
-    fail('Invalid NBS quarter: ' + value);
-  }
-
-  const canonicalMonth = compact.match(/^(\d{4})-(\d{2})$/);
-  if (canonicalMonth && Number(canonicalMonth[2]) >= 3) return canonicalMonth[0];
-  const canonicalCombined = compact.match(/^(\d{4})-01–(\d{2})$/);
-  if (canonicalCombined && Number(canonicalCombined[2]) >= 2) {
-    return contract.periodKind === 'cumulative-yoy' ? canonicalCombined[0] : canonicalCombined[1] + '-01–02';
-  }
-
-  const chinese = compact.match(/^(\d{4})年(\d{1,2})(?:[—-](\d{1,2}))?月$/);
-  if (!chinese) fail('Invalid NBS period: ' + value);
-  const year = chinese[1];
-  const firstMonth = Number(chinese[2]);
-  const lastMonth = chinese[3] ? Number(chinese[3]) : firstMonth;
-  if (firstMonth < 1 || firstMonth > 12 || lastMonth < firstMonth || lastMonth > 12) {
-    fail('Invalid NBS month period: ' + value);
-  }
-  if (contract.periodKind === 'cumulative-yoy') {
-    if (firstMonth !== 1 || lastMonth < 2) fail('Invalid cumulative NBS period: ' + value);
-    return year + '-01–' + String(lastMonth).padStart(2, '0');
-  }
-  if (firstMonth === 1 && lastMonth === 2) return year + '-01–02';
-  if (firstMonth < 3 || lastMonth !== firstMonth) fail('Invalid monthly NBS period: ' + value);
-  return year + '-' + String(firstMonth).padStart(2, '0');
+function textOf(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&#x([0-9a-f]+);/gi, (_, code: string) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&#([0-9]+);/g, (_, code: string) => String.fromCodePoint(Number(code)))
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-function requireObservableMethodology(series: NonNullable<NbsPayload['series']>, contract: RealEconomyContract): void {
-  const title = series.title ?? '';
-  const scope = series.scope ?? '';
-  const priceTreatment = series.priceTreatment ?? '';
-  const publicationPattern = series.publicationPattern ?? '';
-  const checks = contract.id === 'gdp'
+function cellsOf(rowHtml: string): string[] {
+  return [...rowHtml.matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi)].map((match) => canonical(textOf(match[1])));
+}
+
+function canonical(value: string): string {
+  return value.replace(/\s+/g, '').replace(/[—－]/g, '-');
+}
+
+function publicationTitlePattern(id: RealEconomyDatasetId): RegExp {
+  if (id === 'gdp') return /国内生产总值.*初步核算结果/;
+  if (id === 'industrial-production') return /规模以上工业增加值增长/;
+  if (id === 'retail-sales') return /社会消费品零售总额增长/;
+  return /固定资产投资.*(?:基本情况|增长)/;
+}
+
+export function discoverLatestRealEconomyPublication(
+  indexHtml: string,
+  id: RealEconomyDatasetId,
+): NbsRealEconomyPublication {
+  const candidates: NbsRealEconomyPublication[] = [];
+  const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  for (const match of indexHtml.matchAll(anchorPattern)) {
+    const title = textOf(match[2]);
+    if (!publicationTitlePattern(id).test(title) || title.includes('解读')) continue;
+    const afterAnchor = indexHtml.slice((match.index ?? 0) + match[0].length, (match.index ?? 0) + match[0].length + 500);
+    const dateMatch = afterAnchor.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    if (!dateMatch || !validIsoDate(dateMatch[1])) fail(`Publication date missing or invalid for: ${title}`);
+    const url = new URL(match[1], NBS_INDEX).toString();
+    if (new URL(url).origin !== NBS_ORIGIN) fail(`NBS publication is not hosted by stats.gov.cn: ${url}`);
+    candidates.push({ title, url, sourceDate: dateMatch[1], coverage: '' });
+  }
+  if (candidates.length === 0) fail(`No NBS publication matching ${id}`);
+  return candidates.sort((left, right) => right.sourceDate.localeCompare(left.sourceDate))[0];
+}
+
+export function buildNbsQueryUrl(contract: RealEconomyContract): string {
+  if (contract.sourceKind !== 'national-data') fail(`National Data URL requested for ${contract.id}`);
+  const query = new URL('https://data.stats.gov.cn/easyquery.htm');
+  query.searchParams.set('m', 'QueryData');
+  query.searchParams.set('dbcode', 'hgyd');
+  query.searchParams.set('rowcode', 'sj');
+  query.searchParams.set('colcode', 'zb');
+  query.searchParams.set('wds', '[]');
+  query.searchParams.set('dfwds', JSON.stringify([{ wdcode: 'zb', valuecode: contract.sourceCodes.join(',') }]));
+  query.searchParams.set('h', '1');
+  return query.toString();
+}
+
+function metadataText(payload: NbsPayload, officialMethodologyText: string): string {
+  return canonical(JSON.stringify({ series: payload.series, wdnodes: payload.returndata?.wdnodes }) + officialMethodologyText);
+}
+
+function requireNationalDataMethodology(payload: NbsPayload, contract: RealEconomyContract, officialMethodologyText: string): void {
+  const text = metadataText(payload, officialMethodologyText);
+  const checks: Array<[string, boolean]> = contract.id === 'industrial-production'
     ? [
-      ['GDP title', title.includes('国内生产总值') && title.includes('同比')],
-      ['GDP constant-price treatment', /不变价|不变价格/.test(priceTreatment)],
-      ['GDP quarterly publication pattern', publicationPattern.includes('季度')],
+      ['industrial series title', text.includes('规模以上工业增加值')],
+      ['industrial YoY metric', text.includes('同比')],
+      ['industrial real treatment', /扣除价格因素|实际/.test(text)],
     ]
-    : contract.id === 'industrial-production'
+    : contract.id === 'retail-sales'
       ? [
-        ['industrial title', title.includes('规模以上工业增加值') && title.includes('同比')],
-        ['industrial scope', scope.includes('规模以上工业')],
-        ['industrial real treatment', /扣除价格因素|实际/.test(priceTreatment)],
-        ['industrial Jan-Feb publication pattern', /1[—-]2月/.test(publicationPattern)],
+        ['retail series title', text.includes('社会消费品零售总额')],
+        ['retail YoY metric', text.includes('同比')],
+        ['retail nominal treatment', /现价|名义/.test(text)],
       ]
-      : contract.id === 'retail-sales'
-        ? [
-          ['retail title', title.includes('社会消费品零售总额') && title.includes('同比')],
-          ['retail scope', scope.includes('社会消费品零售总额')],
-          ['retail nominal treatment', priceTreatment.includes('现价')],
-          ['retail Jan-Feb publication pattern', /1[—-]2月/.test(publicationPattern)],
-        ]
-        : [
-          ['investment title', title.includes('固定资产投资') && title.includes('不含农户')],
-          ['investment comparable treatment', /可比口径/.test(priceTreatment)],
-          ['investment cumulative publication pattern', /累计/.test(publicationPattern)],
-        ];
+      : [
+        ['investment series title', text.includes('固定资产投资')],
+        ['investment non-rural scope', text.includes('不含农户')],
+        ['investment cumulative metric', text.includes('累计')],
+        ['investment comparable treatment', /可比口径|不变价/.test(text)],
+      ];
   const missing = checks.find((entry) => !entry[1]);
   if (missing) throw new MethodologyMismatchError('NBS methodology contract missing or changed: ' + missing[0]);
+}
+
+function nodeValue(node: NbsDataNode, code: string): string | undefined {
+  return node.wds?.find((wd) => wd.wdcode === code)?.valuecode;
+}
+
+function nodeDisplayValue(node: NbsDataNode, code: string): string {
+  return node.wds?.find((wd) => wd.wdcode === code)?.value ?? '';
+}
+
+function normalizeMonthlyWirePeriod(valuecode: string, display: string, rule: RealEconomySeriesRule): string {
+  const compactCode = canonical(valuecode);
+  const yearMatch = compactCode.match(/^(\d{4})/);
+  const monthMatch = compactCode.match(/^(\d{4})(0[1-9]|1[0-2])$/);
+  const displayMatch = canonical(display).match(/^(\d{4})年(\d{1,2})(?:-?(\d{1,2}))?月/);
+  const year = yearMatch?.[1] ?? displayMatch?.[1];
+  const month = monthMatch ? Number(monthMatch[2]) : displayMatch ? Number(displayMatch[2]) : undefined;
+  const lastMonth = displayMatch?.[3] ? Number(displayMatch[3]) : month;
+  if (!year || month === undefined) fail('Invalid NBS month wire value: ' + valuecode);
+  const combinedDisplay = displayMatch?.[3] !== undefined && month === 1 && lastMonth === 2;
+  if (rule === 'combined') {
+    if (month !== 2 && !combinedDisplay) fail('Combined NBS series returned a non-Jan-Feb period: ' + valuecode);
+    return year + '-01–02';
+  }
+  if (rule === 'monthly') {
+    if (month < 3 || combinedDisplay) fail('Monthly NBS series returned a Jan-Feb period: ' + valuecode);
+    return year + '-' + String(month).padStart(2, '0');
+  }
+  const cumulativeEnd = lastMonth ?? month;
+  if (cumulativeEnd < 2) fail('Cumulative NBS series returned an invalid period: ' + valuecode);
+  return year + '-01–' + String(cumulativeEnd).padStart(2, '0');
 }
 
 function metadataCodeSet(code: string): Set<string> {
@@ -114,6 +179,7 @@ export function parseNbsRealEconomyResponse(
   payload: unknown,
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
+  officialMethodologyText = '',
 ): RawNbsRealEconomySeries {
   if (!payload || typeof payload !== 'object') fail('NBS response must be an object');
   if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
@@ -121,39 +187,32 @@ export function parseNbsRealEconomyResponse(
   if (!['data.stats.gov.cn', 'www.stats.gov.cn'].includes(parsedUrl.hostname)) {
     fail('NBS publication is not hosted by an official NBS origin: ' + publication.url);
   }
+  if (contract.sourceKind !== 'national-data') fail('National Data parser cannot parse ' + contract.id);
   const candidate = payload as NbsPayload;
-  const hasSeriesMetadata = Boolean(candidate.series);
-  const series = candidate.series ?? {
-    title: contract.sourceTitle,
-    code: contract.sourceCodes.join(','),
-    unit: contract.unit,
-    frequency: contract.frequency,
-  };
   const nodes = candidate.returndata?.datanodes;
   if (!Array.isArray(nodes) || nodes.length === 0) fail('NBS response is missing data nodes');
-  if (!series.title || !series.code || series.unit !== contract.unit || series.frequency !== contract.frequency) {
-    fail('NBS series metadata does not match the ' + contract.id + ' contract');
-  }
-  const declaredCodes = metadataCodeSet(series.code);
-  if (![...declaredCodes].every((code) => contract.sourceCodes.includes(code))) {
-    fail('NBS series declares unsupported code: ' + series.code);
-  }
-  if (hasSeriesMetadata) requireObservableMethodology(series, contract);
+  requireNationalDataMethodology(candidate, contract, officialMethodologyText);
 
+  const declaredCodes = candidate.series?.code ? metadataCodeSet(candidate.series.code) : new Set(contract.sourceCodes);
+  if (![...declaredCodes].every((code) => contract.sourceCodes.includes(code))) {
+    fail('NBS series declares unsupported code: ' + [...declaredCodes].join(','));
+  }
   const observations: Observation[] = [];
   const seen = new Set<string>();
   const codes = new Set<string>();
   for (const node of nodes) {
-    const periodValue = node.wds?.find((wd) => wd.wdcode === 'sj')?.valuecode;
-    const seriesCode = node.wds?.find((wd) => wd.wdcode === 'zb')?.valuecode;
+    const periodValue = nodeValue(node, 'sj');
+    const seriesCode = nodeValue(node, 'zb');
     if (!periodValue || !seriesCode || !contract.sourceCodes.includes(seriesCode)) {
       fail('NBS data node does not match the ' + contract.id + ' series contract');
     }
+    const rule = contract.sourceCodeRules[seriesCode];
+    if (!rule) fail('NBS series code has no period rule: ' + seriesCode);
     if (!node.data?.hasdata) fail('NBS value is missing for ' + periodValue);
     const rawValue = node.data.data;
     const valueText = String(rawValue ?? '').trim();
     if (!/^-?\d+(?:\.\d+)?$/.test(valueText)) fail('Invalid numeric NBS value for ' + periodValue + ': ' + valueText);
-    const date = normalizePeriod(periodValue, contract);
+    const date = normalizeMonthlyWirePeriod(periodValue, nodeDisplayValue(node, 'sj'), rule);
     if (seen.has(date)) fail('Duplicate NBS period: ' + date);
     seen.add(date);
     codes.add(seriesCode);
@@ -171,21 +230,102 @@ export function parseNbsRealEconomyResponse(
     publication,
     id: contract.id,
     seriesCode: [...codes].join(','),
-    seriesTitle: series.title,
-    unit: series.unit,
-    frequency: series.frequency,
+    seriesTitle: candidate.series?.title ?? contract.sourceTitle,
+    unit: candidate.series?.unit ?? contract.unit,
+    frequency: candidate.series?.frequency ?? contract.frequency,
     methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS[contract.id],
     observations,
   };
+}
+
+export function parseNbsGdpPublication(
+  publication: NbsRealEconomyPublication,
+  html: string,
+): RawNbsRealEconomySeries {
+  if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
+  const parsedUrl = new URL(publication.url);
+  if (parsedUrl.origin !== NBS_ORIGIN) fail('GDP publication is not hosted by stats.gov.cn: ' + publication.url);
+  const compact = canonical(html);
+  const methodologyChecks: Array<[string, boolean]> = [
+    ['GDP release title', compact.includes('国内生产总值') && compact.includes('初步核算结果')],
+    ['GDP YoY table', compact.includes('GDP同比增长速度')],
+    ['GDP percent unit', /单位[:：]%/.test(compact)],
+    ['GDP constant-price treatment', compact.includes('增长速度按不变价计算')],
+    ['GDP YoY definition', compact.includes('同比增长速度为与上年同期对比')],
+  ];
+  const missing = methodologyChecks.find((entry) => !entry[1]);
+  if (missing) throw new MethodologyMismatchError('GDP methodology contract missing or changed: ' + missing[0]);
+
+  const tables = [...html.matchAll(/<table\b[\s\S]*?<\/table>/gi)];
+  const table = tables.find((match) => {
+    const tableText = canonical(match[0]);
+    const beforeTable = canonical(html.slice(Math.max(0, (match.index ?? 0) - 1200), match.index ?? 0));
+    return (beforeTable + tableText).includes('GDP同比增长速度') && tableText.includes('年份') && tableText.includes('1季度');
+  });
+  if (!table) fail('GDP release is missing the GDP同比增长速度 table');
+  const rows = [...table[0].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map((match) => cellsOf(match[1]));
+  const header = rows.find((row) => row.includes('年份') && row.includes('1季度'));
+  if (!header) fail('GDP YoY table is missing quarter headers');
+  const yearColumn = header.indexOf('年份');
+  const quarterColumns = [1, 2, 3, 4].map((quarter) => header.findIndex((cell) => cell.includes(`${quarter}季度`)));
+  if (yearColumn < 0 || quarterColumns.some((column) => column < 0)) fail('GDP YoY table has an unexpected column layout');
+  const observations: Observation[] = [];
+  for (const row of rows) {
+    const year = row[yearColumn];
+    if (!year || !/^\d{4}$/.test(year)) continue;
+    for (const [index, column] of quarterColumns.entries()) {
+      const valueText = row[column]?.replace(/,/g, '').trim() ?? '';
+      if (!valueText || !/^-?\d+(?:\.\d+)?$/.test(valueText)) continue;
+      observations.push({ date: `${year}-Q${index + 1}`, value: Number(valueText) });
+    }
+  }
+  if (observations.length === 0) fail('GDP release contains no GDP YoY observations');
+  observations.sort((left, right) => left.date.localeCompare(right.date));
+  validateRealEconomyObservations(observations, 'gdp', { requireYearStart: false });
+  const first = observations[0];
+  const last = observations.at(-1);
+  if (!first || !last) fail('GDP release contains no observations');
+  return {
+    publication: { ...publication, coverage: `${first.date} to ${last.date}` },
+    id: 'gdp',
+    seriesCode: 'gdp-release-table-2',
+    seriesTitle: 'GDP同比增长速度',
+    unit: '%',
+    frequency: 'quarterly',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS.gdp,
+    observations,
+  };
+}
+
+async function fetchJson(url: string): Promise<unknown> {
+  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
+  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
+  return response.json();
+}
+
+async function fetchText(url: string): Promise<string> {
+  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
+  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
+  return response.text();
 }
 
 export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
 ): Promise<RawNbsRealEconomySeries> {
-  const response = await fetch(publication.url, {
-    headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' },
-  });
-  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + publication.url);
-  return parseNbsRealEconomyResponse(await response.json(), publication, contract);
+  const [payload, officialMethodologyText] = await Promise.all([
+    fetchJson(publication.dataUrl ?? buildNbsQueryUrl(contract)),
+    fetchText(publication.url),
+  ]);
+  return parseNbsRealEconomyResponse(payload, publication, contract, officialMethodologyText);
 }
+
+export async function fetchNbsGdpPublication(
+  publication: NbsRealEconomyPublication,
+): Promise<RawNbsRealEconomySeries> {
+  const response = await fetch(publication.url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
+  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + publication.url);
+  return parseNbsGdpPublication(publication, await response.text());
+}
+
+export const nbsPublicationIndex = NBS_INDEX;

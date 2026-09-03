@@ -5,20 +5,21 @@
     "sourceDate": "2026-08-17",
     "coverage": "2025-01–02 to 2025-01–04"
   },
-  "series": {
-    "title": "固定资产投资（不含农户）累计增长",
-    "code": "A040102",
-    "unit": "%",
-    "frequency": "monthly",
-    "scope": "固定资产投资（不含农户）",
-    "priceTreatment": "增长速度按可比口径计算",
-    "publicationPattern": "年初至报告期累计同比增长"
-  },
   "returndata": {
+    "wdnodes": [
+      {"wdcode":"zb","wdname":"指标","nodes":[
+        {"code":"A040102","name":"固定资产投资（不含农户）累计增长（可比口径）"}
+      ]},
+      {"wdcode":"sj","wdname":"时间","nodes":[
+        {"code":"202502","name":"2025年1—2月"},
+        {"code":"202503","name":"2025年1—3月"},
+        {"code":"202504","name":"2025年1—4月"}
+      ]}
+    ],
     "datanodes": [
-      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"2025-01–02","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.1"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"2025-01–03","value":"2025年1—3月"}],"data":{"hasdata":true,"data":"4.2"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"2025-01–04","value":"2025年1—4月"}],"data":{"hasdata":true,"data":"4.0"}}
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202502","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.1"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202503","value":"2025年1—3月"}],"data":{"hasdata":true,"data":"4.2"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A040102"},{"wdcode":"sj","valuecode":"202504","value":"2025年1—4月"}],"data":{"hasdata":true,"data":"4.0"}}
     ]
   }
 }

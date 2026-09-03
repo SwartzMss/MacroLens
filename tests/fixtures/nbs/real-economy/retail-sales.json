@@ -5,20 +5,22 @@
     "sourceDate": "2026-08-17",
     "coverage": "2025-01–02 to 2025-04"
   },
-  "series": {
-    "title": "社会消费品零售总额同比增长",
-    "code": "A070103,A070104",
-    "unit": "%",
-    "frequency": "monthly",
-    "scope": "社会消费品零售总额",
-    "priceTreatment": "其他指标除特殊说明外，增长速度均按现价计算",
-    "publicationPattern": "国家统计局将1—2月合并发布"
-  },
   "returndata": {
+    "wdnodes": [
+      {"wdcode":"zb","wdname":"指标","nodes":[
+        {"code":"A070103","name":"社会消费品零售总额同比增长（现价）"},
+        {"code":"A070104","name":"社会消费品零售总额1—2月同比增长（现价）"}
+      ]},
+      {"wdcode":"sj","wdname":"时间","nodes":[
+        {"code":"202502","name":"2025年1—2月"},
+        {"code":"202503","name":"2025年3月"},
+        {"code":"202504","name":"2025年4月"}
+      ]}
+    ],
     "datanodes": [
-      {"wds":[{"wdcode":"zb","valuecode":"A070104"},{"wdcode":"sj","valuecode":"2025-01–02","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.0"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"2025-03","value":"2025年3月"}],"data":{"hasdata":true,"data":"5.9"}},
-      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"2025-04","value":"2025年4月"}],"data":{"hasdata":true,"data":"5.1"}}
+      {"wds":[{"wdcode":"zb","valuecode":"A070104"},{"wdcode":"sj","valuecode":"202502","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.0"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"202503","value":"2025年3月"}],"data":{"hasdata":true,"data":"5.9"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"202504","value":"2025年4月"}],"data":{"hasdata":true,"data":"5.1"}}
     ]
   }
 }

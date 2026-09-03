@@ -10,7 +10,7 @@ This change is limited to the offline-testable ingestion pipeline, the four exis
 
 ## Architecture
 
-The implementation adds one NBS National Data adapter and one real-economy CLI beside the existing PMI and PBOC adapters. A small series contract table identifies the official NBS indicator code, expected dataset fields, period parser, sequence validator, source URL, and observable methodology anchors for each target.
+The implementation adds one real-economy CLI beside the existing PMI and PBOC adapters. The series contracts distinguish the official NBS National Data codes for monthly/cumulative data from GDP's official quarterly release-page table; each contract identifies expected dataset fields, wire-period parser, sequence validator, source URL, and observable methodology anchors.
 
 The adapter pipeline is:
 
@@ -31,7 +31,7 @@ The generic dataset validator will support monthly, quarterly, combined Jan–Fe
 
 | Dataset | NBS code(s) | Frequency | Metric | Period semantics |
 | --- | --- | --- | --- | --- |
-| GDP | official quarterly real-GDP YoY series | quarterly | yoy | `YYYY-Q1` through `YYYY-Q4`; no monthly continuity |
+| GDP | official quarterly release-page GDP YoY table (not A010101 current-quarter level) | quarterly | yoy | `YYYY-Q1` through `YYYY-Q4`; no monthly continuity |
 | Industrial production | `A020101`, `A020102` | monthly | yoy | `YYYY-01–02`, then `YYYY-03` through `YYYY-12`; no synthetic Jan/Feb |
 | Retail sales | `A070103`, `A070104` | monthly | yoy | `YYYY-01–02`, then `YYYY-03` through `YYYY-12`; nominal YoY |
 | Fixed-asset investment | `A040102` | monthly | cumulative_yoy | `YYYY-01–02`, `YYYY-01–03` through `YYYY-01–12`; cumulative values are preserved |
@@ -46,4 +46,4 @@ The CLI writes only after all four normalized datasets pass validation. Stable J
 
 ## Testing
 
-Checked-in fixtures model official NBS responses for a successful four-series update and malformed/changed variants. Tests cover quarterly GDP, Jan–Feb combined periods, fixed-asset cumulative progression, wrong contract metadata, provenance/coverage, methodology mismatch, duplicate/invalid periods, overlap mismatch, idempotency, and group atomicity. No test or ordinary CI command makes a live NBS request.
+Checked-in fixtures model the official GDP release-page HTML and National Data `returndata.wdnodes`/`datanodes` wire shape for a successful four-series update, plus malformed/changed variants. Tests cover GDP table methodology, real `YYYYMM` wire periods, Jan–Feb code routing, fixed-asset cumulative progression, wrong contract metadata, provenance/coverage, methodology mismatch, duplicate/invalid periods, overlap mismatch, idempotency, and group atomicity. No test or ordinary CI command makes a live NBS request.

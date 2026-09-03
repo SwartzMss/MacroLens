@@ -1,7 +1,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { fetchNbsRealEconomySeries, parseNbsRealEconomyResponse } from './fetch/nbs-real-economy.ts';
+import {
+  buildNbsQueryUrl,
+  discoverLatestRealEconomyPublication,
+  fetchNbsGdpPublication,
+  fetchNbsRealEconomySeries,
+  nbsPublicationIndex,
+  parseNbsGdpPublication,
+  parseNbsRealEconomyResponse,
+} from './fetch/nbs-real-economy.ts';
 import { normalizeRealEconomyDataset } from './normalize/real-economy.ts';
 import { writeIndicatorDataset } from './write/indicator.ts';
 import {
@@ -11,8 +19,6 @@ import type { IndicatorDataset, RealEconomyDatasetId } from './types.ts';
 import { validateRealEconomyDataset } from './validate/real-economy.ts';
 
 const IDS: RealEconomyDatasetId[] = ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'];
-const NBS_QUERY_ENDPOINT = 'https://data.stats.gov.cn/easyquery.htm';
-
 type CliOptions = {
   fixtureIndex?: string;
   fixtureDir?: string;
@@ -48,24 +54,16 @@ async function loadExisting(targetDir: string): Promise<Map<RealEconomyDatasetId
   return existing;
 }
 
-function livePublication(id: RealEconomyDatasetId) {
-  const contract = REAL_ECONOMY_CONTRACTS[id];
-  const dbcode = id === 'gdp' ? 'hgjd' : 'hgyd';
-  const query = new URL(NBS_QUERY_ENDPOINT);
-  query.searchParams.set('m', 'QueryData');
-  query.searchParams.set('dbcode', dbcode);
-  query.searchParams.set('rowcode', 'sj');
-  query.searchParams.set('colcode', 'zb');
-  query.searchParams.set('wds', '[]');
-  query.searchParams.set('dfwds', JSON.stringify([{ wdcode: 'zb', valuecode: contract.sourceCodes.join(',') }]));
-  query.searchParams.set('k1', String(Date.now()));
-  query.searchParams.set('h', '1');
-  return {
-    title: '国家数据：' + contract.sourceTitle,
-    url: query.toString(),
-    sourceDate: new Date().toISOString().slice(0, 10),
-    coverage: '',
-  };
+async function fetchText(url: string): Promise<string> {
+  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
+  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
+  return response.text();
+}
+
+async function livePublication(id: RealEconomyDatasetId) {
+  const publication = discoverLatestRealEconomyPublication(await fetchText(nbsPublicationIndex), id);
+  if (id === 'gdp') return publication;
+  return { ...publication, dataUrl: buildNbsQueryUrl(REAL_ECONOMY_CONTRACTS[id]) };
 }
 
 async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions) {
@@ -75,9 +73,14 @@ async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions) {
     const fixtureName = index[id];
     if (!fixtureName) throw new Error('Fixture index is missing ' + id);
     const payload = JSON.parse(await fs.readFile(path.join(options.fixtureDir, fixtureName), 'utf8'));
+    if (id === 'gdp') {
+      const htmlPath = path.join(options.fixtureDir, 'gdp-quarterly.html');
+      return parseNbsGdpPublication(payload.publication, await fs.readFile(htmlPath, 'utf8'));
+    }
     return parseNbsRealEconomyResponse(payload, payload.publication, contract);
   }
-  return fetchNbsRealEconomySeries(livePublication(id), contract);
+  const publication = await livePublication(id);
+  return id === 'gdp' ? fetchNbsGdpPublication(publication) : fetchNbsRealEconomySeries(publication, contract);
 }
 
 export async function runRealEconomy(args: string[] = process.argv.slice(2)): Promise<void> {
