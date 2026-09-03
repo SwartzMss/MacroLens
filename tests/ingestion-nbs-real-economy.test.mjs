@@ -193,6 +193,21 @@ test('discovers a latest official publication and builds a stable National Data 
   assert.deepEqual(first, second);
 });
 
+test('maps Jan-Feb publication titles to the combined MacroLens period', () => {
+  const cases = [
+    ['industrial-production', '2026年1—2月份规模以上工业增加值增长6.3%', 'industrial-jan-feb.html'],
+    ['retail-sales', '2026年1—2月份社会消费品零售总额增长2.8%', 'retail-jan-feb.html'],
+  ];
+  for (const [id, title, file] of cases) {
+    const publication = discoverLatestRealEconomyPublication(
+      `<a href="/sj/zxfbhjd/202603/t20260316_1966000.html">${title}</a> 2026-03-16`,
+      id,
+    );
+    assert.equal(publication.url, `https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260316_1966000.html`);
+    assert.equal(publication.coverage, '2026-01–02 to 2026-01–02', file);
+  }
+});
+
 test('builds one stable National Data URL per semantic source code', () => {
   const urls = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
   assert.deepEqual(Object.keys(urls), ['A020101', 'A020102']);

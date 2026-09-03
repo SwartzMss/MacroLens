@@ -119,14 +119,19 @@ export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string,
 
 function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
   if (id === 'gdp') return '';
-  const match = canonical(title).match(/^(\d{4})年(?:\d{1,2}-(\d{1,2})|\d{1,2})月份/);
+  const match = canonical(title).match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/);
   if (!match) fail(`NBS publication title has no period: ${title}`);
   const year = match[1];
-  const month = Number(match[2] ?? canonical(title).match(/^(\d{4})年(\d{1,2})月份/)?.[2]);
-  if (!Number.isInteger(month) || month < 1 || month > 12) fail(`NBS publication title has invalid period: ${title}`);
-  const period = id === 'fixed-asset-investment'
-    ? `${year}-01–${String(month).padStart(2, '0')}`
-    : `${year}-${String(month).padStart(2, '0')}`;
+  const startMonth = Number(match[2]);
+  const endMonth = Number(match[3] ?? match[2]);
+  if (!Number.isInteger(startMonth) || startMonth < 1 || startMonth > 12 || !Number.isInteger(endMonth) || endMonth < startMonth || endMonth > 12) {
+    fail(`NBS publication title has invalid period: ${title}`);
+  }
+  const period = startMonth === 1 && endMonth === 2
+    ? `${year}-01–02`
+    : id === 'fixed-asset-investment'
+      ? `${year}-01–${String(endMonth).padStart(2, '0')}`
+      : `${year}-${String(endMonth).padStart(2, '0')}`;
   return `${period} to ${period}`;
 }
 
