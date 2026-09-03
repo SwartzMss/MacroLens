@@ -47,6 +47,27 @@ function delayFor(attempt: number, base: number, maximum: number): number {
   return Math.min(base * 2 ** (attempt - 1), maximum);
 }
 
+function describeCause(cause: unknown): string {
+  const messages: string[] = [];
+  const seen = new Set<unknown>();
+  let current = cause;
+
+  while (current !== undefined && current !== null && !seen.has(current)) {
+    seen.add(current);
+    if (current instanceof Error) {
+      const errorWithCode = current as Error & { code?: unknown };
+      const code = errorWithCode.code === undefined ? '' : ` [${String(errorWithCode.code)}]`;
+      messages.push(`${current.message}${code}`);
+      current = current.cause;
+    } else {
+      messages.push(String(current));
+      break;
+    }
+  }
+
+  return messages.join(' <- ');
+}
+
 function messageForFailure(
   url: string,
   attempts: number,
@@ -57,10 +78,10 @@ function messageForFailure(
   const statusText = status === undefined ? '' : ` HTTP ${status}`;
   const timeoutText = timedOut ? ' timeout' : '';
   const causeText = cause instanceof Error
-    ? `: ${cause.message}`
+    ? `: ${describeCause(cause)}`
     : cause === undefined
       ? ''
-      : `: ${String(cause)}`;
+      : `: ${describeCause(cause)}`;
   return `Fetch${timeoutText} failed${statusText} for ${url} after ${attempts} attempt${attempts === 1 ? '' : 's'}${causeText}`;
 }
 

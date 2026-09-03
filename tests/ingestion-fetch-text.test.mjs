@@ -98,7 +98,9 @@ test('reports the final HTTP failure with URL, status, and attempt count', async
 
 test('preserves the underlying transport cause after retries are exhausted', async () => {
   const firstCause = new Error('ECONNRESET');
-  const finalCause = new Error('getaddrinfo ENOTFOUND pbc.gov.cn');
+  const finalCause = new Error('fetch failed', {
+    cause: new Error('getaddrinfo EAI_AGAIN pbc.gov.cn'),
+  });
   let attempts = 0;
   await assert.rejects(
     () => fetchText(url, {
@@ -114,7 +116,7 @@ test('preserves the underlying transport cause after retries are exhausted', asy
       && error.attempts === 2
       && error.cause === finalCause
       && error.firstCause === firstCause
-      && error.message.includes('ENOTFOUND'),
+      && error.message.includes('EAI_AGAIN'),
   );
   assert.equal(attempts, 2);
 });
