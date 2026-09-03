@@ -75,9 +75,9 @@ function canonical(value: string): string {
 
 function publicationTitlePattern(id: RealEconomyDatasetId): RegExp {
   if (id === 'gdp') return /国内生产总值.*初步核算结果/;
-  if (id === 'industrial-production') return /规模以上工业增加值增长/;
-  if (id === 'retail-sales') return /社会消费品零售总额增长/;
-  return /固定资产投资.*(?:基本情况|增长)/;
+  if (id === 'industrial-production') return /规模以上工业增加值/;
+  if (id === 'retail-sales') return /社会消费品零售总额/;
+  return /固定资产投资/;
 }
 
 export function discoverLatestRealEconomyPublication(

@@ -208,6 +208,19 @@ test('maps Jan-Feb publication titles to the combined MacroLens period', () => {
   }
 });
 
+test('discovers negative-growth industrial and retail publications', () => {
+  const cases = [
+    ['industrial-production', '2020年3月份规模以上工业增加值下降1.1%'],
+    ['retail-sales', '2022年11月份社会消费品零售总额下降5.9%'],
+  ];
+  for (const [id, title] of cases) {
+    assert.doesNotThrow(() => discoverLatestRealEconomyPublication(
+      `<a href="/sj/zxfbhjd/202212/t20221215_1900000.html">${title}</a> 2022-12-15`,
+      id,
+    ));
+  }
+});
+
 test('builds one stable National Data URL per semantic source code', () => {
   const urls = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
   assert.deepEqual(Object.keys(urls), ['A020101', 'A020102']);
