@@ -9,7 +9,8 @@ import {
 } from '../scripts/ingest/fetch/nbs-pmi.ts';
 import { normalizePmiDataset } from '../scripts/ingest/normalize/pmi.ts';
 import { validateIndicatorDataset } from '../scripts/ingest/validate/dataset.ts';
-import { mergePmiObservations } from '../scripts/ingest/validate/overlap.ts';
+import { validatePmiDataset } from '../scripts/ingest/validate/pmi.ts';
+import { mergeObservations, mergePmiObservations } from '../scripts/ingest/validate/overlap.ts';
 import { HistoricalMismatchError, MethodologyMismatchError } from '../scripts/ingest/types.ts';
 import { writeIndicatorDataset } from '../scripts/ingest/write/indicator.ts';
 import { run as runPmiCli } from '../scripts/ingest/cli.ts';
@@ -167,25 +168,46 @@ test('normalizes the publication into the existing indicator contract', () => {
 test('validates the normalized indicator dataset', () => {
   const publication = discoverLatestPmiPublication(fixture('publication-index.html'));
   const normalized = normalizePmiDataset(parsePmiPublication(publication, fixture('pmi-2026-08.html')), existingDataset);
-  assert.doesNotThrow(() => validateIndicatorDataset(normalized));
+  assert.doesNotThrow(() => validatePmiDataset(normalized));
 });
 
 test('rejects an indicator dataset with an invalid series contract', () => {
   assert.throws(
-    () => validateIndicatorDataset({ ...existingDataset, metric: 'rate' }),
+    () => validatePmiDataset({ ...existingDataset, metric: 'rate' }),
     /metric/i,
   );
   assert.throws(
-    () => validateIndicatorDataset({ ...existingDataset, data: [{ date: '2025-01', value: 101 }] }),
+    () => validatePmiDataset({ ...existingDataset, data: [{ date: '2025-01', value: 101 }] }),
     /value|\[0, 100\]/i,
   );
   assert.throws(
-    () => validateIndicatorDataset({ ...existingDataset, sources: [] }),
+    () => validatePmiDataset({ ...existingDataset, sources: [] }),
     /source/i,
   );
   assert.throws(
-    () => validateIndicatorDataset({ ...existingDataset, data: [{ date: '2025-10', value: 49 }, { date: '2025-12', value: 50 }] }),
+    () => validatePmiDataset({ ...existingDataset, data: [{ date: '2025-10', value: 49 }, { date: '2025-12', value: 50 }] }),
     /continuous|连续|month|月份/i,
+  );
+});
+
+test('generic indicator validation accepts a monthly percentage dataset', () => {
+  assert.doesNotThrow(() => validateIndicatorDataset({
+    ...existingDataset,
+    source: 'PBOC',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+  }));
+});
+
+test('generic observation merging reports the series label on mismatch', () => {
+  assert.deepEqual(
+    mergeObservations([{ date: '2025-01', value: 1 }], [{ date: '2025-02', value: 2 }], 'M1'),
+    [{ date: '2025-01', value: 1 }, { date: '2025-02', value: 2 }],
+  );
+  assert.throws(
+    () => mergeObservations([{ date: '2025-01', value: 1 }], [{ date: '2025-01', value: 2 }], 'M1'),
+    /M1.*2025-01/i,
   );
 });
 
@@ -204,7 +226,7 @@ test('rejects a merged dataset with a missing month between existing and incomin
   const raw = parsePmiPublication(publication, fixture('pmi-2026-08.html'));
   const gapRaw = { ...raw, observations: raw.observations.filter(({ date }) => date >= '2025-12') };
   assert.throws(
-    () => validateIndicatorDataset(normalizePmiDataset(gapRaw, baselineDataset)),
+    () => validatePmiDataset(normalizePmiDataset(gapRaw, baselineDataset)),
     /continuous|连续|month|月份/i,
   );
 });
@@ -267,15 +289,21 @@ test('runs the fixture CLI idempotently and appends only the missing months', as
 test('defines a scheduled and manually runnable reviewable data-update workflow', () => {
   const workflow = fs.readFileSync(path.join(here, '..', '.github', 'workflows', 'update-macro-data.yml'), 'utf8');
   assert.match(workflow, /workflow_dispatch/);
-  assert.match(workflow, /cron:\s*["']?30 2 1 \* \*["']?/);
+  assert.match(workflow, /cron:\s*["']?30 2 \* \* 1["']?/);
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run ingest:pmi/);
+  assert.match(workflow, /npm run ingest:pboc-money-supply -- --target-dir data\/indicators/);
   assert.match(workflow, /contents:\s*write/);
   assert.match(workflow, /pull-requests:\s*write/);
   assert.match(workflow, /peter-evans\/create-pull-request@v7/);
   assert.match(workflow, /data\/indicators\/pmi\.json/);
+  for (const id of ['m0', 'm1', 'm2']) assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
+  assert.match(workflow, /branch:\s*automation\/update-macro-data/);
+  assert.match(workflow, /title:\s*['"]?data: update macro data/);
+  assert.doesNotMatch(workflow, /Closes #51/);
   assert.doesNotMatch(workflow, /playwright|puppeteer|browser/i);
   assert.match(workflow, /stats\.gov\.cn/);
+  assert.match(workflow, /pbc\.gov\.cn/);
 });
 
 async function captureOutput(callback) {

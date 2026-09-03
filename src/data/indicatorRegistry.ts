@@ -10,7 +10,7 @@ import fixedAssetInvestment from '../../data/indicators/fixed-asset-investment.j
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
   unit: string; metric: string; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
-  calculation: string; updatedAt: string; comparabilityNote: string;
+  calculation: string; calculationEffectiveFrom?: string; updatedAt: string; comparabilityNote: string;
   sources: Array<{ title: string; url: string; sourceDate: string; coverage: string }>;
   referenceValue?: number; referenceLabel?: string;
   data: Array<{ date: string; value: number }>;

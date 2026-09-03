@@ -1,7 +1,7 @@
 {
   "id": "m1", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速", "chartTitle": "M1 历史同比增速",
   "definitionEffectiveFrom": "2025-01", "definitionAsOf": "2025-11", "source": "PBOC",
-  "calculation": "published",
+  "calculation": "published", "methodologyFingerprint": "pboc-m1|revised-from-2025-01|m0+corporate-demand+personal-demand+nonbank-payment-reserves|month-end-balance-yoy",
   "sources": [{"title":"中国人民银行货币供应量表（含 M1 可比口径回溯）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535682666.pdf","sourceDate":"2025-11-19","coverage":"2024-01 to 2025-10"}],
   "updatedAt": "2025-11-19",
   "comparabilityNote": "2024 年数据采用中国人民银行按 2025 年 1 月启用的新 M1 统计口径回溯后的可比数据；序列为央行直接公布值。",

@@ -19,6 +19,7 @@ export type IndicatorDataset = {
   definitionAsOf?: string;
   source: string;
   calculation: string;
+  calculationEffectiveFrom?: string;
   updatedAt: string;
   comparabilityNote: string;
   methodologyFingerprint: string;
@@ -33,6 +34,21 @@ export type RawPmiPublication = {
   publication: PmiPublication;
   observations: Observation[];
   methodologyFingerprint: string;
+};
+
+export type MoneySupplyPublication = {
+  title: string;
+  url: string;
+  sourceDate: string;
+  month: string;
+};
+
+export type MoneySupplyValues = { m0: number; m1: number; m2: number };
+
+export type RawMoneySupplyPublication = {
+  publication: MoneySupplyPublication;
+  values: MoneySupplyValues;
+  methodologyFingerprints: typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
 };
 
 export class HistoricalMismatchError extends Error {
@@ -64,3 +80,12 @@ export const PMI_METHODOLOGY_FINGERPRINT = [
   'weights=new-orders:30,production:25,employment:20,supplier-delivery:15-inverse,raw-materials-inventory:10',
   'seasonally-adjusted',
 ].join('|');
+
+export const MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS = {
+  // Only include anchors that parsePBOCMoneySupplyReport verifies in each monthly report.
+  m0: 'pboc-m0|currency-in-circulation|published-yoy',
+  m1: 'pboc-m1|revised-from-2025-01|m0+corporate-demand+personal-demand+nonbank-payment-reserves|month-end-balance-yoy',
+  m2: 'pboc-m2|broad-money|published-yoy',
+} as const;
+
+export type MoneySupplyDatasetId = keyof typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
