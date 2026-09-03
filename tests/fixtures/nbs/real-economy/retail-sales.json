@@ -1,0 +1,24 @@
+{
+  "publication": {
+    "title": "2026年1—7月份社会消费品零售总额增长1.2%",
+    "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965052.html",
+    "sourceDate": "2026-08-17",
+    "coverage": "2025-01–02 to 2025-04"
+  },
+  "series": {
+    "title": "社会消费品零售总额同比增长",
+    "code": "A070103,A070104",
+    "unit": "%",
+    "frequency": "monthly",
+    "scope": "社会消费品零售总额",
+    "priceTreatment": "其他指标除特殊说明外，增长速度均按现价计算",
+    "publicationPattern": "国家统计局将1—2月合并发布"
+  },
+  "returndata": {
+    "datanodes": [
+      {"wds":[{"wdcode":"zb","valuecode":"A070104"},{"wdcode":"sj","valuecode":"2025-01–02","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"4.0"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"2025-03","value":"2025年3月"}],"data":{"hasdata":true,"data":"5.9"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A070103"},{"wdcode":"sj","valuecode":"2025-04","value":"2025年4月"}],"data":{"hasdata":true,"data":"5.1"}}
+    ]
+  }
+}

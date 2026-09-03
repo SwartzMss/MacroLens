@@ -4,7 +4,14 @@ import {
   validateRealEconomyDataset,
   validateRealEconomyObservations,
 } from '../scripts/ingest/validate/real-economy.ts';
-import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
+import { parseNbsRealEconomyResponse } from '../scripts/ingest/fetch/nbs-real-economy.ts';
+import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_CONTRACTS, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const fixture = (id) => JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', `${id}.json`), 'utf8'));
 
 const source = (coverage) => ({
   title: '国家统计局：官方数据',
@@ -125,4 +132,37 @@ test('rejects exact field and source contract mismatches', () => {
     ], { sources: [source('2025-01 to 2025-03')] }), 'industrial-production'),
     IngestionContractError,
   );
+});
+
+test('parses official-shaped NBS responses for all four target series', () => {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    const payload = fixture(id === 'gdp' ? 'gdp-quarterly' : id);
+    const parsed = parseNbsRealEconomyResponse(payload, payload.publication, REAL_ECONOMY_CONTRACTS[id]);
+    assert.equal(parsed.id, id);
+    assert.equal(parsed.unit, '%');
+    assert.equal(parsed.methodologyFingerprint, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS[id]);
+    assert.deepEqual(parsed.observations.at(-1), {
+      date: id === 'gdp' ? '2026-Q2' : id === 'fixed-asset-investment' ? '2025-01–04' : '2025-04',
+      value: id === 'gdp' ? 4.3 : id === 'fixed-asset-investment' ? 4.0 : id === 'industrial-production' ? 6.1 : 5.1,
+    });
+  }
+});
+
+test('rejects missing, malformed, duplicate, and invalid NBS observations', () => {
+  const payload = fixture('industrial-production');
+  const contract = REAL_ECONOMY_CONTRACTS['industrial-production'];
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, returndata: { datanodes: [] } }, payload.publication, contract), IngestionContractError);
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, returndata: { datanodes: [{ ...payload.returndata.datanodes[0], data: { hasdata: false, data: '' } }] } }, payload.publication, contract), IngestionContractError);
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, returndata: { datanodes: [{ ...payload.returndata.datanodes[0], data: { hasdata: true, data: '待定' } }] } }, payload.publication, contract), IngestionContractError);
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, returndata: { datanodes: [...payload.returndata.datanodes, payload.returndata.datanodes[0]] } }, payload.publication, contract), IngestionContractError);
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, publication: { ...payload.publication, sourceDate: '2026-02-31' } }, { ...payload.publication, sourceDate: '2026-02-31' }, contract), IngestionContractError);
+});
+
+test('rejects NBS source, code, and observable methodology mismatches', () => {
+  const payload = fixture('industrial-production');
+  const contract = REAL_ECONOMY_CONTRACTS['industrial-production'];
+  assert.throws(() => parseNbsRealEconomyResponse(payload, { ...payload.publication, url: 'https://example.com/nbs.json' }, contract), IngestionContractError);
+  const wrongCode = { ...payload, returndata: { datanodes: payload.returndata.datanodes.map((node) => ({ ...node, wds: node.wds.map((wd) => wd.wdcode === 'zb' ? { ...wd, valuecode: 'A040102' } : wd) })) } };
+  assert.throws(() => parseNbsRealEconomyResponse(wrongCode, payload.publication, contract), IngestionContractError);
+  assert.throws(() => parseNbsRealEconomyResponse({ ...payload, series: { ...payload.series, priceTreatment: '按现价计算' } }, payload.publication, contract), MethodologyMismatchError);
 });

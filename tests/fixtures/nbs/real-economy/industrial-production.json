@@ -1,0 +1,24 @@
+{
+  "publication": {
+    "title": "2026年7月份规模以上工业增加值增长4.5%",
+    "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965055.html",
+    "sourceDate": "2026-08-17",
+    "coverage": "2025-01–02 to 2025-04"
+  },
+  "series": {
+    "title": "规模以上工业增加值同比增长",
+    "code": "A020101,A020102",
+    "unit": "%",
+    "frequency": "monthly",
+    "scope": "规模以上工业企业",
+    "priceTreatment": "增加值增速为扣除价格因素的实际增长率",
+    "publicationPattern": "国家统计局将1—2月合并发布"
+  },
+  "returndata": {
+    "datanodes": [
+      {"wds":[{"wdcode":"zb","valuecode":"A020102"},{"wdcode":"sj","valuecode":"2025-01–02","value":"2025年1—2月"}],"data":{"hasdata":true,"data":"5.9"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020101"},{"wdcode":"sj","valuecode":"2025-03","value":"2025年3月"}],"data":{"hasdata":true,"data":"7.7"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A020101"},{"wdcode":"sj","valuecode":"2025-04","value":"2025年4月"}],"data":{"hasdata":true,"data":"6.1"}}
+    ]
+  }
+}
