@@ -8,6 +8,7 @@ import { parseNbsRealEconomyResponse } from '../scripts/ingest/fetch/nbs-real-ec
 import { normalizeRealEconomyDataset } from '../scripts/ingest/normalize/real-economy.ts';
 import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_CONTRACTS, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
 import { HistoricalMismatchError } from '../scripts/ingest/types.ts';
+import { runRealEconomy } from '../scripts/ingest/real-economy-cli.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -213,4 +214,76 @@ test('rejects an incoming real-economy sequence with a gap before merging', () =
   const payload = fixture('industrial-production');
   const raw = parseNbsRealEconomyResponse(payload, payload.publication, REAL_ECONOMY_CONTRACTS['industrial-production']);
   assert.throws(() => normalizeRealEconomyDataset({ ...raw, observations: raw.observations.filter(({ date }) => date !== '2025-03') }, existingFor('industrial-production'), 'industrial-production'), IngestionContractError);
+});
+
+function seedTargets(directory) {
+  fs.mkdirSync(directory, { recursive: true });
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    const existing = existingFor(id);
+    fs.writeFileSync(path.join(directory, `${id}.json`), `${JSON.stringify(existing, null, 2)}\n`);
+  }
+}
+
+function seedFixtureDirectory(directory) {
+  fs.mkdirSync(directory, { recursive: true });
+  const names = {
+    gdp: 'gdp-quarterly.json',
+    'industrial-production': 'industrial-production.json',
+    'retail-sales': 'retail-sales.json',
+    'fixed-asset-investment': 'fixed-asset-investment.json',
+  };
+  for (const name of Object.values(names)) fs.copyFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', name), path.join(directory, name));
+  const index = path.join(directory, 'index.json');
+  fs.writeFileSync(index, `${JSON.stringify(names, null, 2)}\n`);
+  return index;
+}
+
+async function captureOutput(callback) {
+  const originalLog = console.log;
+  const lines = [];
+  console.log = (...args) => lines.push(args.join(' '));
+  try {
+    await callback();
+    return lines.join('\n');
+  } finally {
+    console.log = originalLog;
+  }
+}
+
+test('runs the fixture CLI for all four targets and is idempotent', async () => {
+  const targets = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-'));
+  const fixtures = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-fixture-'));
+  seedTargets(targets);
+  const fixtureIndex = seedFixtureDirectory(fixtures);
+  const args = ['--fixture-index', fixtureIndex, '--fixture-dir', fixtures, '--target-dir', targets];
+  const firstOutput = await captureOutput(() => runRealEconomy(args));
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) assert.match(firstOutput, new RegExp(`${id}.*Changed: true`));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(targets, 'gdp.json'), 'utf8')).data.at(-1).date, '2026-Q2');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(targets, 'industrial-production.json'), 'utf8')).data.at(-1).date, '2025-04');
+  const snapshots = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
+  const secondOutput = await captureOutput(() => runRealEconomy(args));
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    assert.match(secondOutput, new RegExp(`${id}.*Changed: false`));
+    assert.equal(fs.readFileSync(path.join(targets, `${id}.json`), 'utf8'), snapshots.get(id));
+  }
+});
+
+test('does not write any target when one NBS series has a historical mismatch', async () => {
+  const targets = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-atomic-'));
+  const fixtures = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-atomic-fixture-'));
+  seedTargets(targets);
+  const fixtureIndex = seedFixtureDirectory(fixtures);
+  const args = ['--fixture-index', fixtureIndex, '--fixture-dir', fixtures, '--target-dir', targets];
+  await runRealEconomy(args);
+  const before = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
+  const industrialPath = path.join(fixtures, 'industrial-production.json');
+  const industrial = JSON.parse(fs.readFileSync(industrialPath, 'utf8'));
+  industrial.returndata.datanodes[0].data.data = '9.9';
+  fs.writeFileSync(industrialPath, `${JSON.stringify(industrial, null, 2)}\n`);
+  await assert.rejects(() => runRealEconomy(args), HistoricalMismatchError);
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) assert.equal(fs.readFileSync(path.join(targets, `${id}.json`), 'utf8'), before.get(id));
+});
+
+test('help exits before reading or writing real-economy targets', async () => {
+  await assert.doesNotReject(() => runRealEconomy(['--help']));
 });

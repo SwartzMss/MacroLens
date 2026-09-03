@@ -8,6 +8,7 @@
     "test": "node --import tsx --test tests/*.test.mjs",
     "ingest:pmi": "node --import tsx scripts/ingest/cli.ts",
     "ingest:pboc-money-supply": "node --import tsx scripts/ingest/money-supply-cli.ts",
+    "ingest:nbs-real-economy": "node --import tsx scripts/ingest/real-economy-cli.ts",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check"
