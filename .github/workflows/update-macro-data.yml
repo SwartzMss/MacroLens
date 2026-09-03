@@ -6,7 +6,7 @@ name: Update macro data
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 2 1 * *'
+    - cron: '30 2 * * 1'
 
 permissions:
   contents: write
@@ -53,5 +53,3 @@ jobs:
             The ingestion adapters validate official publication structures,
             check historical overlaps and methodology, and update only changed
             indicator datasets.
-
-            Closes #51

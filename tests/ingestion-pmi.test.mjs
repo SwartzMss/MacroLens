@@ -289,7 +289,7 @@ test('runs the fixture CLI idempotently and appends only the missing months', as
 test('defines a scheduled and manually runnable reviewable data-update workflow', () => {
   const workflow = fs.readFileSync(path.join(here, '..', '.github', 'workflows', 'update-macro-data.yml'), 'utf8');
   assert.match(workflow, /workflow_dispatch/);
-  assert.match(workflow, /cron:\s*["']?30 2 1 \* \*["']?/);
+  assert.match(workflow, /cron:\s*["']?30 2 \* \* 1["']?/);
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run ingest:pmi/);
   assert.match(workflow, /npm run ingest:pboc-money-supply -- --target-dir data\/indicators/);
@@ -300,7 +300,7 @@ test('defines a scheduled and manually runnable reviewable data-update workflow'
   for (const id of ['m0', 'm1', 'm2']) assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
   assert.match(workflow, /branch:\s*automation\/update-macro-data/);
   assert.match(workflow, /title:\s*['"]?data: update macro data/);
-  assert.match(workflow, /Closes #51/);
+  assert.doesNotMatch(workflow, /Closes #51/);
   assert.doesNotMatch(workflow, /playwright|puppeteer|browser/i);
   assert.match(workflow, /stats\.gov\.cn/);
   assert.match(workflow, /pbc\.gov\.cn/);
