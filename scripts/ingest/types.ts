@@ -82,9 +82,10 @@ export const PMI_METHODOLOGY_FINGERPRINT = [
 ].join('|');
 
 export const MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS = {
-  m0: 'pboc-m0|currency-in-circulation|month-end-balance-yoy|e-cny-included-from-2022-12',
+  // Only include anchors that parsePBOCMoneySupplyReport verifies in each monthly report.
+  m0: 'pboc-m0|currency-in-circulation|published-yoy',
   m1: 'pboc-m1|revised-from-2025-01|m0+corporate-demand+personal-demand+nonbank-payment-reserves|month-end-balance-yoy',
-  m2: 'pboc-m2|money-and-quasi-money|m1+time-and-other-deposits|month-end-balance-yoy',
+  m2: 'pboc-m2|broad-money|published-yoy',
 } as const;
 
 export type MoneySupplyDatasetId = keyof typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;

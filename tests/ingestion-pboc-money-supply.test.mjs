@@ -101,6 +101,11 @@ test('makes the published YoY calculation boundary explicit for M0 and M2', () =
   }
 });
 
+test('only claims M0 and M2 methodology anchors verified by monthly reports', () => {
+  assert.equal(MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m0, 'pboc-m0|currency-in-circulation|published-yoy');
+  assert.equal(MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m2, 'pboc-m2|broad-money|published-yoy');
+});
+
 test('validates normalized PBOC dataset values without applying the PMI range', () => {
   const normalized = normalizeMoneySupplyDataset(rawReports, existingWithFingerprint, 'm1');
   assert.doesNotThrow(() => validateMoneySupplyDataset(normalized, 'm1'));

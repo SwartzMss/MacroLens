@@ -1,7 +1,7 @@
 {
   "id": "m2", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速", "chartTitle": "M2 历史同比增速",
   "definitionEffectiveFrom": "2018-01", "definitionAsOf": "2025-11", "source": "PBOC",
-  "calculation": "published", "calculationEffectiveFrom": "2025-11", "methodologyFingerprint": "pboc-m2|money-and-quasi-money|m1+time-and-other-deposits|month-end-balance-yoy",
+  "calculation": "published", "calculationEffectiveFrom": "2025-11", "methodologyFingerprint": "pboc-m2|broad-money|published-yoy",
   "sources": [
     {"title":"中国人民银行货币供应量表（2023）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025110416490190973.pdf","sourceDate":"2024-01-17","coverage":"2023-01 to 2023-12"},
     {"title":"中国人民银行货币供应量表（2024）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111416484293445.pdf","sourceDate":"2025-01-14","coverage":"2024-01 to 2024-12"},
