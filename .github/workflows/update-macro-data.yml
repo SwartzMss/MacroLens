@@ -1,6 +1,7 @@
 name: Update macro data
 
-# The CLI fetches the official NBS publication index at stats.gov.cn.
+# The ingestion CLIs fetch official NBS (stats.gov.cn) and PBOC (pbc.gov.cn)
+# publication sources.
 
 on:
   workflow_dispatch:
@@ -12,7 +13,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  update-pmi:
+  update-macro-data:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -30,17 +31,27 @@ jobs:
       - name: Fetch and validate NBS PMI
         run: npm run ingest:pmi -- --target data/indicators/pmi.json
 
-      - name: Open data update pull request
+      - name: Fetch and validate PBOC money supply
+        run: npm run ingest:pboc-money-supply -- --target-dir data/indicators
+
+      - name: Open macro data update pull request
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          add-paths: data/indicators/pmi.json
-          branch: automation/update-pmi
+          add-paths: |
+            data/indicators/pmi.json
+            data/indicators/m0.json
+            data/indicators/m1.json
+            data/indicators/m2.json
+          branch: automation/update-macro-data
           delete-branch: true
-          commit-message: 'data: update NBS manufacturing PMI'
-          title: 'data: update NBS manufacturing PMI'
+          commit-message: 'data: update macro indicators'
+          title: 'data: update macro data'
           body: |
-            Automated NBS manufacturing PMI update.
+            Automated official macro-data update.
 
-            The ingestion adapter validates the official publication structure,
-            checks historical overlaps, and updates only the main PMI series.
+            The ingestion adapters validate official publication structures,
+            check historical overlaps and methodology, and update only changed
+            indicator datasets.
+
+            Closes #51

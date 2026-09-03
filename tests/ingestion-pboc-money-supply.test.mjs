@@ -15,7 +15,7 @@ import {
   HistoricalMismatchError,
   MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS,
 } from '../scripts/ingest/types.ts';
-import { runMoneySupply } from '../scripts/ingest/money-supply-cli.ts';
+import { runMoneySupply, selectPublications } from '../scripts/ingest/money-supply-cli.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => fs.readFileSync(path.join(here, 'fixtures', 'pboc', name), 'utf8');
@@ -36,10 +36,9 @@ test('discovers only monthly PBOC financial-statistics reports', () => {
 });
 
 test('parses M0 M1 and M2 from one official report', () => {
-  assert.deepEqual(
-    parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html')).values,
-    { m0: 10.8, m1: -0.7, m2: 8.0 },
-  );
+  const parsed = parsePBOCMoneySupplyReport(publications[0], fixture('report-2025-11.html'));
+  assert.deepEqual(parsed.values, { m0: 10.8, m1: -0.7, m2: 8.0 });
+  assert.deepEqual(parsed.methodologyFingerprints, MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS);
 });
 
 test('parses a positive and negative published growth rate', () => {
@@ -86,6 +85,19 @@ test('rejects money-supply field and methodology mismatches before merging', () 
   assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, frequency: 'quarterly' }, 'm1'), /frequency/i);
   assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, metric: 'index' }, 'm1'), /metric/i);
   assert.throws(() => normalizeMoneySupplyDataset(rawReports, { ...existingWithFingerprint, methodologyFingerprint: 'changed' }, 'm1'), MethodologyMismatchError);
+  assert.throws(() => normalizeMoneySupplyDataset(
+    [{ ...rawReports[0], methodologyFingerprints: { ...rawReports[0].methodologyFingerprints, m0: 'changed' } }],
+    { ...existingWithFingerprint, id: 'm0', methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m0 },
+    'm0',
+  ), MethodologyMismatchError);
+});
+
+test('accepts an index that includes the existing latest month before new reports', () => {
+  const overlap = { ...publications[0], month: '2025-10' };
+  assert.deepEqual(
+    selectPublications([overlap, ...publications], '2025-10').map(({ month }) => month),
+    ['2025-10', '2025-11', '2025-12', '2026-01'],
+  );
 });
 
 test('rejects incoming gaps, final gaps, and historical mismatches', () => {
@@ -93,6 +105,28 @@ test('rejects incoming gaps, final gaps, and historical mismatches', () => {
   assert.throws(() => normalizeMoneySupplyDataset([rawReports[1]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
   const mismatch = { ...rawReports[0], publication: { ...rawReports[0].publication, month: '2025-10' } };
   assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingWithFingerprint, 'm1'), HistoricalMismatchError);
+});
+
+test('allows an older publication date when the report only verifies an existing month', () => {
+  const existingThroughNovember = {
+    ...existingWithFingerprint,
+    updatedAt: '2026-01-31',
+    sources: [
+      ...existingWithFingerprint.sources,
+      {
+        title: '中国人民银行：2025年11月金融统计数据报告',
+        url: 'https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025111216000000001/index.html',
+        sourceDate: '2026-01-31',
+        coverage: '2025-11 to 2025-11',
+      },
+    ],
+    data: [...existingWithFingerprint.data, { date: '2025-11', value: -0.7 }],
+  };
+  const overlap = {
+    ...rawReports[0],
+    publication: { ...rawReports[0].publication, sourceDate: '2025-12-12' },
+  };
+  assert.doesNotThrow(() => normalizeMoneySupplyDataset([overlap], existingThroughNovember, 'm1'));
 });
 
 function seedTargets(directory) {

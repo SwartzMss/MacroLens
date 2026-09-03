@@ -1,6 +1,6 @@
 {
   "id": "m0", "country": "CN", "frequency": "monthly", "unit": "%", "metric": "yoy", "label": "同比增速", "chartTitle": "M0 历史同比增速",
-  "definitionEffectiveFrom": "2022-12", "definitionAsOf": "2025-11", "source": "PBOC", "calculation": "derived_from_balance",
+  "definitionEffectiveFrom": "2022-12", "definitionAsOf": "2025-11", "source": "PBOC", "calculation": "derived_from_balance", "methodologyFingerprint": "pboc-m0|currency-in-circulation|month-end-balance-yoy|e-cny-included-from-2022-12",
   "sources": [
     {"title":"中国人民银行货币供应量表（2023）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025110416490190973.pdf","sourceDate":"2024-01-17","coverage":"2023-01 to 2023-12"},
     {"title":"中国人民银行货币供应量表（2024）","url":"https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111416484293445.pdf","sourceDate":"2025-01-14","coverage":"2024-01 to 2024-12"},

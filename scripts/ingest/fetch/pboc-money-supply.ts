@@ -99,6 +99,6 @@ export function parsePBOCMoneySupplyReport(
       m1: parseGrowth(canonical, '狭义货币（M1）'),
       m2: parseGrowth(canonical, '广义货币（M2）'),
     },
-    methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1,
+    methodologyFingerprints: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS,
   };
 }

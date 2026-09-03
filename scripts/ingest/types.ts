@@ -47,7 +47,7 @@ export type MoneySupplyValues = { m0: number; m1: number; m2: number };
 export type RawMoneySupplyPublication = {
   publication: MoneySupplyPublication;
   values: MoneySupplyValues;
-  methodologyFingerprint: string;
+  methodologyFingerprints: typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
 };
 
 export class HistoricalMismatchError extends Error {

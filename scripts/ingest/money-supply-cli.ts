@@ -63,12 +63,12 @@ function latestMonth(dataset: IndicatorDataset): string {
   return latest;
 }
 
-function selectPublications(publications: MoneySupplyPublication[], existingMonth: string): MoneySupplyPublication[] {
+export function selectPublications(publications: MoneySupplyPublication[], existingMonth: string): MoneySupplyPublication[] {
   const latestPublication = publications.at(-1);
   if (!latestPublication) throw new IngestionContractError('No PBOC publications available');
   const selected = publications.filter(({ month }) => month >= existingMonth);
-  if (latestPublication.month > existingMonth && selected[0]?.month !== nextMonth(existingMonth)) {
-    throw new IngestionContractError(`PBOC publication range starts at ${selected[0]?.month}, expected ${nextMonth(existingMonth)}`);
+  if (latestPublication.month > existingMonth && ![existingMonth, nextMonth(existingMonth)].includes(selected[0]?.month ?? '')) {
+    throw new IngestionContractError(`PBOC publication range starts at ${selected[0]?.month}, expected ${existingMonth} or ${nextMonth(existingMonth)}`);
   }
   if (selected.length === 0) throw new IngestionContractError(`No PBOC publication covers existing month ${existingMonth}`);
   return selected;

@@ -292,12 +292,18 @@ test('defines a scheduled and manually runnable reviewable data-update workflow'
   assert.match(workflow, /cron:\s*["']?30 2 1 \* \*["']?/);
   assert.match(workflow, /npm ci/);
   assert.match(workflow, /npm run ingest:pmi/);
+  assert.match(workflow, /npm run ingest:pboc-money-supply -- --target-dir data\/indicators/);
   assert.match(workflow, /contents:\s*write/);
   assert.match(workflow, /pull-requests:\s*write/);
   assert.match(workflow, /peter-evans\/create-pull-request@v7/);
   assert.match(workflow, /data\/indicators\/pmi\.json/);
+  for (const id of ['m0', 'm1', 'm2']) assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
+  assert.match(workflow, /branch:\s*automation\/update-macro-data/);
+  assert.match(workflow, /title:\s*['"]?data: update macro data/);
+  assert.match(workflow, /Closes #51/);
   assert.doesNotMatch(workflow, /playwright|puppeteer|browser/i);
   assert.match(workflow, /stats\.gov\.cn/);
+  assert.match(workflow, /pbc\.gov\.cn/);
 });
 
 async function captureOutput(callback) {

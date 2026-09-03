@@ -12,7 +12,7 @@ function validateReports(rawReports: RawMoneySupplyPublication[], id: MoneySuppl
   const observations = rawReports.map((report) => {
     const value = report.values[id];
     if (!Number.isFinite(value)) throw new IngestionContractError(`Missing finite ${id} value for ${report.publication.month}`);
-    if (report.methodologyFingerprint !== MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1) {
+    if (report.methodologyFingerprints[id] !== MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id]) {
       throw new MethodologyMismatchError(`PBOC report methodology fingerprint mismatch for ${report.publication.month}`);
     }
     return { date: report.publication.month, value };
@@ -27,8 +27,10 @@ export function normalizeMoneySupplyDataset(
 ): IndicatorDataset {
   validateMoneySupplyDataset(existing, id);
   validateReports(rawReports, id);
+  const existingLatestMonth = existing.data.at(-1)?.date;
+  if (!existingLatestMonth) throw new IngestionContractError(`Existing ${id} dataset contains no observations`);
   for (const report of rawReports) {
-    if (report.publication.sourceDate < existing.updatedAt) {
+    if (report.publication.month > existingLatestMonth && report.publication.sourceDate < existing.updatedAt) {
       throw new IngestionContractError(`Fetched PBOC publication is older than existing updatedAt: ${report.publication.sourceDate} < ${existing.updatedAt}`);
     }
   }
