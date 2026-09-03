@@ -123,8 +123,8 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
 
       if (!response.ok) {
         const error = new FetchTextError(
-          messageForFailure(url, attempt, response.status, false, undefined),
-          { url, attempts: attempt, status: response.status },
+          messageForFailure(url, attempt, response.status, false, firstCause),
+          { url, attempts: attempt, status: response.status, cause: firstCause, firstCause },
         );
         if (isRetryableStatus(response.status) && attempt < maxAttempts) {
           await sleep(delayFor(attempt, backoffMs, maxBackoffMs));
@@ -138,7 +138,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
       } catch (cause) {
         throw new FetchTextError(
           messageForFailure(url, attempt, undefined, false, cause),
-          { url, attempts: attempt, cause },
+          { url, attempts: attempt, cause, firstCause },
         );
       }
     } finally {

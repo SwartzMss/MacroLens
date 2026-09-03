@@ -96,6 +96,29 @@ test('reports the final HTTP failure with URL, status, and attempt count', async
   assert.equal(attempts, 3);
 });
 
+test('retains an earlier transport cause when the final failure is an HTTP response', async () => {
+  const firstCause = new Error('ECONNRESET');
+  let attempts = 0;
+  await assert.rejects(
+    () => fetchText(url, {
+      maxAttempts: 2,
+      sleep: async () => {},
+      fetchImpl: async () => {
+        attempts += 1;
+        if (attempts === 1) throw firstCause;
+        return response('upstream unavailable', 503);
+      },
+    }),
+    (error) => error instanceof FetchTextError
+      && error.status === 503
+      && error.attempts === 2
+      && error.cause === firstCause
+      && error.firstCause === firstCause
+      && error.message.includes('ECONNRESET'),
+  );
+  assert.equal(attempts, 2);
+});
+
 test('preserves the underlying transport cause after retries are exhausted', async () => {
   const firstCause = new Error('ECONNRESET');
   const finalCause = new Error('fetch failed', {
