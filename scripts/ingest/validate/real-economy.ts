@@ -93,7 +93,7 @@ export function validateRealEconomyDataset(dataset: IndicatorDataset, id: RealEc
     throw new MethodologyMismatchError(`${id} methodology fingerprint differs from the expected contract`);
   }
   for (const source of dataset.sources) {
-    if (!/^https:\/\/(?:data\.)?stats\.gov\.cn\//.test(source.url)) {
+    if (!/^https:\/\/(?:data\.|www\.)?stats\.gov\.cn\//.test(source.url)) {
       fail(`Invalid official NBS source for ${id}: ${source.url}`);
     }
   }
