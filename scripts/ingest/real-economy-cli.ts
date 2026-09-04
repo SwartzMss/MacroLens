@@ -5,8 +5,8 @@ import {
   buildNbsQueryUrls,
   discoverLatestRealEconomyPublication,
   fetchNbsGdpPublication,
+  fetchNbsPublicationIndex,
   fetchNbsRealEconomySeries,
-  nbsPublicationIndex,
   parseNbsGdpPublication,
   parseNbsRealEconomyResponse,
 } from './fetch/nbs-real-economy.ts';
@@ -54,14 +54,8 @@ async function loadExisting(targetDir: string): Promise<Map<RealEconomyDatasetId
   return existing;
 }
 
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
-  return response.text();
-}
-
 async function livePublication(id: RealEconomyDatasetId) {
-  const publication = discoverLatestRealEconomyPublication(await fetchText(nbsPublicationIndex), id);
+  const publication = discoverLatestRealEconomyPublication(await fetchNbsPublicationIndex(), id);
   if (id === 'gdp') return publication;
   return { ...publication, dataUrls: buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS[id]) };
 }
