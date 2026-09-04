@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { dashboardIndicatorIds, deriveObservationSummary, getDashboardIndicators } from '../src/data/dashboard.ts';
+
+const dashboardComponent = fileURLToPath(new URL('../src/components/MacroDashboard.astro', import.meta.url));
+const dashboardStyles = fileURLToPath(new URL('../src/styles/dashboard.css', import.meta.url));
+const homepage = fileURLToPath(new URL('../src/pages/index.astro', import.meta.url));
 
 test('keeps the dashboard focused on the eight available datasets', () => {
   assert.deepEqual(dashboardIndicatorIds, [
@@ -31,4 +37,22 @@ test('does not invent a change for a single observation', () => {
 
 test('rejects an empty observation series', () => {
   assert.throws(() => deriveObservationSummary([]), /at least one observation/);
+});
+
+test('dashboard markup includes changes, update timestamps, sources, and concept links', () => {
+  const source = readFileSync(dashboardComponent, 'utf8');
+  assert.match(source, /更新：/);
+  assert.match(source, /核验来源/);
+  assert.match(source, /conceptHref/);
+  assert.match(source, /最近一期变化/);
+});
+
+test('dashboard styles are responsive and homepage preserves current sections', () => {
+  const styles = readFileSync(dashboardStyles, 'utf8');
+  const page = readFileSync(homepage, 'utf8');
+  assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
+  assert.match(styles, /dashboard-grid/);
+  assert.match(page, /MacroDashboard/);
+  assert.match(page, /TransmissionPaths/);
+  assert.match(page, /先认识两种“钱”/);
 });

@@ -1,0 +1,67 @@
+---
+import type { DashboardIndicator } from '../data/dashboard';
+import '../styles/dashboard.css';
+
+const { indicators } = Astro.props as { indicators: DashboardIndicator[] };
+const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
+const formatChange = (change: number | null, unit: string) => {
+  if (change === null) return '—';
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${unit === '%' ? '%' : ''}`;
+};
+---
+
+<section class="dashboard section" aria-labelledby="dashboard-title">
+  <div class="dashboard-head">
+    <div>
+      <div class="eyebrow">Macro dashboard</div>
+      <h2 id="dashboard-title">现在，宏观数据说什么？</h2>
+      <p>从现有官方数据集中读取最新观测，快速浏览经济活动、货币与需求的变化。</p>
+    </div>
+    <p class="dashboard-note">静态生成 · 无运行时数据请求</p>
+  </div>
+
+  <div class="dashboard-grid">
+    {indicators.map((item) => <article class="indicator-card" data-indicator-id={item.id}>
+      <div class="indicator-card-top">
+        <span>{item.dataset.frequency === 'quarterly' ? '季度' : '月度'}</span>
+        <span>{item.dataset.source}</span>
+      </div>
+      <h3>{item.name}</h3>
+      <p class="indicator-label">{item.dataset.label}</p>
+      <div class="indicator-value">{formatValue(item.latest.value, item.dataset.unit)}</div>
+      <div class:list={['indicator-change', item.change !== null && item.change < 0 && 'is-negative']}>
+        <span>较上一期</span>
+        <strong>{formatChange(item.change, item.dataset.unit)}</strong>
+      </div>
+      <div class="indicator-meta">
+        <span>数据期：{item.latest.date}</span>
+        <span>更新：{item.dataset.updatedAt}</span>
+      </div>
+      <div class="indicator-actions">
+        <a href={item.conceptHref}>查看定义与图表 →</a>
+        <details>
+          <summary>核验来源（{item.dataset.sources.length}）</summary>
+          {item.dataset.sources.length > 0 ? <ul>{item.dataset.sources.map((source) => <li>
+            <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+            <small>{source.coverage} · 发布 {source.sourceDate}</small>
+          </li>)}</ul> : <p>来源信息待补充</p>}
+        </details>
+      </div>
+    </article>)}
+  </div>
+
+  <section class="dashboard-changes" aria-labelledby="dashboard-changes-title">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Recent changes</div>
+        <h3 id="dashboard-changes-title">最近一期变化</h3>
+      </div>
+      <p>按各指标自身单位比较上一观测期</p>
+    </div>
+    <ul>{indicators.map((item) => <li>
+      <a href={item.conceptHref}>{item.name}</a>
+      <span>{item.latest.date}</span>
+      <strong class={item.change !== null && item.change < 0 ? 'is-negative' : ''}>{formatChange(item.change, item.dataset.unit)}</strong>
+    </li>)}</ul>
+  </section>
+</section>
