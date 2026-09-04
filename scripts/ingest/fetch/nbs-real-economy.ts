@@ -82,10 +82,17 @@ function publicationTitlePattern(id: RealEconomyDatasetId): RegExp {
   return /固定资产投资/;
 }
 
-export function discoverLatestRealEconomyPublication(
+const REAL_ECONOMY_DATASET_IDS: RealEconomyDatasetId[] = [
+  'gdp',
+  'industrial-production',
+  'retail-sales',
+  'fixed-asset-investment',
+];
+
+function discoverRealEconomyPublicationCandidates(
   indexHtml: string,
   id: RealEconomyDatasetId,
-): NbsRealEconomyPublication {
+): NbsRealEconomyPublication[] {
   const candidates: NbsRealEconomyPublication[] = [];
   const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   for (const match of indexHtml.matchAll(anchorPattern)) {
@@ -98,6 +105,14 @@ export function discoverLatestRealEconomyPublication(
     if (new URL(url).origin !== NBS_ORIGIN) fail(`NBS publication is not hosted by stats.gov.cn: ${url}`);
     candidates.push({ title, url, sourceDate: dateMatch[1], coverage: publicationCoverageFromTitle(title, id) });
   }
+  return candidates;
+}
+
+export function discoverLatestRealEconomyPublication(
+  indexHtml: string,
+  id: RealEconomyDatasetId,
+): NbsRealEconomyPublication {
+  const candidates = discoverRealEconomyPublicationCandidates(indexHtml, id);
   if (candidates.length === 0) fail(`No NBS publication matching ${id}`);
   return candidates.sort((left, right) => right.sourceDate.localeCompare(left.sourceDate))[0];
 }
@@ -121,7 +136,17 @@ export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string,
 
 function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
   if (id === 'gdp') return '';
-  const match = canonical(title).match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/);
+  const canonicalTitle = canonical(title);
+  const annualFixedAssetMatch = canonicalTitle.match(/^(\d{4})年全国固定资产投资基本情况/);
+  if (id === 'fixed-asset-investment' && annualFixedAssetMatch) {
+    const period = `${annualFixedAssetMatch[1]}-01–12`;
+    return `${period} to ${period}`;
+  }
+  const halfYearMatch = canonicalTitle.match(/^(\d{4})年上半年/);
+  if (id === 'retail-sales' && halfYearMatch) {
+    return `${halfYearMatch[1]}-06 to ${halfYearMatch[1]}-06`;
+  }
+  const match = canonicalTitle.match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/);
   if (!match) fail(`NBS publication title has no period: ${title}`);
   const year = match[1];
   const startMonth = Number(match[2]);
@@ -349,8 +374,40 @@ async function fetchJson(url: string, fetcher: TextFetcher): Promise<unknown> {
   return JSON.parse(await fetcher(url));
 }
 
+const DEFAULT_MAX_PUBLICATION_INDEX_PAGES = 8;
+
 export async function fetchNbsPublicationIndex(fetcher: TextFetcher = fetchText): Promise<string> {
   return fetcher(NBS_INDEX);
+}
+
+function publicationIndexPageUrl(page: number): string {
+  return page === 0 ? NBS_INDEX : new URL(`index_${page}.html`, NBS_INDEX).toString();
+}
+
+export async function fetchNbsRealEconomyPublications(
+  fetcher: TextFetcher = fetchText,
+  maxPages = DEFAULT_MAX_PUBLICATION_INDEX_PAGES,
+): Promise<Record<RealEconomyDatasetId, NbsRealEconomyPublication>> {
+  if (!Number.isInteger(maxPages) || maxPages < 1) fail('NBS publication index page limit must be a positive integer');
+  const latest = new Map<RealEconomyDatasetId, NbsRealEconomyPublication>();
+  for (let page = 0; page < maxPages; page += 1) {
+    const indexHtml = await fetcher(publicationIndexPageUrl(page));
+    const candidatesByDataset = REAL_ECONOMY_DATASET_IDS.map((id) => [
+      id,
+      discoverRealEconomyPublicationCandidates(indexHtml, id),
+    ] as const);
+    for (const [id, candidates] of candidatesByDataset) {
+      for (const candidate of candidates) {
+        const current = latest.get(id);
+        if (!current || candidate.sourceDate > current.sourceDate) latest.set(id, candidate);
+      }
+    }
+    if (latest.size === REAL_ECONOMY_DATASET_IDS.length) {
+      return Object.fromEntries(REAL_ECONOMY_DATASET_IDS.map((id) => [id, latest.get(id)])) as Record<RealEconomyDatasetId, NbsRealEconomyPublication>;
+    }
+  }
+  const missing = REAL_ECONOMY_DATASET_IDS.filter((id) => !latest.has(id));
+  fail(`No NBS publication matching ${missing.join(', ')} after scanning ${maxPages} pages`);
 }
 
 export async function fetchNbsRealEconomySeries(

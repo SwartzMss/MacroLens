@@ -9,6 +9,7 @@ import {
   discoverLatestRealEconomyPublication,
   fetchNbsGdpPublication,
   fetchNbsPublicationIndex,
+  fetchNbsRealEconomyPublications,
   fetchNbsRealEconomySeries,
   nbsPublicationIndex,
   parseNbsGdpPublication,
@@ -213,6 +214,61 @@ test('discovers all real-economy publications from the official data-release ind
   }
 });
 
+test('scans paginated official indexes once and keeps the newest match per dataset', async () => {
+  const pageOneUrl = new URL('index_1.html', nbsPublicationIndex).toString();
+  const pageTwoUrl = new URL('index_2.html', nbsPublicationIndex).toString();
+  const calls = [];
+  const pages = new Map([
+    [nbsPublicationIndex, fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'publication-index-page-0.html'), 'utf8')],
+    [pageOneUrl, fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'publication-index-page-1.html'), 'utf8')],
+  ]);
+  const publications = await fetchNbsRealEconomyPublications(async (url) => {
+    calls.push(url);
+    if (url === pageTwoUrl) throw new Error('page 2 should not be fetched');
+    const page = pages.get(url);
+    if (!page) throw new Error(`unexpected URL: ${url}`);
+    return page;
+  }, 3);
+
+  assert.equal(publications.gdp.url, 'https://www.stats.gov.cn/sj/zxfb/202607/t20260716_1964142.html');
+  assert.equal(publications['industrial-production'].url, 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965055.html');
+  assert.equal(publications['retail-sales'].url, 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965052.html');
+  assert.equal(publications['fixed-asset-investment'].url, 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965054.html');
+  assert.deepEqual(calls, [nbsPublicationIndex, pageOneUrl]);
+});
+
+test('fails clearly after exhausting the bounded publication page scan', async () => {
+  const calls = [];
+  const page = fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'publication-index-page-0.html'), 'utf8');
+  await assert.rejects(
+    () => fetchNbsRealEconomyPublications(async (url) => {
+      calls.push(url);
+      return page;
+    }, 2),
+    (error) => error instanceof IngestionContractError && /gdp/i.test(error.message) && /2/.test(error.message),
+  );
+  assert.deepEqual(calls, [
+    nbsPublicationIndex,
+    new URL('index_1.html', nbsPublicationIndex).toString(),
+  ]);
+});
+
+test('maps official retail half-year titles to June publication coverage', () => {
+  const publication = discoverLatestRealEconomyPublication(
+    '<a href="/sj/zxfb/202607/t20260715_1964144.html">2026年上半年社会消费品零售总额增长5.4%</a> 2026-07-15',
+    'retail-sales',
+  );
+  assert.equal(publication.coverage, '2026-06 to 2026-06');
+});
+
+test('maps official annual fixed-asset-investment titles to full-year coverage', () => {
+  const publication = discoverLatestRealEconomyPublication(
+    '<a href="/sj/zxfb/202601/t20260119_1962324.html">2025年全国固定资产投资基本情况</a> 2026-01-19',
+    'fixed-asset-investment',
+  );
+  assert.equal(publication.coverage, '2025-01–12 to 2025-01–12');
+});
+
 test('routes real-economy live requests through the shared text fetch boundary', async () => {
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));
@@ -244,6 +300,12 @@ test('routes real-economy live requests through the shared text fetch boundary',
   const cliSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'real-economy-cli.ts'), 'utf8');
   assert.doesNotMatch(realEconomySource, /\bfetch\s*\(/);
   assert.doesNotMatch(cliSource, /\bfetch\s*\(/);
+});
+
+test('CLI uses one shared paginated publication scan for live datasets', () => {
+  const cliSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'real-economy-cli.ts'), 'utf8');
+  assert.match(cliSource, /fetchNbsRealEconomyPublications/);
+  assert.doesNotMatch(cliSource, /discoverLatestRealEconomyPublication/);
 });
 
 test('propagates shared transport errors without replacing diagnostics', async () => {

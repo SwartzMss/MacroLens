@@ -3,9 +3,8 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   buildNbsQueryUrls,
-  discoverLatestRealEconomyPublication,
   fetchNbsGdpPublication,
-  fetchNbsPublicationIndex,
+  fetchNbsRealEconomyPublications,
   fetchNbsRealEconomySeries,
   parseNbsGdpPublication,
   parseNbsRealEconomyResponse,
@@ -15,7 +14,7 @@ import { writeIndicatorDataset } from './write/indicator.ts';
 import {
   REAL_ECONOMY_CONTRACTS,
 } from './types.ts';
-import type { IndicatorDataset, RealEconomyDatasetId } from './types.ts';
+import type { IndicatorDataset, NbsRealEconomyPublication, RealEconomyDatasetId } from './types.ts';
 import { validateRealEconomyDataset } from './validate/real-economy.ts';
 
 const IDS: RealEconomyDatasetId[] = ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'];
@@ -54,13 +53,7 @@ async function loadExisting(targetDir: string): Promise<Map<RealEconomyDatasetId
   return existing;
 }
 
-async function livePublication(id: RealEconomyDatasetId) {
-  const publication = discoverLatestRealEconomyPublication(await fetchNbsPublicationIndex(), id);
-  if (id === 'gdp') return publication;
-  return { ...publication, dataUrls: buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS[id]) };
-}
-
-async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions) {
+async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions, livePublication?: NbsRealEconomyPublication) {
   const contract = REAL_ECONOMY_CONTRACTS[id];
   if (options.fixtureDir && options.fixtureIndex) {
     const index = JSON.parse(await fs.readFile(options.fixtureIndex, 'utf8')) as Record<string, string>;
@@ -73,7 +66,10 @@ async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions) {
     }
     return parseNbsRealEconomyResponse(payload, payload.publication, contract);
   }
-  const publication = await livePublication(id);
+  if (!livePublication) throw new Error('Live NBS publication was not discovered for ' + id);
+  const publication = id === 'gdp'
+    ? livePublication
+    : { ...livePublication, dataUrls: buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS[id]) };
   return id === 'gdp' ? fetchNbsGdpPublication(publication) : fetchNbsRealEconomySeries(publication, contract);
 }
 
@@ -81,9 +77,12 @@ export async function runRealEconomy(args: string[] = process.argv.slice(2)): Pr
   const options = parseArgs(args);
   if (options.help) return;
   const existing = await loadExisting(options.targetDir);
+  const publications = options.fixtureDir && options.fixtureIndex
+    ? undefined
+    : await fetchNbsRealEconomyPublications();
   const candidates = new Map<RealEconomyDatasetId, IndicatorDataset>();
   for (const id of IDS) {
-    const raw = await loadRawSeries(id, options);
+    const raw = await loadRawSeries(id, options, publications?.[id]);
     candidates.set(id, normalizeRealEconomyDataset(raw, existing.get(id)!, id));
   }
   for (const id of IDS) {
