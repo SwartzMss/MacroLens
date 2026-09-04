@@ -17,6 +17,7 @@ import {
 } from '../scripts/ingest/fetch/nbs-real-economy.ts';
 import { FetchTextError, fetchText } from '../scripts/ingest/fetch-text.ts';
 import { normalizeRealEconomyDataset } from '../scripts/ingest/normalize/real-economy.ts';
+import { writeIndicatorDataset } from '../scripts/ingest/write/indicator.ts';
 import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_CONTRACTS, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
 import { HistoricalMismatchError } from '../scripts/ingest/types.ts';
 import { runRealEconomy } from '../scripts/ingest/real-economy-cli.ts';
@@ -425,6 +426,37 @@ test('rejects a structured response when one selected indicator has no valid val
       && error.message.includes('A020102')
       && error.message.includes('missing selected indicators'),
   );
+});
+
+test('persists structured request provenance from actual data coverage, not run time', async () => {
+  const structuredFixture = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8'));
+  const payload = fixture('industrial-production');
+  const endpoint = 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData';
+  const run = (runAt) => fetchNbsRealEconomySeries(
+    payload.publication,
+    REAL_ECONOMY_CONTRACTS['industrial-production'],
+    async (url) => url === payload.publication.url
+      ? '规模以上工业增加值同比增长按不变价格计算'
+      : JSON.stringify(structuredFixture.responses['industrial-production']),
+    runAt,
+  );
+
+  const august = await run(new Date('2026-08-31T00:00:00Z'));
+  const september = await run(new Date('2026-09-01T00:00:00Z'));
+  const persistedRequest = JSON.parse(august.dataSources[0].request.body);
+  assert.equal(persistedRequest.dts[0], '201101MM-202504MM');
+  assert.equal(august.dataSources[0].request.url, endpoint);
+  const augustNormalized = normalizeRealEconomyDataset(august, existingFor('industrial-production'), 'industrial-production');
+  const septemberNormalized = normalizeRealEconomyDataset(september, existingFor('industrial-production'), 'industrial-production');
+  assert.deepEqual(augustNormalized, septemberNormalized);
+  const targetDir = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-provenance-'));
+  try {
+    const target = path.join(targetDir, 'industrial-production.json');
+    assert.equal(writeIndicatorDataset(target, augustNormalized).changed, true);
+    assert.equal(writeIndicatorDataset(target, septemberNormalized).changed, false);
+  } finally {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+  }
 });
 
 test('CLI uses one shared paginated publication scan for live datasets', () => {

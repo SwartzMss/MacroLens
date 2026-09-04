@@ -439,6 +439,15 @@ function parseNbsStructuredDataPayload(
   };
 }
 
+function latestStructuredDataMonth(payload: NbsPayload): Date {
+  const months = (payload.returndata?.datanodes ?? [])
+    .map((node) => nodeValue(node, 'sj'))
+    .filter((value): value is string => /^\d{6}$/.test(value ?? ''));
+  const latest = [...new Set(months)].sort().at(-1);
+  if (!latest) fail('NBS structured response contains no selected observations');
+  return new Date(Date.UTC(Number(latest.slice(0, 4)), Number(latest.slice(4, 6)) - 1, 1));
+}
+
 export function parseNbsRealEconomyResponse(
   payload: unknown,
   publication: NbsRealEconomyPublication,
@@ -630,14 +639,23 @@ export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
   fetcher: TextFetcher = fetchText,
+  now = new Date(),
 ): Promise<RawNbsRealEconomySeries> {
-  const request = buildStructuredDataRequest(contract);
+  const networkRequest = buildStructuredDataRequest(contract, now);
   const [payload, officialMethodologyText] = await Promise.all([
-    fetchJson(request.url, fetcher, request.options),
+    fetchJson(networkRequest.url, fetcher, networkRequest.options),
     fetcher(publication.url),
   ]);
-  const adaptedPayload = parseNbsStructuredDataPayload(payload, contract, request.mapping);
-  return parseNbsRealEconomyResponse(adaptedPayload, publication, contract, officialMethodologyText, request.dataUrls, request.requests);
+  const adaptedPayload = parseNbsStructuredDataPayload(payload, contract, networkRequest.mapping);
+  const persistedRequest = buildStructuredDataRequest(contract, latestStructuredDataMonth(adaptedPayload));
+  return parseNbsRealEconomyResponse(
+    adaptedPayload,
+    publication,
+    contract,
+    officialMethodologyText,
+    persistedRequest.dataUrls,
+    persistedRequest.requests,
+  );
 }
 
 export async function fetchNbsGdpPublication(
