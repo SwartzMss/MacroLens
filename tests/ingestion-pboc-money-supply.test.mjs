@@ -30,6 +30,15 @@ const existingWithFingerprint = {
   methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1,
 };
 
+function datasetBeforeFixtureReports(dataset) {
+  return {
+    ...dataset,
+    updatedAt: '2025-11-19',
+    data: dataset.data.filter(({ date }) => date <= '2025-10'),
+    sources: dataset.sources.filter(({ sourceDate }) => sourceDate <= '2025-11-19'),
+  };
+}
+
 test('discovers monthly, annual, quarterly, and half-year PBOC reports', () => {
   assert.deepEqual(publications.map(({ month }) => month), [
     '2025-10', '2025-11', '2025-12', '2026-01', '2026-02',
@@ -133,18 +142,20 @@ test('accepts an index that includes the existing latest month before new report
 });
 
 test('rejects incoming gaps, final gaps, and historical mismatches', () => {
-  assert.throws(() => normalizeMoneySupplyDataset([rawReports[0], rawReports[2]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
-  assert.throws(() => normalizeMoneySupplyDataset([rawReports[2]], existingWithFingerprint, 'm1'), /continuous|连续|month/i);
+  const existingThroughOctober = datasetBeforeFixtureReports(existingWithFingerprint);
+  assert.throws(() => normalizeMoneySupplyDataset([rawReports[0], rawReports[2]], existingThroughOctober, 'm1'), /continuous|连续|month/i);
+  assert.throws(() => normalizeMoneySupplyDataset([rawReports[2]], existingThroughOctober, 'm1'), /continuous|连续|month/i);
   const mismatch = { ...rawReports[1], publication: { ...rawReports[1].publication, month: '2025-10' } };
-  assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingWithFingerprint, 'm1'), HistoricalMismatchError);
+  assert.throws(() => normalizeMoneySupplyDataset([mismatch], existingThroughOctober, 'm1'), HistoricalMismatchError);
 });
 
 test('allows an older publication date when the report only verifies an existing month', () => {
+  const existingThroughOctober = datasetBeforeFixtureReports(existingWithFingerprint);
   const existingThroughNovember = {
-    ...existingWithFingerprint,
+    ...existingThroughOctober,
     updatedAt: '2026-01-31',
     sources: [
-      ...existingWithFingerprint.sources,
+      ...existingThroughOctober.sources,
       {
         title: '中国人民银行：2025年11月金融统计数据报告',
         url: 'https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025111216000000001/index.html',
@@ -152,7 +163,7 @@ test('allows an older publication date when the report only verifies an existing
         coverage: '2025-11 to 2025-11',
       },
     ],
-    data: [...existingWithFingerprint.data, { date: '2025-11', value: 4.9 }],
+    data: [...existingThroughOctober.data, { date: '2025-11', value: 4.9 }],
   };
   const overlap = {
     ...rawReports[0],
@@ -166,7 +177,7 @@ function seedTargets(directory) {
   for (const id of ['m0', 'm1', 'm2']) {
     const dataset = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
     dataset.methodologyFingerprint = MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS[id];
-    fs.writeFileSync(path.join(directory, `${id}.json`), `${JSON.stringify(dataset, null, 2)}\n`);
+    fs.writeFileSync(path.join(directory, `${id}.json`), `${JSON.stringify(datasetBeforeFixtureReports(dataset), null, 2)}\n`);
   }
 }
 
