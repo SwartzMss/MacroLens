@@ -78,8 +78,8 @@
   color: var(--green);
 }
 
-.indicator-change .is-negative,
-.dashboard-changes .is-negative {
+.indicator-change.is-negative strong,
+.dashboard-changes strong.is-negative {
   color: #a34d3f;
 }
 

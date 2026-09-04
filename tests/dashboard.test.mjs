@@ -52,6 +52,7 @@ test('dashboard styles are responsive and homepage preserves current sections', 
   const page = readFileSync(homepage, 'utf8');
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(styles, /dashboard-grid/);
+  assert.match(styles, /\.indicator-change\.is-negative/);
   assert.match(page, /MacroDashboard/);
   assert.match(page, /TransmissionPaths/);
   assert.match(page, /先认识两种“钱”/);
