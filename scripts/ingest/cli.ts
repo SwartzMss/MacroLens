@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { fetchText } from './fetch-text.ts';
 import { discoverLatestPmiPublication, parsePmiPublication } from './fetch/nbs-pmi.ts';
 import { normalizePmiDataset } from './normalize/pmi.ts';
 import { validateIndicatorDataset } from './validate/dataset.ts';
@@ -27,12 +28,6 @@ function parseArgs(args: string[]): CliOptions {
   const fixtureArgs = [options.fixtureIndex, options.fixturePublication].filter(Boolean).length;
   if (fixtureArgs !== 0 && fixtureArgs !== 2) throw new Error('--fixture-index and --fixture-publication must be provided together');
   return options;
-}
-
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error(`NBS request failed ${response.status}: ${url}`);
-  return response.text();
 }
 
 async function loadPublication(options: CliOptions): Promise<{ publication: PmiPublication; html: string }> {

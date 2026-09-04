@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
+import { fetchText } from './fetch-text.ts';
 import { discoverPBOCMoneySupplyPublications, parsePBOCMoneySupplyReport } from './fetch/pboc-money-supply.ts';
 import { normalizeMoneySupplyDataset, validateReportRange } from './normalize/money-supply.ts';
 import { validateMoneySupplyDataset } from './validate/money-supply.ts';
@@ -34,12 +35,6 @@ function parseArgs(args: string[]): CliOptions {
   const fixtureCount = [options.fixtureIndex, options.fixtureDir].filter(Boolean).length;
   if (fixtureCount !== 0 && fixtureCount !== 2) throw new Error('--fixture-index and --fixture-dir must be provided together');
   return options;
-}
-
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error(`PBOC request failed ${response.status}: ${url}`);
-  return response.text();
 }
 
 async function loadReports(options: CliOptions, publications: MoneySupplyPublication[]): Promise<RawMoneySupplyPublication[]> {
