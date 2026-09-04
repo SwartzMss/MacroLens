@@ -7,9 +7,14 @@ import {
 import {
   buildNbsQueryUrls,
   discoverLatestRealEconomyPublication,
+  fetchNbsGdpPublication,
+  fetchNbsPublicationIndex,
+  fetchNbsRealEconomySeries,
+  nbsPublicationIndex,
   parseNbsGdpPublication,
   parseNbsRealEconomyResponse,
 } from '../scripts/ingest/fetch/nbs-real-economy.ts';
+import { FetchTextError } from '../scripts/ingest/fetch-text.ts';
 import { normalizeRealEconomyDataset } from '../scripts/ingest/normalize/real-economy.ts';
 import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_CONTRACTS, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
 import { HistoricalMismatchError } from '../scripts/ingest/types.ts';
@@ -21,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (id) => JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', `${id}.json`), 'utf8'));
 const gdpFixture = () => fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.html'), 'utf8');
+const publicationIndexFixture = () => fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'publication-index.html'), 'utf8');
 
 function parseFixture(id) {
   if (id === 'gdp') {
@@ -183,14 +189,75 @@ test('rejects National Data responses without observable methodology metadata', 
 });
 
 test('discovers a latest official publication and builds a stable National Data URL', () => {
-  const index = '<a href="/sj/zxfbhjd/202608/t20260817_1965055.html">2026年7月份规模以上工业增加值增长4.5%</a> 2026-08-17';
+  const index = '<a href="/sj/zxfb/202608/t20260817_1965055.html">2026年7月份规模以上工业增加值增长4.5%</a> 2026-08-17';
   const publication = discoverLatestRealEconomyPublication(index, 'industrial-production');
   assert.equal(publication.sourceDate, '2026-08-17');
-  assert.equal(publication.url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260817_1965055.html');
+  assert.equal(publication.url, 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965055.html');
   assert.equal(publication.coverage, '2026-07 to 2026-07');
   const first = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
   const second = buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS['industrial-production']);
   assert.deepEqual(first, second);
+});
+
+test('discovers all real-economy publications from the official data-release index', () => {
+  const expected = {
+    gdp: 'https://www.stats.gov.cn/sj/zxfb/202607/t20260716_1964142.html',
+    'industrial-production': 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965055.html',
+    'retail-sales': 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965056.html',
+    'fixed-asset-investment': 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965057.html',
+  };
+  for (const [id, url] of Object.entries(expected)) {
+    const publication = discoverLatestRealEconomyPublication(publicationIndexFixture(), id);
+    assert.equal(publication.url, url);
+    assert.equal(new URL(publication.url).origin, 'https://www.stats.gov.cn');
+  }
+});
+
+test('routes real-economy live requests through the shared text fetch boundary', async () => {
+  const calls = [];
+  const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));
+  const fixedAssetPayload = fixture('fixed-asset-investment');
+  const gdpPublication = { ...gdpPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202607/t20260716_1964142.html' };
+  const fixedAssetPublication = { ...fixedAssetPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965057.html' };
+  const fetcher = async (url) => {
+    calls.push(url);
+    if (url === nbsPublicationIndex) return publicationIndexFixture();
+    if (url === gdpPublication.url) return gdpFixture();
+    if (url === fixedAssetPublication.url) return '';
+    if (new URL(url).hostname === 'data.stats.gov.cn') return JSON.stringify(fixedAssetPayload);
+    throw new Error(`unexpected URL: ${url}`);
+  };
+
+  assert.equal(await fetchNbsPublicationIndex(fetcher), publicationIndexFixture());
+  assert.equal((await fetchNbsGdpPublication(gdpPublication, fetcher)).id, 'gdp');
+  assert.equal((await fetchNbsRealEconomySeries(
+    fixedAssetPublication,
+    REAL_ECONOMY_CONTRACTS['fixed-asset-investment'],
+    fetcher,
+  )).id, 'fixed-asset-investment');
+  assert.ok(calls.includes(nbsPublicationIndex));
+  assert.ok(calls.includes(gdpPublication.url));
+  assert.ok(calls.includes(fixedAssetPublication.url));
+  assert.ok(calls.some((url) => url.startsWith('https://data.stats.gov.cn/easyquery.htm')));
+
+  const realEconomySource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'fetch', 'nbs-real-economy.ts'), 'utf8');
+  const cliSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'real-economy-cli.ts'), 'utf8');
+  assert.doesNotMatch(realEconomySource, /\bfetch\s*\(/);
+  assert.doesNotMatch(cliSource, /\bfetch\s*\(/);
+});
+
+test('propagates shared transport errors without replacing diagnostics', async () => {
+  const publication = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8')).publication;
+  const sentinel = new FetchTextError('shared failure', {
+    url: publication.url,
+    attempts: 3,
+    status: 503,
+    cause: new Error('upstream unavailable'),
+  });
+  await assert.rejects(
+    () => fetchNbsGdpPublication(publication, async () => { throw sentinel; }),
+    (error) => error === sentinel,
+  );
 });
 
 test('maps Jan-Feb publication titles to the combined MacroLens period', () => {
@@ -200,10 +267,10 @@ test('maps Jan-Feb publication titles to the combined MacroLens period', () => {
   ];
   for (const [id, title, file] of cases) {
     const publication = discoverLatestRealEconomyPublication(
-      `<a href="/sj/zxfbhjd/202603/t20260316_1966000.html">${title}</a> 2026-03-16`,
+      `<a href="/sj/zxfb/202603/t20260316_1966000.html">${title}</a> 2026-03-16`,
       id,
     );
-    assert.equal(publication.url, `https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260316_1966000.html`);
+    assert.equal(publication.url, `https://www.stats.gov.cn/sj/zxfb/202603/t20260316_1966000.html`);
     assert.equal(publication.coverage, '2026-01–02 to 2026-01–02', file);
   }
 });
@@ -215,7 +282,7 @@ test('discovers negative-growth industrial and retail publications', () => {
   ];
   for (const [id, title] of cases) {
     assert.doesNotThrow(() => discoverLatestRealEconomyPublication(
-      `<a href="/sj/zxfbhjd/202212/t20221215_1900000.html">${title}</a> 2022-12-15`,
+      `<a href="/sj/zxfb/202212/t20221215_1900000.html">${title}</a> 2022-12-15`,
       id,
     ));
   }

@@ -11,10 +11,12 @@ import type {
   RealEconomyDatasetId,
   RealEconomySeriesRule,
 } from '../types.ts';
+import { fetchText } from '../fetch-text.ts';
 import { validateRealEconomyObservations } from '../validate/real-economy.ts';
 
-const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
+const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfb/';
 const NBS_ORIGIN = 'https://www.stats.gov.cn';
+type TextFetcher = (url: string) => Promise<string>;
 
 type NbsDataNode = {
   wds?: Array<{ wdcode?: string; valuecode?: string; value?: string }>;
@@ -343,36 +345,32 @@ export function parseNbsGdpPublication(
   };
 }
 
-async function fetchJson(url: string): Promise<unknown> {
-  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
-  return response.json();
+async function fetchJson(url: string, fetcher: TextFetcher): Promise<unknown> {
+  return JSON.parse(await fetcher(url));
 }
 
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + url);
-  return response.text();
+export async function fetchNbsPublicationIndex(fetcher: TextFetcher = fetchText): Promise<string> {
+  return fetcher(NBS_INDEX);
 }
 
 export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
+  fetcher: TextFetcher = fetchText,
 ): Promise<RawNbsRealEconomySeries> {
   const dataUrls = publication.dataUrls ?? buildNbsQueryUrls(contract);
   const [payload, officialMethodologyText] = await Promise.all([
-    Promise.all(Object.values(dataUrls).map((url) => fetchJson(url))),
-    fetchText(publication.url),
+    Promise.all(Object.values(dataUrls).map((url) => fetchJson(url, fetcher))),
+    fetcher(publication.url),
   ]);
   return parseNbsRealEconomyResponse(payload, publication, contract, officialMethodologyText, dataUrls);
 }
 
 export async function fetchNbsGdpPublication(
   publication: NbsRealEconomyPublication,
+  fetcher: TextFetcher = fetchText,
 ): Promise<RawNbsRealEconomySeries> {
-  const response = await fetch(publication.url, { headers: { 'user-agent': 'MacroLens-data-ingestion/1.0' } });
-  if (!response.ok) throw new Error('NBS request failed ' + response.status + ': ' + publication.url);
-  return parseNbsGdpPublication(publication, await response.text());
+  return parseNbsGdpPublication(publication, await fetcher(publication.url));
 }
 
 export const nbsPublicationIndex = NBS_INDEX;
