@@ -353,7 +353,10 @@ test('retrieves all five National Data series through the official structured en
     assert.equal(raw.unit, '%');
     assert.equal(raw.frequency, 'monthly');
     assert.equal(raw.dataSources.length, REAL_ECONOMY_CONTRACTS[id].sourceCodes.length);
-    assert.ok(raw.dataSources.every((source) => source.url.startsWith(endpoint + '?')));
+    assert.ok(raw.dataSources.every((source) => source.url.startsWith('https://data.stats.gov.cn/dg/website/page.html?')));
+    assert.ok(raw.dataSources.every((source) => source.request?.url === endpoint));
+    assert.ok(raw.dataSources.every((source) => source.request?.method === 'POST'));
+    assert.ok(raw.dataSources.every((source) => JSON.parse(source.request?.body ?? '{}').cid));
   }
 
   const dataCalls = calls.filter(({ url }) => url === endpoint);
@@ -401,6 +404,27 @@ test('keeps official structured endpoint 403 failures explicit and non-retryable
   );
   assert.equal(attempts.length, 1);
   assert.equal(attempts[0].url, endpoint);
+});
+
+test('rejects a structured response when one selected indicator has no valid values', async () => {
+  const structuredFixture = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8'));
+  const payload = fixture('industrial-production');
+  const structuredPayload = structuredFixture.responses['industrial-production'];
+  for (const row of structuredPayload.data) {
+    for (const value of row.values) {
+      if (value._id === '21e7072e9f384209aedb56e69a18216e') value.value = '';
+    }
+  }
+  const fetcher = async (url) => url === payload.publication.url
+    ? '规模以上工业增加值同比增长按不变价格计算'
+    : JSON.stringify(structuredPayload);
+
+  await assert.rejects(
+    () => fetchNbsRealEconomySeries(payload.publication, REAL_ECONOMY_CONTRACTS['industrial-production'], fetcher),
+    (error) => error instanceof IngestionContractError
+      && error.message.includes('A020102')
+      && error.message.includes('missing selected indicators'),
+  );
 });
 
 test('CLI uses one shared paginated publication scan for live datasets', () => {

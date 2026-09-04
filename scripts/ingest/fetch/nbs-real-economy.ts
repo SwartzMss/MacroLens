@@ -205,17 +205,18 @@ function structuredPeriodRange(now = new Date()): string {
   return `${NBS_FIRST_MONTH}MM-${year}${month}MM`;
 }
 
-function buildStructuredDataUrl(
+function buildStructuredPageUrl(
   mapping: StructuredSeriesMapping,
   code: string,
   periodRange: string,
 ): string {
   const indicator = mapping.indicators[code];
   if (!indicator) fail(`Official structured National Data mapping is missing ${code}`);
-  const url = new URL(NBS_STRUCTURED_DATA_ENDPOINT);
+  const url = new URL(`${NBS_DATA_ORIGIN}/dg/website/page.html`);
   url.searchParams.set('cid', mapping.cid);
   url.searchParams.set('indicatorId', indicator.id);
   url.searchParams.set('dts', periodRange);
+  url.hash = '/pc/national/monthData';
   return url.toString();
 }
 
@@ -223,6 +224,7 @@ type StructuredDataRequest = {
   url: string;
   options: FetchTextOptions;
   dataUrls: Record<string, string>;
+  requests: Record<string, NonNullable<IndicatorSource['request']>>;
   mapping: StructuredSeriesMapping;
 };
 
@@ -231,7 +233,7 @@ function buildStructuredDataRequest(contract: RealEconomyContract, now = new Dat
   const periodRange = structuredPeriodRange(now);
   const dataUrls = Object.fromEntries(contract.sourceCodes.map((code) => [
     code,
-    buildStructuredDataUrl(mapping, code, periodRange),
+    buildStructuredPageUrl(mapping, code, periodRange),
   ]));
   const body = {
     cid: mapping.cid,
@@ -242,6 +244,11 @@ function buildStructuredDataRequest(contract: RealEconomyContract, now = new Dat
     dts: [periodRange],
     rootId: NBS_MONTHLY_ROOT_ID,
   };
+  const bodyText = JSON.stringify(body);
+  const requests = Object.fromEntries(contract.sourceCodes.map((code) => [
+    code,
+    { url: NBS_STRUCTURED_DATA_ENDPOINT, method: 'POST' as const, body: bodyText },
+  ]));
   return {
     url: NBS_STRUCTURED_DATA_ENDPOINT,
     options: {
@@ -251,9 +258,10 @@ function buildStructuredDataRequest(contract: RealEconomyContract, now = new Dat
         'content-type': 'application/json',
         referer: `${NBS_DATA_ORIGIN}/dg/website/page.html`,
       },
-      body: JSON.stringify(body),
+      body: bodyText,
     },
     dataUrls,
+    requests,
     mapping,
   };
 }
@@ -388,11 +396,11 @@ function parseNbsStructuredDataPayload(
         fail(`NBS structured indicator metadata changed for ${indicator.code}`);
       }
       if (value.du_name !== '%') fail(`NBS structured indicator unit changed for ${indicator.code}`);
-      observedIndicatorIds.add(value._id);
       indicatorNames.set(indicator.code, value.i_showname.trim());
       const valueText = String(value.value ?? '').trim();
       if (!valueText) continue;
       if (!/^-?\d+(?:\.\d+)?$/.test(valueText)) fail(`Invalid numeric NBS structured value for ${periodWireCode}: ${valueText}`);
+      observedIndicatorIds.add(value._id);
       datanodes.push({
         wds: [
           { wdcode: 'zb', valuecode: indicator.code },
@@ -437,6 +445,7 @@ export function parseNbsRealEconomyResponse(
   contract: RealEconomyContract,
   officialMethodologyText = '',
   dataUrls: Record<string, string> = buildNbsQueryUrls(contract),
+  requests: Record<string, NonNullable<IndicatorSource['request']>> = {},
 ): RawNbsRealEconomySeries {
   if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
   const parsedUrl = new URL(publication.url);
@@ -496,6 +505,7 @@ export function parseNbsRealEconomyResponse(
     sourceDate: publication.sourceDate,
     coverage: [...periods].sort().map((date) => `${date} to ${date}`).join('; '),
     role: 'data',
+    request: requests[code],
   }));
   return {
     publication,
@@ -627,7 +637,7 @@ export async function fetchNbsRealEconomySeries(
     fetcher(publication.url),
   ]);
   const adaptedPayload = parseNbsStructuredDataPayload(payload, contract, request.mapping);
-  return parseNbsRealEconomyResponse(adaptedPayload, publication, contract, officialMethodologyText, request.dataUrls);
+  return parseNbsRealEconomyResponse(adaptedPayload, publication, contract, officialMethodologyText, request.dataUrls, request.requests);
 }
 
 export async function fetchNbsGdpPublication(
