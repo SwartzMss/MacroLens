@@ -311,7 +311,7 @@ export function parseNbsGdpPublication(
   if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
   const parsedUrl = new URL(publication.url);
   if (parsedUrl.origin !== NBS_ORIGIN) fail('GDP publication is not hosted by stats.gov.cn: ' + publication.url);
-  const compact = canonical(html);
+  const compact = canonical(textOf(html));
   const methodologyChecks: Array<[string, boolean]> = [
     ['GDP release title', compact.includes('国内生产总值') && compact.includes('初步核算结果')],
     ['GDP YoY table', compact.includes('GDP同比增长速度')],
@@ -324,8 +324,8 @@ export function parseNbsGdpPublication(
 
   const tables = [...html.matchAll(/<table\b[\s\S]*?<\/table>/gi)];
   const table = tables.find((match) => {
-    const tableText = canonical(match[0]);
-    const beforeTable = canonical(html.slice(Math.max(0, (match.index ?? 0) - 1200), match.index ?? 0));
+    const tableText = canonical(textOf(match[0]));
+    const beforeTable = canonical(textOf(html.slice(Math.max(0, (match.index ?? 0) - 1200), match.index ?? 0)));
     return (beforeTable + tableText).includes('GDP同比增长速度') && tableText.includes('年份') && tableText.includes('1季度');
   });
   if (!table) fail('GDP release is missing the GDP同比增长速度 table');
