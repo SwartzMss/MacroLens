@@ -25,4 +25,3 @@ The existing `MethodologyMismatchError` remains the response when required visib
 ## Testing
 
 Add an offline regression fixture/test whose required methodology phrases and GDP YoY table labels are split across elements such as `<span>GDP</span><span>同比增长速度</span>`. Assert that the correct quarterly observations are still returned. Retain and run the existing tests for a level-only page, missing methodology metadata, and malformed table structure to prove the contract remains strict.
-

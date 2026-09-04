@@ -125,4 +125,3 @@ git commit -m "fix: normalize GDP release HTML text"
 Run: `git push -u origin codex/issue-61-gdp-html-normalization`
 
 Create a PR against `main` with title `Fix GDP release HTML text normalization` and body containing `Fixes #61`, the visible-text normalization summary, preserved contract behavior, and the commands/results from Steps 1–2.
-

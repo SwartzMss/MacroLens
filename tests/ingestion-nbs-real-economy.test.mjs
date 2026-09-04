@@ -180,6 +180,24 @@ test('rejects a GDP release page that only exposes the current-quarter level tab
   assert.throws(() => parseNbsGdpPublication(publication, levelOnly), MethodologyMismatchError);
 });
 
+test('parses GDP release text when official markup splits visible phrases across tags', () => {
+  const publication = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8')).publication;
+  const splitMarkup = gdpFixture()
+    .replace('GDP同比增长速度', '<span>GDP</span><span>同比增长速度</span>')
+    .replace('国内生产总值', '<strong>国内生产</strong><strong>总值</strong>')
+    .replace('初步核算结果', '<em>初步核算</em><em>结果</em>')
+    .replace('单位：%', '<span>单位：</span><span>%</span>')
+    .replace('增长速度按不变价计算', '<span>增长速度按</span><span>不变价计算</span>')
+    .replace('同比增长速度为与上年同期对比', '<span>同比增长速度为与</span><span>上年同期对比</span>')
+    .replace('年份', '<span>年</span><span>份</span>')
+    .replace('1季度', '<span>1</span><span>季度</span>');
+
+  const parsed = parseNbsGdpPublication(publication, splitMarkup);
+
+  assert.deepEqual(parsed.observations.at(-1), { date: '2026-Q2', value: 4.3 });
+  assert.equal(parsed.seriesTitle, 'GDP同比增长速度');
+});
+
 test('rejects National Data responses without observable methodology metadata', () => {
   const payload = fixture('industrial-production');
   assert.throws(() => parseNbsRealEconomyResponse(
