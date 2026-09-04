@@ -2,7 +2,6 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-  buildNbsQueryUrls,
   fetchNbsGdpPublication,
   fetchNbsRealEconomyPublications,
   fetchNbsRealEconomySeries,
@@ -69,7 +68,7 @@ async function loadRawSeries(id: RealEconomyDatasetId, options: CliOptions, live
   if (!livePublication) throw new Error('Live NBS publication was not discovered for ' + id);
   const publication = id === 'gdp'
     ? livePublication
-    : { ...livePublication, dataUrls: buildNbsQueryUrls(REAL_ECONOMY_CONTRACTS[id]) };
+    : livePublication;
   return id === 'gdp' ? fetchNbsGdpPublication(publication) : fetchNbsRealEconomySeries(publication, contract);
 }
 

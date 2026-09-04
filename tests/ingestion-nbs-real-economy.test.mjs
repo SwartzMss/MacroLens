@@ -15,7 +15,7 @@ import {
   parseNbsGdpPublication,
   parseNbsRealEconomyResponse,
 } from '../scripts/ingest/fetch/nbs-real-economy.ts';
-import { FetchTextError } from '../scripts/ingest/fetch-text.ts';
+import { FetchTextError, fetchText } from '../scripts/ingest/fetch-text.ts';
 import { normalizeRealEconomyDataset } from '../scripts/ingest/normalize/real-economy.ts';
 import { IngestionContractError, MethodologyMismatchError, REAL_ECONOMY_CONTRACTS, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS } from '../scripts/ingest/types.ts';
 import { HistoricalMismatchError } from '../scripts/ingest/types.ts';
@@ -291,14 +291,15 @@ test('routes real-economy live requests through the shared text fetch boundary',
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));
   const fixedAssetPayload = fixture('fixed-asset-investment');
+  const structuredPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8')).responses['fixed-asset-investment'];
   const gdpPublication = { ...gdpPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202607/t20260716_1964142.html' };
   const fixedAssetPublication = { ...fixedAssetPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965057.html' };
   const fetcher = async (url) => {
     calls.push(url);
     if (url === nbsPublicationIndex) return publicationIndexFixture();
     if (url === gdpPublication.url) return gdpFixture();
-    if (url === fixedAssetPublication.url) return '';
-    if (new URL(url).hostname === 'data.stats.gov.cn') return JSON.stringify(fixedAssetPayload);
+    if (url === fixedAssetPublication.url) return '固定资产投资（不含农户）累计增长按可比口径计算';
+    if (url === 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData') return JSON.stringify(structuredPayload);
     throw new Error(`unexpected URL: ${url}`);
   };
 
@@ -312,7 +313,7 @@ test('routes real-economy live requests through the shared text fetch boundary',
   assert.ok(calls.includes(nbsPublicationIndex));
   assert.ok(calls.includes(gdpPublication.url));
   assert.ok(calls.includes(fixedAssetPublication.url));
-  assert.ok(calls.some((url) => url.startsWith('https://data.stats.gov.cn/easyquery.htm')));
+  assert.ok(calls.includes('https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData'));
 
   const realEconomySource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'fetch', 'nbs-real-economy.ts'), 'utf8');
   const cliSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'real-economy-cli.ts'), 'utf8');
@@ -320,10 +321,93 @@ test('routes real-economy live requests through the shared text fetch boundary',
   assert.doesNotMatch(cliSource, /\bfetch\s*\(/);
 });
 
+test('retrieves all five National Data series through the official structured endpoint', async () => {
+  const structuredFixture = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8'));
+  const endpoint = 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData';
+  const methodology = {
+    'industrial-production': '规模以上工业增加值同比增长按不变价格计算',
+    'retail-sales': '社会消费品零售总额同比增长按现价计算',
+    'fixed-asset-investment': '固定资产投资（不含农户）累计增长按可比口径计算',
+  };
+  const calls = [];
+  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    const fixturePayload = structuredFixture.responses[id];
+    const publication = JSON.parse(JSON.stringify(fixture(id)));
+    publication.publication.coverage = '';
+    const fetcher = async (url, options) => {
+      calls.push({ id, url, options });
+      if (url === publication.publication.url) return methodology[id];
+      if (url === endpoint) return JSON.stringify(fixturePayload);
+      throw new Error(`unexpected URL: ${url}`);
+    };
+
+    const raw = await fetchNbsRealEconomySeries(
+      publication.publication,
+      REAL_ECONOMY_CONTRACTS[id],
+      fetcher,
+    );
+    assert.deepEqual(new Set(raw.seriesCode.split(',')), new Set(REAL_ECONOMY_CONTRACTS[id].sourceCodes));
+    assert.deepEqual(raw.observations.map(({ date }) => date), id === 'fixed-asset-investment'
+      ? ['2025-01–02', '2025-01–03', '2025-01–04']
+      : ['2025-01–02', '2025-03', '2025-04']);
+    assert.equal(raw.unit, '%');
+    assert.equal(raw.frequency, 'monthly');
+    assert.equal(raw.dataSources.length, REAL_ECONOMY_CONTRACTS[id].sourceCodes.length);
+    assert.ok(raw.dataSources.every((source) => source.url.startsWith(endpoint + '?')));
+  }
+
+  const dataCalls = calls.filter(({ url }) => url === endpoint);
+  assert.equal(dataCalls.length, 3);
+  for (const { id, options } of dataCalls) {
+    assert.equal(options.method, 'POST');
+    assert.equal(options.headers.accept, 'application/json, text/plain, */*');
+    assert.equal(options.headers.referer, 'https://data.stats.gov.cn/dg/website/page.html');
+    const body = JSON.parse(options.body);
+    assert.equal(body.rootId, 'fc982599aa684be7969d7b90b1bd0e84');
+    assert.equal(body.showType, '1');
+    assert.deepEqual(body.das, [{ text: '全国', value: '000000000000' }]);
+    assert.match(body.dts[0], /^201101MM-\d{6}MM$/);
+    assert.deepEqual(body.indicatorIds, id === 'industrial-production'
+      ? ['ef1b1765960d45a29b4d7c4ca91be916', '21e7072e9f384209aedb56e69a18216e']
+      : id === 'retail-sales'
+        ? ['aaac57d54d2e465d91bc9f3ea1a8618e', 'e3ca151b53d347b78d1e179e5ebf1d33']
+        : ['7e570cf8071c4734a7d78d9f0a70fbe1']);
+    assert.equal(new URL(calls.find((call) => call.id === id && call.url === endpoint).url).hostname, 'data.stats.gov.cn');
+  }
+  assert.ok(calls.every(({ url }) => !url.includes('/easyquery.htm')));
+});
+
+test('keeps official structured endpoint 403 failures explicit and non-retryable', async () => {
+  const payload = fixture('industrial-production');
+  const endpoint = 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData';
+  const attempts = [];
+  const fetcher = async (url, options) => {
+    if (url === payload.publication.url) return '规模以上工业增加值同比增长按不变价格计算';
+    attempts.push({ url, options });
+    return fetchText(url, {
+      ...options,
+      maxAttempts: 3,
+      sleep: async () => assert.fail('403 structured endpoint responses must not retry'),
+      fetchImpl: async () => new Response('blocked', { status: 403 }),
+    });
+  };
+
+  await assert.rejects(
+    () => fetchNbsRealEconomySeries(payload.publication, REAL_ECONOMY_CONTRACTS['industrial-production'], fetcher),
+    (error) => error instanceof FetchTextError
+      && error.status === 403
+      && error.attempts === 1
+      && error.url === endpoint,
+  );
+  assert.equal(attempts.length, 1);
+  assert.equal(attempts[0].url, endpoint);
+});
+
 test('CLI uses one shared paginated publication scan for live datasets', () => {
   const cliSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'real-economy-cli.ts'), 'utf8');
   assert.match(cliSource, /fetchNbsRealEconomyPublications/);
   assert.doesNotMatch(cliSource, /discoverLatestRealEconomyPublication/);
+  assert.doesNotMatch(cliSource, /buildNbsQueryUrls/);
 });
 
 test('propagates shared transport errors without replacing diagnostics', async () => {

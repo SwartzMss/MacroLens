@@ -20,6 +20,30 @@ test('returns response text and sends the MacroLens user agent', async () => {
   assert.ok(request.init.signal instanceof AbortSignal);
 });
 
+test('passes adapter-scoped POST request options through the shared fetch boundary', async () => {
+  let request;
+  const body = await fetchText(url, {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      referer: 'https://data.stats.gov.cn/dg/website/page.html',
+    },
+    body: '{"ok":true}',
+    fetchImpl: async (input, init) => {
+      request = { input, init };
+      return response('{"success":true}');
+    },
+  });
+
+  assert.equal(body, '{"success":true}');
+  assert.equal(request.input, url);
+  assert.equal(request.init.method, 'POST');
+  assert.equal(request.init.body, '{"ok":true}');
+  assert.equal(request.init.headers.accept, 'application/json');
+  assert.equal(request.init.headers.referer, 'https://data.stats.gov.cn/dg/website/page.html');
+  assert.equal(request.init.headers['user-agent'], 'MacroLens-data-ingestion/1.0');
+});
+
 test('retries a transport failure and returns the next successful response', async () => {
   let attempts = 0;
   const delays = [];

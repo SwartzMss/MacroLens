@@ -14,6 +14,9 @@ export type FetchTextOptions = {
   maxAttempts?: number;
   backoffMs?: number;
   maxBackoffMs?: number;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: BodyInit | null;
 };
 
 export class FetchTextError extends Error {
@@ -106,7 +109,9 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
       let response: Response;
       try {
         response = await fetchImpl(url, {
-          headers: { 'user-agent': USER_AGENT },
+          method: options.method ?? 'GET',
+          headers: { 'user-agent': USER_AGENT, ...options.headers },
+          body: options.body,
           signal: controller.signal,
         });
       } catch (cause) {
