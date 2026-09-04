@@ -311,4 +311,3 @@ Create a body with Closes #68, a concise feature summary, the eight covered data
 ~~~bash
 gh pr create --repo SwartzMss/MacroLens --base main --head codex/issue-68-dashboard --title "feat: build macro dashboard and economic overview" --body-file /tmp/issue-68-pr-body.md
 ~~~
-
