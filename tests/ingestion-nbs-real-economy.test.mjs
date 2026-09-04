@@ -261,6 +261,14 @@ test('maps official retail half-year titles to June publication coverage', () =>
   assert.equal(publication.coverage, '2026-06 to 2026-06');
 });
 
+test('maps official annual fixed-asset-investment titles to full-year coverage', () => {
+  const publication = discoverLatestRealEconomyPublication(
+    '<a href="/sj/zxfb/202601/t20260119_1962324.html">2025年全国固定资产投资基本情况</a> 2026-01-19',
+    'fixed-asset-investment',
+  );
+  assert.equal(publication.coverage, '2025-01–12 to 2025-01–12');
+});
+
 test('routes real-economy live requests through the shared text fetch boundary', async () => {
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));

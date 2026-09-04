@@ -137,6 +137,11 @@ export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string,
 function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
   if (id === 'gdp') return '';
   const canonicalTitle = canonical(title);
+  const annualFixedAssetMatch = canonicalTitle.match(/^(\d{4})年全国固定资产投资基本情况/);
+  if (id === 'fixed-asset-investment' && annualFixedAssetMatch) {
+    const period = `${annualFixedAssetMatch[1]}-01–12`;
+    return `${period} to ${period}`;
+  }
   const halfYearMatch = canonicalTitle.match(/^(\d{4})年上半年/);
   if (id === 'retail-sales' && halfYearMatch) {
     return `${halfYearMatch[1]}-06 to ${halfYearMatch[1]}-06`;
