@@ -4,6 +4,11 @@ export type IndicatorSource = {
   sourceDate: string;
   coverage: string;
   role?: 'data' | 'methodology';
+  request?: {
+    url: string;
+    method: 'GET' | 'POST';
+    body?: string;
+  };
 };
 
 export type Observation = { date: string; value: number };

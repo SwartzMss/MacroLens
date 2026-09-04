@@ -12,11 +12,66 @@ import type {
   RealEconomySeriesRule,
 } from '../types.ts';
 import { fetchText } from '../fetch-text.ts';
+import type { FetchTextOptions } from '../fetch-text.ts';
 import { validateRealEconomyObservations } from '../validate/real-economy.ts';
 
 const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfb/';
 const NBS_ORIGIN = 'https://www.stats.gov.cn';
-type TextFetcher = (url: string) => Promise<string>;
+const NBS_DATA_ORIGIN = 'https://data.stats.gov.cn';
+const NBS_STRUCTURED_DATA_ENDPOINT = `${NBS_DATA_ORIGIN}/dg/website/publicrelease/web/external/stream/esData`;
+const NBS_MONTHLY_ROOT_ID = 'fc982599aa684be7969d7b90b1bd0e84';
+const NBS_NATIONAL_AREA = { text: '全国', value: '000000000000' };
+const NBS_FIRST_MONTH = '201101';
+type TextFetcher = (url: string, options?: FetchTextOptions) => Promise<string>;
+
+type NbsStructuredValue = {
+  _id?: string;
+  value?: string | number | null;
+  _name?: string;
+  i_showname?: string;
+  du_name?: string;
+};
+
+type NbsStructuredRow = {
+  code?: string;
+  name?: string;
+  values?: NbsStructuredValue[];
+};
+
+type NbsStructuredPayload = {
+  success?: boolean;
+  state?: number;
+  message?: string;
+  data?: NbsStructuredRow[];
+};
+
+type StructuredSeriesMapping = {
+  cid: string;
+  indicators: Record<string, { id: string; title: string }>;
+};
+
+const NBS_STRUCTURED_MAPPINGS: Partial<Record<RealEconomyDatasetId, StructuredSeriesMapping>> = {
+  'industrial-production': {
+    cid: '3f2e14f0542348ed9fe02476eca3450b',
+    indicators: {
+      A020101: { id: 'ef1b1765960d45a29b4d7c4ca91be916', title: '规上工业增加值同比增长 (%)' },
+      A020102: { id: '21e7072e9f384209aedb56e69a18216e', title: '规上工业增加值累计增长 (%)' },
+    },
+  },
+  'retail-sales': {
+    cid: 'd0cb882c7f27443ab6b3ef9421901961',
+    indicators: {
+      A070103: { id: 'aaac57d54d2e465d91bc9f3ea1a8618e', title: '社会消费品零售总额同比增长 (%)' },
+      A070104: { id: 'e3ca151b53d347b78d1e179e5ebf1d33', title: '社会消费品零售总额累计增长 (%)' },
+    },
+  },
+  'fixed-asset-investment': {
+    cid: '5129067b149d4ddfbec1ffc478d35bfb',
+    indicators: {
+      A040102: { id: '7e570cf8071c4734a7d78d9f0a70fbe1', title: '固定资产投资额累计增长 (%)' },
+    },
+  },
+};
 
 type NbsDataNode = {
   wds?: Array<{ wdcode?: string; valuecode?: string; value?: string }>;
@@ -134,6 +189,83 @@ export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string,
   return Object.fromEntries(contract.sourceCodes.map((code) => [code, buildNbsQueryUrlForCode(code)]));
 }
 
+function structuredMappingFor(contract: RealEconomyContract): StructuredSeriesMapping {
+  if (contract.sourceKind !== 'national-data') fail(`Structured National Data requested for ${contract.id}`);
+  const mapping = NBS_STRUCTURED_MAPPINGS[contract.id];
+  if (!mapping) fail(`No official structured National Data mapping for ${contract.id}`);
+  for (const code of contract.sourceCodes) {
+    if (!mapping.indicators[code]) fail(`Official structured National Data mapping is missing ${code}`);
+  }
+  return mapping;
+}
+
+function structuredPeriodRange(now = new Date()): string {
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  return `${NBS_FIRST_MONTH}MM-${year}${month}MM`;
+}
+
+function buildStructuredPageUrl(
+  mapping: StructuredSeriesMapping,
+  code: string,
+  periodRange: string,
+): string {
+  const indicator = mapping.indicators[code];
+  if (!indicator) fail(`Official structured National Data mapping is missing ${code}`);
+  const url = new URL(`${NBS_DATA_ORIGIN}/dg/website/page.html`);
+  url.searchParams.set('cid', mapping.cid);
+  url.searchParams.set('indicatorId', indicator.id);
+  url.searchParams.set('dts', periodRange);
+  url.hash = '/pc/national/monthData';
+  return url.toString();
+}
+
+type StructuredDataRequest = {
+  url: string;
+  options: FetchTextOptions;
+  dataUrls: Record<string, string>;
+  requests: Record<string, NonNullable<IndicatorSource['request']>>;
+  mapping: StructuredSeriesMapping;
+};
+
+function buildStructuredDataRequest(contract: RealEconomyContract, now = new Date()): StructuredDataRequest {
+  const mapping = structuredMappingFor(contract);
+  const periodRange = structuredPeriodRange(now);
+  const dataUrls = Object.fromEntries(contract.sourceCodes.map((code) => [
+    code,
+    buildStructuredPageUrl(mapping, code, periodRange),
+  ]));
+  const body = {
+    cid: mapping.cid,
+    indicatorIds: contract.sourceCodes.map((code) => mapping.indicators[code].id),
+    daCatalogId: '',
+    das: [NBS_NATIONAL_AREA],
+    showType: '1',
+    dts: [periodRange],
+    rootId: NBS_MONTHLY_ROOT_ID,
+  };
+  const bodyText = JSON.stringify(body);
+  const requests = Object.fromEntries(contract.sourceCodes.map((code) => [
+    code,
+    { url: NBS_STRUCTURED_DATA_ENDPOINT, method: 'POST' as const, body: bodyText },
+  ]));
+  return {
+    url: NBS_STRUCTURED_DATA_ENDPOINT,
+    options: {
+      method: 'POST',
+      headers: {
+        accept: 'application/json, text/plain, */*',
+        'content-type': 'application/json',
+        referer: `${NBS_DATA_ORIGIN}/dg/website/page.html`,
+      },
+      body: bodyText,
+    },
+    dataUrls,
+    requests,
+    mapping,
+  };
+}
+
 function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
   if (id === 'gdp') return '';
   const canonicalTitle = canonical(title);
@@ -172,7 +304,7 @@ function requireNationalDataMethodology(payload: NbsPayload, contract: RealEcono
     ? [
       ['industrial series title', text.includes('规模以上工业增加值')],
       ['industrial YoY metric', text.includes('同比')],
-      ['industrial real treatment', /扣除价格因素|实际/.test(text)],
+      ['industrial real treatment', /扣除价格因素|实际|不变价格/.test(text)],
     ]
     : contract.id === 'retail-sales'
       ? [
@@ -225,12 +357,104 @@ function metadataCodeSet(code: string): Set<string> {
   return new Set(code.split(',').map((value) => value.trim()).filter(Boolean));
 }
 
+function parseNbsStructuredDataPayload(
+  payload: unknown,
+  contract: RealEconomyContract,
+  mapping: StructuredSeriesMapping,
+): NbsPayload {
+  if (!payload || typeof payload !== 'object') fail('NBS structured response must be an object');
+  const candidate = payload as NbsStructuredPayload;
+  if (candidate.success !== true || candidate.state !== 20000) {
+    fail(`NBS structured response was not successful: ${candidate.message ?? 'unknown response state'}`);
+  }
+  if (!Array.isArray(candidate.data) || candidate.data.length === 0) {
+    fail('NBS structured response is missing data rows');
+  }
+
+  const indicatorById = new Map<string, { code: string; title: string }>();
+  for (const code of contract.sourceCodes) {
+    const indicator = mapping.indicators[code];
+    if (!indicator) fail(`Official structured National Data mapping is missing ${code}`);
+    indicatorById.set(indicator.id, { code, title: indicator.title });
+  }
+  const observedIndicatorIds = new Set<string>();
+  const indicatorNames = new Map<string, string>();
+  const timeNodes: NbsDimensionNode[] = [];
+  const datanodes: NbsDataNode[] = [];
+  for (const row of candidate.data) {
+    const periodWireCode = row?.code;
+    if (!row || typeof row !== 'object' || typeof periodWireCode !== 'string' || !/^\d{6}MM$/.test(periodWireCode) || !row.name || !Array.isArray(row.values)) {
+      fail('NBS structured response contains an invalid time row');
+    }
+    const periodCode = periodWireCode.slice(0, -2);
+    timeNodes.push({ code: periodCode, valuecode: periodCode, name: row.name });
+    for (const value of row.values) {
+      if (!value || typeof value !== 'object' || typeof value._id !== 'string') fail('NBS structured response contains an invalid indicator value');
+      const indicator = indicatorById.get(value._id);
+      if (!indicator) continue;
+      if (typeof value.i_showname !== 'string' || !value.i_showname.includes(indicator.title.replace(/\s*\(%\)$/, ''))) {
+        fail(`NBS structured indicator metadata changed for ${indicator.code}`);
+      }
+      if (value.du_name !== '%') fail(`NBS structured indicator unit changed for ${indicator.code}`);
+      indicatorNames.set(indicator.code, value.i_showname.trim());
+      const valueText = String(value.value ?? '').trim();
+      if (!valueText) continue;
+      if (!/^-?\d+(?:\.\d+)?$/.test(valueText)) fail(`Invalid numeric NBS structured value for ${periodWireCode}: ${valueText}`);
+      observedIndicatorIds.add(value._id);
+      datanodes.push({
+        wds: [
+          { wdcode: 'zb', valuecode: indicator.code },
+          { wdcode: 'sj', valuecode: periodCode, value: row.name },
+        ],
+        data: { hasdata: true, data: valueText },
+      });
+    }
+  }
+  const missing = contract.sourceCodes
+    .filter((code) => !observedIndicatorIds.has(mapping.indicators[code].id));
+  if (missing.length > 0) fail(`NBS structured response is missing selected indicators: ${missing.join(',')}`);
+  if (datanodes.length === 0) fail('NBS structured response contains no selected observations');
+  return {
+    series: {
+      title: contract.sourceTitle,
+      code: contract.sourceCodes.join(','),
+      unit: contract.unit,
+      frequency: contract.frequency,
+    },
+    returndata: {
+      wdnodes: [
+        {
+          wdcode: 'zb',
+          wdname: '指标',
+          nodes: contract.sourceCodes.map((code) => ({
+            code,
+            valuecode: code,
+            name: indicatorNames.get(code) ?? mapping.indicators[code].title,
+          })),
+        },
+        { wdcode: 'sj', wdname: '时间', nodes: timeNodes },
+      ],
+      datanodes,
+    },
+  };
+}
+
+function latestStructuredDataMonth(payload: NbsPayload): Date {
+  const months = (payload.returndata?.datanodes ?? [])
+    .map((node) => nodeValue(node, 'sj'))
+    .filter((value): value is string => /^\d{6}$/.test(value ?? ''));
+  const latest = [...new Set(months)].sort().at(-1);
+  if (!latest) fail('NBS structured response contains no selected observations');
+  return new Date(Date.UTC(Number(latest.slice(0, 4)), Number(latest.slice(4, 6)) - 1, 1));
+}
+
 export function parseNbsRealEconomyResponse(
   payload: unknown,
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
   officialMethodologyText = '',
   dataUrls: Record<string, string> = buildNbsQueryUrls(contract),
+  requests: Record<string, NonNullable<IndicatorSource['request']>> = {},
 ): RawNbsRealEconomySeries {
   if (!validIsoDate(publication.sourceDate)) fail('Invalid NBS publication date: ' + publication.sourceDate);
   const parsedUrl = new URL(publication.url);
@@ -290,6 +514,7 @@ export function parseNbsRealEconomyResponse(
     sourceDate: publication.sourceDate,
     coverage: [...periods].sort().map((date) => `${date} to ${date}`).join('; '),
     role: 'data',
+    request: requests[code],
   }));
   return {
     publication,
@@ -370,8 +595,8 @@ export function parseNbsGdpPublication(
   };
 }
 
-async function fetchJson(url: string, fetcher: TextFetcher): Promise<unknown> {
-  return JSON.parse(await fetcher(url));
+async function fetchJson(url: string, fetcher: TextFetcher, options?: FetchTextOptions): Promise<unknown> {
+  return JSON.parse(await fetcher(url, options));
 }
 
 const DEFAULT_MAX_PUBLICATION_INDEX_PAGES = 8;
@@ -414,13 +639,23 @@ export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
   fetcher: TextFetcher = fetchText,
+  now = new Date(),
 ): Promise<RawNbsRealEconomySeries> {
-  const dataUrls = publication.dataUrls ?? buildNbsQueryUrls(contract);
+  const networkRequest = buildStructuredDataRequest(contract, now);
   const [payload, officialMethodologyText] = await Promise.all([
-    Promise.all(Object.values(dataUrls).map((url) => fetchJson(url, fetcher))),
+    fetchJson(networkRequest.url, fetcher, networkRequest.options),
     fetcher(publication.url),
   ]);
-  return parseNbsRealEconomyResponse(payload, publication, contract, officialMethodologyText, dataUrls);
+  const adaptedPayload = parseNbsStructuredDataPayload(payload, contract, networkRequest.mapping);
+  const persistedRequest = buildStructuredDataRequest(contract, latestStructuredDataMonth(adaptedPayload));
+  return parseNbsRealEconomyResponse(
+    adaptedPayload,
+    publication,
+    contract,
+    officialMethodologyText,
+    persistedRequest.dataUrls,
+    persistedRequest.requests,
+  );
 }
 
 export async function fetchNbsGdpPublication(

@@ -1,0 +1,80 @@
+{
+  "responses": {
+    "industrial-production": {
+      "success": true,
+      "state": 20000,
+      "message": "成功",
+      "data": [
+        {"code":"202505MM","name":"2025年5月","values":[
+          {"_id":"ef1b1765960d45a29b4d7c4ca91be916","value":"","_name":"工业增加值","i_showname":"规上工业增加值同比增长 (%) ","du_name":"%"},
+          {"_id":"21e7072e9f384209aedb56e69a18216e","value":"","_name":"工业增加值","i_showname":"规上工业增加值累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202504MM","name":"2025年4月","values":[
+          {"_id":"ef1b1765960d45a29b4d7c4ca91be916","value":"6.1","_name":"工业增加值","i_showname":"规上工业增加值同比增长 (%) ","du_name":"%"},
+          {"_id":"21e7072e9f384209aedb56e69a18216e","value":"6.5","_name":"工业增加值","i_showname":"规上工业增加值累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202503MM","name":"2025年3月","values":[
+          {"_id":"ef1b1765960d45a29b4d7c4ca91be916","value":"7.7","_name":"工业增加值","i_showname":"规上工业增加值同比增长 (%) ","du_name":"%"},
+          {"_id":"21e7072e9f384209aedb56e69a18216e","value":"6.7","_name":"工业增加值","i_showname":"规上工业增加值累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202502MM","name":"2025年2月","values":[
+          {"_id":"ef1b1765960d45a29b4d7c4ca91be916","value":"","_name":"工业增加值","i_showname":"规上工业增加值同比增长 (%) ","du_name":"%"},
+          {"_id":"21e7072e9f384209aedb56e69a18216e","value":"5.9","_name":"工业增加值","i_showname":"规上工业增加值累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202501MM","name":"2025年1月","values":[
+          {"_id":"ef1b1765960d45a29b4d7c4ca91be916","value":"","_name":"工业增加值","i_showname":"规上工业增加值同比增长 (%) ","du_name":"%"},
+          {"_id":"21e7072e9f384209aedb56e69a18216e","value":"","_name":"工业增加值","i_showname":"规上工业增加值累计增长 (%) ","du_name":"%"}
+        ]}
+      ]
+    },
+    "retail-sales": {
+      "success": true,
+      "state": 20000,
+      "message": "成功",
+      "data": [
+        {"code":"202505MM","name":"2025年5月","values":[
+          {"_id":"aaac57d54d2e465d91bc9f3ea1a8618e","value":"","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额同比增长 (%) ","du_name":"%"},
+          {"_id":"e3ca151b53d347b78d1e179e5ebf1d33","value":"","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202504MM","name":"2025年4月","values":[
+          {"_id":"aaac57d54d2e465d91bc9f3ea1a8618e","value":"5.1","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额同比增长 (%) ","du_name":"%"},
+          {"_id":"e3ca151b53d347b78d1e179e5ebf1d33","value":"4.6","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202503MM","name":"2025年3月","values":[
+          {"_id":"aaac57d54d2e465d91bc9f3ea1a8618e","value":"5.9","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额同比增长 (%) ","du_name":"%"},
+          {"_id":"e3ca151b53d347b78d1e179e5ebf1d33","value":"4.8","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202502MM","name":"2025年2月","values":[
+          {"_id":"aaac57d54d2e465d91bc9f3ea1a8618e","value":"","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额同比增长 (%) ","du_name":"%"},
+          {"_id":"e3ca151b53d347b78d1e179e5ebf1d33","value":"4.0","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202501MM","name":"2025年1月","values":[
+          {"_id":"aaac57d54d2e465d91bc9f3ea1a8618e","value":"","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额同比增长 (%) ","du_name":"%"},
+          {"_id":"e3ca151b53d347b78d1e179e5ebf1d33","value":"","_name":"社会消费品零售总额","i_showname":"社会消费品零售总额累计增长 (%) ","du_name":"%"}
+        ]}
+      ]
+    },
+    "fixed-asset-investment": {
+      "success": true,
+      "state": 20000,
+      "message": "成功",
+      "data": [
+        {"code":"202505MM","name":"2025年5月","values":[
+          {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202504MM","name":"2025年4月","values":[
+          {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"4.0","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202503MM","name":"2025年3月","values":[
+          {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"4.2","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202502MM","name":"2025年2月","values":[
+          {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"4.1","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
+        ]},
+        {"code":"202501MM","name":"2025年1月","values":[
+          {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
+        ]}
+      ]
+    }
+  }
+}
