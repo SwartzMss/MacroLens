@@ -65,12 +65,23 @@ export function validateRealEconomyObservations(
   }
 }
 
-function coverageRanges(source: IndicatorSource, id: RealEconomyDatasetId): Array<[string, string]> {
-  const ranges = source.coverage.split(';').map((part) => {
+type CoverageRange = { start: string; end: string; annual: boolean };
+
+function coverageRanges(source: IndicatorSource, id: RealEconomyDatasetId): CoverageRange[] {
+  const ranges = source.coverage.split(';').map((part): CoverageRange => {
+    const annualRange = part.trim().match(/^(.+?)\s+to\s+(.+?)\s+\(annual\)$/);
+    if (annualRange) return { start: annualRange[1], end: annualRange[2], annual: true };
     const range = part.trim().match(/^(.+?)\s+to\s+(.+)$/);
-    return (range ? [range[1], range[2]] : [part.trim(), part.trim()]) as [string, string];
+    return range
+      ? { start: range[1], end: range[2], annual: false }
+      : { start: part.trim(), end: part.trim(), annual: false };
   });
-  if (ranges.some(([start, end]) => !validPeriod(start, id) || !validPeriod(end, id) || periodRank(start, id) > periodRank(end, id))) {
+  if (ranges.some(({ start, end, annual }) => (
+    !validPeriod(start, id)
+    || !validPeriod(end, id)
+    || periodRank(start, id) > periodRank(end, id)
+    || (annual && start.slice(5) !== end.slice(5))
+  ))) {
     return [];
   }
   return ranges;
@@ -82,9 +93,15 @@ export function realEconomyCoverageCoversDates(
   id: RealEconomyDatasetId,
 ): boolean {
   return dates.every((date) => sources.some((source) => {
-    return coverageRanges(source, id).some(([start, end]) => (
-      periodRank(start, id) <= periodRank(date, id) && periodRank(date, id) <= periodRank(end, id)
-    ));
+    return coverageRanges(source, id).some(({ start, end, annual }) => {
+      if (annual) {
+        const startYear = Number(start.slice(0, 4));
+        const endYear = Number(end.slice(0, 4));
+        const dateYear = Number(date.slice(0, 4));
+        return date.slice(5) === start.slice(5) && startYear <= dateYear && dateYear <= endYear;
+      }
+      return periodRank(start, id) <= periodRank(date, id) && periodRank(date, id) <= periodRank(end, id);
+    });
   }));
 }
 

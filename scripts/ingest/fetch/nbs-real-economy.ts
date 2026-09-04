@@ -448,6 +448,66 @@ function latestStructuredDataMonth(payload: NbsPayload): Date {
   return new Date(Date.UTC(Number(latest.slice(0, 4)), Number(latest.slice(4, 6)) - 1, 1));
 }
 
+function nextCoveragePeriod(date: string, id: RealEconomyDatasetId): string | undefined {
+  const year = Number(date.slice(0, 4));
+  const month = id === 'fixed-asset-investment'
+    ? Number(date.slice(-2))
+    : date.includes('01–02') ? 2 : Number(date.slice(-2));
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 2 || month > 12) return undefined;
+  if (month === 12) return `${year + 1}-01–02`;
+  if (month === 2) return id === 'fixed-asset-investment' ? `${year}-01–03` : `${year}-03`;
+  return id === 'fixed-asset-investment'
+    ? `${year}-01–${String(month + 1).padStart(2, '0')}`
+    : `${year}-${String(month + 1).padStart(2, '0')}`;
+}
+
+function annualCoverageRun(periods: string[], start: number): number {
+  const first = periods[start].match(/^(\d{4})(-01–02)$/);
+  if (!first) return 0;
+  let end = start + 1;
+  while (end < periods.length) {
+    const expected = `${Number(first[1]) + end - start}${first[2]}`;
+    if (periods[end] !== expected) break;
+    end += 1;
+  }
+  return end - start >= 2 ? end - start : 0;
+}
+
+export function compactRealEconomyCoverage(
+  periods: Iterable<string>,
+  id: RealEconomyDatasetId,
+): string {
+  const sorted = [...new Set(periods)].sort();
+  const annualRuns = new Map<string, number>();
+  for (let index = 0; index < sorted.length; index += 1) {
+    const length = annualCoverageRun(sorted, index);
+    if (length > 0) annualRuns.set(sorted[index], length);
+  }
+
+  const ranges: string[] = [];
+  for (let index = 0; index < sorted.length;) {
+    const start = sorted[index];
+    const annualLength = annualRuns.get(start);
+    if (annualLength) {
+      const end = sorted[index + annualLength - 1];
+      ranges.push(`${start} to ${end} (annual)`);
+      index += annualLength;
+      continue;
+    }
+    let endIndex = index;
+    while (
+      endIndex + 1 < sorted.length
+      && !annualRuns.has(sorted[endIndex + 1])
+      && nextCoveragePeriod(sorted[endIndex], id) === sorted[endIndex + 1]
+    ) {
+      endIndex += 1;
+    }
+    ranges.push(`${start} to ${sorted[endIndex]}`);
+    index = endIndex + 1;
+  }
+  return ranges.join('; ');
+}
+
 export function parseNbsRealEconomyResponse(
   payload: unknown,
   publication: NbsRealEconomyPublication,
@@ -512,7 +572,7 @@ export function parseNbsRealEconomyResponse(
     title: `国家统计局：国家数据（${code}）`,
     url: dataUrls[code] ?? buildNbsQueryUrlForCode(code),
     sourceDate: publication.sourceDate,
-    coverage: [...periods].sort().map((date) => `${date} to ${date}`).join('; '),
+    coverage: compactRealEconomyCoverage(periods, contract.id),
     role: 'data',
     request: requests[code],
   }));

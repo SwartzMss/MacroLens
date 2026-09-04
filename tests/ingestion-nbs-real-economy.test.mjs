@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
+  realEconomyCoverageCoversDates,
   validateRealEconomyDataset,
   validateRealEconomyObservations,
 } from '../scripts/ingest/validate/real-economy.ts';
 import {
   buildNbsQueryUrls,
+  compactRealEconomyCoverage,
   discoverLatestRealEconomyPublication,
   fetchNbsGdpPublication,
   fetchNbsPublicationIndex,
@@ -38,6 +40,42 @@ function parseFixture(id) {
   const payload = fixture(id);
   return parseNbsRealEconomyResponse(payload, payload.publication, REAL_ECONOMY_CONTRACTS[id]);
 }
+
+test('compresses consecutive structured National Data periods into one range', () => {
+  assert.equal(
+    compactRealEconomyCoverage(['2026-01–02', '2026-01–03', '2026-01–04', '2026-01–07'], 'fixed-asset-investment'),
+    '2026-01–02 to 2026-01–04; 2026-01–07 to 2026-01–07',
+  );
+  assert.equal(
+    compactRealEconomyCoverage(['2025-03', '2025-04', '2025-05'], 'industrial-production'),
+    '2025-03 to 2025-05',
+  );
+});
+
+test('compresses complete annual Jan-Feb source coverage without implying monthly coverage', () => {
+  assert.equal(
+    compactRealEconomyCoverage(['2023-01–02', '2024-01–02', '2025-01–02'], 'retail-sales'),
+    '2023-01–02 to 2025-01–02 (annual)',
+  );
+});
+
+test('does not compress an annual source across a missing year', () => {
+  assert.equal(
+    compactRealEconomyCoverage(['2023-01–02', '2025-01–02'], 'retail-sales'),
+    '2023-01–02 to 2023-01–02; 2025-01–02 to 2025-01–02',
+  );
+});
+
+test('annual coverage matches only the represented period in each year', () => {
+  const sources = [{
+    title: 'annual Jan-Feb',
+    url: 'https://data.stats.gov.cn/source',
+    sourceDate: '2026-01-01',
+    coverage: '2023-01–02 to 2025-01–02 (annual)',
+  }];
+  assert.equal(realEconomyCoverageCoversDates(sources, ['2023-01–02', '2024-01–02', '2025-01–02'], 'retail-sales'), true);
+  assert.equal(realEconomyCoverageCoversDates(sources, ['2024-03'], 'retail-sales'), false);
+});
 
 const source = (coverage, sourceDate = '2026-08-17') => ({
   title: '国家统计局：官方数据',
@@ -581,6 +619,26 @@ test('does not use release-page coverage as National Data coverage', () => {
   const raw = parseNbsRealEconomyResponse(payload, payload.publication, contract);
   assert.equal(raw.publication.coverage, '2026-07 to 2026-07');
   assert.ok(raw.dataSources.every((source) => source.coverage !== raw.publication.coverage));
+});
+
+test('compacts structured National Data coverage independently per source code', () => {
+  const expected = {
+    'industrial-production': [
+      '2025-01–02 to 2025-01–02',
+      '2025-03 to 2025-04',
+    ],
+    'retail-sales': [
+      '2025-01–02 to 2025-01–02',
+      '2025-03 to 2025-04',
+    ],
+    'fixed-asset-investment': [
+      '2025-01–02 to 2025-01–04',
+    ],
+  };
+  for (const [id, coverages] of Object.entries(expected)) {
+    const raw = parseFixture(id);
+    assert.deepEqual(raw.dataSources.map((source) => source.coverage), coverages, id);
+  }
 });
 
 function existingFor(id) {
