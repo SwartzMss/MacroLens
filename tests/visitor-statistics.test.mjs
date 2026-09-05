@@ -88,10 +88,7 @@ test('returns total and today from distinct blob1 counts', async () => {
   let query = '';
   globalThis.fetch = async (_input, init) => {
     query = String(init.body);
-    return Response.json({ data: [
-      { metric: 'total', visitors: '123' },
-      { metric: 'today', visitors: '4' },
-    ] });
+    return Response.json({ data: [{ total: '123', today: '4' }] });
   };
   try {
     const response = await onStatsRequest({
@@ -100,6 +97,7 @@ test('returns total and today from distinct blob1 counts', async () => {
     });
     assert.deepEqual(await response.json(), { available: true, total: 123, today: 4 });
     assert.match(query, /COUNT\s*\(DISTINCT\s+blob1\)/i);
+    assert.doesNotMatch(query, /UNION/i);
     assert.match(query, /FROM\s+macrolens_visitors/i);
     assert.match(query, /blob2\s*=/i);
   } finally {
@@ -120,7 +118,7 @@ test('returns unavailable for missing credentials, upstream failure, and invalid
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
     });
     assert.deepEqual(await failed.json(), { available: false });
-    globalThis.fetch = async () => Response.json({ data: [{ metric: 'total', visitors: '-1' }] });
+    globalThis.fetch = async () => Response.json({ data: [{ total: '-1', today: '0' }] });
     const malformed = await onStatsRequest({
       request: new Request('https://macrolens.example/api/visitor-stats'),
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },

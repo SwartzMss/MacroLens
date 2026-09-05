@@ -43,18 +43,16 @@ No IP, user-agent, path, referrer, or page-view count is written. The `index1` v
 
 Create `functions/api/visitor-stats.ts` with a `GET` handler. It queries the Cloudflare Analytics Engine SQL API using server-side `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` values. The API token is never sent to the browser.
 
-The handler runs one query that returns two rows:
+The handler runs one query that returns one row. It uses a conditional distinct count for today's visitors because Analytics Engine SQL does not support `UNION`:
 
 ```sql
-SELECT 'total' AS metric, count(DISTINCT blob1) AS visitors
+SELECT
+  count(DISTINCT blob1) AS total,
+  count(DISTINCT if(blob2 = '<Shanghai date>', blob1, NULL)) AS today
 FROM macrolens_visitors
-UNION ALL
-SELECT 'today' AS metric, count(DISTINCT blob1) AS visitors
-FROM macrolens_visitors
-WHERE blob2 = '<Shanghai date>'
 ```
 
-The handler validates the response shape and converts numeric strings to non-negative integers. A successful response is:
+The handler validates the single-row response shape and converts numeric strings to non-negative integers. A successful response is:
 
 ```json
 {"available":true,"total":123,"today":4}

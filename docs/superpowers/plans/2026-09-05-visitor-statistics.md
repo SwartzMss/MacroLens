@@ -103,8 +103,7 @@ test('returns total and today from distinct blob1 counts', async () => {
   globalThis.fetch = async (_input, init) => {
     query = String(init.body);
     return Response.json({ data: [
-      { metric: 'total', visitors: '123' },
-      { metric: 'today', visitors: '4' },
+      { total: '123', today: '4' },
     ] });
   };
   try {
@@ -114,6 +113,7 @@ test('returns total and today from distinct blob1 counts', async () => {
     });
     assert.deepEqual(await response.json(), { available: true, total: 123, today: 4 });
     assert.match(query, /COUNT\s*\(DISTINCT\s+blob1\)/i);
+    assert.doesNotMatch(query, /UNION/i);
     assert.match(query, /FROM\s+macrolens_visitors/i);
     assert.match(query, /blob2\s*=/i);
   } finally {
@@ -134,7 +134,7 @@ test('returns unavailable for missing credentials, upstream failure, and invalid
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
     });
     assert.deepEqual(await failed.json(), { available: false });
-    globalThis.fetch = async () => Response.json({ data: [{ metric: 'total', visitors: '-1' }] });
+    globalThis.fetch = async () => Response.json({ data: [{ total: '-1', today: '0' }] });
     const malformed = await onStatsRequest({
       request: new Request('https://macrolens.example/api/visitor-stats'),
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
@@ -259,29 +259,17 @@ export type VisitorStats = { available: true; total: number; today: number };
 
 export function visitorStatsQuery(today = getShanghaiDate()): string {
   const safeDate = today.replaceAll("'", "''");
-  return [
-    "SELECT 'total' AS metric, COUNT(DISTINCT blob1) AS visitors FROM macrolens_visitors",
-    `SELECT 'today' AS metric, COUNT(DISTINCT blob1) AS visitors FROM macrolens_visitors WHERE blob2 = '${safeDate}'`,
-  ].join(' UNION ALL ');
+  return `SELECT COUNT(DISTINCT blob1) AS total, COUNT(DISTINCT if(blob2 = '${safeDate}', blob1, NULL)) AS today FROM macrolens_visitors`;
 }
 
 export function parseVisitorStats(payload: unknown): VisitorStats | null {
   if (!payload || typeof payload !== 'object' || !Array.isArray((payload as { data?: unknown }).data)) return null;
   const rows = (payload as { data: unknown[] }).data;
-  const values = new Map<string, number>();
-  for (const row of rows) {
-    if (!row || typeof row !== 'object') return null;
-    const typedRow = row as { metric?: unknown; visitors?: unknown };
-    const metric = typedRow.metric;
-    if ((metric !== 'total' && metric !== 'today') || values.has(metric)) return null;
-    const value = typeof typedRow.visitors === 'number' ? typedRow.visitors : Number(typedRow.visitors);
-    if (!Number.isSafeInteger(value) || value < 0) return null;
-    values.set(metric, value);
-  }
-  if (values.size !== 2) return null;
-  const total = values.get('total');
-  const today = values.get('today');
-  if (total === undefined || today === undefined) return null;
+  if (rows.length !== 1 || !rows[0] || typeof rows[0] !== 'object') return null;
+  const row = rows[0] as { total?: unknown; today?: unknown };
+  const total = typeof row.total === 'number' ? row.total : Number(row.total);
+  const today = typeof row.today === 'number' ? row.today : Number(row.today);
+  if (!Number.isSafeInteger(total) || total < 0 || !Number.isSafeInteger(today) || today < 0) return null;
   return { available: true, total, today };
 }
 ```
