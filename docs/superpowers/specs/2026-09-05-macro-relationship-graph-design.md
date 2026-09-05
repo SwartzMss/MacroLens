@@ -1,69 +1,67 @@
-# Macro Indicator Relationship Graph
+# Global Relationship Explorer
 
 ## Context
 
-Issue #69 asks MacroLens to move from isolated indicator pages to an explainable, connected macro knowledge model. The repository already has a manually curated `data/relations/macro.json` dataset, a typed `src/data/graphRegistry.ts` access layer, readable relationship cards on concept pages, and ECharts for existing indicator visualizations. The missing capability is a discoverable global graph that lets a user explore upstream and downstream relationships without creating unsupported economic conclusions.
+Issue #17 established the product boundary for MacroLens: keep the knowledge graph as structured data, but present relationships through readable relationship cards and curated transmission paths. A node-link or force graph is not part of the primary product experience. Issue #69 is refined to add a global relationship explorer that follows this decision rather than reopening graph visualization.
 
 ## Goals and non-goals
 
 Goals:
 
-- Provide a stable `/graph` route where users can explore the canonical macro relationship dataset.
-- Reuse existing graph nodes, relation types, concept metadata, and concept-page links.
-- Make upstream, downstream, and symmetric relationships distinguishable.
-- Keep all economic relationship definitions manually curated and version controlled.
-- Preserve compatibility with existing concept pages and the existing JSON graph format.
+- Provide a stable, unlinked `/graph` route for browsing the canonical relationship data when a user has a direct reason to use it.
+- Let a user select any node and read its incoming, outgoing, and symmetric relationships as readable cards.
+- Reuse `getConceptRelations`, `RelationshipCards`, stable concept IDs, and the existing concept collection.
+- Link nodes with real concept pages and show abstract/context nodes as text only.
+- Keep `data/relations/macro.json` unchanged as the version-controlled knowledge-graph source.
 
 Non-goals:
 
+- Do not add or restore Cytoscape, ECharts graph series, force layouts, pan/zoom canvases, or network visualizations.
+- Do not add `/graph` to primary navigation or the homepage.
 - Do not infer, score, or generate new economic relationships at runtime.
-- Do not replace the readable relationship cards or existing transmission-path sections.
-- Do not add a graph database, server API, or new content-authoring workflow.
-- Do not require every abstract graph node to have a concept page.
+- Do not replace the existing homepage transmission paths or concept-page relationship cards.
 
 ## User experience
 
-The `/graph` page contains:
+The `/graph` route is titled “关系浏览器” and is intentionally not linked from the header or homepage. It contains:
 
-1. A short explanation that the graph shows curated relationships rather than automatic causal claims.
-2. A search/select control for finding a node by its existing label.
-3. An interactive graph canvas with pan, zoom, and node dragging. Nodes are visually separated into indicator nodes and explanatory/context nodes. Directed edges use the existing relation type labels; symmetric relations are rendered without implying direction.
-4. A details panel for the selected node. It shows the node label, whether a concept page exists, and grouped incoming/upstream, outgoing/downstream, and symmetric relations. Linked content pages are navigable; abstract nodes remain readable but are not made into fake pages.
-5. A concise legend and an accessible text fallback listing the selected node's relationships, so the graph is not the only way to consume the information.
+1. A short explanation that the data is manually curated and does not imply automatic causation.
+2. A select control listing every canonical node by label.
+3. A readable panel for the selected node. The panel links to the node's concept page when one exists and marks abstract/context nodes as graph concepts.
+4. Existing `RelationshipCards` output grouped as upstream/incoming, downstream/outgoing, and symmetric relationships. Relation labels and direction remain those defined by `graphRegistry.ts`.
 
-The page is linked from the global site navigation and from the homepage's relationship section. Existing concept-page relationship cards remain unchanged apart from an optional link to the full graph.
+The page server-renders the M2 panel as the default and embeds all other node panels as accessible static HTML. A small enhancement toggles panels when the select changes and moves focus to the selected heading. There is no visual graph, canvas, or layout engine.
 
 ## Architecture and data flow
 
-`src/pages/graph.astro` loads the concept collection and calls `getRelationData('macro')`. It passes serialized nodes, relations, and concept IDs to a focused `src/components/RelationshipGraph.astro` component. The component initializes an ECharts graph in the browser using the dependency already used by `IndicatorChart.astro`.
+`src/pages/graph.astro` loads the concept collection and the node list from `getRelationData('macro')`. `src/components/RelationshipExplorer.astro` derives each panel's direct neighborhood with `getConceptRelations('macro', node.id)` and delegates relationship rendering to `RelationshipCards.astro`.
 
-The browser receives only the canonical node and edge records plus the concept-page lookup needed for navigation. It does not derive new edges. Selecting a node filters/highlights its direct adjacency in the chart and renders the same direct relations in the details panel. Relation direction is calculated with the existing `getConceptRelations` semantics, including the existing symmetric relation set.
+The explorer uses concept collection IDs to decide whether a node gets a stable `/concepts/<id>` link. It does not use `kind` as a presentation category, so concept pages such as monetary policy, fiscal policy, and balance of payments are handled consistently with measured indicators. Abstract nodes remain text-only.
 
-The graph remains static-site compatible: all graph data is embedded at build time, and the client script is enhancement-only. If JavaScript is unavailable, the page still exposes the node search/list and selected relationship text in the rendered HTML.
+The existing `src/components/TransmissionPaths.astro` and concept-page relationship cards remain the primary relationship presentation. The explorer is a secondary readable query surface over the same data.
 
 ## Interaction and safety rules
 
-- Use the existing `RelationType` values and Chinese labels; unknown relation types must not be silently accepted.
-- Treat only `CORRELATES` and `OVERLAPS_WITH` as symmetric, matching `graphRegistry.ts`.
-- Do not label any edge as deterministic causation unless the canonical dataset explicitly uses that relation type.
-- When a node has no concept page, show its graph label and mark it as an explanatory graph node.
-- Keep graph initialization resilient to an empty selection and small viewport sizes.
-- Avoid random IDs or browser-only assumptions in the server-rendered fallback.
+- Keep `CORRELATES` and `OVERLAPS_WITH` symmetric and render them in the symmetric relationship group.
+- Preserve incoming/outgoing direction supplied by `getConceptRelations`.
+- Use the existing relation labels; do not introduce new economic semantics in the UI.
+- Never create links for nodes absent from the concept collection.
+- Keep the explorer readable on mobile without pan or zoom.
+- Keep `/graph` out of the primary navigation and homepage.
 
 ## Testing strategy
 
-- Add a focused graph contract test that loads `data/relations/macro.json`, asserts node and relation uniqueness/referential integrity, checks the Issue #69 relationship clusters, and verifies that the graph has no unsupported duplicate edges.
-- Add source-level page/component assertions for the `/graph` route, canonical dataset usage, relation labels, and concept-page links/fallback text.
-- Run the full Node test suite, `npm run check`, and `npm run build` before opening the PR.
+- Validate node uniqueness, edge uniqueness, endpoint integrity, and the Issue #69 relationship clusters from `macro.json`.
+- Assert that the route uses `RelationshipExplorer` and `getRelationData('macro')`, and that the explorer uses `RelationshipCards` and `getConceptRelations`.
+- Assert that navigation/homepage do not promote `/graph` and that no ECharts, Cytoscape, force-layout, or graph-canvas code remains in the explorer route.
+- Run the full Node suite, `npm run check`, and `npm run build`.
 
 ## Acceptance mapping
 
-| Issue #69 requirement | Design coverage |
+| Requirement | Design coverage |
 | --- | --- |
-| Users can explore upstream/downstream relationships | Interactive graph selection plus grouped details panel |
-| Existing concept pages remain compatible | Existing graph JSON and concept cards are reused without schema changes |
-| Relationship definitions are version controlled | All edges remain in `data/relations/macro.json`; tests guard the contract |
-| Reuse metadata and prerequisites | Graph registry and concept collection are the only data sources |
-| Explainable/manual relationships | Existing relation types/labels and no runtime inference |
-| Reusable frontend graph data | `/graph` consumes the canonical registry shape directly |
-
+| Explore upstream/downstream relationships | Select a node and read grouped relationship cards |
+| Existing concept pages remain compatible | Reuse `RelationshipCards` and stable concept IDs |
+| Relationship definitions are version controlled | Continue reading `data/relations/macro.json` through `graphRegistry` |
+| Explainable/manual relationships | Existing labels, direction, and symmetric semantics; no inference |
+| Respect #17 product decision | No force graph; `/graph` is unlinked and text-first |

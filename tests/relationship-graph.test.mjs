@@ -50,7 +50,7 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(component, /data-explorer-panel/);
   assert.match(component, /RelationshipCards/);
   assert.match(component, /getConceptRelations/);
-  assert.match(component, /上游|下游/);
+  assert.match(component, /上游|下游|它受什么影响/);
   assert.match(component, /<noscript>/);
   assert.match(component, /图谱概念/);
   assert.doesNotMatch(nav, /href=["']\/graph["']/);
