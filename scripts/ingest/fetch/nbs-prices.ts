@@ -47,10 +47,13 @@ function signedValue(direction: string, value: string): number {
   return numeric;
 }
 
-function assertObservableMethodology(text: string, id: PriceDatasetId): void {
+function assertObservableMethodology(text: string, id: PriceDatasetId, url: string): void {
+  const compact = text.replace(/\s+/g, '');
   const marker = /2026年1月份?(?:起|开始编制和发布).{0,240}2025年为基期/;
-  if (!marker.test(text)) {
-    throw new MethodologyMismatchError(`Official ${id} publication is missing the expected 2025-base methodology marker`);
+  if (!marker.test(compact)) {
+    throw new MethodologyMismatchError(
+      `Official ${id} publication is missing the expected 2025-base methodology marker: ${url}`,
+    );
   }
 }
 
@@ -127,7 +130,7 @@ export function parseNbsPricePublication(
   if (new URL(publication.url).origin !== NBS_ORIGIN) fail(`Price publication is not hosted by stats.gov.cn: ${publication.url}`);
   if (!validDate(publication.sourceDate)) fail(`Invalid price publication date: ${publication.sourceDate}`);
   const visible = textOf(html);
-  assertObservableMethodology(visible, id);
+  assertObservableMethodology(visible, id, publication.url);
   const value = publishedValue(id === 'core-cpi' ? html : visible, id);
   const coverage = publication.coverage || coverageFromTitle(publication.title, id);
   const date = monthFromCoverage(coverage);
