@@ -12,13 +12,22 @@ import ppi from '../../data/indicators/ppi.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
-  unit: string; metric: string; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
+  unit: string; metric: string; comparisonType?: IndicatorComparisonType; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
   calculation: string; calculationEffectiveFrom?: string; updatedAt: string; comparabilityNote: string;
   methodologyFingerprint: string; methodologyEffectiveFrom?: string;
   sources: Array<{ title: string; url: string; sourceDate: string; coverage: string; role?: string }>;
   referenceValue?: number; referenceLabel?: string;
   data: Array<{ date: string; value: number }>;
 }
+
+export type IndicatorComparisonType =
+  | 'previous_month_same_metric'
+  | 'previous_month_level'
+  | 'previous_month_rate'
+  | 'previous_quarter_same_metric'
+  | 'previous_quarter_level'
+  | 'previous_quarter_rate'
+  | 'previous_cumulative_period';
 
 const indicatorData = {
   m0, m1, m2, pmi, gdp,

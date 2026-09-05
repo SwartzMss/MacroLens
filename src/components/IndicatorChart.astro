@@ -2,15 +2,8 @@
 import type { IndicatorDataset } from '../data/indicatorRegistry';
 const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${Math.random().toString(36).slice(2)}`;
-function previousMonth(value: string): string {
-  const [year, month] = value.split('-').map(Number);
-  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
-}
-const calculationDescription = indicator.calculationEffectiveFrom && indicator.calculation === 'published'
-  ? `${previousMonth(indicator.calculationEffectiveFrom)} 及以前：由官方余额计算；${indicator.calculationEffectiveFrom} 起：央行官方公布值`
-  : indicator.calculation === 'published' ? '官方公布值' : '由官方余额计算';
 ---
-<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify({data:indicator.data,unit:indicator.unit,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}折线图`}></div><div class="data-note"><span>{indicator.comparabilityNote}</span><span>方法：{calculationDescription}</span><span>更新：{indicator.updatedAt}</span><details><summary>核验数据来源（{indicator.sources.length}）</summary><ul>{indicator.sources.map(source => <li><a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a><small>{source.coverage} · 发布 {source.sourceDate}</small></li>)}</ul></details></div></div>
+<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify({data:indicator.data,unit:indicator.unit,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}折线图`}></div></div>
 <script>
   import * as echarts from 'echarts';
   document.querySelectorAll<HTMLElement>('[data-chart]').forEach((element) => {

@@ -43,6 +43,10 @@ test('builds one signal for each existing dashboard indicator', () => {
   assert.equal(snapshot.signals.length, dashboardIndicatorIds.length);
   assert.ok(snapshot.signals.every((item) => item.fact && item.interpretation));
   assert.equal(signal(snapshot, 'pmi').metric, 'index');
+  assert.equal(signal(snapshot, 'pmi').valueLabel, '指数');
+  assert.equal(signal(snapshot, 'pmi').changeLabel, '较上月变化');
+  assert.equal(signal(snapshot, 'cpi').valueLabel, '同比');
+  assert.equal(signal(snapshot, 'cpi').changeLabel, '较上月变化');
   assert.equal(signal(snapshot, 'pmi').changeUnit, 'points');
   assert.equal(signal(snapshot, 'm2').metric, 'yoy');
   assert.equal(signal(snapshot, 'm2').changeUnit, 'percentage-points');
@@ -55,7 +59,7 @@ test('classifies PMI using the 50 threshold and momentum boundary', () => {
   const pmi = signal(snapshot, 'pmi');
 
   assert.match(pmi.fact, /49\.8/);
-  assert.match(pmi.fact, /较上一期\+0\.6 点/);
+  assert.match(pmi.fact, /较上月变化：\+0\.6 点/);
   assert.match(pmi.interpretation, /低于|景气/);
   assert.match(pmi.interpretation, /改善|回升|动能/);
 });
@@ -70,7 +74,8 @@ test('classifies growth indicators by level and change without flattening semant
   assert.match(signal(snapshot, 'gdp').interpretation, /走弱|放缓/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /负|非正/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /走弱|放缓/);
-  assert.match(signal(snapshot, 'gdp').fact, /较上一期-0\.7 个百分点/);
+  assert.match(signal(snapshot, 'gdp').fact, /较上一季度：-0\.7 个百分点/);
+  assert.match(signal(snapshot, 'gdp').fact, /最新同比为/);
 });
 
 test('reports monetary growth momentum cautiously without causal claims', () => {
@@ -174,6 +179,12 @@ test('emits independent risks and evidence-backed watch items', () => {
   assert.ok(snapshot.risks.some((item) => item.title.includes('货币增速')));
   assert.ok(snapshot.watchNext.length >= snapshot.risks.length);
   assert.ok(snapshot.watchNext.every((item) => item.evidenceIds.length > 0 && /下一期|下一次|继续观察/.test(item.explanation)));
+  const publicExplanations = [
+    snapshot.phase.explanation,
+    ...snapshot.risks.map((item) => item.explanation),
+    ...snapshot.watchNext.map((item) => item.explanation),
+  ];
+  assert.ok(publicExplanations.every((text) => !text.includes('较上一期')));
 });
 
 test('classifies price indicators separately from activity phase rules', () => {
@@ -225,11 +236,30 @@ test('renders an explainable homepage snapshot without changing dashboard owners
   assert.match(component, /fact/);
   assert.match(component, /interpretation/);
   assert.match(component, /changeUnit/);
+  assert.match(component, /signal\.valueLabel/);
+  assert.doesNotMatch(component, /comparisonMethod/);
+  assert.doesNotMatch(component, /signal\.family === 'price-yoy'/);
   assert.match(component, /conceptHref|\/concepts/);
   assert.match(component, /投资建议|投资决策/);
-  assert.match(component, /最近数据更新/);
+  assert.match(component, /快照更新/);
+  assert.doesNotMatch(component, /rulesVersion|methodologyFingerprint|runtime|fingerprint/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(page, /MacroDashboard/);
   assert.match(page, /MacroSnapshot/);
   assert.match(page, /buildMacroSnapshot/);
+});
+
+test('snapshot exposes its update date without exposing the rules version', () => {
+  const component = readFileSync(snapshotComponent, 'utf8');
+  assert.match(component, /快照更新/);
+  assert.doesNotMatch(component, /rulesVersion/);
+  assert.doesNotMatch(component, /规则版本/);
+  assert.doesNotMatch(component, /较上一期/);
+  assert.doesNotMatch(component, /每个指标按自身口径解释/);
+});
+
+test('snapshot evidence carries indicator-specific change labels', () => {
+  const snapshot = buildMacroSnapshot();
+  assert.equal(signal(snapshot, 'gdp').changeLabel, '较上一季度');
+  assert.equal(signal(snapshot, 'cpi').changeLabel, '较上月变化');
 });

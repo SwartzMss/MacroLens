@@ -1,0 +1,50 @@
+---
+import type { IndicatorViewModel } from '../data/indicatorPresentationAdapter';
+import '../styles/indicator-metadata.css';
+
+const { presentation } = Astro.props as { presentation: IndicatorViewModel };
+---
+
+<section class="indicator-metadata" aria-labelledby="indicator-metadata-title">
+  <div class="indicator-metadata-head">
+    <div>
+      <div class="eyebrow">Read the data</div>
+      <h2 id="indicator-metadata-title">如何阅读</h2>
+    </div>
+    <span class="tag">{presentation.frequencyLabel} · {presentation.valueLabel}</span>
+  </div>
+
+  <div class="indicator-definition">
+    <strong>指标定义</strong>
+    <p>{presentation.definition}</p>
+  </div>
+
+  <dl class="indicator-metadata-grid">
+    <dt>统计频率</dt>
+    <dd>{presentation.frequencyLabel}</dd>
+    <dt>变化口径</dt>
+    <dd>{presentation.comparisonMethod}</dd>
+    <dt>数据来源</dt>
+    <dd>
+      <strong>{presentation.sourceLabel}</strong>
+      {presentation.sources.length > 0 ? <details class="indicator-source-details">
+        <summary>来源详情（{presentation.sources.length}）</summary>
+        <ul class="indicator-sources">
+          {presentation.sources.map((source) => <li>
+            <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+            <small>{presentation.sourceLabel} 发布于 {source.sourceDate} · 覆盖：{source.coverage}</small>
+          </li>)}
+        </ul>
+      </details> : <p class="indicator-source-empty">来源信息待补充</p>}
+    </dd>
+    <dt>数据更新</dt>
+    <dd>MacroLens 于 {presentation.updatedAt} 更新</dd>
+    <dt>覆盖期间</dt>
+    <dd>{presentation.coverage}</dd>
+  </dl>
+
+  <div class="indicator-methodology">
+    <p><strong>口径说明</strong>{presentation.comparabilityNote}</p>
+    <p><strong>计算方式</strong>{presentation.calculationDescription}</p>
+  </div>
+</section>

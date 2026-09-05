@@ -4,6 +4,7 @@ import {
   type DashboardIndicator,
   type DashboardIndicatorId,
 } from './dashboard';
+import { getIndicatorPresentation } from './indicatorPresentationAdapter';
 
 export const macroSnapshotRulesVersion = '2026-09-05.2';
 
@@ -13,14 +14,21 @@ export type SnapshotEvidence = {
   id: DashboardIndicatorId;
   name: string;
   metric: string;
+  valueLabel: string;
   conceptHref: string;
   latest: number;
   previous: number | null;
   change: number | null;
   changeUnit: SnapshotChangeUnit;
+  changeLabel: string;
   period: string;
   unit: string;
 };
+
+// Keep snapshot rules dependent on numeric evidence only. Presentation labels
+// are intentionally carried alongside facts, but never participate in phase
+// or risk classification.
+type SnapshotRuleSignal = Pick<SnapshotEvidence, 'id' | 'latest' | 'change' | 'unit'>;
 
 export type SnapshotSignal = SnapshotEvidence & {
   family: SignalFamily;
@@ -66,7 +74,7 @@ const EPSILON = 1e-9;
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
 const changeUnitForMetric = (metric: string): SnapshotChangeUnit => {
   if (metric === 'index') return 'points';
-  if (metric === 'yoy' || metric === 'cumulative_yoy') return 'percentage-points';
+  if (metric === 'yoy' || metric === 'mom' || metric === 'cumulative_yoy') return 'percentage-points';
   return 'units';
 };
 const formatChange = (change: number | null, changeUnit: SnapshotChangeUnit) => {
@@ -90,15 +98,18 @@ function changeInterpretation(change: number | null): 'improving' | 'weakening' 
 }
 
 function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
+  const presentation = getIndicatorPresentation(indicator.dataset);
   return {
     id: indicator.id,
     name: indicator.name,
     metric: indicator.dataset.metric,
+    valueLabel: presentation.valueLabel,
     conceptHref: indicator.conceptHref,
     latest: indicator.latest.value,
     previous: indicator.previous?.value ?? null,
     change: indicator.change,
     changeUnit: changeUnitForMetric(indicator.dataset.metric),
+    changeLabel: presentation.changeLabel,
     period: indicator.latest.date,
     unit: indicator.dataset.unit,
   };
@@ -110,11 +121,11 @@ function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
   const level = indicator.latest.value > 50
     ? '高于 50 的扩张区间'
     : indicator.latest.value < 50 ? '低于 50 的收缩区间' : '处于 50 的中性水平';
-  const momentumText = momentum === 'improving' ? '，较上一期改善' : momentum === 'weakening' ? '，较上一期走弱' : '，较上一期基本稳定';
+  const momentumText = momentum === 'improving' ? '，与上月相比动能改善' : momentum === 'weakening' ? '，与上月相比动能走弱' : '，与上月相比基本稳定';
   return {
     ...evidence,
     family: 'pmi',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按 PMI 50 荣枯线规则，当前${level}${momentumText}。`,
   };
 }
@@ -127,7 +138,7 @@ function classifyGrowth(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'activity-growth',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按该指标的增长率口径，当前为${level}，变化动能${momentumText}。`,
   };
 }
@@ -138,7 +149,7 @@ function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'monetary-growth',
-    fact: `${indicator.name}最新增速为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: weakening
       ? '按货币增速自身的变化，当前货币增速动能走弱，需继续观察；这不直接推出需求、价格或资产价格结论。'
       : '当前仅报告货币增速及其变化，不据此推出需求、价格或资产价格结论。',
@@ -153,12 +164,12 @@ function classifyPriceYoy(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'price-yoy',
-    fact: `${indicator.name}最新同比为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `当前价格同比表现为${level}，${momentumText}；这只是该价格指标自身的描述，不据此推出需求、资产价格或投资结论。`,
   };
 }
 
-function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
+function derivePhase(signals: SnapshotRuleSignal[]): SnapshotPhase {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const activity = activityIds.map((id) => byId.get(id)!);
   const positiveCount = activity.filter((signal) => signal.id === 'pmi'
@@ -186,7 +197,7 @@ function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
   if (weakeningIds.length >= 3) {
     return {
       label: '增长放缓',
-      explanation: `${weakeningIds.length} 项活动指标较上一期走弱，达到增长放缓规则。`,
+      explanation: `${weakeningIds.length} 项活动指标近期动能走弱，达到增长放缓规则。`,
       evidenceIds: weakeningIds,
     };
   }
@@ -206,7 +217,7 @@ function makeRisk(
   return { id, title, explanation, kind: 'risk', evidenceIds };
 }
 
-function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
+function deriveRisks(signals: SnapshotRuleSignal[]): SnapshotConclusion[] {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const pmi = byId.get('pmi')!;
   const activity = activityIds.map((id) => byId.get(id)!);
@@ -229,7 +240,7 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
     risks.push(makeRisk(
       'activity-synchronised-weakening',
       '活动指标近期同步走弱',
-      `共有 ${weakeningActivity.length} 项活动指标较上一期走弱，达到同步走弱规则。`,
+      `共有 ${weakeningActivity.length} 项活动指标近期同步走弱，达到同步走弱规则。`,
       weakeningActivity.map((signal) => signal.id),
     ));
   }
@@ -245,7 +256,7 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
     risks.push(makeRisk(
       'monetary-growth-momentum-weakening',
       '货币增速动能走弱',
-      '至少一项货币增速较上一期走弱；这只说明货币增速本身的变化，不断言其对需求、价格或资产价格的传导结果。',
+      '至少一项货币增速近期走弱；这只说明货币增速本身的变化，不断言其对需求、价格或资产价格的传导结果。',
       weakeningMonetary.map((signal) => signal.id),
     ));
   }

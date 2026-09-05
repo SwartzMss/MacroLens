@@ -45,10 +45,18 @@ test('rejects an empty observation series', () => {
   assert.throws(() => deriveObservationSummary([]), /at least one observation/);
 });
 
-test('dashboard markup includes changes, update timestamps, sources, and concept links', () => {
+test('dashboard markup uses presentation labels and keeps engineering metadata internal', () => {
   const source = readFileSync(dashboardComponent, 'utf8');
-  assert.match(source, /更新：/);
-  assert.match(source, /核验来源/);
+  assert.match(source, /getIndicatorPresentation/);
+  assert.match(source, /valueLabel/);
+  assert.match(source, /changeLabel/);
+  assert.doesNotMatch(source, /comparisonMethod/);
+  assert.doesNotMatch(source, /dataset\.source/);
+  assert.doesNotMatch(source, /dataset\.updatedAt/);
+  assert.doesNotMatch(source, /rulesVersion|methodologyFingerprint|runtime|fingerprint/);
+  assert.doesNotMatch(source, /核验来源/);
+  assert.doesNotMatch(source, /静态生成/);
+  assert.doesNotMatch(source, /上一观测期/);
   assert.match(source, /conceptHref/);
   assert.match(source, /最近一期变化/);
   assert.match(source, /个百分点/);

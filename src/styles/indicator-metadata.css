@@ -1,0 +1,132 @@
+.indicator-metadata {
+  margin: 28px 0;
+  padding: 24px;
+  background: #f1f5f1;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.indicator-metadata-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.indicator-metadata h2 {
+  margin: 5px 0 0;
+  font: 700 28px/1.2 var(--serif);
+}
+
+.indicator-definition {
+  padding: 16px 18px;
+  background: var(--card);
+  border-left: 3px solid var(--green);
+}
+
+.indicator-definition p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.indicator-metadata-grid {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.25fr) 1fr;
+  gap: 0 20px;
+  margin: 18px 0 0;
+}
+
+.indicator-metadata-grid dt,
+.indicator-metadata-grid dd {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.indicator-metadata-grid dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.indicator-metadata-grid dd {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.indicator-sources {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.indicator-source-details {
+  margin-top: 8px;
+}
+
+.indicator-source-details summary {
+  color: var(--green);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.indicator-sources a {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.indicator-sources small,
+.indicator-source-empty {
+  display: block;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.indicator-methodology {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.indicator-methodology p {
+  margin: 0;
+}
+
+.indicator-methodology strong {
+  margin-right: 6px;
+  color: var(--green);
+}
+
+@media (max-width: 760px) {
+  .indicator-metadata {
+    padding: 18px;
+  }
+
+  .indicator-metadata-head {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .indicator-metadata-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .indicator-metadata-grid dt {
+    padding-bottom: 4px;
+    border-top: 0;
+  }
+
+  .indicator-metadata-grid dd {
+    padding-top: 0;
+  }
+}
