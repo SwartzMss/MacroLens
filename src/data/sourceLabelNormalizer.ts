@@ -9,5 +9,5 @@ const sourceAliases: Record<string, string> = {
 
 export function normalizeSourceLabel(source: string): string {
   const normalized = source.trim();
-  return sourceAliases[normalized] ?? source;
+  return sourceAliases[normalized] ?? normalized;
 }

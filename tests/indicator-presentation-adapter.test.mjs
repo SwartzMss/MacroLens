@@ -83,4 +83,5 @@ test('normalizes known source aliases and preserves unknown source strings', () 
   assert.equal(normalizeSourceLabel(' 国家统计局 '), '国家统计局');
   assert.equal(normalizeSourceLabel('PBOC'), '中国人民银行');
   assert.equal(normalizeSourceLabel('A future statistical agency'), 'A future statistical agency');
+  assert.equal(normalizeSourceLabel(' Future Agency '), 'Future Agency');
 });
