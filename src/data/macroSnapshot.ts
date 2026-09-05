@@ -5,16 +5,19 @@ import {
   type DashboardIndicatorId,
 } from './dashboard';
 
-export const macroSnapshotRulesVersion = '2026-09-05';
+export const macroSnapshotRulesVersion = '2026-09-05.1';
 
 type SignalFamily = 'pmi' | 'activity-growth' | 'monetary-growth';
+export type SnapshotChangeUnit = 'percentage-points' | 'points' | 'units';
 export type SnapshotEvidence = {
   id: DashboardIndicatorId;
   name: string;
+  metric: string;
   conceptHref: string;
   latest: number;
   previous: number | null;
   change: number | null;
+  changeUnit: SnapshotChangeUnit;
   period: string;
   unit: string;
 };
@@ -57,26 +60,44 @@ const growthIds: DashboardIndicatorId[] = [
 const monetaryIds: DashboardIndicatorId[] = ['m0', 'm1', 'm2'];
 const weakeningBoundary = -0.2;
 const improvingBoundary = 0.2;
+const EPSILON = 1e-9;
 
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
-const formatChange = (change: number | null, unit: string) => {
+const changeUnitForMetric = (metric: string): SnapshotChangeUnit => {
+  if (metric === 'index') return 'points';
+  if (metric === 'yoy' || metric === 'cumulative_yoy') return 'percentage-points';
+  return 'units';
+};
+const formatChange = (change: number | null, changeUnit: SnapshotChangeUnit) => {
   if (change === null) return '无可比上一期';
-  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${unit === '%' ? '%' : ''}`;
+  const suffix = changeUnit === 'percentage-points' ? ' 个百分点' : changeUnit === 'points' ? ' 点' : '';
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${suffix}`;
 };
 
+function isImproving(change: number | null): boolean {
+  return change !== null && change > improvingBoundary + EPSILON;
+}
+
+function isWeakening(change: number | null): boolean {
+  return change !== null && change < weakeningBoundary - EPSILON;
+}
+
 function changeInterpretation(change: number | null): 'improving' | 'weakening' | 'stable' {
-  if (change === null || (change >= weakeningBoundary && change <= improvingBoundary)) return 'stable';
-  return change > improvingBoundary ? 'improving' : 'weakening';
+  if (isImproving(change)) return 'improving';
+  if (isWeakening(change)) return 'weakening';
+  return 'stable';
 }
 
 function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
   return {
     id: indicator.id,
     name: indicator.name,
+    metric: indicator.dataset.metric,
     conceptHref: indicator.conceptHref,
     latest: indicator.latest.value,
     previous: indicator.previous?.value ?? null,
     change: indicator.change,
+    changeUnit: changeUnitForMetric(indicator.dataset.metric),
     period: indicator.latest.date,
     unit: indicator.dataset.unit,
   };
@@ -85,12 +106,14 @@ function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
 function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
   const evidence = makeEvidence(indicator);
   const momentum = changeInterpretation(indicator.change);
-  const level = indicator.latest.value >= 50 ? '达到或高于 50 的扩张阈值' : '低于 50 的扩张阈值';
+  const level = indicator.latest.value > 50
+    ? '高于 50 的扩张区间'
+    : indicator.latest.value < 50 ? '低于 50 的收缩区间' : '处于 50 的中性水平';
   const momentumText = momentum === 'improving' ? '，较上一期改善' : momentum === 'weakening' ? '，较上一期走弱' : '，较上一期基本稳定';
   return {
     ...evidence,
     family: 'pmi',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, indicator.dataset.unit)}。`,
+    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按 PMI 50 荣枯线规则，当前${level}${momentumText}。`,
   };
 }
@@ -98,23 +121,23 @@ function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
 function classifyGrowth(indicator: DashboardIndicator): SnapshotSignal {
   const evidence = makeEvidence(indicator);
   const momentum = changeInterpretation(indicator.change);
-  const level = indicator.latest.value > 0 ? '正增长' : '非正增长';
+  const level = indicator.latest.value > 0 ? '正增长' : indicator.latest.value < 0 ? '负增长' : '零增长';
   const momentumText = momentum === 'improving' ? '改善' : momentum === 'weakening' ? '走弱或放缓' : '基本稳定';
   return {
     ...evidence,
     family: 'activity-growth',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, indicator.dataset.unit)}。`,
+    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按该指标的增长率口径，当前为${level}，变化动能${momentumText}。`,
   };
 }
 
 function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
   const evidence = makeEvidence(indicator);
-  const weakening = indicator.change !== null && indicator.change < weakeningBoundary;
+  const weakening = isWeakening(indicator.change);
   return {
     ...evidence,
     family: 'monetary-growth',
-    fact: `${indicator.name}最新增速为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, indicator.dataset.unit)}。`,
+    fact: `${indicator.name}最新增速为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: weakening
       ? '按货币增速自身的变化，当前货币增速动能走弱，需继续观察；这不直接推出需求、价格或资产价格结论。'
       : '当前仅报告货币增速及其变化，不据此推出需求、价格或资产价格结论。',
@@ -125,12 +148,12 @@ function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const activity = activityIds.map((id) => byId.get(id)!);
   const positiveCount = activity.filter((signal) => signal.id === 'pmi'
-    ? signal.latest >= 50
+    ? signal.latest > 50
     : signal.latest > 0).length;
   const negativeIds = activity.filter((signal) => signal.id === 'pmi'
     ? signal.latest < 50
-    : signal.latest <= 0).map((signal) => signal.id);
-  const weakeningIds = activity.filter((signal) => signal.change !== null && signal.change < weakeningBoundary).map((signal) => signal.id);
+    : signal.latest < 0).map((signal) => signal.id);
+  const weakeningIds = activity.filter((signal) => isWeakening(signal.change)).map((signal) => signal.id);
 
   if (positiveCount >= 4 && weakeningIds.length <= 1) {
     return {
@@ -142,7 +165,7 @@ function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
   if (negativeIds.length >= 3) {
     return {
       label: '收缩压力',
-      explanation: `${negativeIds.length} 项活动指标处于非正向水平，达到收缩压力规则。`,
+      explanation: `${negativeIds.length} 项活动指标处于负值或 PMI 低于 50，达到收缩压力规则。`,
       evidenceIds: negativeIds,
     };
   }
@@ -173,13 +196,11 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const pmi = byId.get('pmi')!;
   const activity = activityIds.map((id) => byId.get(id)!);
-  const weakeningActivity = activity.filter((signal) => signal.change !== null && signal.change < weakeningBoundary);
-  const nonPositiveActivity = activity.filter((signal) => signal.id === 'pmi'
-    ? signal.latest < 50
-    : signal.latest <= 0);
+  const weakeningActivity = activity.filter((signal) => isWeakening(signal.change));
+  const negativeGrowth = growthIds.map((id) => byId.get(id)!).filter((signal) => signal.latest < 0);
   const weakeningMonetary = monetaryIds
     .map((id) => byId.get(id)!)
-    .filter((signal) => signal.change !== null && signal.change < weakeningBoundary);
+    .filter((signal) => isWeakening(signal.change));
   const risks: SnapshotConclusion[] = [];
 
   if (pmi.latest < 50) {
@@ -198,12 +219,12 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
       weakeningActivity.map((signal) => signal.id),
     ));
   }
-  if (nonPositiveActivity.some((signal) => signal.id !== 'pmi')) {
+  if (negativeGrowth.length > 0) {
     risks.push(makeRisk(
       'non-positive-activity-growth',
       '存在负增长或负累计增长信号',
-      '至少一项增长类活动指标处于非正增长水平，需要结合其自身口径继续观察。',
-      nonPositiveActivity.filter((signal) => signal.id !== 'pmi').map((signal) => signal.id),
+      '至少一项增长类活动指标处于负增长或负累计增长水平，需要结合其自身口径继续观察。',
+      negativeGrowth.map((signal) => signal.id),
     ));
   }
   if (weakeningMonetary.length > 0) {

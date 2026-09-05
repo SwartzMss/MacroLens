@@ -42,6 +42,10 @@ test('builds one signal for each existing dashboard indicator', () => {
   assert.deepEqual(snapshot.signals.map((item) => item.id), dashboardIndicatorIds);
   assert.equal(snapshot.signals.length, 8);
   assert.ok(snapshot.signals.every((item) => item.fact && item.interpretation));
+  assert.equal(signal(snapshot, 'pmi').metric, 'index');
+  assert.equal(signal(snapshot, 'pmi').changeUnit, 'points');
+  assert.equal(signal(snapshot, 'm2').metric, 'yoy');
+  assert.equal(signal(snapshot, 'm2').changeUnit, 'percentage-points');
 });
 
 test('classifies PMI using the 50 threshold and momentum boundary', () => {
@@ -51,6 +55,7 @@ test('classifies PMI using the 50 threshold and momentum boundary', () => {
   const pmi = signal(snapshot, 'pmi');
 
   assert.match(pmi.fact, /49\.8/);
+  assert.match(pmi.fact, /较上一期\+0\.6 点/);
   assert.match(pmi.interpretation, /低于|景气/);
   assert.match(pmi.interpretation, /改善|回升|动能/);
 });
@@ -65,6 +70,7 @@ test('classifies growth indicators by level and change without flattening semant
   assert.match(signal(snapshot, 'gdp').interpretation, /走弱|放缓/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /负|非正/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /走弱|放缓/);
+  assert.match(signal(snapshot, 'gdp').fact, /较上一期-0\.7 个百分点/);
 });
 
 test('reports monetary growth momentum cautiously without causal claims', () => {
@@ -76,6 +82,43 @@ test('reports monetary growth momentum cautiously without causal claims', () => 
   assert.match(m2.fact, /7\.7/);
   assert.match(m2.interpretation, /货币增速|动能/);
   assert.doesNotMatch(m2.interpretation, /意味着|导致|必然上涨/);
+});
+
+test('keeps exact momentum boundaries stable despite floating-point subtraction', () => {
+  const pmiUp = buildMacroSnapshot(makeIndicators({
+    pmi: { latest: { date: '2026-08', value: 50.2 }, previous: { date: '2026-07', value: 50 } },
+  }));
+  const pmiDown = buildMacroSnapshot(makeIndicators({
+    pmi: { latest: { date: '2026-08', value: 50 }, previous: { date: '2026-07', value: 50.2 } },
+  }));
+  const monetaryStable = buildMacroSnapshot(makeIndicators({
+    m2: { latest: { date: '2026-07', value: 7.8 }, previous: { date: '2026-06', value: 8 } },
+  }));
+  const monetaryWeakening = buildMacroSnapshot(makeIndicators({
+    m2: { latest: { date: '2026-07', value: 7.7 }, previous: { date: '2026-06', value: 8 } },
+  }));
+
+  assert.match(signal(pmiUp, 'pmi').interpretation, /基本稳定/);
+  assert.match(signal(pmiDown, 'pmi').interpretation, /基本稳定/);
+  assert.doesNotMatch(signal(monetaryStable, 'm2').interpretation, /走弱/);
+  assert.match(signal(monetaryWeakening, 'm2').interpretation, /走弱/);
+});
+
+test('keeps PMI at 50 neutral and zero growth distinct from negative growth', () => {
+  const snapshot = buildMacroSnapshot(makeIndicators({
+    pmi: { latest: { date: '2026-08', value: 50 }, previous: { date: '2026-07', value: 50 } },
+    gdp: { latest: { date: '2026-Q2', value: 0 }, previous: { date: '2026-Q1', value: 0 } },
+    'industrial-production': { latest: { date: '2026-07', value: 4 }, previous: { date: '2026-06', value: 4 } },
+    'retail-sales': { latest: { date: '2026-07', value: 4 }, previous: { date: '2026-06', value: 4 } },
+    'fixed-asset-investment': { latest: { date: '2026-01–07', value: 4 }, previous: { date: '2026-01–06', value: 4 } },
+    m0: { latest: { date: '2026-07', value: 11 }, previous: { date: '2026-06', value: 11 } },
+    m1: { latest: { date: '2026-07', value: 4 }, previous: { date: '2026-06', value: 4 } },
+    m2: { latest: { date: '2026-07', value: 8 }, previous: { date: '2026-06', value: 8 } },
+  }));
+
+  assert.match(signal(snapshot, 'pmi').interpretation, /中性|持平/);
+  assert.match(signal(snapshot, 'gdp').interpretation, /零增长/);
+  assert.equal(snapshot.risks.length, 0);
 });
 
 test('applies phase precedence for expansion, contraction, slowing, and mixed signals', () => {
@@ -154,8 +197,10 @@ test('renders an explainable homepage snapshot without changing dashboard owners
   assert.match(component, /Macro snapshot|宏观快照/);
   assert.match(component, /fact/);
   assert.match(component, /interpretation/);
+  assert.match(component, /changeUnit/);
   assert.match(component, /conceptHref|\/concepts/);
   assert.match(component, /投资建议|投资决策/);
+  assert.match(component, /最近数据更新/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(page, /MacroDashboard/);
   assert.match(page, /MacroSnapshot/);

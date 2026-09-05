@@ -5,9 +5,10 @@ import '../styles/snapshot.css';
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 const signalById = new Map(snapshot.signals.map((signal) => [signal.id, signal]));
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
-const formatChange = (change: number | null, unit: string) => {
+const formatChange = (change: number | null, changeUnit: string) => {
   if (change === null) return '—';
-  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${unit === '%' ? '%' : ''}`;
+  const suffix = changeUnit === 'percentage-points' ? ' 个百分点' : changeUnit === 'points' ? ' 点' : '';
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${suffix}`;
 };
 const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => conclusion.evidenceIds
   .map((id) => signalById.get(id))
@@ -22,7 +23,7 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
       <p>把已发布的指标事实与明确规则分开呈现，帮助你理解快照是如何生成的。</p>
     </div>
     <div class="snapshot-meta">
-      <span>数据截至 {snapshot.asOf}</span>
+      <span>最近数据更新：{snapshot.asOf}</span>
       <span>规则版本 {snapshot.rulesVersion}</span>
     </div>
   </div>
@@ -57,7 +58,7 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
       {snapshot.signals.map((signal) => <article class="snapshot-signal">
         <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.period}</span></div>
         <div class="snapshot-signal-value">{formatValue(signal.latest, signal.unit)}</div>
-        <div class="snapshot-signal-change">较上一期 {formatChange(signal.change, signal.unit)}</div>
+        <div class="snapshot-signal-change">较上一期 {formatChange(signal.change, signal.changeUnit)}</div>
         <div class="snapshot-fact"><strong>事实</strong><p>{signal.fact}</p></div>
         <div class="snapshot-interpretation"><strong>解释</strong><p>{signal.interpretation}</p></div>
       </article>)}
