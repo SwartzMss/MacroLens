@@ -5,7 +5,7 @@ import { getIndicatorPresentation } from '../data/indicatorPresentationAdapter';
 
 const { indicators } = Astro.props as { indicators: DashboardIndicator[] };
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
-const changeSuffix = (metric: string) => metric === 'yoy' || metric === 'cumulative_yoy'
+const changeSuffix = (metric: string) => metric === 'yoy' || metric === 'mom' || metric === 'cumulative_yoy'
   ? ' 个百分点'
   : metric === 'index' ? ' 点' : '';
 const formatChange = (change: number | null, metric: string) => {

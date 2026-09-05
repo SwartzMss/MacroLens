@@ -17,6 +17,9 @@ test('derives comparable recent-change labels without flattening indicator seman
   assert.equal(getIndicatorPresentation(getIndicatorData('cpi')).changeLabel, '较上月变化');
   assert.equal(getIndicatorPresentation(getIndicatorData('pmi')).changeLabel, '较上月变化');
   assert.equal(getIndicatorPresentation(getIndicatorData('fixed-asset-investment')).changeLabel, '较上一个累计期');
+  const monthlyRate = { ...getIndicatorData('cpi'), metric: 'mom' };
+  assert.equal(getIndicatorPresentation(monthlyRate).valueLabel, '环比');
+  assert.equal(getIndicatorPresentation(monthlyRate).changeLabel, '较上月环比变化');
 });
 
 test('derives comparison method, source name, and actual series coverage', () => {

@@ -362,7 +362,17 @@ npm run build
 
 Expected: the site builds all static pages successfully.
 
-- [ ] **Step 4: Check formatting and scope**
+- [ ] **Step 4: Verify the generated public HTML boundary**
+
+Run:
+
+```bash
+npm run test:output
+```
+
+Expected: Dashboard, Snapshot, and representative concept pages contain only user-facing metadata and do not expose engineering fields.
+
+- [ ] **Step 5: Check formatting and scope**
 
 Run:
 
@@ -373,13 +383,13 @@ git diff --stat origin/main...HEAD
 git log --oneline --decorate origin/main..HEAD
 ```
 
-Expected: no whitespace errors; only the adapter, three UI surfaces, related styles/tests, the approved spec, and this plan are changed; no data-ingestion or numerical-calculation files are modified.
+Expected: no whitespace errors; only the adapter, three UI surfaces, related styles/tests, the output-boundary verifier, CI command wiring, the approved spec, and this plan are changed; no data-ingestion or numerical-calculation files are modified.
 
-- [ ] **Step 5: Request review before PR creation**
+- [ ] **Step 6: Request review before PR creation**
 
 Use the requesting-code-review workflow with base `origin/main` and the final branch HEAD. Fix Critical and Important findings, rerun the affected tests, and re-run the full verification commands if production code changes.
 
-- [ ] **Step 6: Push and create PR #83**
+- [ ] **Step 7: Push and create PR #83**
 
 ```bash
 git push -u origin codex/issue-83-metadata-visibility
@@ -395,6 +405,7 @@ Closes #81
 - [x] npm test
 - [x] npm run check
 - [x] npm run build
+- [x] npm run test:output
 - [x] git diff --check
 EOF
 )"

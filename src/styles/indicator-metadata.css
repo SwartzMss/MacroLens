@@ -61,6 +61,17 @@
   padding-left: 18px;
 }
 
+.indicator-source-details {
+  margin-top: 8px;
+}
+
+.indicator-source-details summary {
+  color: var(--green);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .indicator-sources a {
   color: var(--green);
   font-weight: 700;

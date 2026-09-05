@@ -31,14 +31,17 @@ function frequencyLabel(indicator: IndicatorDataset): string {
 
 function valueLabel(indicator: IndicatorDataset): string {
   if (indicator.metric === 'yoy') return '同比';
+  if (indicator.metric === 'mom') return '环比';
   if (indicator.metric === 'cumulative_yoy') return '累计同比';
   if (indicator.metric === 'index') return '指数';
   return indicator.metric;
 }
 
 function changeLabel(indicator: IndicatorDataset): string {
-  if (indicator.frequency === 'quarterly') return '较上一季度';
   if (indicator.metric === 'cumulative_yoy') return '较上一个累计期';
+  if (indicator.metric === 'mom') return indicator.frequency === 'quarterly' ? '较上一季度环比变化' : '较上月环比变化';
+  if (indicator.frequency === 'quarterly' && indicator.metric === 'yoy') return '较上一季度';
+  if (indicator.frequency === 'quarterly') return '较上一季度';
   return '较上月变化';
 }
 
@@ -48,6 +51,11 @@ function comparisonMethod(indicator: IndicatorDataset): string {
   }
   if (indicator.metric === 'cumulative_yoy') {
     return '累计同比用于比较与上年同期累计值的变化；近期变化相对于上一个累计期。';
+  }
+  if (indicator.metric === 'mom') {
+    return indicator.frequency === 'quarterly'
+      ? '环比用于表示本季度相对上一季度的变化；近期变化相对于上一个季度的环比读数。'
+      : '环比用于表示本月相对上月的变化；近期变化相对于上一个月的环比读数。';
   }
   if (indicator.metric === 'index') {
     return '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。';

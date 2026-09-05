@@ -240,6 +240,7 @@ test('renders an explainable homepage snapshot without changing dashboard owners
   assert.match(component, /conceptHref|\/concepts/);
   assert.match(component, /投资建议|投资决策/);
   assert.match(component, /快照更新/);
+  assert.doesNotMatch(component, /rulesVersion|methodologyFingerprint|runtime|fingerprint/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(page, /MacroDashboard/);
   assert.match(page, /MacroSnapshot/);

@@ -38,12 +38,15 @@ const calculationDescription = indicator.calculationEffectiveFrom && indicator.c
     <dt>数据来源</dt>
     <dd>
       <strong>{presentation.sourceLabel}</strong>
-      {presentation.sources.length > 0 ? <ul class="indicator-sources">
-        {presentation.sources.map((source) => <li>
-          <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
-          <small>来源发布：{source.sourceDate} · 来源覆盖：{source.coverage}</small>
-        </li>)}
-      </ul> : <p class="indicator-source-empty">来源信息待补充</p>}
+      {presentation.sources.length > 0 ? <details class="indicator-source-details">
+        <summary>来源详情（{presentation.sources.length}）</summary>
+        <ul class="indicator-sources">
+          {presentation.sources.map((source) => <li>
+            <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+            <small>来源发布：{source.sourceDate} · 来源覆盖：{source.coverage}</small>
+          </li>)}
+        </ul>
+      </details> : <p class="indicator-source-empty">来源信息待补充</p>}
     </dd>
     <dt>数据集更新时间</dt>
     <dd>{indicator.updatedAt}</dd>

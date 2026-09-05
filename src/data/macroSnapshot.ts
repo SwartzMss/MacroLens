@@ -69,7 +69,7 @@ const EPSILON = 1e-9;
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
 const changeUnitForMetric = (metric: string): SnapshotChangeUnit => {
   if (metric === 'index') return 'points';
-  if (metric === 'yoy' || metric === 'cumulative_yoy') return 'percentage-points';
+  if (metric === 'yoy' || metric === 'mom' || metric === 'cumulative_yoy') return 'percentage-points';
   return 'units';
 };
 const formatChange = (change: number | null, changeUnit: SnapshotChangeUnit) => {

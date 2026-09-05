@@ -23,6 +23,9 @@ test('indicator detail provides structured user-facing metadata', () => {
   }
   assert.match(page, /IndicatorMetadata/);
   assert.match(page, /!indicator.*entry\.data\.source/);
+  assert.match(source, /<details/);
+  assert.match(source, /来源详情/);
+  assert.doesNotMatch(source, /open>/);
   assert.doesNotMatch(source, /methodologyFingerprint/);
   assert.doesNotMatch(source, /runtime/);
   assert.doesNotMatch(source, /静态生成/);

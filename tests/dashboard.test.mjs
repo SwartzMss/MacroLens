@@ -50,8 +50,10 @@ test('dashboard markup uses presentation labels and keeps engineering metadata i
   assert.match(source, /getIndicatorPresentation/);
   assert.match(source, /valueLabel/);
   assert.match(source, /changeLabel/);
+  assert.doesNotMatch(source, /comparisonMethod/);
   assert.doesNotMatch(source, /dataset\.source/);
   assert.doesNotMatch(source, /dataset\.updatedAt/);
+  assert.doesNotMatch(source, /rulesVersion|methodologyFingerprint|runtime|fingerprint/);
   assert.doesNotMatch(source, /核验来源/);
   assert.doesNotMatch(source, /静态生成/);
   assert.doesNotMatch(source, /上一观测期/);
