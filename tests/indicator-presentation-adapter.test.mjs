@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
 import { getIndicatorPresentation } from '../src/data/indicatorPresentationAdapter.ts';
+import { normalizeSourceLabel } from '../src/data/sourceLabelNormalizer.ts';
 
 test('derives user-facing frequency and value labels', () => {
   assert.equal(getIndicatorPresentation(getIndicatorData('gdp')).frequencyLabel, '季度');
@@ -52,4 +53,12 @@ test('derives labels from domain metadata rather than indicator ids', () => {
   assert.equal(monthlyYoy.frequencyLabel, '月度');
   assert.equal(monthlyYoy.valueLabel, '同比');
   assert.equal(monthlyYoy.changeLabel, '较上月变化');
+});
+
+test('normalizes known source aliases and preserves unknown source strings', () => {
+  assert.equal(normalizeSourceLabel('NBS'), '国家统计局');
+  assert.equal(normalizeSourceLabel('National Bureau of Statistics'), '国家统计局');
+  assert.equal(normalizeSourceLabel(' 国家统计局 '), '国家统计局');
+  assert.equal(normalizeSourceLabel('PBOC'), '中国人民银行');
+  assert.equal(normalizeSourceLabel('A future statistical agency'), 'A future statistical agency');
 });

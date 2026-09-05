@@ -1,4 +1,5 @@
 import type { IndicatorDataset } from './indicatorRegistry';
+import { normalizeSourceLabel } from './sourceLabelNormalizer';
 
 export type IndicatorPresentationSource = {
   title: string;
@@ -16,11 +17,6 @@ export type IndicatorViewModel = {
   sourceLabel: string;
   coverage: string;
   sources: IndicatorPresentationSource[];
-};
-
-const sourceLabels: Record<string, string> = {
-  NBS: '国家统计局',
-  PBOC: '中国人民银行',
 };
 
 function frequencyLabel(indicator: IndicatorDataset): string {
@@ -76,7 +72,7 @@ export function getIndicatorPresentation(indicator: IndicatorDataset): Indicator
     valueLabel: valueLabel(indicator),
     changeLabel: changeLabel(indicator),
     comparisonMethod: comparisonMethod(indicator),
-    sourceLabel: sourceLabels[indicator.source] ?? indicator.source,
+    sourceLabel: normalizeSourceLabel(indicator.source),
     coverage: `${first.date} 至 ${last.date}`,
     sources: indicator.sources.map(({ title, url, sourceDate, coverage, role }) => ({
       title,

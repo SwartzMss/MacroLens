@@ -19,6 +19,7 @@
 - Modify `src/components/MacroDashboard.astro`: consume presentation labels and remove engineering/provenance details from cards.
 - Modify `src/components/MacroSnapshot.astro`: remove rules version and render the snapshot update date with user-facing wording.
 - Modify `src/data/macroSnapshot.ts`: carry `changeLabel` into snapshot evidence and use it when generating facts.
+- Add `src/data/sourceLabelNormalizer.ts`: normalize known source aliases while preserving unknown source strings.
 - Modify `src/pages/concepts/[id].astro`: mount `IndicatorMetadata` and remove audit-style header metadata.
 - Modify `src/components/IndicatorChart.astro`: keep the chart and remove the mixed provenance footer now owned by `IndicatorMetadata`.
 - Modify `src/styles/dashboard.css`: remove obsolete card provenance styles and retain responsive card layout.
