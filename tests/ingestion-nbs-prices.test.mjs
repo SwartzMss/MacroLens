@@ -146,6 +146,20 @@ test('accepts the official PPI base-year wording variant', () => {
   assert.doesNotThrow(() => parseNbsPricePublication(fixture.publication, variant, 'ppi'));
 });
 
+test('parses an official CPI publication that reports同比持平 as zero', () => {
+  const fixture = priceFixture('cpi');
+  const variant = fixture.html.replace(/同比上涨0\.2%/g, '同比持平');
+  const raw = parseNbsPricePublication(fixture.publication, variant, 'cpi');
+  assert.equal(raw.observations[0].value, 0);
+});
+
+test('parses an official PPI publication that reports同比持平 as zero', () => {
+  const fixture = priceFixture('ppi');
+  const variant = fixture.html.replace(/同比下降1\.4%/g, '同比持平');
+  const raw = parseNbsPricePublication(fixture.publication, variant, 'ppi');
+  assert.equal(raw.observations[0].value, 0);
+});
+
 test('discovers the newest official monthly price publication per dataset', () => {
   const index = [
     '<a href="/sj/zxfbhjd/202602/t20260210_1962001.html">2026年1月份居民消费价格同比上涨0.2%</a> 2026-02-10',

@@ -84,11 +84,11 @@ function coreCpiTableValue(html: string): number {
 function publishedValue(text: string, id: PriceDatasetId): number {
   if (id === 'core-cpi') return coreCpiTableValue(text);
   const pattern = id === 'cpi'
-    ? /居民消费价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/
-    : /工业生产者出厂价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/;
+    ? /居民消费价格(?:同比)?(?:(上涨|下降)(\d+(?:\.\d+)?)%|(持平))/
+    : /工业生产者出厂价格(?:同比)?(?:(上涨|下降)(\d+(?:\.\d+)?)%|(持平))/;
   const match = text.match(pattern);
   if (!match) fail(`Official ${id} YoY value was not found in publication`);
-  return match[1] === '持平' ? 0 : signedValue(match[1], match[2]);
+  return match[3] ? 0 : signedValue(match[1], match[2]);
 }
 
 function coverageFromTitle(title: string, id: PriceDatasetId): string {
