@@ -17,6 +17,8 @@ import {
 } from '../scripts/ingest/validate/prices.ts';
 import {
   discoverLatestPricePublication,
+  fetchNbsPriceIndex,
+  nbsPricePublicationIndex,
   parseNbsPricePublication,
 } from '../scripts/ingest/fetch/nbs-prices.ts';
 import { normalizePriceDataset } from '../scripts/ingest/normalize/prices.ts';
@@ -156,6 +158,20 @@ test('discovers core CPI from the formal CPI release rather than an interpretati
   assert.equal(publication.coverage, '2026-07 to 2026-07');
 });
 
+test('fetches the next official release-index page when the root page is stale', async () => {
+  const requested = [];
+  const pages = new Map([
+    [nbsPricePublicationIndex, '<a href="/sj/zxfbhjd/202608/t20260817_1965010.html">2026年7月份国民经济运行情况</a> 2026-08-17'],
+    [`${nbsPricePublicationIndex}index_1.html`, '<a href="/sj/zxfbhjd/202608/t20260809_1965008.html">2026年7月份居民消费价格同比上涨0.5%</a> 2026-08-09'],
+  ]);
+  const combined = await fetchNbsPriceIndex(async (url) => {
+    requested.push(url);
+    return pages.get(url) ?? '';
+  });
+  assert.deepEqual(requested, [nbsPricePublicationIndex, `${nbsPricePublicationIndex}index_1.html`]);
+  assert.match(combined, /2026年7月份居民消费价格同比上涨0\.5%/);
+});
+
 function rawPrice(id, observations, sourceDate = '2026-08-09') {
   const contract = PRICE_CONTRACTS[id];
   return {
@@ -205,6 +221,18 @@ test('price normalization rejects a changed historical value', () => {
     ),
     HistoricalMismatchError,
   );
+});
+
+test('price normalization replaces a legacy same-coverage source with the incoming official release', () => {
+  const legacyUrl = 'https://www.stats.gov.cn/sj/sjjd/202608/t20260809_1965009.html';
+  const formalUrl = 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html';
+  const existing = dataset('core-cpi', [{ date: '2026-07', value: 0.9 }], {
+    sources: [{ ...source('2026-07 to 2026-07'), url: legacyUrl, role: 'data' }],
+  });
+  const incoming = rawPrice('core-cpi', [{ date: '2026-07', value: 0.9 }]);
+  incoming.dataSources = [{ ...incoming.dataSources[0], url: formalUrl, role: 'data', coverage: '2026-07 to 2026-07' }];
+  const normalized = normalizePriceDataset(incoming, existing, 'core-cpi');
+  assert.deepEqual(normalized.sources.map(({ url }) => url), [formalUrl]);
 });
 
 test('price group writer is idempotent when every output is unchanged', async () => {
@@ -291,6 +319,9 @@ test('checked-in price datasets are complete monthly official series', () => {
     assert.equal(checkedIn.data.at(-1).date, '2026-07');
     assert.equal(checkedIn.data.length, 7);
     assert.ok(checkedIn.sources.every((source) => source.url.includes('stats.gov.cn')));
+    if (id === 'cpi' || id === 'core-cpi') {
+      assert.equal(checkedIn.sources.at(-1).url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html');
+    }
   }
 });
 

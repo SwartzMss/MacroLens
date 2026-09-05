@@ -9,6 +9,7 @@ import { fetchText } from '../fetch-text.ts';
 import type { FetchTextOptions } from '../fetch-text.ts';
 
 const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
+const NBS_INDEX_PAGES = [NBS_INDEX, `${NBS_INDEX}index_1.html`];
 const NBS_ORIGIN = 'https://www.stats.gov.cn';
 type TextFetcher = (url: string, options?: FetchTextOptions) => Promise<string>;
 
@@ -167,7 +168,9 @@ export async function fetchNbsPricePublication(
 }
 
 export async function fetchNbsPriceIndex(fetcher: TextFetcher = fetchText): Promise<string> {
-  return fetcher(NBS_INDEX);
+  const pages = [];
+  for (const url of NBS_INDEX_PAGES) pages.push(await fetcher(url));
+  return pages.join('\n');
 }
 
 export const nbsPricePublicationIndex = NBS_INDEX;

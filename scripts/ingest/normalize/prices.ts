@@ -16,6 +16,10 @@ function sourceOrder(left: IndicatorSource, right: IndicatorSource): number {
     || left.url.localeCompare(right.url);
 }
 
+function sourceCoverageKey(source: IndicatorSource): string {
+  return `${source.role ?? 'data'}|${source.coverage}`;
+}
+
 export function normalizePriceDataset(
   raw: RawNbsPriceSeries,
   existing: IndicatorDataset,
@@ -38,10 +42,15 @@ export function normalizePriceDataset(
 
   const data = mergeObservations(existing.data, raw.observations, `NBS ${id}`);
   const incomingUrls = new Set(raw.dataSources.map((source) => source.url));
-  const sources = pruneSources(
-    [...existing.sources.filter((source) => !incomingUrls.has(source.url)), ...raw.dataSources].sort(sourceOrder),
-    data.map((observation) => observation.date),
-  ).sort(sourceOrder);
+  const incomingCoverageKeys = new Set(raw.dataSources.map(sourceCoverageKey));
+  const candidates = [
+    ...existing.sources.filter((source) => !incomingUrls.has(source.url) && !incomingCoverageKeys.has(sourceCoverageKey(source))),
+    ...raw.dataSources,
+  ].sort(sourceOrder);
+  const pruned = pruneSources(candidates, data.map((observation) => observation.date));
+  const sourceByKey = new Map<string, IndicatorSource>();
+  for (const source of [...pruned, ...raw.dataSources]) sourceByKey.set(`${source.url}|${sourceCoverageKey(source)}`, source);
+  const sources = [...sourceByKey.values()].sort(sourceOrder);
   const latestSource = sources.at(-1);
   if (!latestSource) throw new IngestionContractError(`NBS price dataset has no source after normalization: ${id}`);
 
