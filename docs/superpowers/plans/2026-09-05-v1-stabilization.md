@@ -168,7 +168,7 @@ Load getIndicatorData() and assert the exact V1 registry set and field matrix:
 const expected = {
   m0: ['monthly', '%', 'yoy', 'published'],
   m1: ['monthly', '%', 'yoy', 'published'],
-  m2: ['monthly', '%', 'yoy', 'derived_from_balance'],
+  m2: ['monthly', '%', 'yoy', 'published'],
   pmi: ['monthly', 'index', 'index', 'published'],
   gdp: ['quarterly', '%', 'yoy', 'published'],
   'industrial-production': ['monthly', '%', 'yoy', 'published'],

@@ -25,3 +25,17 @@ test('README describes the shipped V1 runtime and product boundaries', () => {
   assert.match(readme, /不提供投资建议|非投资建议/);
   assert.doesNotMatch(readme, /Cytoscape/);
 });
+
+test('scheduled data updates remain reviewable and do not auto-merge', () => {
+  assert.match(updateWorkflow, /stats\.gov\.cn|pbc\.gov\.cn/);
+  assert.match(updateWorkflow, /create-pull-request@v7/);
+  assert.match(updateWorkflow, /branch:\s*automation\/update-macro-data/);
+  assert.match(updateWorkflow, /delete-branch:\s*true/);
+  assert.doesNotMatch(updateWorkflow, /merge|auto-merge/i);
+  for (const command of [
+    'npm run ingest:pmi',
+    'npm run ingest:pboc-money-supply',
+    'npm run ingest:nbs-real-economy',
+    'npm run ingest:nbs-prices',
+  ]) assert.match(updateWorkflow, new RegExp(command.replaceAll('-', '\\-')));
+});

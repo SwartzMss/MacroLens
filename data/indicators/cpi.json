@@ -16,8 +16,8 @@
   "methodologyEffectiveFrom": "2026-01",
   "sources": [
     {
-      "title": "国家统计局：2026年1月份CPI和PPI数据解读",
-      "url": "https://www.stats.gov.cn/sj/sjjd/202602/t20260211_1962586.html",
+      "title": "国家统计局：2026年1月份居民消费价格同比上涨0.2%",
+      "url": "https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202602/t20260211_1962588.html",
       "sourceDate": "2026-02-11",
       "coverage": "2026-01 to 2026-01",
       "role": "data"
@@ -44,15 +44,15 @@
       "role": "data"
     },
     {
-      "title": "国家统计局：5月份国民经济运行总体平稳",
-      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202606/t20260616_1963954.html",
-      "sourceDate": "2026-06-16",
+      "title": "国家统计局：2026年5月份居民消费价格同比上涨1.2%",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202606/t20260610_1963923.html",
+      "sourceDate": "2026-06-10",
       "coverage": "2026-05 to 2026-05",
       "role": "data"
     },
     {
-      "title": "国家统计局：2026年6月份CPI和PPI数据解读",
-      "url": "https://www.stats.gov.cn/sj/sjjd/202607/t20260709_1964082.html",
+      "title": "国家统计局：2026年6月份居民消费价格同比上涨1.0%",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964084.html",
       "sourceDate": "2026-07-09",
       "coverage": "2026-06 to 2026-06",
       "role": "data"
