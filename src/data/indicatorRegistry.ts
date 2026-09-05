@@ -6,12 +6,16 @@ import gdp from '../../data/indicators/gdp.json';
 import industrialProduction from '../../data/indicators/industrial-production.json';
 import retailSales from '../../data/indicators/retail-sales.json';
 import fixedAssetInvestment from '../../data/indicators/fixed-asset-investment.json';
+import cpi from '../../data/indicators/cpi.json';
+import coreCpi from '../../data/indicators/core-cpi.json';
+import ppi from '../../data/indicators/ppi.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
   unit: string; metric: string; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
   calculation: string; calculationEffectiveFrom?: string; updatedAt: string; comparabilityNote: string;
-  sources: Array<{ title: string; url: string; sourceDate: string; coverage: string }>;
+  methodologyFingerprint: string; methodologyEffectiveFrom?: string;
+  sources: Array<{ title: string; url: string; sourceDate: string; coverage: string; role?: string }>;
   referenceValue?: number; referenceLabel?: string;
   data: Array<{ date: string; value: number }>;
 }
@@ -20,7 +24,10 @@ const indicatorData = {
   m0, m1, m2, pmi, gdp,
   'industrial-production': industrialProduction,
   'retail-sales': retailSales,
-  'fixed-asset-investment': fixedAssetInvestment
+  'fixed-asset-investment': fixedAssetInvestment,
+  cpi,
+  'core-cpi': coreCpi,
+  ppi,
 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {

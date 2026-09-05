@@ -3,6 +3,7 @@ import { getIndicatorData, type IndicatorDataset } from './indicatorRegistry';
 export const dashboardIndicatorIds = [
   'gdp', 'pmi', 'm0', 'm1', 'm2',
   'industrial-production', 'retail-sales', 'fixed-asset-investment',
+  'cpi', 'core-cpi', 'ppi',
 ] as const;
 
 export type DashboardIndicatorId = typeof dashboardIndicatorIds[number];
@@ -28,6 +29,9 @@ const names: Record<DashboardIndicatorId, string> = {
   'industrial-production': '工业增加值',
   'retail-sales': '社会消费品零售',
   'fixed-asset-investment': '固定资产投资',
+  cpi: 'CPI',
+  'core-cpi': '核心 CPI',
+  ppi: 'PPI',
 };
 
 export function deriveObservationSummary(observations: Observation[]): ObservationSummary {

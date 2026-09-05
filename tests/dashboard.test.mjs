@@ -8,12 +8,18 @@ const dashboardComponent = fileURLToPath(new URL('../src/components/MacroDashboa
 const dashboardStyles = fileURLToPath(new URL('../src/styles/dashboard.css', import.meta.url));
 const homepage = fileURLToPath(new URL('../src/pages/index.astro', import.meta.url));
 
-test('keeps the dashboard focused on the eight available datasets', () => {
+test('includes the three official price datasets on the dashboard', () => {
   assert.deepEqual(dashboardIndicatorIds, [
     'gdp', 'pmi', 'm0', 'm1', 'm2',
     'industrial-production', 'retail-sales', 'fixed-asset-investment',
+    'cpi', 'core-cpi', 'ppi',
   ]);
   assert.deepEqual(getDashboardIndicators().map((item) => item.id), dashboardIndicatorIds);
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
+    const indicator = getDashboardIndicators().find((item) => item.id === id);
+    assert.equal(indicator.dataset.metric, 'yoy');
+    assert.equal(indicator.conceptHref, `/concepts/${id}`);
+  }
 });
 
 test('derives latest, previous, change, and provenance', () => {
@@ -45,6 +51,8 @@ test('dashboard markup includes changes, update timestamps, sources, and concept
   assert.match(source, /核验来源/);
   assert.match(source, /conceptHref/);
   assert.match(source, /最近一期变化/);
+  assert.match(source, /个百分点/);
+  assert.match(source, /dataset\.metric/);
 });
 
 test('dashboard styles are responsive and homepage preserves current sections', () => {
