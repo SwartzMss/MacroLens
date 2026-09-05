@@ -1,0 +1,91 @@
+---
+import type { MacroSnapshot, SnapshotConclusion, SnapshotSignal } from '../data/macroSnapshot';
+import '../styles/snapshot.css';
+
+const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
+const signalById = new Map(snapshot.signals.map((signal) => [signal.id, signal]));
+const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
+const formatChange = (change: number | null, unit: string) => {
+  if (change === null) return '—';
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${unit === '%' ? '%' : ''}`;
+};
+const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => conclusion.evidenceIds
+  .map((id) => signalById.get(id))
+  .filter((signal): signal is SnapshotSignal => Boolean(signal));
+---
+
+<section class="snapshot section" aria-labelledby="snapshot-title">
+  <div class="snapshot-head">
+    <div>
+      <div class="eyebrow">Macro snapshot</div>
+      <h2 id="snapshot-title">这一期，宏观信号如何组合？</h2>
+      <p>把已发布的指标事实与明确规则分开呈现，帮助你理解快照是如何生成的。</p>
+    </div>
+    <div class="snapshot-meta">
+      <span>数据截至 {snapshot.asOf}</span>
+      <span>规则版本 {snapshot.rulesVersion}</span>
+    </div>
+  </div>
+
+  <div class="snapshot-disclaimer">这是基于已存数据的规则化观察，不构成投资建议或投资决策。</div>
+
+  <section class="snapshot-phase" aria-labelledby="snapshot-phase-title">
+    <div>
+      <div class="eyebrow">Current phase</div>
+      <h3 id="snapshot-phase-title">{snapshot.phase.label}</h3>
+    </div>
+    <div>
+      <p>{snapshot.phase.explanation}</p>
+      <div class="snapshot-evidence-links">
+        {snapshot.phase.evidenceIds.map((id) => {
+          const signal = signalById.get(id);
+          return signal ? <a href={signal.conceptHref}>{signal.name}</a> : null;
+        })}
+      </div>
+    </div>
+  </section>
+
+  <section class="snapshot-signals" aria-labelledby="snapshot-signals-title">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Facts & interpretations</div>
+        <h3 id="snapshot-signals-title">指标事实与规则解释</h3>
+      </div>
+      <p>每个指标按自身口径解释</p>
+    </div>
+    <div class="snapshot-signal-grid">
+      {snapshot.signals.map((signal) => <article class="snapshot-signal">
+        <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.period}</span></div>
+        <div class="snapshot-signal-value">{formatValue(signal.latest, signal.unit)}</div>
+        <div class="snapshot-signal-change">较上一期 {formatChange(signal.change, signal.unit)}</div>
+        <div class="snapshot-fact"><strong>事实</strong><p>{signal.fact}</p></div>
+        <div class="snapshot-interpretation"><strong>解释</strong><p>{signal.interpretation}</p></div>
+      </article>)}
+    </div>
+  </section>
+
+  <div class="snapshot-conclusions">
+    <section class="snapshot-conclusion-group" aria-labelledby="snapshot-risks-title">
+      <div class="eyebrow">Risks to notice</div>
+      <h3 id="snapshot-risks-title">需要留意的信号</h3>
+      {snapshot.risks.length > 0 ? <ul>
+        {snapshot.risks.map((conclusion) => <li>
+          <strong>{conclusion.title}</strong>
+          <p>{conclusion.explanation}</p>
+          <div class="snapshot-evidence-links">{evidenceSignals(conclusion).map((signal) => <a href={signal.conceptHref}>{signal.name}</a>)}</div>
+        </li>)}
+      </ul> : <p class="snapshot-empty">当前没有触发独立风险规则。</p>}
+    </section>
+    <section class="snapshot-conclusion-group" aria-labelledby="snapshot-watch-title">
+      <div class="eyebrow">Watch next</div>
+      <h3 id="snapshot-watch-title">下一期观察什么</h3>
+      <ul>
+        {snapshot.watchNext.map((conclusion) => <li>
+          <strong>{conclusion.title}</strong>
+          <p>{conclusion.explanation}</p>
+          <div class="snapshot-evidence-links">{evidenceSignals(conclusion).map((signal) => <a href={signal.conceptHref}>{signal.name}</a>)}</div>
+        </li>)}
+      </ul>
+    </section>
+  </div>
+</section>
