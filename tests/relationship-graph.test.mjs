@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const graph = JSON.parse(readFileSync(`${root}data/relations/macro.json`, 'utf8'));
 const graphPage = `${root}src/pages/graph.astro`;
-const graphComponent = `${root}src/components/RelationshipGraph.astro`;
+const explorerComponent = `${root}src/components/RelationshipExplorer.astro`;
 const layout = `${root}src/layouts/BaseLayout.astro`;
 const homepage = `${root}src/pages/index.astro`;
 
@@ -37,32 +37,31 @@ test('keeps the canonical graph structurally valid and complete', () => {
   for (const relation of expectedRelations) assert.ok(relationKeys.has(relation.join('|')), `missing ${relation.join(' -- ')}`);
 });
 
-test('exposes a discoverable graph route and canonical payload contract', () => {
+test('keeps the relationship explorer unlinked from the primary product shell', () => {
   const page = readSource(graphPage);
-  const component = readSource(graphComponent);
+  const component = readSource(explorerComponent);
   const nav = readSource(layout);
   const home = readSource(homepage);
 
   assert.match(page, /getRelationData\(['"]macro['"]\)/);
-  assert.match(page, /RelationshipGraph/);
-  assert.match(component, /data-graph/);
-  assert.match(component, /data-payload/);
+  assert.match(page, /RelationshipExplorer/);
+  assert.match(component, /data-explorer/);
+  assert.match(component, /data-explorer-select/);
+  assert.match(component, /data-explorer-panel/);
+  assert.match(component, /RelationshipCards/);
+  assert.match(component, /getConceptRelations/);
   assert.match(component, /上游|下游/);
   assert.match(component, /<noscript>/);
   assert.match(component, /图谱概念/);
-  assert.match(nav, /href=["']\/graph["']/);
-  assert.match(home, /href=["']\/graph["']/);
+  assert.doesNotMatch(nav, /href=["']\/graph["']/);
+  assert.doesNotMatch(home, /href=["']\/graph["']/);
 });
 
-test('renders an interactive graph using the existing chart dependency', () => {
-  const component = readSource(graphComponent);
+test('does not reintroduce a node-link visualization', () => {
+  const page = readSource(graphPage);
+  const component = readSource(explorerComponent);
 
-  assert.match(component, /import \* as echarts from ['"]echarts['"]/);
-  assert.match(component, /echarts\.init/);
-  assert.match(component, /type:\s*['"]graph['"]/);
-  assert.match(component, /layout:\s*['"]force['"]/);
-  assert.match(component, /data-graph-select/);
-  assert.match(component, /data-graph-details/);
-  assert.match(component, /CORRELATES|OVERLAPS_WITH/);
-  assert.match(component, /focus:\s*['"]adjacency['"]/);
+  assert.doesNotMatch(page, /echarts|RelationshipGraph|graph-canvas|force/i);
+  assert.doesNotMatch(component, /echarts|Cytoscape|graph-canvas|force/i);
+  assert.match(component, /它受什么影响|它影响什么|与什么相关/);
 });
