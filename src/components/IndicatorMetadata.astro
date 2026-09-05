@@ -1,0 +1,58 @@
+---
+import type { IndicatorDataset } from '../data/indicatorRegistry';
+import { getIndicatorPresentation } from '../data/indicatorPresentationAdapter';
+import '../styles/indicator-metadata.css';
+
+const { indicator, definition } = Astro.props as { indicator: IndicatorDataset; definition: string };
+const presentation = getIndicatorPresentation(indicator);
+
+function previousMonth(value: string): string {
+  const [year, month] = value.split('-').map(Number);
+  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
+}
+
+const calculationDescription = indicator.calculationEffectiveFrom && indicator.calculation === 'published'
+  ? `${previousMonth(indicator.calculationEffectiveFrom)} 及以前：由官方余额计算；${indicator.calculationEffectiveFrom} 起：央行官方公布值`
+  : indicator.calculation === 'published' ? '官方公布值' : '由官方余额计算';
+---
+
+<section class="indicator-metadata" aria-labelledby="indicator-metadata-title">
+  <div class="indicator-metadata-head">
+    <div>
+      <div class="eyebrow">Read the data</div>
+      <h2 id="indicator-metadata-title">如何阅读</h2>
+    </div>
+    <span class="tag">{presentation.frequencyLabel} · {presentation.valueLabel}</span>
+  </div>
+
+  <div class="indicator-definition">
+    <strong>指标定义</strong>
+    <p>{definition}</p>
+  </div>
+
+  <dl class="indicator-metadata-grid">
+    <dt>统计频率</dt>
+    <dd>{presentation.frequencyLabel}</dd>
+    <dt>变化口径</dt>
+    <dd>{presentation.comparisonMethod}</dd>
+    <dt>数据来源</dt>
+    <dd>
+      <strong>{presentation.sourceLabel}</strong>
+      {presentation.sources.length > 0 ? <ul class="indicator-sources">
+        {presentation.sources.map((source) => <li>
+          <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+          <small>来源发布：{source.sourceDate} · 来源覆盖：{source.coverage}</small>
+        </li>)}
+      </ul> : <p class="indicator-source-empty">来源信息待补充</p>}
+    </dd>
+    <dt>数据集更新时间</dt>
+    <dd>{indicator.updatedAt}</dd>
+    <dt>覆盖期间</dt>
+    <dd>{presentation.coverage}</dd>
+  </dl>
+
+  <div class="indicator-methodology">
+    <p><strong>口径说明</strong>{indicator.comparabilityNote}</p>
+    <p><strong>计算方式</strong>{calculationDescription}</p>
+  </div>
+</section>
