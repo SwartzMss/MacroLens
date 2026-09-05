@@ -36,7 +36,6 @@ const source = (coverage = '2026-01 to 2026-03', sourceDate = '2026-08-09') => (
 });
 
 function dataset(id, data, overrides = {}) {
-  const contract = PRICE_CONTRACTS[id];
   return {
     id,
     country: 'CN',

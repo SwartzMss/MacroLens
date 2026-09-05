@@ -9,7 +9,6 @@ import {
 } from './fetch/nbs-prices.ts';
 import { normalizePriceDataset } from './normalize/prices.ts';
 import { writeIndicatorDatasetGroup } from './write/group.ts';
-import { PRICE_CONTRACTS } from './types.ts';
 import type { IndicatorDataset, PriceDatasetId } from './types.ts';
 import { validatePriceDataset } from './validate/prices.ts';
 

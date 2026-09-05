@@ -10,7 +10,6 @@ import type { FetchTextOptions } from '../fetch-text.ts';
 
 const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
 const NBS_ORIGIN = 'https://www.stats.gov.cn';
-const PRICE_IDS: PriceDatasetId[] = ['cpi', 'core-cpi', 'ppi'];
 type TextFetcher = (url: string, options?: FetchTextOptions) => Promise<string>;
 
 function fail(message: string): never {
