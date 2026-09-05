@@ -44,18 +44,18 @@ function changeLabel(indicator: IndicatorDataset): string {
 
 function comparisonMethod(indicator: IndicatorDataset): string {
   if (indicator.frequency === 'quarterly' && indicator.metric === 'yoy') {
-    return '季度同比：最新读数与上年同期比较；近期变化与上一季度的同比读数比较。';
+    return '同比增速用于比较与上年同季度的变化；近期变化相对于上一季度。';
   }
   if (indicator.metric === 'cumulative_yoy') {
-    return '累计同比：最新读数与上年同期累计值比较；近期变化与上一个累计期的读数比较。';
+    return '累计同比用于比较与上年同期累计值的变化；近期变化相对于上一个累计期。';
   }
   if (indicator.metric === 'index') {
-    return '月度指数：最新读数为当月调查指数；近期变化与上月读数比较，50 为荣枯线参考。';
+    return '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。';
   }
   if (indicator.metric === 'yoy') {
-    return '月度同比：最新读数与上年同月比较；近期变化与上月的同比读数比较。';
+    return '同比增速用于比较与上年同月的变化；近期变化相对于上月。';
   }
-  return `最新读数按${frequencyLabel(indicator)}数据展示；近期变化${changeLabel(indicator)}。`;
+  return `读数按${frequencyLabel(indicator)}数据展示；近期变化${changeLabel(indicator)}。`;
 }
 
 export function getIndicatorPresentation(indicator: IndicatorDataset): IndicatorViewModel {

@@ -21,8 +21,11 @@ test('derives comparable recent-change labels without flattening indicator seman
 
 test('derives comparison method, source name, and actual series coverage', () => {
   const gdp = getIndicatorPresentation(getIndicatorData('gdp'));
-  assert.match(gdp.comparisonMethod, /上年同期/);
-  assert.match(gdp.comparisonMethod, /上一季度/);
+  assert.equal(gdp.comparisonMethod, '同比增速用于比较与上年同季度的变化；近期变化相对于上一季度。');
+  const cpi = getIndicatorPresentation(getIndicatorData('cpi'));
+  assert.equal(cpi.comparisonMethod, '同比增速用于比较与上年同月的变化；近期变化相对于上月。');
+  const pmi = getIndicatorPresentation(getIndicatorData('pmi'));
+  assert.equal(pmi.comparisonMethod, '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。');
   assert.equal(gdp.sourceLabel, '国家统计局');
   assert.equal(gdp.coverage, '2021-Q1 至 2026-Q2');
   assert.ok(gdp.sources.every((source) => source.title && source.url && source.sourceDate && source.coverage));

@@ -43,6 +43,10 @@ test('builds one signal for each existing dashboard indicator', () => {
   assert.equal(snapshot.signals.length, dashboardIndicatorIds.length);
   assert.ok(snapshot.signals.every((item) => item.fact && item.interpretation));
   assert.equal(signal(snapshot, 'pmi').metric, 'index');
+  assert.equal(signal(snapshot, 'pmi').valueLabel, '指数');
+  assert.equal(signal(snapshot, 'pmi').changeLabel, '较上月变化');
+  assert.equal(signal(snapshot, 'cpi').valueLabel, '同比');
+  assert.equal(signal(snapshot, 'cpi').changeLabel, '较上月变化');
   assert.equal(signal(snapshot, 'pmi').changeUnit, 'points');
   assert.equal(signal(snapshot, 'm2').metric, 'yoy');
   assert.equal(signal(snapshot, 'm2').changeUnit, 'percentage-points');
@@ -231,6 +235,8 @@ test('renders an explainable homepage snapshot without changing dashboard owners
   assert.match(component, /fact/);
   assert.match(component, /interpretation/);
   assert.match(component, /changeUnit/);
+  assert.match(component, /signal\.valueLabel/);
+  assert.doesNotMatch(component, /signal\.family === 'price-yoy'/);
   assert.match(component, /conceptHref|\/concepts/);
   assert.match(component, /投资建议|投资决策/);
   assert.match(component, /快照更新/);

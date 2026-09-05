@@ -14,6 +14,7 @@ export type SnapshotEvidence = {
   id: DashboardIndicatorId;
   name: string;
   metric: string;
+  valueLabel: string;
   conceptHref: string;
   latest: number;
   previous: number | null;
@@ -92,16 +93,18 @@ function changeInterpretation(change: number | null): 'improving' | 'weakening' 
 }
 
 function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
+  const presentation = getIndicatorPresentation(indicator.dataset);
   return {
     id: indicator.id,
     name: indicator.name,
     metric: indicator.dataset.metric,
+    valueLabel: presentation.valueLabel,
     conceptHref: indicator.conceptHref,
     latest: indicator.latest.value,
     previous: indicator.previous?.value ?? null,
     change: indicator.change,
     changeUnit: changeUnitForMetric(indicator.dataset.metric),
-    changeLabel: getIndicatorPresentation(indicator.dataset).changeLabel,
+    changeLabel: presentation.changeLabel,
     period: indicator.latest.date,
     unit: indicator.dataset.unit,
   };

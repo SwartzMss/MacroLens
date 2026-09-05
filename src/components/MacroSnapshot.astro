@@ -55,7 +55,7 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
     </div>
     <div class="snapshot-signal-grid">
       {snapshot.signals.map((signal) => <article class="snapshot-signal" data-signal-family={signal.family}>
-        <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.family === 'price-yoy' ? '价格同比' : signal.family === 'pmi' ? '景气指标' : signal.family === 'activity-growth' ? '活动增长' : '货币增长'} · {signal.period}</span></div>
+        <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.valueLabel} · {signal.period}</span></div>
         <div class="snapshot-signal-value">{formatValue(signal.latest, signal.unit)}</div>
         <div class="snapshot-signal-change">{signal.changeLabel} {formatChange(signal.change, signal.changeUnit)}</div>
         <div class="snapshot-fact"><strong>事实</strong><p>{signal.fact}</p></div>
