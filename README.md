@@ -67,6 +67,8 @@ PUBLIC_SITE_URL 必须是站点真实、稳定的 http/https origin，不带路�
 
 Umami tracking script 会在所有页面加载。页脚访客统计通过同源的 `/api/umami-stats` Pages Function 读取 Umami Cloud 数据；API key 只在服务端使用，未配置或请求失败时统计区块会保持隐藏。在 Cloudflare Pages 中配置：
 
+Today's visitor count uses the `Asia/Shanghai` timezone (`UTC+8`).
+
 ~~~text
 UMAMI_API_KEY=<Umami Cloud API key，作为 secret 保存>
 UMAMI_WEBSITE_ID=<可选，默认使用 issue #84 提供的网站 ID>
