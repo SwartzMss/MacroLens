@@ -240,7 +240,7 @@ Extend the release-readiness test to read .github/workflows/update-macro-data.ym
 
 ~~~
 assert.match(updateWorkflow, /stats\.gov\.cn|pbc\.gov\.cn/);
-assert.match(updateWorkflow, /create-pull-request@v7/);
+assert.match(updateWorkflow, /create-pull-request@v8/);
 assert.match(updateWorkflow, /branch:\s*automation\/update-macro-data/);
 assert.match(updateWorkflow, /delete-branch:\s*true/);
 assert.doesNotMatch(updateWorkflow, /merge|auto-merge/i);

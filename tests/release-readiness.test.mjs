@@ -28,7 +28,11 @@ test('README describes the shipped V1 runtime and product boundaries', () => {
 
 test('scheduled data updates remain reviewable and do not auto-merge', () => {
   assert.match(updateWorkflow, /stats\.gov\.cn|pbc\.gov\.cn/);
-  assert.match(updateWorkflow, /create-pull-request@v7/);
+  assert.match(updateWorkflow, /actions\/checkout@v5/);
+  assert.match(updateWorkflow, /actions\/setup-node@v5/);
+  assert.match(updateWorkflow, /create-pull-request@v8/);
+  assert.doesNotMatch(updateWorkflow, /actions\/(?:checkout|setup-node)@v4/);
+  assert.doesNotMatch(updateWorkflow, /create-pull-request@v7/);
   assert.match(updateWorkflow, /branch:\s*automation\/update-macro-data/);
   assert.match(updateWorkflow, /delete-branch:\s*true/);
   assert.doesNotMatch(updateWorkflow, /merge|auto-merge/i);

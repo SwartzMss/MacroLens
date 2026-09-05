@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
+import { validateRealEconomyObservations } from '../scripts/ingest/validate/real-economy.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.join(here, '..', 'data', 'indicators');
@@ -85,6 +87,30 @@ function isOfficialHost(value) {
     || hostname.endsWith('.pbc.gov.cn'));
 }
 
+function nextMonth(value) {
+  const match = value.match(/^(\d{4})-(\d{2})$/);
+  assert.ok(match, `expected an exact monthly period: ${value}`);
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  return month === 12
+    ? `${year + 1}-01`
+    : `${year}-${String(month + 1).padStart(2, '0')}`;
+}
+
+function nextQuarter(value) {
+  const match = value.match(/^(\d{4})-Q([1-4])$/);
+  assert.ok(match, `expected a quarterly period: ${value}`);
+  const year = Number(match[1]);
+  const quarter = Number(match[2]);
+  return quarter === 4 ? `${year + 1}-Q1` : `${year}-Q${quarter + 1}`;
+}
+
+function assertContinuous(data, next, id) {
+  for (let index = 1; index < data.length; index += 1) {
+    assert.equal(next(data[index - 1].date), data[index].date, `${id} gap before ${data[index].date}`);
+  }
+}
+
 test('all V1 indicator datasets satisfy the explicit data contract', () => {
   assert.deepEqual(Object.keys(contracts).sort(), fs.readdirSync(dataDir)
     .filter((file) => file.endsWith('.json'))
@@ -92,7 +118,7 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
     .sort());
 
   for (const [id, contract] of Object.entries(contracts)) {
-    const dataset = readDataset(id);
+    const dataset = getIndicatorData(id);
     assert.equal(dataset.id, id);
     assert.equal(dataset.country, 'CN');
     for (const [field, value] of Object.entries(contract)) assert.equal(dataset[field], value, `${id}.${field}`);
@@ -118,6 +144,19 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
       sourceKeys.add(key);
     }
     assert.ok(dataset.sources.some((source) => source.coverage.includes(dataset.data.at(-1).date)), `${id} latest data lacks provenance`);
+  }
+});
+
+test('registry resolves every V1 dataset and observations are continuous by semantics', () => {
+  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi'];
+  for (const id of Object.keys(contracts)) {
+    const dataset = getIndicatorData(id);
+    assert.equal(dataset.id, id, `${id} must resolve through indicatorRegistry`);
+  }
+  for (const id of exactMonthlyIds) assertContinuous(getIndicatorData(id).data, nextMonth, id);
+  assertContinuous(getIndicatorData('gdp').data, nextQuarter, 'gdp');
+  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+    validateRealEconomyObservations(getIndicatorData(id).data, id);
   }
 });
 
