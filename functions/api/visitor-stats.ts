@@ -8,8 +8,8 @@ type Context = {
   };
 };
 
-const unavailable = () => Response.json(
-  { available: false },
+const unavailable = (extra?: Record<string, unknown>) => Response.json(
+  { available: false, ...extra },
   { headers: { 'Cache-Control': 'no-store' } },
 );
 
@@ -17,7 +17,13 @@ export async function onRequest({ request, env }: Context): Promise<Response> {
   if (request.method !== 'GET') {
     return new Response(null, { status: 405, headers: { Allow: 'GET' } });
   }
-  if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) return unavailable();
+  if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) {
+    return unavailable({
+      error: 'missing credentials',
+      accountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
+      apiToken: Boolean(env.CLOUDFLARE_API_TOKEN),
+    });
+  }
 
   try {
     const endpoint = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)}/analytics_engine/sql`;
@@ -29,12 +35,20 @@ export async function onRequest({ request, env }: Context): Promise<Response> {
       },
       body: visitorStatsQuery(),
     });
-    if (!upstream.ok) return unavailable();
-    const stats = parseVisitorStats(await upstream.json());
+
+    if (!upstream.ok) {
+      return unavailable({
+        error: `Cloudflare API ${upstream.status}`,
+        detail: await upstream.text(),
+      });
+    }
+
+    const payload = await upstream.json();
+    const stats = parseVisitorStats(payload);
     return stats
       ? Response.json(stats, { headers: { 'Cache-Control': 'no-store' } })
-      : unavailable();
-  } catch {
-    return unavailable();
+      : unavailable({ error: 'invalid analytics response', payload });
+  } catch (error) {
+    return unavailable({ error: String(error) });
   }
 }
