@@ -295,7 +295,9 @@ test('defines a scheduled and manually runnable reviewable data-update workflow'
   assert.match(workflow, /npm run ingest:pboc-money-supply -- --target-dir data\/indicators/);
   assert.match(workflow, /contents:\s*write/);
   assert.match(workflow, /pull-requests:\s*write/);
-  assert.match(workflow, /peter-evans\/create-pull-request@v7/);
+  assert.match(workflow, /actions\/checkout@v5/);
+  assert.match(workflow, /actions\/setup-node@v5/);
+  assert.match(workflow, /peter-evans\/create-pull-request@v8/);
   assert.match(workflow, /data\/indicators\/pmi\.json/);
   for (const id of ['m0', 'm1', 'm2']) assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
   assert.match(workflow, /branch:\s*automation\/update-macro-data/);
