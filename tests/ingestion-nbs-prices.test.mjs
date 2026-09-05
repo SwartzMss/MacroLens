@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import fs from 'node:fs';
+import fsPromises from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -118,12 +119,20 @@ test('parses the official published CPI, core CPI, and PPI YoY series', () => {
   }
 });
 
-test('requires the official core CPI phrase rather than deriving it', () => {
+test('parses core CPI YoY from the official CPI table', () => {
   const fixture = priceFixture('core-cpi');
-  assert.throws(
-    () => parseNbsPricePublication(fixture.publication, fixture.html.replace('扣除食品和能源', '扣除食品'), 'core-cpi'),
-    /core CPI|食品和能源|official/i,
-  );
+  const raw = parseNbsPricePublication(fixture.publication, fixture.html, 'core-cpi');
+  assert.equal(raw.observations[0].value, 0.8);
+});
+
+test('rejects a publication when the observable price methodology marker changes', () => {
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
+    const fixture = priceFixture(id);
+    assert.throws(
+      () => parseNbsPricePublication(fixture.publication, fixture.html.replace('2025年为基期', '2024年为基期'), id),
+      MethodologyMismatchError,
+    );
+  }
 });
 
 test('discovers the newest official monthly price publication per dataset', () => {
@@ -135,6 +144,16 @@ test('discovers the newest official monthly price publication per dataset', () =
   assert.equal(publication.sourceDate, '2026-03-10');
   assert.equal(publication.coverage, '2026-02 to 2026-02');
   assert.equal(publication.url, 'https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260310_1963001.html');
+});
+
+test('discovers core CPI from the formal CPI release rather than an interpretation page', () => {
+  const index = [
+    '<a href="/sj/sjjd/202608/t20260809_1965009.html">2026年7月份居民消费价格同比上涨0.5%</a> 2026-08-09',
+    '<a href="/sj/zxfbhjd/202608/t20260809_1965009.html">2026年7月份居民消费价格同比上涨0.5%解读</a> 2026-08-09',
+  ].join(' ');
+  const publication = discoverLatestPricePublication(index, 'core-cpi');
+  assert.equal(publication.url, 'https://www.stats.gov.cn/sj/sjjd/202608/t20260809_1965009.html');
+  assert.equal(publication.coverage, '2026-07 to 2026-07');
 });
 
 function rawPrice(id, observations, sourceDate = '2026-08-09') {
@@ -205,6 +224,35 @@ test('price group writer is idempotent when every output is unchanged', async ()
   }
 });
 
+test('price group writer restores all targets when backup fails mid-commit', async () => {
+  const targetDir = fs.mkdtempSync('/tmp/macrolens-price-group-rollback-');
+  try {
+    const targets = ['cpi', 'core-cpi', 'ppi'].map((id) => path.join(targetDir, `${id}.json`));
+    for (const target of targets) fs.writeFileSync(target, `old-${path.basename(target)}\n`);
+    const outputs = new Map(targets.map((target) => [target, `new-${path.basename(target)}\n`]));
+    let copies = 0;
+    const failingFileSystem = {
+      ...fsPromises,
+      copyFile: async (...args) => {
+        copies += 1;
+        if (copies === 2) throw new Error('injected backup failure');
+        return fsPromises.copyFile(...args);
+      },
+    };
+
+    await assert.rejects(
+      () => writeIndicatorDatasetGroup(outputs, failingFileSystem),
+      /injected backup failure/,
+    );
+    assert.deepEqual(
+      targets.map((target) => fs.readFileSync(target, 'utf8')),
+      targets.map((target) => `old-${path.basename(target)}\n`),
+    );
+  } finally {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+  }
+});
+
 test('price CLI validates all candidates before changing any target', async () => {
   const targetDir = fs.mkdtempSync('/tmp/macrolens-price-cli-target-');
   const fixtureDir = fs.mkdtempSync('/tmp/macrolens-price-cli-fixtures-');
@@ -218,7 +266,7 @@ test('price CLI validates all candidates before changing any target', async () =
     const before = Object.fromEntries(['cpi', 'core-cpi', 'ppi'].map((id) => [id, fs.readFileSync(path.join(targetDir, `${id}.json`), 'utf8')]));
     const corePath = path.join(fixtureDir, 'core-cpi.json');
     const core = JSON.parse(fs.readFileSync(corePath, 'utf8'));
-    core.html = core.html.replace('核心CPI同比上涨0.8%', '核心CPI为不可用值');
+    core.html = core.html.replace('<td>0.8</td><td>0.8</td>', '<td>不可用值</td><td>不可用值</td>');
     fs.writeFileSync(corePath, JSON.stringify(core));
     await assert.rejects(() => runPrices([
       '--fixture-index', fixtureIndex,

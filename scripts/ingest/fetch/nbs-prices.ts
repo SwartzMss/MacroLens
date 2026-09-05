@@ -1,4 +1,4 @@
-import { IngestionContractError, PRICE_CONTRACTS } from '../types.ts';
+import { IngestionContractError, MethodologyMismatchError, PRICE_CONTRACTS } from '../types.ts';
 import type {
   IndicatorSource,
   NbsPricePublication,
@@ -46,12 +46,47 @@ function signedValue(direction: string, value: string): number {
   return numeric;
 }
 
+function assertObservableMethodology(text: string, id: PriceDatasetId): void {
+  const marker = id === 'ppi'
+    ? /2026年(?:1月份?|)起.{0,240}2025年为基期/
+    : /2026年1月份?起.{0,240}2025年为基期/;
+  if (!marker.test(text)) {
+    throw new MethodologyMismatchError(`Official ${id} publication is missing the expected 2025-base methodology marker`);
+  }
+}
+
+function tableCells(fragment: string): string[] {
+  return [...fragment.matchAll(/<(?:td|th)\b[^>]*>([\s\S]*?)<\/(?:td|th)>/gi)]
+    .map((match) => textOf(match[1]));
+}
+
+function coreCpiTableValue(html: string): number {
+  for (const tableMatch of html.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)) {
+    const rows = [...tableMatch[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)]
+      .map((match) => tableCells(match[1]))
+      .filter((cells) => cells.length > 0);
+    const row = rows.find((cells) => cells.some((cell) => /不包括食品和能源/.test(cell)));
+    if (!row) continue;
+
+    const header = rows.find((cells) => cells.some((cell) => /同比/.test(cell)) && cells.some((cell) => /环比/.test(cell)));
+    const labelIndex = row.findIndex((cell) => /不包括食品和能源/.test(cell));
+    const yoyIndex = header?.findIndex((cell) => /同比/.test(cell)) ?? -1;
+    const numericCells = row.slice(labelIndex + 1).filter((cell) => /^[-+]?\d+(?:\.\d+)?%?$/.test(cell));
+    const candidate = yoyIndex >= 0
+      ? row[yoyIndex]
+      : numericCells[1];
+    const numeric = candidate?.replace('%', '').trim();
+    if (numeric && /^[-+]?\d+(?:\.\d+)?$/.test(numeric)) return Number(numeric);
+    fail('Official core-cpi table contains an invalid YoY value');
+  }
+  fail('Official core-cpi YoY value was not found in the CPI table');
+}
+
 function publishedValue(text: string, id: PriceDatasetId): number {
-  const pattern = id === 'core-cpi'
-    ? /扣除食品和能源(?:价格)?的核心CPI(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/
-    : id === 'cpi'
-      ? /居民消费价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/
-      : /工业生产者出厂价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/;
+  if (id === 'core-cpi') return coreCpiTableValue(text);
+  const pattern = id === 'cpi'
+    ? /居民消费价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/
+    : /工业生产者出厂价格(?:同比)?(上涨|下降|持平)(\d+(?:\.\d+)?)%/;
   const match = text.match(pattern);
   if (!match) fail(`Official ${id} YoY value was not found in publication`);
   return match[1] === '持平' ? 0 : signedValue(match[1], match[2]);
@@ -81,7 +116,8 @@ export function parseNbsPricePublication(
   if (new URL(publication.url).origin !== NBS_ORIGIN) fail(`Price publication is not hosted by stats.gov.cn: ${publication.url}`);
   if (!validDate(publication.sourceDate)) fail(`Invalid price publication date: ${publication.sourceDate}`);
   const visible = textOf(html);
-  const value = publishedValue(visible, id);
+  assertObservableMethodology(visible, id);
+  const value = publishedValue(id === 'core-cpi' ? html : visible, id);
   const coverage = publication.coverage || coverageFromTitle(publication.title, id);
   const date = monthFromCoverage(coverage);
   const source: IndicatorSource = {

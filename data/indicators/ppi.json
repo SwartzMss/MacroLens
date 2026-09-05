@@ -12,7 +12,7 @@
   "calculation": "published",
   "updatedAt": "2026-08-09",
   "comparabilityNote": "国家统计局发布的工业生产者出厂价格同比涨跌幅；2026年1月起采用2025年为基期的新基期序列。",
-  "methodologyFingerprint": "nbs-ppi|factory-gate|published-yoy",
+  "methodologyFingerprint": "nbs-ppi|factory-gate|published-yoy|base=2025-from-2026-01",
   "methodologyEffectiveFrom": "2026-01",
   "sources": [
     {

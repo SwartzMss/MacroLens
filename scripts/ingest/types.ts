@@ -68,8 +68,8 @@ export type RawNbsPriceSeries = {
 
 export const PRICE_METHODOLOGY_FINGERPRINTS = {
   cpi: 'nbs-cpi|headline|published-yoy|base=2025-from-2026-01',
-  'core-cpi': 'nbs-core-cpi|food-and-energy-excluded|published-yoy',
-  ppi: 'nbs-ppi|factory-gate|published-yoy',
+  'core-cpi': 'nbs-core-cpi|food-and-energy-excluded|published-yoy|base=2025-from-2026-01',
+  ppi: 'nbs-ppi|factory-gate|published-yoy|base=2025-from-2026-01',
 } as const;
 
 export const PRICE_CONTRACTS: Record<PriceDatasetId, PriceContract> = {
