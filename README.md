@@ -65,6 +65,17 @@ NODE_VERSION=24
 
 PUBLIC_SITE_URL 必须是站点真实、稳定的 http/https origin，不带路径。它用于 sitemap、canonical 和 Open Graph URL。Cloudflare Pages 的 main 构建缺少该变量时会直接失败，不会把当前 deployment 的 CF_PAGES_URL 静默用作 production canonical。
 
+Umami tracking script 会在所有页面加载。页脚访客统计通过同源的 `/api/umami-stats` Pages Function 读取 Umami Cloud 数据；API key 只在服务端使用，未配置或请求失败时统计区块会保持隐藏。在 Cloudflare Pages 中配置：
+
+~~~text
+UMAMI_API_KEY=<Umami Cloud API key，作为 secret 保存>
+UMAMI_WEBSITE_ID=<可选，默认使用 issue #84 提供的网站 ID>
+UMAMI_API_ENDPOINT=https://api.umami.is/v1
+PUBLIC_UMAMI_WEBSITE_ID=<可选，用于覆盖 tracking script 的网站 ID>
+~~~
+
+Umami Cloud API key 不能写入前端代码或 `PUBLIC_` 变量。`UMAMI_API_ENDPOINT` 仅在使用自建 Umami 实例时覆盖默认的 Cloud API 地址。
+
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 /MacroLens base。首页、/concepts、/topics、/graph、/search、Pagefind 资源和图表资源均使用根路径。
 
 内容位于 src/content/concepts，指标数据位于 data/indicators，关系数据位于 data/relations。

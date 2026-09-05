@@ -1,0 +1,39 @@
+---
+import '../styles/visitor-stats.css';
+---
+
+<div class="visitor-stats" data-visitor-stats hidden aria-live="polite">
+  <span class="visitor-stats-label">访问统计</span>
+  <span><small>累计访客</small><strong data-total-visitors>—</strong></span>
+  <span><small>今日访客</small><strong data-today-visitors>—</strong></span>
+</div>
+
+<script>
+  const stats = document.querySelector<HTMLElement>('[data-visitor-stats]');
+  const totalVisitors = document.querySelector<HTMLElement>('[data-total-visitors]');
+  const todayVisitors = document.querySelector<HTMLElement>('[data-today-visitors]');
+
+  const loadVisitorStats = async () => {
+    if (!stats || !totalVisitors || !todayVisitors) return;
+
+    try {
+      const response = await fetch('/api/umami-stats', { headers: { Accept: 'application/json' } });
+      if (!response.ok) return;
+      const result = await response.json();
+      if (!Number.isInteger(result.totalVisitors) || !Number.isInteger(result.todayVisitors)) return;
+
+      const formatter = new Intl.NumberFormat('zh-CN');
+      totalVisitors.textContent = formatter.format(result.totalVisitors);
+      todayVisitors.textContent = formatter.format(result.todayVisitors);
+      stats.hidden = false;
+    } catch {
+      // Visitor statistics are optional and must not affect page rendering.
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadVisitorStats, { once: true });
+  } else {
+    void loadVisitorStats();
+  }
+</script>

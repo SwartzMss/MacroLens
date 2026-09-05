@@ -1,0 +1,27 @@
+.visitor-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.visitor-stats[hidden] {
+  display: none;
+}
+
+.visitor-stats > span:not(.visitor-stats-label) {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.visitor-stats small {
+  color: var(--muted);
+}
+
+.visitor-stats strong {
+  color: var(--green);
+  font-size: 13px;
+}
