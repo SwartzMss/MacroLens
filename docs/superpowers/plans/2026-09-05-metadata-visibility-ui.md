@@ -274,7 +274,7 @@ Render each source as an official link with its publication date and source cove
 
 - [ ] **Step 4: Integrate and style the detail metadata**
 
-In `src/pages/concepts/[id].astro`, import and render `<IndicatorMetadata indicator={indicator} definition={entry.data.subtitle} />` immediately before `IndicatorChart` when an indicator exists. Remove the header’s audit-style definition effective/as-of spans and the duplicated source span, leaving the country/region context in the header.
+In `src/pages/concepts/[id].astro`, import and render `<IndicatorMetadata indicator={indicator} definition={entry.data.subtitle} />` immediately before `IndicatorChart` when an indicator exists. For indicator pages, remove the header’s audit-style definition effective/as-of spans and duplicated source span, while preserving the user-facing source on non-indicator concept pages and keeping country/region context in the header.
 
 In `IndicatorChart.astro`, keep the chart markup and script unchanged, remove the old mixed `.data-note` provenance footer, and remove its now-unused local calculation-description helper. Delete the obsolete `.data-note` rules from `src/styles/data.css` if no other component uses them.
 
