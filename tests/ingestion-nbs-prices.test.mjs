@@ -19,6 +19,8 @@ import {
   parseNbsPricePublication,
 } from '../scripts/ingest/fetch/nbs-prices.ts';
 import { normalizePriceDataset } from '../scripts/ingest/normalize/prices.ts';
+import { writeIndicatorDatasetGroup } from '../scripts/ingest/write/group.ts';
+import { runPrices } from '../scripts/ingest/price-cli.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const priceFixture = (id) => JSON.parse(fs.readFileSync(
@@ -185,4 +187,51 @@ test('price normalization rejects a changed historical value', () => {
     ),
     HistoricalMismatchError,
   );
+});
+
+test('price group writer is idempotent when every output is unchanged', async () => {
+  const targetDir = fs.mkdtempSync('/tmp/macrolens-price-group-');
+  try {
+    const outputs = new Map([
+      [path.join(targetDir, 'cpi.json'), '{"id":"cpi"}\n'],
+      [path.join(targetDir, 'core-cpi.json'), '{"id":"core-cpi"}\n'],
+      [path.join(targetDir, 'ppi.json'), '{"id":"ppi"}\n'],
+    ]);
+    assert.equal((await writeIndicatorDatasetGroup(outputs)).changed, true);
+    const first = [...outputs.keys()].map((file) => fs.readFileSync(file, 'utf8'));
+    assert.equal((await writeIndicatorDatasetGroup(outputs)).changed, false);
+    assert.deepEqual([...outputs.keys()].map((file) => fs.readFileSync(file, 'utf8')), first);
+  } finally {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+  }
+});
+
+test('price CLI validates all candidates before changing any target', async () => {
+  const targetDir = fs.mkdtempSync('/tmp/macrolens-price-cli-target-');
+  const fixtureDir = fs.mkdtempSync('/tmp/macrolens-price-cli-fixtures-');
+  try {
+    const fixtureIndex = path.join(fixtureDir, 'index.json');
+    fs.writeFileSync(fixtureIndex, JSON.stringify({ cpi: 'cpi.json', 'core-cpi': 'core-cpi.json', ppi: 'ppi.json' }));
+    for (const id of ['cpi', 'core-cpi', 'ppi']) {
+      fs.copyFileSync(path.join(here, 'fixtures', 'nbs', 'prices', `${id}.json`), path.join(fixtureDir, `${id}.json`));
+      fs.writeFileSync(path.join(targetDir, `${id}.json`), JSON.stringify(dataset(id, [{ date: '2026-01', value: id === 'ppi' ? -1.5 : id === 'core-cpi' ? 0.4 : 0.2 }]) , null, 2) + '\n');
+    }
+    const before = Object.fromEntries(['cpi', 'core-cpi', 'ppi'].map((id) => [id, fs.readFileSync(path.join(targetDir, `${id}.json`), 'utf8')]));
+    const corePath = path.join(fixtureDir, 'core-cpi.json');
+    const core = JSON.parse(fs.readFileSync(corePath, 'utf8'));
+    core.html = core.html.replace('核心CPI同比上涨0.4%', '核心CPI为不可用值');
+    fs.writeFileSync(corePath, JSON.stringify(core));
+    await assert.rejects(() => runPrices([
+      '--fixture-index', fixtureIndex,
+      '--fixture-dir', fixtureDir,
+      '--target-dir', targetDir,
+    ]), /core CPI|official/i);
+    assert.deepEqual(
+      Object.fromEntries(['cpi', 'core-cpi', 'ppi'].map((id) => [id, fs.readFileSync(path.join(targetDir, `${id}.json`), 'utf8')])),
+      before,
+    );
+  } finally {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+    fs.rmSync(fixtureDir, { recursive: true, force: true });
+  }
 });
