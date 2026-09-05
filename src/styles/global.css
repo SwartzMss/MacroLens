@@ -272,6 +272,17 @@ main {
   color: var(--muted);
   font-size: 13px;
 }
+.visitor-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.visitor-stats strong {
+  color: var(--ink);
+  font-weight: 600;
+}
 .search-wrap {
   max-width: 740px;
   margin: 50px auto 80px;

@@ -1,0 +1,34 @@
+<div class="visitor-stats" data-visitor-stats hidden aria-live="polite">
+  <span>累计访客 <strong data-total>—</strong></span>
+  <span>今日访客 <strong data-today>—</strong></span>
+</div>
+
+<script>
+  type VisitorStats = { available: true; total: number; today: number };
+
+  const isVisitorStats = (value: unknown): value is VisitorStats => {
+    if (!value || typeof value !== 'object') return false;
+    const stats = value as Partial<VisitorStats>;
+    return stats.available === true
+      && Number.isSafeInteger(stats.total) && stats.total >= 0
+      && Number.isSafeInteger(stats.today) && stats.today >= 0;
+  };
+
+  const container = document.querySelector<HTMLElement>('[data-visitor-stats]');
+  const total = container?.querySelector<HTMLElement>('[data-total]');
+  const today = container?.querySelector<HTMLElement>('[data-today]');
+  if (container && total && today) {
+    fetch('/api/visitor-stats', {
+      credentials: 'same-origin',
+      headers: { accept: 'application/json' },
+    })
+      .then((response) => response.ok ? response.json() : null)
+      .then((stats: unknown) => {
+        if (!isVisitorStats(stats)) return;
+        total.textContent = stats.total.toLocaleString('zh-CN');
+        today.textContent = stats.today.toLocaleString('zh-CN');
+        container.hidden = false;
+      })
+      .catch(() => {});
+  }
+</script>

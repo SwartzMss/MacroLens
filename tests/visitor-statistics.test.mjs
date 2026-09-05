@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { onRequest as onVisitorRequest } from '../functions/_middleware.ts';
 import { onRequest as onStatsRequest } from '../functions/api/visitor-stats.ts';
+
+const visitorComponent = fileURLToPath(new URL('../src/components/VisitorStats.astro', import.meta.url));
+const baseLayout = fileURLToPath(new URL('../src/layouts/BaseLayout.astro', import.meta.url));
+const globalStyles = fileURLToPath(new URL('../src/styles/global.css', import.meta.url));
+const readme = fileURLToPath(new URL('../README.md', import.meta.url));
+const wrangler = fileURLToPath(new URL('../wrangler.toml', import.meta.url));
 
 const analytics = () => ({
   points: [],
@@ -121,4 +129,25 @@ test('returns unavailable for missing credentials, upstream failure, and invalid
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test('footer integration stays optional and documents the privacy and retention contract', () => {
+  const component = readFileSync(visitorComponent, 'utf8');
+  const layout = readFileSync(baseLayout, 'utf8');
+  const styles = readFileSync(globalStyles, 'utf8');
+  const docs = readFileSync(readme, 'utf8');
+  const config = readFileSync(wrangler, 'utf8');
+  assert.match(component, /data-visitor-stats/);
+  assert.match(component, /credentials:\s*['"]same-origin['"]/);
+  assert.match(component, /toLocaleString\(['"]zh-CN['"]\)/);
+  assert.match(layout, /VisitorStats/);
+  assert.match(styles, /\.visitor-stats/);
+  assert.match(config, /binding\s*=\s*["']ANALYTICS["']/);
+  assert.match(config, /dataset\s*=\s*["']macrolens_visitors["']/);
+  assert.match(docs, /累计访客/);
+  assert.match(docs, /保留周期/);
+  assert.match(docs, /不代表永久历史累计/);
+  assert.match(docs, /HttpOnly.*Secure.*SameSite=Lax/s);
+  assert.match(docs, /IP.*UA|IP.*user-agent/i);
+  assert.match(docs, /page views|page-view|页面访问次数/i);
 });

@@ -65,6 +65,20 @@ NODE_VERSION=24
 
 PUBLIC_SITE_URL 必须是站点真实、稳定的 http/https origin，不带路径。它用于 sitemap、canonical 和 Open Graph URL。Cloudflare Pages 的 main 构建缺少该变量时会直接失败，不会把当前 deployment 的 CF_PAGES_URL 静默用作 production canonical。
 
+### 访客统计（可选）
+
+访客统计使用 Cloudflare Pages Functions 和 Analytics Engine；未配置时不会影响站点页面访问。部署时配置以下项目：
+
+~~~text
+ANALYTICS -> macrolens_visitors（Analytics Engine binding）
+CLOUDFLARE_ACCOUNT_ID -> Pages Function variable
+CLOUDFLARE_API_TOKEN -> Pages Function secret（需要 Account Analytics Read）
+~~~
+
+系统只统计 HTML `GET` 请求，并使用匿名 `HttpOnly; Secure; SameSite=Lax` cookie 生成 visitor identifier。不会采集 IP 地址、user-agent（UA）或 page views（页面访问次数）。
+
+“累计访客”表示 Analytics Engine 保留周期内的累计 unique visitors，不代表永久历史累计；“今日访客”按上海时区日期统计。
+
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 /MacroLens base。首页、/concepts、/topics、/graph、/search、Pagefind 资源和图表资源均使用根路径。
 
 内容位于 src/content/concepts，指标数据位于 data/indicators，关系数据位于 data/relations。
