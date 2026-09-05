@@ -1,0 +1,98 @@
+{
+  "id": "core-cpi",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "核心 CPI 同比",
+  "chartTitle": "核心 CPI 同比",
+  "definitionEffectiveFrom": "2026-01",
+  "definitionAsOf": "2026-08",
+  "source": "NBS",
+  "calculation": "published",
+  "updatedAt": "2026-08-09",
+  "comparabilityNote": "国家统计局发布的扣除食品和能源价格后的核心CPI同比涨跌幅；核心CPI为官方发布序列，未由组成项本地推导。",
+  "methodologyFingerprint": "nbs-core-cpi|food-and-energy-excluded|published-yoy|base=2025-from-2026-01",
+  "methodologyEffectiveFrom": "2026-01",
+  "sources": [
+    {
+      "title": "国家统计局：2026年1月份CPI和PPI数据解读",
+      "url": "https://www.stats.gov.cn/sj/sjjd/202602/t20260211_1962586.html",
+      "sourceDate": "2026-02-11",
+      "coverage": "2026-01 to 2026-01",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：2026年2月份CPI和PPI数据解读",
+      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260309_1962728.html",
+      "sourceDate": "2026-03-09",
+      "coverage": "2026-02 to 2026-02",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：2026年3月份CPI和PPI数据解读",
+      "url": "https://www.stats.gov.cn/sj/sjjd/202604/t20260410_1963262.html",
+      "sourceDate": "2026-04-10",
+      "coverage": "2026-03 to 2026-03",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：2026年4月份居民消费价格",
+      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963659.html",
+      "sourceDate": "2026-05-11",
+      "coverage": "2026-04 to 2026-04",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：5月份国民经济运行总体平稳",
+      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202606/t20260616_1963954.html",
+      "sourceDate": "2026-06-16",
+      "coverage": "2026-05 to 2026-05",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：2026年6月份CPI和PPI数据解读",
+      "url": "https://www.stats.gov.cn/sj/sjjd/202607/t20260709_1964082.html",
+      "sourceDate": "2026-07-09",
+      "coverage": "2026-06 to 2026-06",
+      "role": "data"
+    },
+    {
+      "title": "国家统计局：2026年7月份居民消费价格",
+      "url": "https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html",
+      "sourceDate": "2026-08-09",
+      "coverage": "2026-07 to 2026-07",
+      "role": "data"
+    }
+  ],
+  "data": [
+    {
+      "date": "2026-01",
+      "value": 0.8
+    },
+    {
+      "date": "2026-02",
+      "value": 1.8
+    },
+    {
+      "date": "2026-03",
+      "value": 1.1
+    },
+    {
+      "date": "2026-04",
+      "value": 1.2
+    },
+    {
+      "date": "2026-05",
+      "value": 1.1
+    },
+    {
+      "date": "2026-06",
+      "value": 1
+    },
+    {
+      "date": "2026-07",
+      "value": 0.9
+    }
+  ]
+}

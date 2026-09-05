@@ -5,9 +5,9 @@ import {
   type DashboardIndicatorId,
 } from './dashboard';
 
-export const macroSnapshotRulesVersion = '2026-09-05.1';
+export const macroSnapshotRulesVersion = '2026-09-05.2';
 
-type SignalFamily = 'pmi' | 'activity-growth' | 'monetary-growth';
+type SignalFamily = 'pmi' | 'activity-growth' | 'monetary-growth' | 'price-yoy';
 export type SnapshotChangeUnit = 'percentage-points' | 'points' | 'units';
 export type SnapshotEvidence = {
   id: DashboardIndicatorId;
@@ -58,6 +58,7 @@ const growthIds: DashboardIndicatorId[] = [
   'gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment',
 ];
 const monetaryIds: DashboardIndicatorId[] = ['m0', 'm1', 'm2'];
+const priceIds: DashboardIndicatorId[] = ['cpi', 'core-cpi', 'ppi'];
 const weakeningBoundary = -0.2;
 const improvingBoundary = 0.2;
 const EPSILON = 1e-9;
@@ -141,6 +142,19 @@ function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
     interpretation: weakening
       ? '按货币增速自身的变化，当前货币增速动能走弱，需继续观察；这不直接推出需求、价格或资产价格结论。'
       : '当前仅报告货币增速及其变化，不据此推出需求、价格或资产价格结论。',
+  };
+}
+
+function classifyPriceYoy(indicator: DashboardIndicator): SnapshotSignal {
+  const evidence = makeEvidence(indicator);
+  const momentum = changeInterpretation(indicator.change);
+  const level = indicator.latest.value > 0 ? '同比上涨' : indicator.latest.value < 0 ? '同比下降' : '同比持平';
+  const momentumText = momentum === 'improving' ? '动能上行' : momentum === 'weakening' ? '动能回落' : '动能基本稳定';
+  return {
+    ...evidence,
+    family: 'price-yoy',
+    fact: `${indicator.name}最新同比为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），较上一期${formatChange(indicator.change, evidence.changeUnit)}。`,
+    interpretation: `当前价格同比表现为${level}，${momentumText}；这只是该价格指标自身的描述，不据此推出需求、资产价格或投资结论。`,
   };
 }
 
@@ -279,6 +293,7 @@ export function buildMacroSnapshot(indicators: DashboardIndicator[] = getDashboa
   const signals = dashboardIndicatorIds.map((id) => {
     const indicator = byId.get(id)!;
     if (id === 'pmi') return classifyPmi(indicator);
+    if (priceIds.includes(id)) return classifyPriceYoy(indicator);
     if (growthIds.includes(id)) return classifyGrowth(indicator);
     return classifyMonetaryGrowth(indicator);
   });

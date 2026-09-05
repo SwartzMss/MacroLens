@@ -40,7 +40,7 @@ test('builds one signal for each existing dashboard indicator', () => {
   const snapshot = buildMacroSnapshot();
 
   assert.deepEqual(snapshot.signals.map((item) => item.id), dashboardIndicatorIds);
-  assert.equal(snapshot.signals.length, 8);
+  assert.equal(snapshot.signals.length, dashboardIndicatorIds.length);
   assert.ok(snapshot.signals.every((item) => item.fact && item.interpretation));
   assert.equal(signal(snapshot, 'pmi').metric, 'index');
   assert.equal(signal(snapshot, 'pmi').changeUnit, 'points');
@@ -174,6 +174,32 @@ test('emits independent risks and evidence-backed watch items', () => {
   assert.ok(snapshot.risks.some((item) => item.title.includes('货币增速')));
   assert.ok(snapshot.watchNext.length >= snapshot.risks.length);
   assert.ok(snapshot.watchNext.every((item) => item.evidenceIds.length > 0 && /下一期|下一次|继续观察/.test(item.explanation)));
+});
+
+test('classifies price indicators separately from activity phase rules', () => {
+  const baseline = buildMacroSnapshot(makeIndicators());
+  const priceSnapshot = buildMacroSnapshot(makeIndicators({
+    cpi: { latest: { date: '2026-07', value: -1 }, previous: { date: '2026-06', value: 2 } },
+    'core-cpi': { latest: { date: '2026-07', value: 0 }, previous: { date: '2026-06', value: 0.2 } },
+    ppi: { latest: { date: '2026-07', value: 3.5 }, previous: { date: '2026-06', value: 4.1 } },
+  }));
+  assert.equal(priceSnapshot.phase.label, baseline.phase.label);
+  assert.deepEqual(
+    priceSnapshot.signals.filter((signal) => signal.family === 'price-yoy').map((signal) => signal.id),
+    ['cpi', 'core-cpi', 'ppi'],
+  );
+  assert.equal(priceSnapshot.signals.find((signal) => signal.id === 'cpi').changeUnit, 'percentage-points');
+  assert.match(priceSnapshot.signals.find((signal) => signal.id === 'cpi').interpretation, /同比下降/);
+  assert.ok(priceSnapshot.risks.every((risk) => !/通胀|通缩|价格/.test(risk.title)));
+});
+
+test('keeps exact price momentum boundaries stable', () => {
+  const snapshot = buildMacroSnapshot(makeIndicators({
+    cpi: { latest: { date: '2026-07', value: 1.0 }, previous: { date: '2026-06', value: 0.8 } },
+  }));
+  const cpi = snapshot.signals.find((signal) => signal.id === 'cpi');
+  assert.equal(cpi.change, 0.19999999999999996);
+  assert.match(cpi.interpretation, /基本稳定/);
 });
 
 test('derives a deterministic date and rejects incomplete input', () => {

@@ -4,9 +4,12 @@ import '../styles/dashboard.css';
 
 const { indicators } = Astro.props as { indicators: DashboardIndicator[] };
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
-const formatChange = (change: number | null, unit: string) => {
+const changeSuffix = (metric: string) => metric === 'yoy' || metric === 'cumulative_yoy'
+  ? ' 个百分点'
+  : metric === 'index' ? ' 点' : '';
+const formatChange = (change: number | null, metric: string) => {
   if (change === null) return '—';
-  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${unit === '%' ? '%' : ''}`;
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${changeSuffix(metric)}`;
 };
 ---
 
@@ -31,7 +34,7 @@ const formatChange = (change: number | null, unit: string) => {
       <div class="indicator-value">{formatValue(item.latest.value, item.dataset.unit)}</div>
       <div class:list={['indicator-change', item.change !== null && item.change < 0 && 'is-negative']}>
         <span>较上一期</span>
-        <strong>{formatChange(item.change, item.dataset.unit)}</strong>
+        <strong>{formatChange(item.change, item.dataset.metric)}</strong>
       </div>
       <div class="indicator-meta">
         <span>数据期：{item.latest.date}</span>
@@ -61,7 +64,7 @@ const formatChange = (change: number | null, unit: string) => {
     <ul>{indicators.map((item) => <li>
       <a href={item.conceptHref}>{item.name}</a>
       <span>{item.latest.date}</span>
-      <strong class={item.change !== null && item.change < 0 ? 'is-negative' : ''}>{formatChange(item.change, item.dataset.unit)}</strong>
+      <strong class={item.change !== null && item.change < 0 ? 'is-negative' : ''}>{formatChange(item.change, item.dataset.metric)}</strong>
     </li>)}</ul>
   </section>
 </section>
