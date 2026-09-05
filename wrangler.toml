@@ -1,0 +1,6 @@
+name = "macrolens"
+compatibility_date = "2026-09-05"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "macrolens_visitors"
