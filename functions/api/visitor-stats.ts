@@ -1,4 +1,4 @@
-import { parseVisitorStats, visitorStatsQuery } from '../visitor-stats.ts';
+import { parseVisitorCount, visitorStatsQueries } from '../visitor-stats.ts';
 
 type Context = {
   request: Request;
@@ -27,27 +27,41 @@ export async function onRequest({ request, env }: Context): Promise<Response> {
 
   try {
     const endpoint = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)}/analytics_engine/sql`;
-    const upstream = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
-        'Content-Type': 'text/plain',
-      },
-      body: visitorStatsQuery(),
-    });
+    const queries = visitorStatsQueries();
 
-    if (!upstream.ok) {
-      return unavailable({
-        error: `Cloudflare API ${upstream.status}`,
-        detail: await upstream.text(),
+    const query = async (sql: string) => {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+          'Content-Type': 'text/plain',
+        },
+        body: sql,
       });
+
+      if (!response.ok) {
+        throw new Error(`Cloudflare API ${response.status}: ${await response.text()}`);
+      }
+
+      return response.json();
+    };
+
+    const [totalPayload, todayPayload] = await Promise.all([
+      query(queries.total),
+      query(queries.today),
+    ]);
+
+    const total = parseVisitorCount(totalPayload, 'total');
+    const today = parseVisitorCount(todayPayload, 'today');
+
+    if (total === null || today === null) {
+      return unavailable({ error: 'invalid analytics response' });
     }
 
-    const payload = await upstream.json();
-    const stats = parseVisitorStats(payload);
-    return stats
-      ? Response.json(stats, { headers: { 'Cache-Control': 'no-store' } })
-      : unavailable({ error: 'invalid analytics response', payload });
+    return Response.json(
+      { available: true, total, today },
+      { headers: { 'Cache-Control': 'no-store' } },
+    );
   } catch (error) {
     return unavailable({ error: String(error) });
   }
