@@ -1,5 +1,5 @@
 ---
-import { getConceptRelations, isSymmetricRelation, type ConceptRelation, type Relation, type RelationNode, type RelationType } from '../data/graphRegistry';
+import { getConceptRelations, type ConceptRelation, type Relation, type RelationNode, type RelationType } from '../data/graphRegistry';
 
 type GraphProps = {
   nodes: RelationNode[];
@@ -102,11 +102,14 @@ function relationText(item: ConceptRelation) {
     const select = root.querySelector<HTMLSelectElement>('[data-graph-select]');
     const details = root.querySelector<HTMLElement>('[data-graph-details]');
     if (!canvas || !select || !details) return;
+    const graphCanvas = canvas;
+    const graphSelect = select;
+    const graphDetails = details;
 
     const payload = JSON.parse(root.dataset.payload || '{}') as GraphPayload;
     const nodesById = new Map(payload.nodes.map((node) => [node.id, node]));
     const conceptIds = new Set(payload.conceptIds);
-    const chart = echarts.init(canvas);
+    const chart = echarts.init(graphCanvas);
     const relationDirection = (relation: BrowserRelation, nodeId: string): RelationDirection => {
       if (symmetricTypes.has(relation.type)) return 'symmetric';
       return relation.source === nodeId ? 'outgoing' : 'incoming';
@@ -169,22 +172,23 @@ function relationText(item: ConceptRelation) {
         return `<section class="graph-detail-group"><h3>${headings[direction]}</h3><ul>${items}</ul></section>`;
       };
       const pageLink = conceptIds.has(node.id) ? `<a class="graph-concept-link" href="/concepts/${encodeURIComponent(node.id)}">打开概念页 →</a>` : '<p class="graph-note">图谱概念：用于解释关系，不单独提供概念页。</p>';
-      details.innerHTML = `<div class="eyebrow">Selected node</div><h2>${escapeHtml(node.label)}</h2>${pageLink}${groupMarkup('incoming')}${groupMarkup('outgoing')}${groupMarkup('symmetric')}`;
+      graphDetails.innerHTML = `<div class="eyebrow">Selected node</div><h2>${escapeHtml(node.label)}</h2>${pageLink}${groupMarkup('incoming')}${groupMarkup('outgoing')}${groupMarkup('symmetric')}`;
     }
 
     function selectNode(nodeId: string) {
       if (!nodesById.has(nodeId)) return;
-      select.value = nodeId;
+      graphSelect.value = nodeId;
       renderDetails(nodeId);
       chart.dispatchAction({ type: 'downplay', seriesIndex: 0 });
       chart.dispatchAction({ type: 'highlight', seriesIndex: 0, name: nodesById.get(nodeId)?.label });
     }
 
-    chart.on('click', (params: { dataType?: string; data?: { id?: string } }) => {
-      if (params.dataType === 'node' && params.data?.id) selectNode(params.data.id);
+    chart.on('click', (params) => {
+      const data = params.data as { id?: string } | null | undefined;
+      if (params.dataType === 'node' && data?.id) selectNode(data.id);
     });
-    select.addEventListener('change', () => selectNode(select.value));
-    new ResizeObserver(() => chart.resize()).observe(canvas);
+    graphSelect.addEventListener('change', () => selectNode(graphSelect.value));
+    new ResizeObserver(() => chart.resize()).observe(graphCanvas);
     selectNode(payload.initialNodeId);
   });
 </script>
