@@ -75,7 +75,7 @@ The tests must fail before the adapter exists with a module/function resolution 
 Run:
 
 ```bash
-node --test tests/indicator-presentation-adapter.test.mjs
+node --import tsx --test tests/indicator-presentation-adapter.test.mjs
 ```
 
 Expected: FAIL because `src/data/indicatorPresentationAdapter.ts` and `getIndicatorPresentation` do not exist yet.
@@ -121,7 +121,7 @@ Implement the rules from existing domain fields:
 Run:
 
 ```bash
-node --test tests/indicator-presentation-adapter.test.mjs
+node --import tsx --test tests/indicator-presentation-adapter.test.mjs
 ```
 
 Expected: all adapter tests pass.
@@ -153,7 +153,7 @@ Add a data-level snapshot assertion that `signal(snapshot, 'gdp').changeLabel ==
 Run:
 
 ```bash
-node --test tests/dashboard.test.mjs tests/macro-snapshot.test.mjs
+node --import tsx --test tests/dashboard.test.mjs tests/macro-snapshot.test.mjs
 ```
 
 Expected: FAIL on the new UI-boundary and `changeLabel` assertions while existing behavior tests remain diagnostic.
@@ -169,7 +169,7 @@ Replace each generated fact’s literal `较上一期` with `${evidence.changeLa
 Run:
 
 ```bash
-node --test tests/macro-snapshot.test.mjs
+node --import tsx --test tests/macro-snapshot.test.mjs
 ```
 
 Expected: the new change-label assertions pass; update any old assertions that specifically require the prohibited generic wording so they assert the indicator-specific wording instead.
@@ -218,7 +218,7 @@ Delete styles that only support the removed source details (`.indicator-actions 
 Run:
 
 ```bash
-node --test tests/dashboard.test.mjs
+node --import tsx --test tests/dashboard.test.mjs
 ```
 
 Expected: all dashboard tests pass, including the absence of engineering/provenance copy and presence of indicator-specific labels.
@@ -253,7 +253,7 @@ The new assertions must fail before the component exists.
 Run:
 
 ```bash
-node --test tests/indicator-presentation.test.mjs
+node --import tsx --test tests/indicator-presentation.test.mjs
 ```
 
 Expected: FAIL because the structured metadata component and page integration do not yet exist.
@@ -285,7 +285,7 @@ Style the new section as a bordered, readable card with a two-column label/value
 Run:
 
 ```bash
-node --test tests/indicator-presentation.test.mjs
+node --import tsx --test tests/indicator-presentation.test.mjs
 ```
 
 Expected: all detail boundary and calculation-method presentation tests pass.
@@ -317,7 +317,7 @@ Retain the existing responsive layout and only adjust `.snapshot-meta` if needed
 Run:
 
 ```bash
-node --test tests/macro-snapshot.test.mjs
+node --import tsx --test tests/macro-snapshot.test.mjs
 ```
 
 Expected: all snapshot behavior, change-label, and UI boundary tests pass.
