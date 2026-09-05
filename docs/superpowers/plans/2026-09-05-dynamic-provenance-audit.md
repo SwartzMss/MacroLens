@@ -4,7 +4,7 @@
 
 **Goal:** Make the V1 indicator audit derive provenance coverage from checked-in observations instead of maintaining a hard-coded list of monthly price URLs.
 
-**Architecture:** Keep the audit in `tests/indicator-data-integrity.test.mjs`. The generic contract will require every observation period in every dataset to be covered by a source whose effective role is `data` and whose URL is official. Coverage parsing will support exact, ranged, quarterly, cumulative, and annual-shaped periods already used by the checked-in datasets. Because `role` is optional in the existing schema, an omitted role remains backward-compatible shorthand for `data`; an explicit `methodology` role never satisfies the contract. Price-specific assertions will additionally require exact-month data sources and reject known interpretation-page titles without locking historical URLs.
+**Architecture:** Keep the audit in `tests/indicator-data-integrity.test.mjs` and put reusable coverage parsing in `tests/helpers/coverage.mjs`. The generic contract will require every observation period in every dataset to be covered by a source whose effective role is `data` and whose URL is official. Coverage parsing will support exact, ranged, quarterly, cumulative, and annual-shaped periods already used by the checked-in datasets. Because `role` is optional in the existing schema, an omitted role remains backward-compatible shorthand for `data`; an explicit `methodology` role never satisfies the contract. Price-specific assertions will additionally require exact-month data sources and reject known interpretation-page titles without locking historical URLs.
 
 **Tech Stack:** Node test runner, `tsx` loader, checked-in JSON datasets, JavaScript assertions.
 
@@ -13,6 +13,8 @@
 ### Task 1: Replace hard-coded price URL audit with dynamic provenance coverage
 
 **Files:**
+- Create: `tests/helpers/coverage.mjs`
+- Create: `tests/coverage.test.mjs`
 - Modify: `tests/indicator-data-integrity.test.mjs`
 
 - [ ] **Step 1: Add the failing generic provenance assertion**
@@ -32,13 +34,25 @@
   }
   ```
 
-- [ ] **Step 2: Run the integrity test and verify the new contract passes**
+- [ ] **Step 2: Add focused coverage helper regression tests**
+
+  In `tests/coverage.test.mjs`, cover exact month ranges, quarter ranges, cumulative periods, annual-shaped coverage, semicolon-separated ranges, malformed coverage, and the optional-role default:
+
+  ```js
+  assert.equal(coversPeriod('2026-01 to 2026-07', '2026-04'), true);
+  assert.equal(coversPeriod('2021-Q1 to 2026-Q2', '2026-Q1'), true);
+  assert.equal(coversPeriod('2011-01–02 to 2026-01–07', '2026-01–03'), true);
+  assert.equal(coversPeriod('2011-01–02 to 2026-01–02 (annual)', '2025-01–02'), true);
+  assert.equal(isDataSource({ role: 'methodology' }), false);
+  ```
+
+- [ ] **Step 3: Run the integrity test and verify the new contract passes**
 
   Run: `node --import tsx --test tests/indicator-data-integrity.test.mjs`
 
   Expected: PASS for all integrity subtests. Existing datasets already contain exact-period data sources for the monthly and quarterly observations covered by this audit.
 
-- [ ] **Step 3: Remove the hard-coded `officialPriceSources` object**
+- [ ] **Step 4: Remove the hard-coded `officialPriceSources` object**
 
   Delete the month-to-URL map and replace the price-specific test with a dynamic regression that requires an exact data source for every price observation and rejects interpretation-page titles:
 
@@ -57,7 +71,7 @@
   });
   ```
 
-- [ ] **Step 4: Run the full verification suite**
+- [ ] **Step 5: Run the full verification suite**
 
   Run:
 
@@ -70,9 +84,9 @@
 
   Expected: tests pass, Astro reports 0 errors/warnings/hints, static build succeeds, and audit reports 0 vulnerabilities.
 
-- [ ] **Step 5: Commit the focused change**
+- [ ] **Step 6: Commit the focused change**
 
   ```bash
-  git add tests/indicator-data-integrity.test.mjs docs/superpowers/plans/2026-09-05-dynamic-provenance-audit.md
-  git commit -m "test: derive provenance audit coverage from observations"
+  git add tests/helpers/coverage.mjs tests/coverage.test.mjs tests/indicator-data-integrity.test.mjs docs/superpowers/plans/2026-09-05-dynamic-provenance-audit.md
+  git commit -m "test: extract reusable provenance coverage helper"
   ```
