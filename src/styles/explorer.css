@@ -1,0 +1,103 @@
+.graph-page {
+  padding: 68px 0 88px;
+}
+.graph-page-head {
+  max-width: 780px;
+  padding-bottom: 34px;
+}
+.graph-page-head h1 {
+  font: 800 clamp(42px, 7vw, 72px)/1.06 var(--serif);
+  letter-spacing: -0.04em;
+  margin: 16px 0 22px;
+}
+.graph-disclaimer {
+  max-width: 700px;
+  margin: 28px 0 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--amber);
+  background: #f0eee5;
+  color: var(--muted);
+  font-size: 14px;
+}
+.explorer-shell {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 16px 34px #174a380d;
+}
+.explorer-controls {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 360px) 1fr;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.explorer-controls label {
+  font-weight: 700;
+}
+.explorer-controls select {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #a9b8ae;
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+.explorer-controls select:focus,
+.explorer-panel a:focus {
+  outline: 3px solid #a9d8c3;
+  outline-offset: 3px;
+}
+.explorer-controls p,
+.explorer-note,
+.explorer-node-head p,
+.explorer-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.explorer-panel {
+  padding-top: 26px;
+}
+.explorer-node-head {
+  padding: 10px 0 2px;
+}
+.explorer-node-head h2 {
+  margin: 8px 0 10px;
+  font: 700 32px/1.25 var(--serif);
+  overflow-wrap: anywhere;
+}
+.explorer-node-head h2:focus {
+  outline: 0;
+}
+.explorer-node-head a {
+  color: var(--green);
+  font-weight: 700;
+}
+.explorer-empty {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+.explorer-note {
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .graph-page {
+    padding-top: 48px;
+  }
+  .explorer-shell {
+    padding: 14px;
+  }
+  .explorer-controls {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+  .explorer-controls p {
+    margin-top: 3px;
+  }
+}

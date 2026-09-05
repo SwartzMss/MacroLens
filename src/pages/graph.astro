@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RelationshipExplorer from '../components/RelationshipExplorer.astro';
+import { getRelationData } from '../data/graphRegistry';
+import '../styles/explorer.css';
+
+const concepts = await getCollection('concepts');
+const { nodes } = getRelationData('macro');
+---
+
+<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的手工维护关系。">
+  <div class="shell graph-page">
+    <header class="graph-page-head">
+      <div class="eyebrow">Relationship explorer</div>
+      <h1>按节点浏览关系</h1>
+      <p class="lead">选择一个指标或概念，阅读它受什么影响、影响什么，以及与什么通常相关。</p>
+      <p class="graph-disclaimer">这是由 MacroLens 手工维护的解释性关系数据浏览器，不代表关系必然成立，也不会自动生成经济结论。</p>
+    </header>
+    <RelationshipExplorer nodes={nodes} concepts={concepts} initialNodeId="m2" />
+  </div>
+</BaseLayout>

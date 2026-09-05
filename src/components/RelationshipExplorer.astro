@@ -1,0 +1,56 @@
+---
+import { getConceptRelations, type RelationNode } from '../data/graphRegistry';
+import RelationshipCards from './RelationshipCards.astro';
+
+type ConceptLink = { data: { id: string; name: string } };
+type ExplorerProps = {
+  nodes: RelationNode[];
+  concepts: ConceptLink[];
+  initialNodeId: string;
+};
+
+const { nodes, concepts, initialNodeId } = Astro.props as ExplorerProps;
+const conceptsById = new Set(concepts.map((concept) => concept.data.id));
+const initialNode = nodes.find((node) => node.id === initialNodeId) ?? nodes[0];
+if (!initialNode) throw new Error('The relationship explorer must contain an initial node');
+const panels = nodes.map((node) => ({ node, relations: getConceptRelations('macro', node.id) }));
+---
+
+<section class="explorer-shell" data-explorer>
+  <div class="explorer-controls">
+    <label for="explorer-node">选择一个节点</label>
+    <select id="explorer-node" data-explorer-select>
+      {nodes.map((node) => <option value={node.id} selected={node.id === initialNode.id}>{node.label}</option>)}
+    </select>
+    <p>可阅读“它受什么影响”“它影响什么”“与什么相关”等分组，保留 canonical dataset 的方向语义。</p>
+  </div>
+  <div class="explorer-panels" data-explorer-panels>
+    {panels.map(({ node, relations }) => <section class="explorer-panel" data-explorer-panel data-node-id={node.id} hidden={node.id !== initialNode.id}>
+      <header class="explorer-node-head">
+        <div class="eyebrow">Selected node</div>
+        <h2 tabindex="-1">{node.label}</h2>
+        {conceptsById.has(node.id) ? <a href={`/concepts/${node.id}`}>打开概念页 →</a> : <p>图谱概念：用于解释关系，不单独提供概念页。</p>}
+      </header>
+      {relations.length > 0 ? <RelationshipCards conceptId={node.id} conceptName={node.label} relations={relations} concepts={concepts} /> : <p class="explorer-empty">这个节点当前没有直接关系。</p>}
+    </section>)}
+  </div>
+  <noscript><p class="explorer-note">启用 JavaScript 后可切换节点；当前默认展示的关系仍可直接阅读。</p></noscript>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-explorer]').forEach((root) => {
+    const select = root.querySelector<HTMLSelectElement>('[data-explorer-select]');
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-explorer-panel]')];
+    if (!select || panels.length === 0) return;
+
+    select.addEventListener('change', () => {
+      const selectedId = select.value;
+      for (const panel of panels) {
+        const isSelected = panel.dataset.nodeId === selectedId;
+        panel.hidden = !isSelected;
+        panel.classList.toggle('is-selected', isSelected);
+        if (isSelected) panel.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
+      }
+    });
+  });
+</script>
