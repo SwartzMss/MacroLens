@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   IngestionContractError,
+  HistoricalMismatchError,
   MethodologyMismatchError,
   PRICE_CONTRACTS,
   PRICE_METHODOLOGY_FINGERPRINTS,
@@ -10,11 +14,22 @@ import {
   validatePriceDataset,
   validatePriceObservations,
 } from '../scripts/ingest/validate/prices.ts';
+import {
+  discoverLatestPricePublication,
+  parseNbsPricePublication,
+} from '../scripts/ingest/fetch/nbs-prices.ts';
+import { normalizePriceDataset } from '../scripts/ingest/normalize/prices.ts';
 
-const source = (coverage = '2026-01 to 2026-03') => ({
+const here = path.dirname(fileURLToPath(import.meta.url));
+const priceFixture = (id) => JSON.parse(fs.readFileSync(
+  path.join(here, 'fixtures', 'nbs', 'prices', `${id}.json`),
+  'utf8',
+));
+
+const source = (coverage = '2026-01 to 2026-03', sourceDate = '2026-08-09') => ({
   title: '国家统计局：官方价格数据',
   url: 'https://data.stats.gov.cn/dg/website/page.html?cid=official',
-  sourceDate: '2026-08-09',
+  sourceDate,
   coverage,
 });
 
@@ -84,5 +99,90 @@ test('price dataset validation enforces exact fields and methodology', () => {
   assert.throws(
     () => validatePriceDataset(dataset('cpi', data, { sources: [{ ...source(), coverage: '' }] }), 'cpi'),
     IngestionContractError,
+  );
+});
+
+test('parses the official published CPI, core CPI, and PPI YoY series', () => {
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
+    const fixture = priceFixture(id);
+    const raw = parseNbsPricePublication(fixture.publication, fixture.html, id);
+    assert.equal(raw.id, id);
+    assert.equal(raw.unit, '%');
+    assert.equal(raw.frequency, 'monthly');
+    assert.equal(raw.metric, 'yoy');
+    assert.equal(raw.observations.length, 1);
+    assert.equal(raw.observations[0].date, '2026-01');
+    assert.equal(raw.dataSources[0].url, fixture.publication.url);
+    assert.equal(raw.dataSources[0].role, 'data');
+  }
+});
+
+test('requires the official core CPI phrase rather than deriving it', () => {
+  const fixture = priceFixture('core-cpi');
+  assert.throws(
+    () => parseNbsPricePublication(fixture.publication, fixture.html.replace('扣除食品和能源', '扣除食品'), 'core-cpi'),
+    /core CPI|食品和能源|official/i,
+  );
+});
+
+test('discovers the newest official monthly price publication per dataset', () => {
+  const index = [
+    '<a href="/sj/zxfbhjd/202602/t20260210_1962001.html">2026年1月份居民消费价格同比上涨0.2%</a> 2026-02-10',
+    '<a href="/sj/zxfbhjd/202603/t20260310_1963001.html">2026年2月份居民消费价格同比上涨0.3%</a> 2026-03-10',
+  ].join(' ');
+  const publication = discoverLatestPricePublication(index, 'cpi');
+  assert.equal(publication.sourceDate, '2026-03-10');
+  assert.equal(publication.coverage, '2026-02 to 2026-02');
+  assert.equal(publication.url, 'https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260310_1963001.html');
+});
+
+function rawPrice(id, observations, sourceDate = '2026-08-09') {
+  const contract = PRICE_CONTRACTS[id];
+  return {
+    publication: {
+      title: '2026年3月份官方价格数据',
+      url: 'https://www.stats.gov.cn/sj/zxfbhjd/202604/t20260410_1964001.html',
+      sourceDate,
+      coverage: '2026-03 to 2026-03',
+    },
+    id,
+    seriesCode: contract.sourceCode,
+    seriesTitle: contract.sourceTitle,
+    unit: '%',
+    frequency: 'monthly',
+    metric: 'yoy',
+    methodologyFingerprint: contract.methodologyFingerprint,
+    dataSources: [{
+      ...source('2026-03 to 2026-03', sourceDate),
+      url: `https://www.stats.gov.cn/sj/zxfbhjd/${sourceDate.replaceAll('-', '')}.html`,
+    }],
+    observations,
+  };
+}
+
+test('price normalization preserves exact overlap and appends new months', () => {
+  const normalized = normalizePriceDataset(
+    rawPrice('cpi', [
+      { date: '2026-02', value: 0.3 },
+      { date: '2026-03', value: 0.1 },
+    ]),
+    dataset('cpi', [
+      { date: '2026-01', value: 0.2 },
+      { date: '2026-02', value: 0.3 },
+    ], { sources: [source('2026-01 to 2026-02', '2026-08-01')], updatedAt: '2026-08-01' }),
+    'cpi',
+  );
+  assert.deepEqual(normalized.data.map(({ date }) => date), ['2026-01', '2026-02', '2026-03']);
+  assert.equal(normalized.updatedAt, '2026-08-09');
+});
+
+test('price normalization rejects a changed historical value', () => {
+  assert.throws(
+    () => normalizePriceDataset(
+      rawPrice('cpi', [{ date: '2026-02', value: 9 }]),
+      dataset('cpi', [{ date: '2026-02', value: 0.3 }]),
+      'cpi',
+    ),
+    HistoricalMismatchError,
   );
 });
