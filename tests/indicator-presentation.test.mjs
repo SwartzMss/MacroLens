@@ -22,6 +22,7 @@ test('indicator detail provides structured user-facing metadata', () => {
     assert.match(source, new RegExp(label));
   }
   assert.match(page, /IndicatorMetadata/);
+  assert.match(source, /presentation\.comparisonMethod/);
   assert.match(page, /!indicator.*entry\.data\.source/);
   assert.match(source, /<details/);
   assert.match(source, /来源详情/);

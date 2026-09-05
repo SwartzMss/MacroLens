@@ -41,3 +41,15 @@ test('keeps source fallback and missing observations explicit', () => {
   assert.throws(() => getIndicatorPresentation(dataset), /at least one observation/);
   assert.equal(getIndicatorPresentation({ ...getIndicatorData('gdp'), source: 'Other agency' }).sourceLabel, 'Other agency');
 });
+
+test('derives labels from domain metadata rather than indicator ids', () => {
+  const quarterlyYoy = getIndicatorPresentation({ ...getIndicatorData('gdp'), id: 'cpi' });
+  const monthlyYoy = getIndicatorPresentation({ ...getIndicatorData('cpi'), id: 'gdp' });
+
+  assert.equal(quarterlyYoy.frequencyLabel, '季度');
+  assert.equal(quarterlyYoy.valueLabel, '同比');
+  assert.equal(quarterlyYoy.changeLabel, '较上一季度');
+  assert.equal(monthlyYoy.frequencyLabel, '月度');
+  assert.equal(monthlyYoy.valueLabel, '同比');
+  assert.equal(monthlyYoy.changeLabel, '较上月变化');
+});
