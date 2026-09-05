@@ -4,9 +4,11 @@
 
 **Goal:** Add official, validated, atomic monthly CPI, core CPI, and PPI datasets and expose them in the dashboard and descriptive macro snapshot.
 
-**Architecture:** Add a price-specific NBS adapter that reuses the existing shared fetch boundary and overlap conventions without refactoring working pipelines. Normalize and validate all three price series in memory, then write them through one staged group transaction. Extend the registry, metric-aware dashboard formatter, and snapshot with a separate `price-yoy` family.
+**Architecture:** Add a price-specific NBS release-page adapter that reuses the existing shared fetch boundary and overlap conventions without refactoring working pipelines. Parse CPI/PPI published YoY values and the Core CPI YoY table column from official NBS monthly release pages, validate all three series in memory, then write them through one staged group transaction. Extend the registry, metric-aware dashboard formatter, and snapshot with a separate `price-yoy` family.
 
-**Tech Stack:** TypeScript, Node test runner, `tsx`, Astro, official NBS structured National Data endpoint, JSON fixtures, GitHub Actions.
+**Tech Stack:** TypeScript, Node test runner, `tsx`, Astro, official NBS release pages, JSON fixtures, GitHub Actions.
+
+**Status:** Implemented in PR #75
 
 ---
 
@@ -14,7 +16,7 @@
 
 Create:
 
-- `scripts/ingest/fetch/nbs-prices.ts`: official mappings, requests, parser, and provenance.
+- `scripts/ingest/fetch/nbs-prices.ts`: official release discovery, parser, and provenance.
 - `scripts/ingest/validate/prices.ts`: exact contracts, monthly continuity, source and methodology checks.
 - `scripts/ingest/normalize/prices.ts`: overlap merge and deterministic dataset construction.
 - `scripts/ingest/write/group.ts`: staged multi-file write, no-change short circuit, and rollback.
@@ -69,9 +71,9 @@ Add:
     };
 
 Define `PRICE_CONTRACTS` and `PRICE_METHODOLOGY_FINGERPRINTS` for the three
-published series. Before committing this task, perform the official mapping
-verification described in Task 2 Step 1 and put the resulting concrete source
-codes in the contracts; never infer them from labels.
+published series. The source codes are stable MacroLens contract identifiers;
+the official NBS release URL, title, source date, coverage, and methodology
+marker are validated by the release-page parser.
 
 - [ ] **Step 2: Write failing validator tests.**
 
@@ -109,56 +111,36 @@ confirm focused tests pass, then:
 
 **Files:** `scripts/ingest/fetch/nbs-prices.ts`, `tests/fixtures/nbs/prices/`, `tests/ingestion-nbs-prices.test.mjs`
 
-- [ ] **Step 1: Verify or re-check official structured mappings.**
+- [ ] **Step 1: Verify the official release-page shapes.**
 
-Using the official NBS National Data page and request shape from
-`scripts/ingest/fetch/nbs-real-economy.ts`, verify each series' `cid`,
-indicator ID, title, unit, monthly frequency, and national-area dimension.
-Record the concrete values in `PRICE_STRUCTURED_MAPPINGS` and fixtures. If Task
-1 already recorded the values, re-check them against the fixture request and
-parser contract. Core CPI must be the official published indicator, never a
-local calculation.
+Verify the formal NBS CPI and PPI monthly release pages and their release-index
+entries. Confirm that CPI/PPI publish the required YoY sentence, that the CPI
+table contains the official `不包括食品和能源` row with `环比`, `同比`, and
+`累计同比` columns, and that the pages expose the 2025-base methodology
+marker. Core CPI must be read from that official table, never calculated
+locally or taken from an interpretation page.
 
-- [ ] **Step 2: Add payload fixtures and parser tests.**
+- [ ] **Step 2: Add release-page fixtures and parser tests.**
 
-Create one official-shaped payload per dataset and publication/methodology
-metadata. Assert exact identity, unit, monthly frequency, `yoy` metric,
-ordered months, POST request provenance, and national-area selection:
-
-    for (const id of ['cpi', 'core-cpi', 'ppi']) {
-      const payload = fixture(id);
-      const raw = parseNbsPriceResponse(payload, payload.publication, PRICE_CONTRACTS[id]);
-      assert.equal(raw.id, id);
-      assert.equal(raw.unit, '%');
-      assert.equal(raw.frequency, 'monthly');
-      assert.equal(raw.metric, 'yoy');
-      assert.deepEqual(raw.observations.map(({ date }) => date), ['2026-01', '2026-02', '2026-03']);
-      assert.equal(raw.dataSources[0].request.method, 'POST');
-    }
-
-Reject missing selected indicators, wrong title/unit, non-national data,
-malformed values, unsupported IDs, and payloads that omit official Core CPI
-while providing component values.
+Create official-shaped HTML fixtures for CPI, Core CPI, and PPI, including the
+release metadata and observable methodology marker. Assert exact identity,
+unit, monthly frequency, `yoy` metric, ordered months, published CPI/PPI
+values, and the Core CPI table's `同比` value. Reject missing methodology
+markers, malformed values, unsupported IDs, non-official URLs, and a Core CPI
+page that has no official table row.
 
 - [ ] **Step 3: Implement the shared-boundary fetch and parser.**
 
-Implement `fetchNbsPriceSeries(publication, contract, fetcher = fetchText)`
-against the official structured endpoint. Preserve POST body, official data
-page, source date, coverage, and methodology source in `dataSources`. The
-module must contain no direct global `fetch(` call. Reject any response whose
-selected official indicator lacks usable numeric values or matching identity.
+Implement release-index discovery and page fetching through the shared
+`fetchText` boundary. Parse CPI/PPI published YoY sentences and the Core CPI
+official table row. Validate the release URL, source date, exact monthly
+coverage, and observable 2025-base marker before assigning the expected
+methodology fingerprint. The module must contain no direct global `fetch(`
+call.
 
-- [ ] **Step 4: Add deterministic publication discovery.**
+- [ ] **Step 4: Run and commit.**
 
-Parse official NBS release-index entries for the latest CPI/PPI publication,
-validate official `stats.gov.cn` origins, derive actual monthly coverage, and
-attach the release page as methodology evidence when separate from the data
-source. Derive `updatedAt` from source metadata, never the wall clock.
-
-- [ ] **Step 5: Run and commit.**
-
-Run `npm test -- --test-name-pattern='official .* structured|NBS price|price response'`,
-then:
+Run `npm test -- --test-name-pattern='NBS price|Core CPI|methodology'`, then:
 
     git add scripts/ingest/fetch/nbs-prices.ts tests/fixtures/nbs/prices tests/ingestion-nbs-prices.test.mjs
     git commit -m "feat: parse official NBS price series"
@@ -255,7 +237,7 @@ then:
 
 Run the fixture-backed CLI into a temporary directory and compare bytes with
 the checked-in datasets. Assert complete monthly sequences, truthful coverage,
-deterministic request metadata, and Core CPI values equal the official Core CPI
+deterministic release metadata, and Core CPI values equal the official Core CPI
 row rather than a formula over CPI.
 
 - [ ] **Step 2: Generate the committed JSON.**
@@ -395,9 +377,8 @@ automatically.
 
 - Spec coverage: contracts/provenance in Tasks 1–3; atomic update/workflow in
   Tasks 4–5; dashboard in Task 6; snapshot in Task 7; verification in Task 8.
-- No unresolved implementation placeholders remain: official mappings are an
-  explicit verification gate before the Task 1 contract commit and are locked
-  by Task 2 parser fixtures.
+- No unresolved implementation placeholders remain: official release-page
+  shapes and methodology markers are locked by parser fixtures.
 - Type consistency: the price types are introduced in Task 1 and consumed in
   Tasks 2–4; `price-yoy` is introduced and consumed within Task 7.
 - Atomicity: validation precedes the group writer, unchanged output is a

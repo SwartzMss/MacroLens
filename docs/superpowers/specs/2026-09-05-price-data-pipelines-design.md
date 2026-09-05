@@ -2,7 +2,7 @@
 
 Date: 2026-09-05
 Issue: #74
-Status: Proposed for implementation
+Status: Implemented in PR #75
 
 ## Context
 
@@ -28,7 +28,7 @@ prices.
 
 - Add `data/indicators/cpi.json`, `core-cpi.json`, and `ppi.json` using the
   existing `IndicatorDataset` contract.
-- Retrieve official NBS observations through one coherent price-data adapter.
+- Retrieve official NBS observations through one coherent release-page adapter.
 - Preserve complete available historical monthly sequences rather than a
   rolling fixed window.
 - Reject historical overlap mismatches, duplicate months, malformed values,
@@ -54,29 +54,36 @@ prices.
 
 ## Source and provenance design
 
-The adapter will use the official NBS National Data structured endpoint used by
-the existing real-economy ingestion path:
+The adapter uses the official NBS monthly release index and release pages:
 
-`https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData`
+`https://www.stats.gov.cn/sj/zxfbhjd/`
 
-The implementation must verify the exact official `cid`, indicator IDs, series
-titles, unit, frequency, and national-area dimension for all three price
-series before adding them to the mapping constants. The identifiers are part
-of the source contract and must be covered by fixtures and parser tests; they
-must not be guessed from a display label.
+The release page is both the data source and the methodology/provenance source.
+The parser is intentionally dataset-specific because the official page shapes
+are different:
+
+- `cpi` reads the published headline YoY sentence from the formal CPI release.
+- `core-cpi` reads the `不包括食品和能源` row and its `同比` column from the
+  formal CPI release table. It never derives Core CPI from CPI components.
+- `ppi` reads the published factory-gate YoY sentence from the formal PPI
+  release.
+
+The adapter validates the release URL, title, source date, exact monthly
+coverage, published metric, and the observable methodology marker before
+accepting a value. The `sourceCode` values in the internal contract are stable
+MacroLens identifiers for these release-page contracts.
 
 Each dataset will retain:
 
-- the structured request URL and request body used to retrieve the series;
-- an official NBS data URL suitable for human inspection;
-- the latest official release page as a provenance/methodology anchor;
+- the official NBS release page URL;
 - source publication date and truthful observation coverage;
+- the published metric and dataset-specific extraction semantics;
 - a stable methodology fingerprint containing the dataset identity, published
-  metric, scope, and any applicable NBS base-year/version boundary.
+  metric, scope, and the NBS base-year/version boundary;
+- an observable methodology guard sourced from the same official release page.
 
-The NBS National Data portal is the data authority. Official release pages
-such as the NBS CPI/PPI monthly release and interpretation pages are used for
-publication and methodology evidence, not as an unofficial data fallback.
+Formal NBS release pages are the authority for the values in this adapter.
+Interpretation pages are not used as a fallback for missing data.
 
 The current NBS publication cycle includes a CPI base-year change to 2025
 starting in 2026. The adapter must represent this explicitly in the
@@ -108,8 +115,7 @@ type PriceContract = {
 };
 ```
 
-The source-code mapping will additionally contain the official structured
-endpoint collection and indicator IDs. The runtime contract will require:
+The runtime contract will require:
 
 - dates normalized to `YYYY-MM`;
 - strictly increasing, duplicate-free observations;
@@ -131,8 +137,8 @@ source/publication date, never from the wall clock.
 
 Add a price-specific adapter rather than refactoring the existing pipelines:
 
-- `scripts/ingest/fetch/nbs-prices.ts`: official mapping, request builder,
-  structured response parser, and release/provenance discovery;
+- `scripts/ingest/fetch/nbs-prices.ts`: official release discovery, published
+  YoY parser, Core CPI table parser, and methodology guard;
 - `scripts/ingest/normalize/prices.ts`: source-to-dataset normalization,
   exact overlap merge, metadata construction, and deterministic serialization
   inputs;
@@ -163,9 +169,9 @@ The price CLI must perform these phases in order:
 6. If all serialized outputs are unchanged, remove staging and perform no
    target writes.
 
-The transaction tests will inject a failure in one series and assert that none
-of the three target files changes. A second run against the same fixtures must
-be idempotent.
+The transaction tests will inject both a candidate validation failure and a
+mid-backup filesystem failure, asserting that none of the three target files
+changes. A second run against the same fixtures must be idempotent.
 
 ## Workflow
 
@@ -219,15 +225,18 @@ interpretation rules change.
 
 Add deterministic fixtures for all three official series and tests covering:
 
-- official series identity, exact title, unit, frequency, and `yoy` metric;
-- complete historical monthly parsing and continuity;
+- official release identity, exact title, unit, frequency, and `yoy` metric;
+- CPI/PPI published YoY sentence parsing and Core CPI official table-column
+  parsing;
+- complete historical monthly continuity;
 - official, non-derived core CPI values;
+- observable 2025-base methodology marker parsing;
 - exact historical overlap acceptance and mismatch rejection;
 - duplicate month rejection;
 - missing month rejection;
 - malformed, non-numeric, non-finite, or unsupported values;
 - methodology fingerprint mismatch and documented boundary metadata;
-- deterministic `updatedAt`, coverage, request metadata, and idempotent output;
+- deterministic `updatedAt`, coverage, release provenance, and idempotent output;
 - all-or-nothing group failure behavior;
 - CLI and workflow wiring;
 - registry and dashboard inclusion;
