@@ -214,12 +214,12 @@ test('price CLI validates all candidates before changing any target', async () =
     fs.writeFileSync(fixtureIndex, JSON.stringify({ cpi: 'cpi.json', 'core-cpi': 'core-cpi.json', ppi: 'ppi.json' }));
     for (const id of ['cpi', 'core-cpi', 'ppi']) {
       fs.copyFileSync(path.join(here, 'fixtures', 'nbs', 'prices', `${id}.json`), path.join(fixtureDir, `${id}.json`));
-      fs.writeFileSync(path.join(targetDir, `${id}.json`), JSON.stringify(dataset(id, [{ date: '2026-01', value: id === 'ppi' ? -1.5 : id === 'core-cpi' ? 0.4 : 0.2 }]) , null, 2) + '\n');
+      fs.writeFileSync(path.join(targetDir, `${id}.json`), JSON.stringify(dataset(id, [{ date: '2026-01', value: id === 'ppi' ? -1.4 : id === 'core-cpi' ? 0.8 : 0.2 }]) , null, 2) + '\n');
     }
     const before = Object.fromEntries(['cpi', 'core-cpi', 'ppi'].map((id) => [id, fs.readFileSync(path.join(targetDir, `${id}.json`), 'utf8')]));
     const corePath = path.join(fixtureDir, 'core-cpi.json');
     const core = JSON.parse(fs.readFileSync(corePath, 'utf8'));
-    core.html = core.html.replace('核心CPI同比上涨0.4%', '核心CPI为不可用值');
+    core.html = core.html.replace('核心CPI同比上涨0.8%', '核心CPI为不可用值');
     fs.writeFileSync(corePath, JSON.stringify(core));
     await assert.rejects(() => runPrices([
       '--fixture-index', fixtureIndex,
@@ -234,4 +234,21 @@ test('price CLI validates all candidates before changing any target', async () =
     fs.rmSync(targetDir, { recursive: true, force: true });
     fs.rmSync(fixtureDir, { recursive: true, force: true });
   }
+});
+
+test('checked-in price datasets are complete monthly official series', () => {
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
+    const checkedIn = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
+    validatePriceDataset(checkedIn, id);
+    assert.equal(checkedIn.data[0].date, '2026-01');
+    assert.equal(checkedIn.data.at(-1).date, '2026-07');
+    assert.equal(checkedIn.data.length, 7);
+    assert.ok(checkedIn.sources.every((source) => source.url.includes('stats.gov.cn')));
+  }
+});
+
+test('scheduled workflow runs and tracks all price datasets', () => {
+  const workflow = fs.readFileSync(path.join(here, '..', '.github', 'workflows', 'update-macro-data.yml'), 'utf8');
+  assert.match(workflow, /npm run ingest:nbs-prices/);
+  for (const id of ['cpi', 'core-cpi', 'ppi']) assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
 });

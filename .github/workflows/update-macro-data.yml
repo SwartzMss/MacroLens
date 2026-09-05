@@ -37,6 +37,9 @@ jobs:
       - name: Fetch and validate NBS real-economy indicators
         run: npm run ingest:nbs-real-economy -- --target-dir data/indicators
 
+      - name: Fetch and validate NBS price indicators
+        run: npm run ingest:nbs-prices -- --target-dir data/indicators
+
       - name: Open macro data update pull request
         uses: peter-evans/create-pull-request@v7
         with:
@@ -50,6 +53,9 @@ jobs:
             data/indicators/industrial-production.json
             data/indicators/retail-sales.json
             data/indicators/fixed-asset-investment.json
+            data/indicators/cpi.json
+            data/indicators/core-cpi.json
+            data/indicators/ppi.json
           branch: automation/update-macro-data
           delete-branch: true
           commit-message: 'data: update macro indicators'
