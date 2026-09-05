@@ -10,8 +10,8 @@
     if (!value || typeof value !== 'object') return false;
     const stats = value as Partial<VisitorStats>;
     return stats.available === true
-      && Number.isSafeInteger(stats.total) && stats.total >= 0
-      && Number.isSafeInteger(stats.today) && stats.today >= 0;
+      && typeof stats.total === 'number' && Number.isSafeInteger(stats.total) && stats.total >= 0
+      && typeof stats.today === 'number' && Number.isSafeInteger(stats.today) && stats.today >= 0;
   };
 
   const container = document.querySelector<HTMLElement>('[data-visitor-stats]');
