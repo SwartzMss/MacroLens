@@ -45,18 +45,4 @@ const formatChange = (change: number | null, metric: string) => {
       </article>;
     })}
   </div>
-
-  <section class="dashboard-changes" aria-labelledby="dashboard-changes-title">
-    <div class="section-head">
-      <div>
-        <div class="eyebrow">Recent changes</div>
-        <h3 id="dashboard-changes-title">最近一期变化</h3>
-      </div>
-    </div>
-    <ul>{indicators.map((item) => <li>
-      <a href={item.conceptHref}>{item.name}</a>
-      <span>{item.latest.date} · {getIndicatorPresentation(item.dataset).changeLabel}</span>
-      <strong class={item.change !== null && item.change < 0 ? 'is-negative' : ''}>{formatChange(item.change, item.dataset.metric)}</strong>
-    </li>)}</ul>
-  </section>
 </section>
