@@ -9,7 +9,7 @@ import { fetchText } from '../fetch-text.ts';
 import type { FetchTextOptions } from '../fetch-text.ts';
 
 const NBS_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
-const NBS_INDEX_PAGES = [NBS_INDEX, `${NBS_INDEX}index_1.html`];
+const NBS_INDEX_MAX_PAGES = 12;
 const NBS_ORIGIN = 'https://www.stats.gov.cn';
 type TextFetcher = (url: string, options?: FetchTextOptions) => Promise<string>;
 
@@ -48,9 +48,7 @@ function signedValue(direction: string, value: string): number {
 }
 
 function assertObservableMethodology(text: string, id: PriceDatasetId): void {
-  const marker = id === 'ppi'
-    ? /2026年(?:1月份?|)起.{0,240}2025年为基期/
-    : /2026年1月份?起.{0,240}2025年为基期/;
+  const marker = /2026年1月份?(?:起|开始编制和发布).{0,240}2025年为基期/;
   if (!marker.test(text)) {
     throw new MethodologyMismatchError(`Official ${id} publication is missing the expected 2025-base methodology marker`);
   }
@@ -105,6 +103,18 @@ function coverageFromTitle(title: string, id: PriceDatasetId): string {
 
 function publicationPattern(id: PriceDatasetId): RegExp {
   return id === 'ppi' ? /工业生产者出厂价格.*同比/ : /居民消费价格.*同比/;
+}
+
+function indexPageUrl(page: number): string {
+  return page === 0 ? NBS_INDEX : `${NBS_INDEX}index_${page}.html`;
+}
+
+function hasPublication(indexHtml: string, id: PriceDatasetId): boolean {
+  const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  return [...indexHtml.matchAll(anchorPattern)].some((match) => {
+    const title = textOf(match[2]);
+    return publicationPattern(id).test(title) && !title.includes('解读');
+  });
 }
 
 export function parseNbsPricePublication(
@@ -169,7 +179,11 @@ export async function fetchNbsPricePublication(
 
 export async function fetchNbsPriceIndex(fetcher: TextFetcher = fetchText): Promise<string> {
   const pages = [];
-  for (const url of NBS_INDEX_PAGES) pages.push(await fetcher(url));
+  for (let page = 0; page < NBS_INDEX_MAX_PAGES; page += 1) {
+    pages.push(await fetcher(indexPageUrl(page)));
+    const combined = pages.join('\n');
+    if (hasPublication(combined, 'cpi') && hasPublication(combined, 'ppi')) return combined;
+  }
   return pages.join('\n');
 }
 

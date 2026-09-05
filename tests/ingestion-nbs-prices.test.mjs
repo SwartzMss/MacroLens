@@ -137,6 +137,15 @@ test('rejects a publication when the observable price methodology marker changes
   }
 });
 
+test('accepts the official PPI base-year wording variant', () => {
+  const fixture = priceFixture('ppi');
+  const variant = fixture.html.replace(
+    '2026年1月起，工业生产者出厂价格指数以2025年为基期。',
+    '2026年1月份开始编制和发布以2025年为基期的PPI。',
+  );
+  assert.doesNotThrow(() => parseNbsPricePublication(fixture.publication, variant, 'ppi'));
+});
+
 test('discovers the newest official monthly price publication per dataset', () => {
   const index = [
     '<a href="/sj/zxfbhjd/202602/t20260210_1962001.html">2026年1月份居民消费价格同比上涨0.2%</a> 2026-02-10',
@@ -162,13 +171,18 @@ test('fetches the next official release-index page when the root page is stale',
   const requested = [];
   const pages = new Map([
     [nbsPricePublicationIndex, '<a href="/sj/zxfbhjd/202608/t20260817_1965010.html">2026年7月份国民经济运行情况</a> 2026-08-17'],
-    [`${nbsPricePublicationIndex}index_1.html`, '<a href="/sj/zxfbhjd/202608/t20260809_1965008.html">2026年7月份居民消费价格同比上涨0.5%</a> 2026-08-09'],
+    [`${nbsPricePublicationIndex}index_1.html`, '<a href="/sj/zxfbhjd/202608/t20260817_1965055.html">2026年7月份规模以上工业增加值增长4.5%</a> 2026-08-17'],
+    [`${nbsPricePublicationIndex}index_2.html`, '<a href="/sj/zxfbhjd/202608/t20260809_1965008.html">2026年7月份居民消费价格同比上涨0.5%</a> 2026-08-09 <a href="/sj/zxfbhjd/202608/t20260809_1965007.html">2026年7月份工业生产者出厂价格同比上涨3.5%</a> 2026-08-09'],
   ]);
   const combined = await fetchNbsPriceIndex(async (url) => {
     requested.push(url);
     return pages.get(url) ?? '';
   });
-  assert.deepEqual(requested, [nbsPricePublicationIndex, `${nbsPricePublicationIndex}index_1.html`]);
+  assert.deepEqual(requested, [
+    nbsPricePublicationIndex,
+    `${nbsPricePublicationIndex}index_1.html`,
+    `${nbsPricePublicationIndex}index_2.html`,
+  ]);
   assert.match(combined, /2026年7月份居民消费价格同比上涨0\.5%/);
 });
 
@@ -321,6 +335,14 @@ test('checked-in price datasets are complete monthly official series', () => {
     assert.ok(checkedIn.sources.every((source) => source.url.includes('stats.gov.cn')));
     if (id === 'cpi' || id === 'core-cpi') {
       assert.equal(checkedIn.sources.at(-1).url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html');
+      const april = checkedIn.sources.find((source) => source.coverage === '2026-04 to 2026-04');
+      assert.deepEqual(
+        { url: april.url, sourceDate: april.sourceDate },
+        {
+          url: 'https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963659.html',
+          sourceDate: '2026-05-11',
+        },
+      );
     }
   }
 });
