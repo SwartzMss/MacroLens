@@ -50,6 +50,7 @@ test('dashboard markup uses presentation labels and keeps engineering metadata i
   assert.match(source, /getIndicatorPresentation/);
   assert.match(source, /valueLabel/);
   assert.match(source, /changeLabel/);
+  assert.doesNotMatch(source, /presentation\.frequencyLabel/);
   assert.doesNotMatch(source, /comparisonMethod/);
   assert.doesNotMatch(source, /dataset\.source/);
   assert.doesNotMatch(source, /dataset\.updatedAt/);

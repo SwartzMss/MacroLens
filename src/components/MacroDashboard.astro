@@ -28,7 +28,6 @@ const formatChange = (change: number | null, metric: string) => {
       const presentation = getIndicatorPresentation(item.dataset);
       return <article class="indicator-card" data-indicator-id={item.id}>
         <div class="indicator-card-top">
-          <span>{presentation.frequencyLabel}</span>
           <span>{presentation.valueLabel}</span>
         </div>
         <h3>{item.name}</h3>
