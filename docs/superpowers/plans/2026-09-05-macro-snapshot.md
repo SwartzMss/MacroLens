@@ -36,11 +36,11 @@
 - [ ] Validate that the input contains exactly the required dashboard indicator IDs (`gdp`, `pmi`, `m0`, `m1`, `m2`, `industrial-production`, `retail-sales`, `fixed-asset-investment`); throw a clear error for missing inputs instead of silently fabricating data.
 - [ ] Implement separate family classifiers using the explicit thresholds from the spec:
   - PMI uses the 50 index threshold and `±0.2` momentum boundaries.
-  - GDP, industrial production, retail sales, and fixed-asset investment use positive/non-positive latest growth and `±0.2` change boundaries.
+  - GDP, industrial production, retail sales, and fixed-asset investment use positive/zero/negative latest growth and `±0.2` change boundaries.
   - M0, M1, and M2 report facts and only label a change below `-0.2` as weakening monetary-growth momentum.
 - [ ] Build one signal per indicator in stable dashboard order, retaining latest value, previous value, change, period, unit, fact text, interpretation text, and evidence metadata.
 - [ ] Derive the phase from the five activity indicators only, with the exact precedence and counts in the approved design. Include the selected evidence IDs and explain the rule outcome in plain language.
-- [ ] Derive independent risk conclusions using the PMI threshold, three-weakening-activity threshold, non-positive activity level, and weakening monetary-growth rules. Do not add causal or investment claims.
+- [ ] Derive independent risk conclusions using the PMI threshold, three-weakening-activity threshold, negative activity level, and weakening monetary-growth rules. Do not add causal or investment claims.
 - [ ] Generate watch conclusions from the triggered risks with relevant evidence IDs, each current period, and “observe the next published observation” wording. Generate the stable fallback when there are no risks.
 - [ ] Derive `asOf` only from input dataset metadata and return a fully serializable object with no wall-clock values or runtime fetches.
 - [ ] Run `node --test tests/macro-snapshot.test.mjs` and make the focused suite pass.
@@ -78,4 +78,3 @@
 - [ ] Push `codex/issue-70-macro-snapshot` to `origin`.
 - [ ] Create a new GitHub pull request against `main`, link it to Issue #70 with `Closes #70`, summarize the deterministic rules and fact/interpretation separation, and include the verification commands/results.
 - [ ] Inspect the created PR and CI status; report the PR URL and any remaining CI state without merging it.
-

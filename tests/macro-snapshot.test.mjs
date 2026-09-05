@@ -170,6 +170,7 @@ test('emits independent risks and evidence-backed watch items', () => {
   assert.ok(snapshot.risks.some((item) => item.title.includes('制造业')));
   assert.ok(snapshot.risks.some((item) => item.title.includes('同步走弱')));
   assert.ok(snapshot.risks.some((item) => item.title.includes('负增长')));
+  assert.equal(snapshot.risks.find((item) => item.title.includes('负增长')).id, 'negative-activity-growth');
   assert.ok(snapshot.risks.some((item) => item.title.includes('货币增速')));
   assert.ok(snapshot.watchNext.length >= snapshot.risks.length);
   assert.ok(snapshot.watchNext.every((item) => item.evidenceIds.length > 0 && /下一期|下一次|继续观察/.test(item.explanation)));

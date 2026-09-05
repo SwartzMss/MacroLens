@@ -221,7 +221,7 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
   }
   if (negativeGrowth.length > 0) {
     risks.push(makeRisk(
-      'non-positive-activity-growth',
+      'negative-activity-growth',
       '存在负增长或负累计增长信号',
       '至少一项增长类活动指标处于负增长或负累计增长水平，需要结合其自身口径继续观察。',
       negativeGrowth.map((signal) => signal.id),

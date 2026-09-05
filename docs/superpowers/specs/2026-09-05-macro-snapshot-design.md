@@ -27,8 +27,8 @@ The snapshot consumes `getDashboardIndicators()` and applies rules by metric fam
 
 | Family | Inputs | Rule semantics |
 | --- | --- | --- |
-| Activity threshold | PMI | `latest >= 50` is an expansion signal; `< 50` is below the expansion threshold. A change greater than `0.2` is improving momentum; less than `-0.2` is weakening momentum. |
-| Activity growth | GDP, industrial production, retail sales, fixed-asset investment | `latest > 0` is a positive growth signal; `latest <= 0` is a negative growth signal. A change greater than `0.2` is improving momentum; less than `-0.2` is weakening momentum; otherwise stable. |
+| Activity threshold | PMI | `latest > 50` is an expansion signal; `latest = 50` is neutral; `< 50` is a contraction signal. A change greater than `0.2` is improving momentum; less than `-0.2` is weakening momentum. |
+| Activity growth | GDP, industrial production, retail sales, fixed-asset investment | `latest > 0` is positive growth; `latest = 0` is zero growth; `latest < 0` is negative growth. A change greater than `0.2` is improving momentum; less than `-0.2` is weakening momentum; otherwise stable. |
 | Monetary growth | M0, M1, M2 | The latest published rate and period change are reported as facts. A change less than `-0.2` is marked as weakening monetary-growth momentum, but is not translated into a claim about demand, prices, or asset prices. |
 
 The phase rule uses only the five activity indicators. Count positive/negative level signals and weakening activity changes:
@@ -44,7 +44,7 @@ Risk rules are independently triggered and may produce multiple items:
 
 - PMI below 50 → “制造业景气低于荣枯线”。
 - At least three activity indicators weakening → “活动指标近期同步走弱”。
-- Any activity indicator at or below zero → “存在负增长或负累计增长信号”。
+- Any growth activity indicator below zero → “存在负增长或负累计增长信号”。
 - Any monetary-growth indicator weakening → “货币增速动能走弱，需继续观察”，without asserting a transmission outcome.
 
 Watch items are generated from triggered risks and always include the evidence indicator, its current data period, and a direction to observe the next published observation. They say what to monitor, not what action to take. If no risk rule triggers, the output contains a stable “继续观察下一期数据” item backed by the phase evidence.
