@@ -146,6 +146,49 @@ test('accepts the official PPI base-year wording variant', () => {
   assert.doesNotThrow(() => parseNbsPricePublication(fixture.publication, variant, 'ppi'));
 });
 
+test('accepts CPI and core CPI methodology split across inline tags', () => {
+  for (const id of ['cpi', 'core-cpi']) {
+    const fixture = priceFixture(id);
+    const variant = fixture.html.replace(
+      '2026年1月起，',
+      '<span>2026年1月</span><span>起</span>，',
+    ).replace(
+      '2025年为基期',
+      '<span>2025年</span><span>为基期</span>',
+    );
+    assert.doesNotThrow(() => parseNbsPricePublication(fixture.publication, variant, id));
+  }
+});
+
+test('accepts PPI methodology wording variants split across inline tags', () => {
+  const fixture = priceFixture('ppi');
+  for (const wording of [
+    '<span>2026年1月</span><span>起</span>，工业生产者出厂价格指数以<span>2025年</span><span>为基期</span>。',
+    '<span>2026年1月份</span><span>开始编制和发布</span>以<span>2025年</span><span>为基期</span>的PPI。',
+  ]) {
+    const variant = fixture.html.replace(
+      '2026年1月起，工业生产者出厂价格指数以2025年为基期。',
+      wording,
+    );
+    assert.doesNotThrow(() => parseNbsPricePublication(fixture.publication, variant, 'ppi'));
+  }
+});
+
+test('reports the publication URL for missing price methodology', () => {
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
+    const fixture = priceFixture(id);
+    assert.throws(
+      () => parseNbsPricePublication(
+        fixture.publication,
+        fixture.html.replace(/<p>2026年1月起[\s\S]*?<\/p>/, ''),
+        id,
+      ),
+      (error) => error instanceof MethodologyMismatchError
+        && error.message.includes(fixture.publication.url),
+    );
+  }
+});
+
 test('parses an official CPI publication that reports同比持平 as zero', () => {
   const fixture = priceFixture('cpi');
   const variant = fixture.html.replace(/同比上涨0\.2%/g, '同比持平');
