@@ -139,6 +139,7 @@ test('footer integration stays optional and documents the privacy and retention 
   assert.match(component, /credentials:\s*['"]same-origin['"]/);
   assert.match(component, /toLocaleString\(['"]zh-CN['"]\)/);
   assert.match(layout, /VisitorStats/);
+  assert.ok(layout.indexOf('<VisitorStats />') < layout.indexOf('MacroLens ·'), 'visitor stats should precede the footer copy');
   assert.match(styles, /\.visitor-stats/);
   assert.match(config, /binding\s*=\s*["']ANALYTICS["']/);
   assert.match(config, /dataset\s*=\s*["']macrolens_visitors["']/);

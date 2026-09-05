@@ -276,7 +276,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 8px;
+  margin-bottom: 8px;
   font-size: 12px;
 }
 .visitor-stats strong {
