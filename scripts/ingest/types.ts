@@ -29,10 +29,80 @@ export type IndicatorDataset = {
   updatedAt: string;
   comparabilityNote: string;
   methodologyFingerprint: string;
+  methodologyEffectiveFrom?: string;
   sources: IndicatorSource[];
   referenceValue?: number;
   referenceLabel?: string;
   data: Observation[];
+};
+
+export type PriceDatasetId = 'cpi' | 'core-cpi' | 'ppi';
+export type NbsPricePublication = {
+  title: string;
+  url: string;
+  sourceDate: string;
+  coverage: string;
+};
+export type PriceContract = {
+  id: PriceDatasetId;
+  sourceCode: string;
+  sourceTitle: string;
+  frequency: 'monthly';
+  unit: '%';
+  metric: 'yoy';
+  calculation: 'published';
+  methodologyFingerprint: string;
+};
+export type RawNbsPriceSeries = {
+  publication: NbsPricePublication;
+  id: PriceDatasetId;
+  seriesCode: string;
+  seriesTitle: string;
+  unit: string;
+  frequency: string;
+  metric: string;
+  methodologyFingerprint: string;
+  dataSources: IndicatorSource[];
+  observations: Observation[];
+};
+
+export const PRICE_METHODOLOGY_FINGERPRINTS = {
+  cpi: 'nbs-cpi|headline|published-yoy|base=2025-from-2026-01',
+  'core-cpi': 'nbs-core-cpi|food-and-energy-excluded|published-yoy',
+  ppi: 'nbs-ppi|factory-gate|published-yoy',
+} as const;
+
+export const PRICE_CONTRACTS: Record<PriceDatasetId, PriceContract> = {
+  cpi: {
+    id: 'cpi',
+    sourceCode: 'cpi-yoy',
+    sourceTitle: '居民消费价格同比',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    methodologyFingerprint: PRICE_METHODOLOGY_FINGERPRINTS.cpi,
+  },
+  'core-cpi': {
+    id: 'core-cpi',
+    sourceCode: 'core-cpi-yoy',
+    sourceTitle: 'CPI扣除食品和能源同比',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    methodologyFingerprint: PRICE_METHODOLOGY_FINGERPRINTS['core-cpi'],
+  },
+  ppi: {
+    id: 'ppi',
+    sourceCode: 'ppi-yoy',
+    sourceTitle: '工业生产者出厂价格同比',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    methodologyFingerprint: PRICE_METHODOLOGY_FINGERPRINTS.ppi,
+  },
 };
 
 export type PmiPublication = { title: string; url: string; sourceDate: string };
