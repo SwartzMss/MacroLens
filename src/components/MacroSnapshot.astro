@@ -23,8 +23,7 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
       <p>把已发布的指标事实与明确规则分开呈现，帮助你理解快照是如何生成的。</p>
     </div>
     <div class="snapshot-meta">
-      <span>最近数据更新：{snapshot.asOf}</span>
-      <span>规则版本 {snapshot.rulesVersion}</span>
+      <span>快照更新：{snapshot.asOf}</span>
     </div>
   </div>
 
@@ -58,7 +57,7 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
       {snapshot.signals.map((signal) => <article class="snapshot-signal" data-signal-family={signal.family}>
         <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.family === 'price-yoy' ? '价格同比' : signal.family === 'pmi' ? '景气指标' : signal.family === 'activity-growth' ? '活动增长' : '货币增长'} · {signal.period}</span></div>
         <div class="snapshot-signal-value">{formatValue(signal.latest, signal.unit)}</div>
-        <div class="snapshot-signal-change">较上一期 {formatChange(signal.change, signal.changeUnit)}</div>
+        <div class="snapshot-signal-change">{signal.changeLabel} {formatChange(signal.change, signal.changeUnit)}</div>
         <div class="snapshot-fact"><strong>事实</strong><p>{signal.fact}</p></div>
         <div class="snapshot-interpretation"><strong>解释</strong><p>{signal.interpretation}</p></div>
       </article>)}
