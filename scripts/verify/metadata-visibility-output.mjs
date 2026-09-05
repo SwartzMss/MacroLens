@@ -22,4 +22,7 @@ const credit = readFileSync(pages[2], 'utf8');
 assert.match(dashboard, /快照更新/);
 assert.match(gdp, /如何阅读/);
 assert.match(gdp, /来源详情/);
+assert.match(gdp, /数据更新/);
+assert.match(gdp, /MacroLens 于/);
+assert.match(gdp, /发布于/);
 assert.match(credit, /来源：中国人民银行/);

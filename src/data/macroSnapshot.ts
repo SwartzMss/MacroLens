@@ -120,7 +120,7 @@ function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'pmi',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按 PMI 50 荣枯线规则，当前${level}${momentumText}。`,
   };
 }
@@ -133,7 +133,7 @@ function classifyGrowth(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'activity-growth',
-    fact: `${indicator.name}最新为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `按该指标的增长率口径，当前为${level}，变化动能${momentumText}。`,
   };
 }
@@ -144,7 +144,7 @@ function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'monetary-growth',
-    fact: `${indicator.name}最新增速为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: weakening
       ? '按货币增速自身的变化，当前货币增速动能走弱，需继续观察；这不直接推出需求、价格或资产价格结论。'
       : '当前仅报告货币增速及其变化，不据此推出需求、价格或资产价格结论。',
@@ -159,7 +159,7 @@ function classifyPriceYoy(indicator: DashboardIndicator): SnapshotSignal {
   return {
     ...evidence,
     family: 'price-yoy',
-    fact: `${indicator.name}最新同比为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
+    fact: `${indicator.name}最新${evidence.valueLabel}为 ${formatValue(indicator.latest.value, indicator.dataset.unit)}（${indicator.latest.date}），${evidence.changeLabel}：${formatChange(indicator.change, evidence.changeUnit)}。`,
     interpretation: `当前价格同比表现为${level}，${momentumText}；这只是该价格指标自身的描述，不据此推出需求、资产价格或投资结论。`,
   };
 }

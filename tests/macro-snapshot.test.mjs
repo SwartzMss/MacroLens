@@ -75,6 +75,7 @@ test('classifies growth indicators by level and change without flattening semant
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /负|非正/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /走弱|放缓/);
   assert.match(signal(snapshot, 'gdp').fact, /较上一季度：-0\.7 个百分点/);
+  assert.match(signal(snapshot, 'gdp').fact, /最新同比为/);
 });
 
 test('reports monetary growth momentum cautiously without causal claims', () => {
@@ -236,6 +237,7 @@ test('renders an explainable homepage snapshot without changing dashboard owners
   assert.match(component, /interpretation/);
   assert.match(component, /changeUnit/);
   assert.match(component, /signal\.valueLabel/);
+  assert.doesNotMatch(component, /comparisonMethod/);
   assert.doesNotMatch(component, /signal\.family === 'price-yoy'/);
   assert.match(component, /conceptHref|\/concepts/);
   assert.match(component, /投资建议|投资决策/);
