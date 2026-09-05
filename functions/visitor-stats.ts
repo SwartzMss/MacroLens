@@ -2,18 +2,19 @@ import { getShanghaiDate } from './visitor.ts';
 
 export type VisitorStats = { available: true; total: number; today: number };
 
-export function visitorStatsQuery(today = getShanghaiDate()): string {
+export function visitorStatsQueries(today = getShanghaiDate()): { total: string; today: string } {
   const safeDate = today.replaceAll("'", "''");
-  return `SELECT (SELECT COUNT(DISTINCT blob1) FROM macrolens_visitors) AS total, (SELECT COUNT(DISTINCT blob1) FROM macrolens_visitors WHERE blob2 = '${safeDate}') AS today`;
+  return {
+    total: 'SELECT COUNT(DISTINCT blob1) AS total FROM macrolens_visitors',
+    today: `SELECT COUNT(DISTINCT blob1) AS today FROM macrolens_visitors WHERE blob2 = '${safeDate}'`,
+  };
 }
 
-export function parseVisitorStats(payload: unknown): VisitorStats | null {
+export function parseVisitorCount(payload: unknown, field: 'total' | 'today'): number | null {
   if (!payload || typeof payload !== 'object' || !Array.isArray((payload as { data?: unknown }).data)) return null;
   const rows = (payload as { data: unknown[] }).data;
   if (rows.length !== 1 || !rows[0] || typeof rows[0] !== 'object') return null;
-  const row = rows[0] as { total?: unknown; today?: unknown };
-  const total = typeof row.total === 'number' ? row.total : Number(row.total);
-  const today = typeof row.today === 'number' ? row.today : Number(row.today);
-  if (!Number.isSafeInteger(total) || total < 0 || !Number.isSafeInteger(today) || today < 0) return null;
-  return { available: true, total, today };
+  const value = (rows[0] as Record<string, unknown>)[field];
+  const count = typeof value === 'number' ? value : Number(value);
+  return Number.isSafeInteger(count) && count >= 0 ? count : null;
 }
