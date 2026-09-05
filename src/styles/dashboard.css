@@ -20,11 +20,6 @@
   margin: 0;
 }
 
-.dashboard-note {
-  white-space: nowrap;
-  font-size: 13px;
-}
-
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -58,13 +53,6 @@
 .indicator-card h3 {
   font: 700 23px var(--serif);
   margin: 18px 0 2px;
-}
-
-.indicator-label {
-  min-height: 46px;
-  color: var(--muted);
-  font-size: 13px;
-  margin: 0;
 }
 
 .indicator-value {
@@ -102,21 +90,6 @@
 .indicator-actions li a {
   color: var(--green);
   font-weight: 700;
-}
-
-.indicator-actions details ul {
-  margin: 8px 0 0;
-  padding-left: 18px;
-}
-
-.indicator-actions li {
-  margin: 6px 0;
-}
-
-.indicator-actions small {
-  display: block;
-  color: var(--muted);
-  font-weight: 400;
 }
 
 .dashboard-changes {
@@ -177,10 +150,6 @@
     align-items: start;
     flex-direction: column;
     gap: 8px;
-  }
-
-  .dashboard-note {
-    white-space: normal;
   }
 
   .dashboard-grid,
