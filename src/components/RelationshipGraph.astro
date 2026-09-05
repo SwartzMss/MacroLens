@@ -31,15 +31,6 @@ const groupedRelations = relationGroups.map((group) => ({
   items: initialRelations.filter((item) => item.direction === group.key),
 })).filter((group) => group.items.length > 0);
 
-function otherLink(item: ConceptRelation) {
-  const node = item.other;
-  return conceptIds.includes(node.id) ? (
-    <a href={`/concepts/${node.id}`}>{node.label}</a>
-  ) : (
-    <span class="graph-abstract-node">{node.label}<small>图谱概念</small></span>
-  );
-}
-
 function relationArrow(item: ConceptRelation) {
   if (item.direction === 'symmetric') return '↔';
   return item.relation.source === selectedNode.id ? '→' : '←';
@@ -68,7 +59,7 @@ function relationText(item: ConceptRelation) {
       {conceptIds.includes(selectedNode.id) ? <a class="graph-concept-link" href={`/concepts/${selectedNode.id}`}>打开概念页 →</a> : <p class="graph-note">图谱概念：用于解释关系，不单独提供概念页。</p>}
       {groupedRelations.map((group) => <section class="graph-detail-group">
         <h3>{group.heading}</h3>
-        <ul>{group.items.map((item) => <li><span class="graph-relation-text">{relationText(item)}</span>{otherLink(item)}</li>)}</ul>
+        <ul>{group.items.map((item) => <li><span class="graph-relation-text">{relationText(item)}</span>{conceptIds.includes(item.other.id) ? <a href={`/concepts/${item.other.id}`}>{item.other.label}</a> : <span class="graph-abstract-node">{item.other.label}<small>图谱概念</small></span>}</li>)}</ul>
       </section>)}
     </aside>
   </div>
