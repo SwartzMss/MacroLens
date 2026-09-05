@@ -4,7 +4,7 @@ export type VisitorStats = { available: true; total: number; today: number };
 
 export function visitorStatsQuery(today = getShanghaiDate()): string {
   const safeDate = today.replaceAll("'", "''");
-  return `SELECT COUNT(DISTINCT blob1) AS total, COUNT(DISTINCT if(blob2 = '${safeDate}', blob1, CAST(NULL AS Nullable(String)))) AS today FROM macrolens_visitors`;
+  return `SELECT COUNT(DISTINCT blob1) AS total, uniqExactIf(blob1, blob2 = '${safeDate}') AS today FROM macrolens_visitors`;
 }
 
 export function parseVisitorStats(payload: unknown): VisitorStats | null {
