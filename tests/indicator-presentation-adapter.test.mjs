@@ -26,6 +26,8 @@ test('derives comparison method, source name, and actual series coverage', () =>
   assert.equal(gdp.sourceLabel, '国家统计局');
   assert.equal(gdp.coverage, '2021-Q1 至 2026-Q2');
   assert.ok(gdp.sources.every((source) => source.title && source.url && source.sourceDate && source.coverage));
+  const detailed = getIndicatorPresentation(getIndicatorData('fixed-asset-investment'));
+  assert.ok(detailed.sources.every((source) => !Object.prototype.hasOwnProperty.call(source, 'request')));
 });
 
 test('keeps source fallback and missing observations explicit', () => {

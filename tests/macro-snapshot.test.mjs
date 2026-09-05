@@ -55,7 +55,7 @@ test('classifies PMI using the 50 threshold and momentum boundary', () => {
   const pmi = signal(snapshot, 'pmi');
 
   assert.match(pmi.fact, /49\.8/);
-  assert.match(pmi.fact, /较上月变化\+0\.6 点/);
+  assert.match(pmi.fact, /较上月变化：\+0\.6 点/);
   assert.match(pmi.interpretation, /低于|景气/);
   assert.match(pmi.interpretation, /改善|回升|动能/);
 });
@@ -70,7 +70,7 @@ test('classifies growth indicators by level and change without flattening semant
   assert.match(signal(snapshot, 'gdp').interpretation, /走弱|放缓/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /负|非正/);
   assert.match(signal(snapshot, 'fixed-asset-investment').interpretation, /走弱|放缓/);
-  assert.match(signal(snapshot, 'gdp').fact, /较上一季度-0\.7 个百分点/);
+  assert.match(signal(snapshot, 'gdp').fact, /较上一季度：-0\.7 个百分点/);
 });
 
 test('reports monetary growth momentum cautiously without causal claims', () => {

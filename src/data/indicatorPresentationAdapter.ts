@@ -70,6 +70,12 @@ export function getIndicatorPresentation(indicator: IndicatorDataset): Indicator
     comparisonMethod: comparisonMethod(indicator),
     sourceLabel: sourceLabels[indicator.source] ?? indicator.source,
     coverage: `${first.date} 至 ${last.date}`,
-    sources: indicator.sources.map((source) => ({ ...source })),
+    sources: indicator.sources.map(({ title, url, sourceDate, coverage, role }) => ({
+      title,
+      url,
+      sourceDate,
+      coverage,
+      ...(role ? { role } : {}),
+    })),
   };
 }
