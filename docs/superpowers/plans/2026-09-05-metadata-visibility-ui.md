@@ -12,7 +12,7 @@
 
 ## File map
 
-- Create `src/data/indicatorPresentationAdapter.ts`: derive `IndicatorViewModel` from an existing `IndicatorDataset`; no numerical calculations or indicator data storage.
+- Create `src/data/indicatorPresentationAdapter.ts`: derive `IndicatorViewModel` from an existing `IndicatorDataset`; no numerical calculations or indicator data storage. Resolve `changeLabel` from explicit `comparisonType` metadata, with a compatibility inference for legacy datasets that do not yet carry that field.
 - Create `src/components/IndicatorMetadata.astro`: render the detail-page “如何阅读” block from an `IndicatorViewModel` passed as `presentation`.
 - Create `src/styles/indicator-metadata.css`: responsive styles for the structured detail metadata block.
 - Create `tests/indicator-presentation-adapter.test.mjs`: unit tests for the view-model semantics.
@@ -118,7 +118,8 @@ Implement the rules from existing domain fields:
 - Quarterly observations use `较上一季度`; monthly index and monthly year-over-year observations use `较上月变化`; monthly cumulative year-over-year observations use `较上一个累计期`.
 - `comparisonMethod` must explain both the value basis and recent-change basis, e.g. quarterly GDP compares the value with the same quarter last year and the recent change with the previous quarter’s reading; monthly CPI compares the value with the same month last year and the recent change with the previous month’s reading; PMI explains the monthly index and its 50 reference line.
 - Map `NBS` to `国家统计局` and `PBOC` to `中国人民银行`; return unknown source strings unchanged.
-- Derive `coverage` from the first and last observations as `${first.date} 至 ${last.date}` and throw `Indicator dataset must contain at least one observation` for an empty series.
+- Resolve recent-change labels from `comparisonType` semantics such as `previous_month_same_metric`, `previous_month_level`, `previous_quarter_same_metric`, `previous_quarter_rate`, and `previous_cumulative_period`; legacy datasets may infer this semantic once from their existing frequency/metric fields.
+- Derive `coverage` from a date-sorted copy of the observations as `${first.date} 至 ${last.date}` and throw `Indicator dataset must contain at least one observation` for an empty series. Never mutate the domain data array.
 - Copy source records into the view model without exposing `methodologyFingerprint` or any other engineering field.
 
 - [ ] **Step 4: Run the adapter tests and confirm GREEN**

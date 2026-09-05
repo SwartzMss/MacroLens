@@ -1,4 +1,4 @@
-import type { IndicatorDataset } from './indicatorRegistry';
+import type { IndicatorComparisonType, IndicatorDataset } from './indicatorRegistry';
 import { normalizeSourceLabel } from './sourceLabelNormalizer';
 
 export type IndicatorPresentationSource = {
@@ -37,12 +37,37 @@ function valueLabel(indicator: IndicatorDataset): string {
   return indicator.metric;
 }
 
+function inferredComparisonType(indicator: IndicatorDataset): IndicatorComparisonType {
+  if (indicator.metric === 'cumulative_yoy') return 'previous_cumulative_period';
+  if (indicator.metric === 'mom') {
+    return indicator.frequency === 'quarterly' ? 'previous_quarter_rate' : 'previous_month_rate';
+  }
+  if (indicator.metric === 'yoy') {
+    return indicator.frequency === 'quarterly' ? 'previous_quarter_same_metric' : 'previous_month_same_metric';
+  }
+  if (indicator.metric === 'index') return 'previous_month_level';
+  return indicator.frequency === 'quarterly' ? 'previous_quarter_level' : 'previous_month_level';
+}
+
+function comparisonType(indicator: IndicatorDataset): IndicatorComparisonType {
+  return indicator.comparisonType ?? inferredComparisonType(indicator);
+}
+
 function changeLabel(indicator: IndicatorDataset): string {
-  if (indicator.metric === 'cumulative_yoy') return '较上一个累计期';
-  if (indicator.metric === 'mom') return indicator.frequency === 'quarterly' ? '较上一季度环比变化' : '较上月环比变化';
-  if (indicator.frequency === 'quarterly' && indicator.metric === 'yoy') return '较上一季度';
-  if (indicator.frequency === 'quarterly') return '较上一季度';
-  return '较上月变化';
+  switch (comparisonType(indicator)) {
+    case 'previous_cumulative_period':
+      return '较上一个累计期';
+    case 'previous_quarter_same_metric':
+    case 'previous_quarter_level':
+      return '较上一季度';
+    case 'previous_quarter_rate':
+      return '较上一季度环比变化';
+    case 'previous_month_rate':
+      return '较上月环比变化';
+    case 'previous_month_same_metric':
+    case 'previous_month_level':
+      return '较上月变化';
+  }
 }
 
 function comparisonMethod(indicator: IndicatorDataset): string {
@@ -78,8 +103,9 @@ function calculationDescription(indicator: IndicatorDataset): string {
 }
 
 export function getIndicatorPresentation(indicator: IndicatorDataset, definition = ''): IndicatorViewModel {
-  const first = indicator.data.at(0);
-  const last = indicator.data.at(-1);
+  const sorted = [...indicator.data].sort((left, right) => left.date.localeCompare(right.date));
+  const first = sorted.at(0);
+  const last = sorted.at(-1);
   if (!first || !last) throw new Error('Indicator dataset must contain at least one observation');
 
   return {

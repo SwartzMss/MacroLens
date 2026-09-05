@@ -59,6 +59,24 @@ test('derives labels from domain metadata rather than indicator ids', () => {
   assert.equal(monthlyYoy.changeLabel, '较上月变化');
 });
 
+test('uses explicit comparison semantics when the dataset supplies them', () => {
+  const quarterlyComparison = {
+    ...getIndicatorData('cpi'),
+    comparisonType: 'previous_quarter_same_metric',
+  };
+
+  assert.equal(getIndicatorPresentation(quarterlyComparison).changeLabel, '较上一季度');
+});
+
+test('derives coverage from chronological observations rather than input order', () => {
+  const dataset = getIndicatorData('gdp');
+  const data = [...dataset.data].reverse();
+  const presentation = getIndicatorPresentation({ ...dataset, data });
+
+  assert.equal(presentation.coverage, '2021-Q1 至 2026-Q2');
+  assert.equal(data[0].date, '2026-Q2');
+});
+
 test('normalizes known source aliases and preserves unknown source strings', () => {
   assert.equal(normalizeSourceLabel('NBS'), '国家统计局');
   assert.equal(normalizeSourceLabel('National Bureau of Statistics'), '国家统计局');
