@@ -246,6 +246,7 @@ test('snapshot exposes its update date without exposing the rules version', () =
   assert.doesNotMatch(component, /rulesVersion/);
   assert.doesNotMatch(component, /规则版本/);
   assert.doesNotMatch(component, /较上一期/);
+  assert.doesNotMatch(component, /每个指标按自身口径解释/);
 });
 
 test('snapshot evidence carries indicator-specific change labels', () => {

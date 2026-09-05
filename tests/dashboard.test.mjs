@@ -54,6 +54,7 @@ test('dashboard markup uses presentation labels and keeps engineering metadata i
   assert.doesNotMatch(source, /dataset\.updatedAt/);
   assert.doesNotMatch(source, /核验来源/);
   assert.doesNotMatch(source, /静态生成/);
+  assert.doesNotMatch(source, /上一观测期/);
   assert.match(source, /conceptHref/);
   assert.match(source, /最近一期变化/);
   assert.match(source, /个百分点/);
