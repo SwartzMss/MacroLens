@@ -7,7 +7,7 @@ export function visitorStatsQuery(today = getShanghaiDate()): string {
   return `SELECT COUNT(DISTINCT blob1) AS total, COUNT(DISTINCT if(blob2 = '${safeDate}', blob1, CAST(NULL AS Nullable(String)))) AS today FROM macrolens_visitors`;
 }
 
-export parseVisitorStats(payload: unknown): VisitorStats | null {
+export function parseVisitorStats(payload: unknown): VisitorStats | null {
   if (!payload || typeof payload !== 'object' || !Array.isArray((payload as { data?: unknown }).data)) return null;
   const rows = (payload as { data: unknown[] }).data;
   if (rows.length !== 1 || !rows[0] || typeof rows[0] !== 'object') return null;
