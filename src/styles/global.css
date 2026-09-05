@@ -112,6 +112,9 @@ main {
   color: var(--muted);
   margin: 0;
 }
+.section-head-actions p {
+  margin: 0;
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

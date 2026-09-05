@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RelationshipGraph from '../components/RelationshipGraph.astro';
+import { getRelationData } from '../data/graphRegistry';
+import '../styles/graph.css';
+
+const concepts = await getCollection('concepts');
+const conceptIds = concepts.map((concept) => concept.data.id);
+const { nodes, relations } = getRelationData('macro');
+---
+
+<BaseLayout title="宏观关系图｜MacroLens" description="探索宏观指标、政策工具与经济活动之间的手工维护关系。">
+  <div class="shell graph-page">
+    <header class="graph-page-head">
+      <div class="eyebrow">Macro relationship graph</div>
+      <h1>宏观指标如何连接</h1>
+      <p class="lead">从一个指标出发，沿着上游、下游和相互关联的路径，建立宏观经济的整体直觉。</p>
+      <p class="graph-disclaimer">这是由 MacroLens 手工维护的解释性关系图，用于导航和理解，不代表关系必然成立，也不会自动生成经济结论。</p>
+    </header>
+    <RelationshipGraph nodes={nodes} relations={relations} conceptIds={conceptIds} initialNodeId="m2" />
+  </div>
+</BaseLayout>
