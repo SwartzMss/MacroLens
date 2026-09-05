@@ -23,36 +23,6 @@ const contracts = {
   ppi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
 };
 
-const officialPriceSources = {
-  cpi: {
-    '2026-01': 'https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202602/t20260211_1962588.html',
-    '2026-02': 'https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260309_1962732.html',
-    '2026-03': 'https://www.stats.gov.cn/sj/zxfbhjd/202604/t20260410_1963264.html',
-    '2026-04': 'https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963659.html',
-    '2026-05': 'https://www.stats.gov.cn/sj/zxfb/202606/t20260610_1963923.html',
-    '2026-06': 'https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964084.html',
-    '2026-07': 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html',
-  },
-  'core-cpi': {
-    '2026-01': 'https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202602/t20260211_1962588.html',
-    '2026-02': 'https://www.stats.gov.cn/sj/zxfbhjd/202603/t20260309_1962732.html',
-    '2026-03': 'https://www.stats.gov.cn/sj/zxfbhjd/202604/t20260410_1963264.html',
-    '2026-04': 'https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963659.html',
-    '2026-05': 'https://www.stats.gov.cn/sj/zxfb/202606/t20260610_1963923.html',
-    '2026-06': 'https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964084.html',
-    '2026-07': 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html',
-  },
-  ppi: {
-    '2026-01': 'https://www.stats.gov.cn/sj/zxfbhjd/202602/t20260211_1962587.html',
-    '2026-02': 'https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202603/t20260309_1962729.html',
-    '2026-03': 'https://www.stats.gov.cn/sj/zxfbhjd/202604/t20260410_1963263.html',
-    '2026-04': 'https://www.stats.gov.cn/sj/zxfbhjd/202605/t20260511_1963658.html',
-    '2026-05': 'https://www.stats.gov.cn/sj/zxfb/202606/t20260610_1963922.html',
-    '2026-06': 'https://www.stats.gov.cn/sj/zxfb/202607/t20260709_1964083.html',
-    '2026-07': 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965007.html',
-  },
-};
-
 function readDataset(id) {
   return JSON.parse(fs.readFileSync(path.join(dataDir, `${id}.json`), 'utf8'));
 }
@@ -85,6 +55,47 @@ function isOfficialHost(value) {
     || hostname.endsWith('.stats.gov.cn')
     || hostname === 'pbc.gov.cn'
     || hostname.endsWith('.pbc.gov.cn'));
+}
+
+function isDataSource(source) {
+  return (source.role ?? 'data') === 'data';
+}
+
+function periodRank(period) {
+  const quarter = period.match(/^(\d{4})-Q([1-4])$/);
+  if (quarter) return Number(quarter[1]) * 4 + Number(quarter[2]);
+
+  const combined = period.match(/^(\d{4})-(\d{2})–(\d{2})$/);
+  if (combined) return Number(combined[1]) * 12 + Number(combined[3]);
+
+  const month = period.match(/^(\d{4})-(\d{2})$/);
+  if (month) return Number(month[1]) * 12 + Number(month[2]);
+
+  return null;
+}
+
+function coverageSegments(coverage) {
+  return coverage.split(';').map((part) => {
+    const annual = part.trim().match(/^(.+?)\s+to\s+(.+?)\s+\(annual\)$/);
+    if (annual) return { start: annual[1], end: annual[2], annual: true };
+    const range = part.trim().match(/^(.+?)\s+to\s+(.+)$/);
+    return range
+      ? { start: range[1], end: range[2], annual: false }
+      : { start: part.trim(), end: part.trim(), annual: false };
+  });
+}
+
+function coversPeriod(coverage, period) {
+  const targetRank = periodRank(period);
+  if (targetRank === null) return false;
+
+  return coverageSegments(coverage).some(({ start, end, annual }) => {
+    const startRank = periodRank(start);
+    const endRank = periodRank(end);
+    if (startRank === null || endRank === null || startRank > endRank) return false;
+    if (annual && period.slice(5) !== start.slice(5)) return false;
+    return startRank <= targetRank && targetRank <= endRank;
+  });
 }
 
 function nextMonth(value) {
@@ -143,7 +154,12 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
       assert.ok(!sourceKeys.has(key), `${id} duplicate source coverage: ${key}`);
       sourceKeys.add(key);
     }
-    assert.ok(dataset.sources.some((source) => source.coverage.includes(dataset.data.at(-1).date)), `${id} latest data lacks provenance`);
+    for (const observation of dataset.data) {
+      const covered = dataset.sources.some((source) => (
+        isDataSource(source) && coversPeriod(source.coverage, observation.date)
+      ));
+      assert.ok(covered, `${id} ${observation.date} missing data provenance`);
+    }
   }
 });
 
@@ -161,14 +177,15 @@ test('registry resolves every V1 dataset and observations are continuous by sema
 });
 
 test('price datasets use the formal monthly release as data provenance', () => {
-  for (const [id, expectedByMonth] of Object.entries(officialPriceSources)) {
+  for (const id of ['cpi', 'core-cpi', 'ppi']) {
     const dataset = readDataset(id);
-    for (const [month, url] of Object.entries(expectedByMonth)) {
-      const source = dataset.sources.find(({ coverage }) => coverage === `${month} to ${month}`);
-      assert.ok(source, `${id} missing source for ${month}`);
-      assert.equal(source.role, 'data', `${id} ${month} source role`);
-      assert.equal(source.url, url, `${id} ${month} source URL`);
-      assert.doesNotMatch(source.title, /解读|国民经济运行总体平稳/, `${id} ${month} source title`);
+    for (const observation of dataset.data) {
+      const source = dataset.sources.find((candidate) => (
+        isDataSource(candidate)
+        && candidate.coverage === `${observation.date} to ${observation.date}`
+      ));
+      assert.ok(source, `${id} missing exact source for ${observation.date}`);
+      assert.doesNotMatch(source.title, /解读|国民经济运行总体平稳/, `${id} ${observation.date} source title`);
     }
   }
 });

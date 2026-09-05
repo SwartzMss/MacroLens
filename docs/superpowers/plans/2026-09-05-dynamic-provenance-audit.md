@@ -4,7 +4,7 @@
 
 **Goal:** Make the V1 indicator audit derive provenance coverage from checked-in observations instead of maintaining a hard-coded list of monthly price URLs.
 
-**Architecture:** Keep the audit in `tests/indicator-data-integrity.test.mjs`. The generic contract will require every observation period in every dataset to have one exact-period source with `role: data`, an official source host, and valid source metadata. Price-specific assertions will remain focused on rejecting known interpretation-page titles without locking historical URLs.
+**Architecture:** Keep the audit in `tests/indicator-data-integrity.test.mjs`. The generic contract will require every observation period in every dataset to be covered by a source whose effective role is `data` and whose URL is official. Coverage parsing will support exact, ranged, quarterly, cumulative, and annual-shaped periods already used by the checked-in datasets. Because `role` is optional in the existing schema, an omitted role remains backward-compatible shorthand for `data`; an explicit `methodology` role never satisfies the contract. Price-specific assertions will additionally require exact-month data sources and reject known interpretation-page titles without locking historical URLs.
 
 **Tech Stack:** Node test runner, `tsx` loader, checked-in JSON datasets, JavaScript assertions.
 
@@ -17,15 +17,18 @@
 
 - [ ] **Step 1: Add the failing generic provenance assertion**
 
-  In the existing `all V1 indicator datasets satisfy the explicit data contract` test, after source metadata validation, derive each dataset's expected coverage from its observations and require an exact `data` source for every period:
+  Add a test helper that parses semicolon-separated coverage segments, compares period ranks for monthly, quarterly, and cumulative periods, and applies the existing annual suffix rule. Then, in the existing `all V1 indicator datasets satisfy the explicit data contract` test, derive each dataset's expected coverage from its observations and require a source with effective role `data` to cover every period:
 
   ```js
-  const observedPeriods = new Set(dataset.data.map(({ date }) => date));
-  for (const period of observedPeriods) {
-    const source = dataset.sources.find(({ role, coverage }) => (
-      role === 'data' && coverage === `${period} to ${period}`
+  function isDataSource(source) {
+    return (source.role ?? 'data') === 'data';
+  }
+
+  for (const observation of dataset.data) {
+    const covered = dataset.sources.some((source) => (
+      isDataSource(source) && coversPeriod(source.coverage, observation.date)
     ));
-    assert.ok(source, `${id} ${period} missing official data provenance`);
+    assert.ok(covered, `${id} ${observation.date} missing data provenance`);
   }
   ```
 
@@ -37,13 +40,17 @@
 
 - [ ] **Step 3: Remove the hard-coded `officialPriceSources` object**
 
-  Delete the month-to-URL map and replace the price-specific test with a dynamic negative regression over the price datasets:
+  Delete the month-to-URL map and replace the price-specific test with a dynamic regression that requires an exact data source for every price observation and rejects interpretation-page titles:
 
   ```js
-  test('price data sources are not interpretation-page provenance', () => {
+  test('price data sources use exact official releases, not interpretation pages', () => {
     for (const id of ['cpi', 'core-cpi', 'ppi']) {
       const dataset = readDataset(id);
-      for (const source of dataset.sources.filter(({ role }) => role === 'data')) {
+      for (const observation of dataset.data) {
+        const source = dataset.sources.find(({ role, coverage }) => (
+          (role ?? 'data') === 'data' && coverage === `${observation.date} to ${observation.date}`
+        ));
+        assert.ok(source, `${id} ${observation.date} missing exact data provenance`);
         assert.doesNotMatch(source.title, /解读|国民经济运行总体平稳/, `${id} data source title`);
       }
     }
@@ -69,4 +76,3 @@
   git add tests/indicator-data-integrity.test.mjs docs/superpowers/plans/2026-09-05-dynamic-provenance-audit.md
   git commit -m "test: derive provenance audit coverage from observations"
   ```
-
