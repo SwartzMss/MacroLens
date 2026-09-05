@@ -25,6 +25,11 @@ export type SnapshotEvidence = {
   unit: string;
 };
 
+// Keep snapshot rules dependent on numeric evidence only. Presentation labels
+// are intentionally carried alongside facts, but never participate in phase
+// or risk classification.
+type SnapshotRuleSignal = Pick<SnapshotEvidence, 'id' | 'latest' | 'change' | 'unit'>;
+
 export type SnapshotSignal = SnapshotEvidence & {
   family: SignalFamily;
   fact: string;
@@ -164,7 +169,7 @@ function classifyPriceYoy(indicator: DashboardIndicator): SnapshotSignal {
   };
 }
 
-function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
+function derivePhase(signals: SnapshotRuleSignal[]): SnapshotPhase {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const activity = activityIds.map((id) => byId.get(id)!);
   const positiveCount = activity.filter((signal) => signal.id === 'pmi'
@@ -212,7 +217,7 @@ function makeRisk(
   return { id, title, explanation, kind: 'risk', evidenceIds };
 }
 
-function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
+function deriveRisks(signals: SnapshotRuleSignal[]): SnapshotConclusion[] {
   const byId = new Map(signals.map((signal) => [signal.id, signal]));
   const pmi = byId.get('pmi')!;
   const activity = activityIds.map((id) => byId.get(id)!);

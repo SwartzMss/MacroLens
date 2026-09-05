@@ -24,7 +24,7 @@ test('derives comparable recent-change labels without flattening indicator seman
 });
 
 test('derives comparison method, source name, and actual series coverage', () => {
-  const gdp = getIndicatorPresentation(getIndicatorData('gdp'));
+  const gdp = getIndicatorPresentation(getIndicatorData('gdp'), 'GDP definition');
   assert.equal(gdp.comparisonMethod, '同比增速用于比较与上年同季度的变化；近期变化相对于上一季度。');
   const cpi = getIndicatorPresentation(getIndicatorData('cpi'));
   assert.equal(cpi.comparisonMethod, '同比增速用于比较与上年同月的变化；近期变化相对于上月。');
@@ -35,6 +35,10 @@ test('derives comparison method, source name, and actual series coverage', () =>
   assert.ok(gdp.sources.every((source) => source.title && source.url && source.sourceDate && source.coverage));
   const detailed = getIndicatorPresentation(getIndicatorData('fixed-asset-investment'));
   assert.ok(detailed.sources.every((source) => !Object.prototype.hasOwnProperty.call(source, 'request')));
+  assert.equal(gdp.definition, 'GDP definition');
+  assert.equal(gdp.updatedAt, getIndicatorData('gdp').updatedAt);
+  assert.equal(gdp.comparabilityNote, getIndicatorData('gdp').comparabilityNote);
+  assert.equal(gdp.calculationDescription, '官方公布值');
 });
 
 test('keeps source fallback and missing observations explicit', () => {

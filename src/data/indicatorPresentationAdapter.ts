@@ -14,6 +14,10 @@ export type IndicatorViewModel = {
   valueLabel: string;
   changeLabel: string;
   comparisonMethod: string;
+  definition: string;
+  updatedAt: string;
+  comparabilityNote: string;
+  calculationDescription: string;
   sourceLabel: string;
   coverage: string;
   sources: IndicatorPresentationSource[];
@@ -62,7 +66,18 @@ function comparisonMethod(indicator: IndicatorDataset): string {
   return `读数按${frequencyLabel(indicator)}数据展示；近期变化${changeLabel(indicator)}。`;
 }
 
-export function getIndicatorPresentation(indicator: IndicatorDataset): IndicatorViewModel {
+function previousMonth(value: string): string {
+  const [year, month] = value.split('-').map(Number);
+  return month === 1 ? `${year - 1}-12` : `${year}-${String(month - 1).padStart(2, '0')}`;
+}
+
+function calculationDescription(indicator: IndicatorDataset): string {
+  return indicator.calculationEffectiveFrom && indicator.calculation === 'published'
+    ? `${previousMonth(indicator.calculationEffectiveFrom)} 及以前：由官方余额计算；${indicator.calculationEffectiveFrom} 起：央行官方公布值`
+    : indicator.calculation === 'published' ? '官方公布值' : '由官方余额计算';
+}
+
+export function getIndicatorPresentation(indicator: IndicatorDataset, definition = ''): IndicatorViewModel {
   const first = indicator.data.at(0);
   const last = indicator.data.at(-1);
   if (!first || !last) throw new Error('Indicator dataset must contain at least one observation');
@@ -72,6 +87,10 @@ export function getIndicatorPresentation(indicator: IndicatorDataset): Indicator
     valueLabel: valueLabel(indicator),
     changeLabel: changeLabel(indicator),
     comparisonMethod: comparisonMethod(indicator),
+    definition,
+    updatedAt: indicator.updatedAt,
+    comparabilityNote: indicator.comparabilityNote,
+    calculationDescription: calculationDescription(indicator),
     sourceLabel: normalizeSourceLabel(indicator.source),
     coverage: `${first.date} 至 ${last.date}`,
     sources: indicator.sources.map(({ title, url, sourceDate, coverage, role }) => ({

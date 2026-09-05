@@ -8,10 +8,13 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 test('indicator metadata presents calculation method changes at their effective date', () => {
   const metadata = fs.readFileSync(path.join(root, 'src', 'components', 'IndicatorMetadata.astro'), 'utf8');
+  const adapter = fs.readFileSync(path.join(root, 'src', 'data', 'indicatorPresentationAdapter.ts'), 'utf8');
   const registry = fs.readFileSync(path.join(root, 'src', 'data', 'indicatorRegistry.ts'), 'utf8');
   assert.match(registry, /calculationEffectiveFrom\?: string/);
-  assert.match(metadata, /previousMonth\(indicator\.calculationEffectiveFrom\)/);
-  assert.match(metadata, /及以前：由官方余额计算；\$\{indicator\.calculationEffectiveFrom\} 起：央行官方公布值/);
+  assert.match(adapter, /previousMonth\(value: string\)/);
+  assert.match(adapter, /及以前：由官方余额计算；\$\{indicator\.calculationEffectiveFrom\} 起：央行官方公布值/);
+  assert.match(adapter, /calculationDescription/);
+  assert.match(metadata, /presentation\.calculationDescription/);
 });
 
 test('indicator detail provides structured user-facing metadata', () => {
@@ -22,6 +25,10 @@ test('indicator detail provides structured user-facing metadata', () => {
     assert.match(source, new RegExp(label));
   }
   assert.match(page, /IndicatorMetadata/);
+  assert.match(page, /getIndicatorPresentation/);
+  assert.match(page, /presentation=\{presentation\}/);
+  assert.doesNotMatch(source, /IndicatorDataset/);
+  assert.doesNotMatch(source, /getIndicatorPresentation/);
   assert.match(source, /presentation\.comparisonMethod/);
   assert.match(page, /!indicator.*entry\.data\.source/);
   assert.match(source, /<details/);

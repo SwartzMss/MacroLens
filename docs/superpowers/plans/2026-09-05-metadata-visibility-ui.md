@@ -4,7 +4,7 @@
 
 **Goal:** Align the homepage dashboard, macro snapshot, and indicator detail pages with the #81/#82 user-facing metadata policy.
 
-**Architecture:** Keep raw indicator datasets and snapshot calculations unchanged. Add `indicatorPresentationAdapter.ts` as a small domain-data-to-UI-model boundary that derives user language such as frequency, value label, change label, comparison method, source name, and coverage. Dashboard, snapshot, and detail metadata consume that model instead of formatting policy-sensitive labels independently.
+**Architecture:** Keep raw indicator datasets and snapshot calculations unchanged. Add `indicatorPresentationAdapter.ts` as a small domain-data-to-UI-model boundary that derives user language such as frequency, value label, change label, comparison method, source name, coverage, and detail-only metadata. Dashboard, snapshot, and detail metadata consume that model instead of formatting policy-sensitive labels independently. `IndicatorMetadata.astro` is a pure view: the page assembles the view model and passes `presentation`; the component does not import domain data or call the adapter.
 
 **Tech Stack:** Astro, TypeScript, Markdown data files, Node test runner, Astro check, static build.
 
@@ -13,7 +13,7 @@
 ## File map
 
 - Create `src/data/indicatorPresentationAdapter.ts`: derive `IndicatorViewModel` from an existing `IndicatorDataset`; no numerical calculations or indicator data storage.
-- Create `src/components/IndicatorMetadata.astro`: render the detail-page “如何阅读” block from the view model.
+- Create `src/components/IndicatorMetadata.astro`: render the detail-page “如何阅读” block from an `IndicatorViewModel` passed as `presentation`.
 - Create `src/styles/indicator-metadata.css`: responsive styles for the structured detail metadata block.
 - Create `tests/indicator-presentation-adapter.test.mjs`: unit tests for the view-model semantics.
 - Modify `src/components/MacroDashboard.astro`: consume presentation labels and remove engineering/provenance details from cards.
@@ -99,6 +99,10 @@ export type IndicatorViewModel = {
   valueLabel: string;
   changeLabel: string;
   comparisonMethod: string;
+  definition: string;
+  updatedAt: string;
+  comparabilityNote: string;
+  calculationDescription: string;
   sourceLabel: string;
   coverage: string;
   sources: IndicatorPresentationSource[];
@@ -243,7 +247,7 @@ git commit -m "feat: simplify dashboard metadata"
 
 - [ ] **Step 1: Add failing detail-page boundary tests**
 
-Extend `tests/indicator-presentation.test.mjs` to read `IndicatorMetadata.astro` and `[id].astro`. Assert that the metadata component contains `如何阅读`, `指标定义`, `统计频率`, `变化口径`, `数据来源`, `数据集更新时间`, and `覆盖期间`; assert that the detail page mounts `IndicatorMetadata`.
+Extend `tests/indicator-presentation.test.mjs` to read `IndicatorMetadata.astro` and `[id].astro`. Assert that the metadata component contains `如何阅读`, `指标定义`, `统计频率`, `变化口径`, `数据来源`, `数据更新`, and `覆盖期间`; assert that the detail page assembles `presentation` and mounts `IndicatorMetadata presentation={presentation}`. Also assert that the component does not import `IndicatorDataset` or call `getIndicatorPresentation`.
 
 Assert that the metadata component does not contain `methodologyFingerprint`, `runtime`, `静态生成`, or `规则版本`. Move the existing calculation-method test from `IndicatorChart.astro` to the new metadata component if the user-readable calculation explanation remains part of the detail block.
 
@@ -261,13 +265,13 @@ Expected: FAIL because the structured metadata component and page integration do
 
 - [ ] **Step 3: Implement `IndicatorMetadata.astro`**
 
-Accept `{ indicator, definition }`, call `getIndicatorPresentation(indicator)`, and render one section with an accessible heading `如何阅读`. Render a definition paragraph from the concept subtitle, then a definition list containing:
+Accept `{ presentation }` and render one section with an accessible heading `如何阅读`. The page assembly supplies the concept definition and other detail fields through the view model; the component does not import domain data or call the adapter. Render a definition paragraph from `presentation.definition`, then a definition list containing:
 
 ```astro
 <dt>统计频率</dt><dd>{presentation.frequencyLabel}</dd>
 <dt>变化口径</dt><dd>{presentation.comparisonMethod}</dd>
 <dt>数据来源</dt><dd>{presentation.sourceLabel}</dd>
-<dt>数据集更新时间</dt><dd>{indicator.updatedAt}</dd>
+<dt>数据更新</dt><dd>MacroLens 于 {presentation.updatedAt} 更新</dd>
 <dt>覆盖期间</dt><dd>{presentation.coverage}</dd>
 ```
 
@@ -275,7 +279,7 @@ Render each source as an official link with its publication date and source cove
 
 - [ ] **Step 4: Integrate and style the detail metadata**
 
-In `src/pages/concepts/[id].astro`, import and render `<IndicatorMetadata indicator={indicator} definition={entry.data.subtitle} />` immediately before `IndicatorChart` when an indicator exists. For indicator pages, remove the header’s audit-style definition effective/as-of spans and duplicated source span, while preserving the user-facing source on non-indicator concept pages and keeping country/region context in the header.
+In `src/pages/concepts/[id].astro`, compute `const presentation = indicator ? getIndicatorPresentation(indicator, entry.data.subtitle) : null` and render `<IndicatorMetadata presentation={presentation} />` immediately before `IndicatorChart` when an indicator exists. For indicator pages, remove the header’s audit-style definition effective/as-of spans and duplicated source span, while preserving the user-facing source on non-indicator concept pages and keeping country/region context in the header.
 
 In `IndicatorChart.astro`, keep the chart markup and script unchanged, remove the old mixed `.data-note` provenance footer, and remove its now-unused local calculation-description helper. Delete the obsolete `.data-note` rules from `src/styles/data.css` if no other component uses them.
 
