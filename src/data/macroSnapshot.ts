@@ -113,7 +113,7 @@ function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
   const level = indicator.latest.value > 50
     ? '高于 50 的扩张区间'
     : indicator.latest.value < 50 ? '低于 50 的收缩区间' : '处于 50 的中性水平';
-  const momentumText = momentum === 'improving' ? '，较上一期改善' : momentum === 'weakening' ? '，较上一期走弱' : '，较上一期基本稳定';
+  const momentumText = momentum === 'improving' ? `，${evidence.changeLabel}改善` : momentum === 'weakening' ? `，${evidence.changeLabel}走弱` : `，${evidence.changeLabel}基本稳定`;
   return {
     ...evidence,
     family: 'pmi',
@@ -189,7 +189,7 @@ function derivePhase(signals: SnapshotSignal[]): SnapshotPhase {
   if (weakeningIds.length >= 3) {
     return {
       label: '增长放缓',
-      explanation: `${weakeningIds.length} 项活动指标较上一期走弱，达到增长放缓规则。`,
+      explanation: `${weakeningIds.length} 项活动指标近期动能走弱，达到增长放缓规则。`,
       evidenceIds: weakeningIds,
     };
   }
@@ -232,7 +232,7 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
     risks.push(makeRisk(
       'activity-synchronised-weakening',
       '活动指标近期同步走弱',
-      `共有 ${weakeningActivity.length} 项活动指标较上一期走弱，达到同步走弱规则。`,
+      `共有 ${weakeningActivity.length} 项活动指标近期同步走弱，达到同步走弱规则。`,
       weakeningActivity.map((signal) => signal.id),
     ));
   }
@@ -248,7 +248,7 @@ function deriveRisks(signals: SnapshotSignal[]): SnapshotConclusion[] {
     risks.push(makeRisk(
       'monetary-growth-momentum-weakening',
       '货币增速动能走弱',
-      '至少一项货币增速较上一期走弱；这只说明货币增速本身的变化，不断言其对需求、价格或资产价格的传导结果。',
+      '至少一项货币增速近期走弱；这只说明货币增速本身的变化，不断言其对需求、价格或资产价格的传导结果。',
       weakeningMonetary.map((signal) => signal.id),
     ));
   }

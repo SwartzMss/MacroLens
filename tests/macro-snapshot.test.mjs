@@ -174,6 +174,12 @@ test('emits independent risks and evidence-backed watch items', () => {
   assert.ok(snapshot.risks.some((item) => item.title.includes('货币增速')));
   assert.ok(snapshot.watchNext.length >= snapshot.risks.length);
   assert.ok(snapshot.watchNext.every((item) => item.evidenceIds.length > 0 && /下一期|下一次|继续观察/.test(item.explanation)));
+  const publicExplanations = [
+    snapshot.phase.explanation,
+    ...snapshot.risks.map((item) => item.explanation),
+    ...snapshot.watchNext.map((item) => item.explanation),
+  ];
+  assert.ok(publicExplanations.every((text) => !text.includes('较上一期')));
 });
 
 test('classifies price indicators separately from activity phase rules', () => {
@@ -239,6 +245,7 @@ test('snapshot exposes its update date without exposing the rules version', () =
   assert.match(component, /快照更新/);
   assert.doesNotMatch(component, /rulesVersion/);
   assert.doesNotMatch(component, /规则版本/);
+  assert.doesNotMatch(component, /较上一期/);
 });
 
 test('snapshot evidence carries indicator-specific change labels', () => {
