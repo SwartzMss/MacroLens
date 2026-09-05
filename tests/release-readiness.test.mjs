@@ -11,6 +11,7 @@ const nodeVersion = fs.existsSync('.nvmrc') ? fs.readFileSync('.nvmrc', 'utf8').
 test('release runtime is Node 24 with an Astro-compatible minimum', () => {
   assert.equal(nodeVersion, '24');
   assert.equal(packageJson.engines.node, '>=22.12.0');
+  assert.match(packageJson.scripts.test, /node --import tsx --test/);
   assert.match(ci, /node-version:\s*24/);
   assert.match(updateWorkflow, /node-version:\s*24/);
   assert.doesNotMatch(ci, /node-version:\s*20/);
