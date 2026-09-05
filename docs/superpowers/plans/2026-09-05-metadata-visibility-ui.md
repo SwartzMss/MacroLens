@@ -301,12 +301,13 @@ git commit -m "feat: add readable indicator metadata"
 
 **Files:**
 - Modify: `src/components/MacroSnapshot.astro`
+- Modify: `src/data/macroSnapshot.ts`
 - Modify: `src/styles/snapshot.css`
 - Modify: `tests/macro-snapshot.test.mjs`
 
 - [ ] **Step 1: Remove engineering metadata from Snapshot**
 
-Render the snapshot date as `快照更新：{snapshot.asOf}`. Remove the rules-version span. In signal cards, render `signal.changeLabel` before the formatted change value so the UI no longer exposes a generic “较上一期”. Keep facts, interpretations, conclusions, and disclaimer unchanged.
+Render the snapshot date as `快照更新：{snapshot.asOf}`. Remove the rules-version span. In signal cards, render `signal.changeLabel` before the formatted change value so the UI no longer exposes a generic “较上一期”. Preserve the existing facts, interpretations, conclusions, and disclaimer semantics; where an aggregate phase or risk explanation would otherwise use the ambiguous phrase, use user-facing wording such as “近期动能走弱” instead.
 
 - [ ] **Step 2: Keep snapshot responsive styles valid**
 
