@@ -73,14 +73,24 @@ test('does not write for non-HTML requests or responses', async () => {
   assert.equal(binding.points.length, 0);
 });
 
-test('leaves an HTML response working when the Analytics binding is absent', async () => {
+test('sets the visitor cookie even when the Analytics binding is absent', async () => {
   const response = await onVisitorRequest({
     request: new Request('https://macrolens.example/', { headers: { accept: 'text/html' } }),
     env: {},
     next: async () => htmlResponse(),
   });
   assert.equal(response.status, 200);
-  assert.equal(response.headers.has('set-cookie'), false);
+  assert.match(response.headers.get('set-cookie'), /macrolens_visitor=/);
+});
+
+test('sets the visitor cookie when Analytics fails', async () => {
+  const response = await onVisitorRequest({
+    request: new Request('https://macrolens.example/', { headers: { accept: 'text/html' } }),
+    env: { ANALYTICS: { writeDataPoint() { throw new Error('Analytics unavailable'); } } },
+    next: async () => htmlResponse(),
+  });
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('set-cookie'), /macrolens_visitor=/);
 });
 
 test('returns total and today from distinct blob1 counts', async () => {

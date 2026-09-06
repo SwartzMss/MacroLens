@@ -84,6 +84,12 @@ CLOUDFLARE_API_TOKEN -> Pages Function secret（需要 Account Analytics Read）
 
 概念页支持匿名的“有帮助 / 需要改进”反馈，使用现有 `macrolens_visitor` HttpOnly cookie 和 Cloudflare D1；未配置时反馈不可用，但不会影响页面访问。D1 迁移文件位于 `migrations/0001_page_feedback.sql`，部署环境需要提供名为 `FEEDBACK_DB` 的 D1 binding。系统不保存 IP、user-agent 或自由文本反馈。
 
+仅创建并绑定 D1 不会自动建表。首次部署或新增数据库后，必须对每个实际使用的数据库分别执行迁移；如果 Production 和 Preview 使用不同数据库，两边都要执行：
+
+~~~bash
+npx wrangler d1 migrations apply <DATABASE_NAME> --remote
+~~~
+
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 /MacroLens base。首页、/concepts、/topics、/graph、/search、Pagefind 资源和图表资源均使用根路径。
 
 内容位于 src/content/concepts，指标数据位于 data/indicators，关系数据位于 data/relations。

@@ -2,7 +2,7 @@
 const { pageId } = Astro.props as { pageId: string };
 ---
 
-<section class="page-feedback" data-page-feedback data-page-id={pageId} aria-labelledby={`${pageId}-feedback-title`}>
+<section class="page-feedback" data-page-feedback data-pagefind-ignore data-page-id={pageId} aria-labelledby={`${pageId}-feedback-title`}>
   <h2 id={`${pageId}-feedback-title`}>这篇解释对你有帮助吗？</h2>
   <div class="feedback-votes" role="group" aria-label="页面反馈">
     <button type="button" data-feedback-vote="helpful" aria-pressed="false">👍 有帮助</button>

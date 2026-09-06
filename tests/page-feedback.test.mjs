@@ -186,6 +186,7 @@ test('renders feedback on concept pages outside relationship navigation', () => 
   const sql = readFileSync(migration, 'utf8');
 
   assert.match(component, /这篇解释对你有帮助吗/);
+  assert.match(component, /data-pagefind-ignore/);
   assert.match(component, /data-feedback-vote="helpful"/);
   assert.match(component, /aria-pressed/);
   assert.match(component, /credentials:\s*['"]same-origin['"]/);
