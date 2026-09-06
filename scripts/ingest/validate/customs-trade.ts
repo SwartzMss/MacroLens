@@ -9,6 +9,10 @@ import { coverageCoversDates, validateIndicatorDataset, validateMonthlyObservati
 
 const COVERAGE_PATTERN = /^\d{4}-(?:0[1-9]|1[0-2])\s+to\s+\d{4}-(?:0[1-9]|1[0-2])$/;
 const IDS: CustomsTradeDatasetId[] = ['exports', 'imports'];
+// GACC published Jan-Feb 2026 as a cumulative release without a defensible
+// standalone January observation. Keep that one documented gap explicit while
+// requiring continuity everywhere else in the backfilled history.
+const STRUCTURAL_GAPS = new Set(['2025-12 -> 2026-02']);
 
 function fail(message: string): never {
   throw new IngestionContractError(message);
@@ -25,7 +29,7 @@ function officialCustomsUrl(value: string): boolean {
 }
 
 export function validateCustomsTradeObservations(observations: Observation[], id: CustomsTradeDatasetId): void {
-  validateMonthlyObservations(observations, `Customs ${id}`);
+  validateMonthlyObservations(observations, `Customs ${id}`, STRUCTURAL_GAPS);
 }
 
 export function customsTradeCoverageCoversDates(
