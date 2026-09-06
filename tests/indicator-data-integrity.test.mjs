@@ -22,6 +22,8 @@ const contracts = {
   cpi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'core-cpi': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   ppi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
+  credit: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
+  'social-financing': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
 };
 
 function readDataset(id) {
@@ -124,7 +126,7 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
 });
 
 test('registry resolves every V1 dataset and observations are continuous by semantics', () => {
-  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi'];
+  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi', 'credit', 'social-financing'];
   for (const id of Object.keys(contracts)) {
     const dataset = getIndicatorData(id);
     assert.equal(dataset.id, id, `${id} must resolve through indicatorRegistry`);

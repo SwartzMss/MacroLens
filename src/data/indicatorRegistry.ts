@@ -9,6 +9,8 @@ import fixedAssetInvestment from '../../data/indicators/fixed-asset-investment.j
 import cpi from '../../data/indicators/cpi.json';
 import coreCpi from '../../data/indicators/core-cpi.json';
 import ppi from '../../data/indicators/ppi.json';
+import credit from '../../data/indicators/credit.json';
+import socialFinancing from '../../data/indicators/social-financing.json';
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
@@ -37,6 +39,8 @@ const indicatorData = {
   cpi,
   'core-cpi': coreCpi,
   ppi,
+  credit,
+  'social-financing': socialFinancing,
 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {
