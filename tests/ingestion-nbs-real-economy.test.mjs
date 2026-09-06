@@ -371,6 +371,21 @@ test('maps official annual fixed-asset-investment titles to full-year coverage',
   assert.equal(publication.coverage, '2025-01–12 to 2025-01–12');
 });
 
+test('maps unemployment Jan-Feb joint releases to the ending month and parses the fixture', () => {
+  const publication = discoverLatestRealEconomyPublication(
+    '<a href="/sj/zxfb/202703/t20270315_1969001.html">2027年1—2月份国民经济运行情况</a> 2027-03-15',
+    'unemployment-rate',
+  );
+  assert.equal(publication.coverage, '2027-02 to 2027-02');
+
+  const payload = fixture('unemployment-rate-jan-feb');
+  const parsed = parseNbsRealEconomyResponse(payload, payload.publication, REAL_ECONOMY_CONTRACTS['unemployment-rate']);
+  assert.deepEqual(parsed.observations, [
+    { date: '2027-01', value: 5.1 },
+    { date: '2027-02', value: 5.2 },
+  ]);
+});
+
 test('routes real-economy live requests through the shared text fetch boundary', async () => {
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));

@@ -306,7 +306,9 @@ function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId, s
   if (!Number.isInteger(startMonth) || startMonth < 1 || startMonth > 12 || !Number.isInteger(endMonth) || endMonth < startMonth || endMonth > 12) {
     fail(`NBS publication title has invalid period: ${title}`);
   }
-  const period = startMonth === 1 && endMonth === 2
+  const period = id === 'unemployment-rate'
+    ? `${year}-${String(endMonth).padStart(2, '0')}`
+    : startMonth === 1 && endMonth === 2
     ? `${year}-01–02`
     : id === 'fixed-asset-investment'
       ? `${year}-01–${String(endMonth).padStart(2, '0')}`
