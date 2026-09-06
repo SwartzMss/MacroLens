@@ -1,0 +1,112 @@
+---
+const { pageId } = Astro.props as { pageId: string };
+---
+
+<section class="page-feedback" data-page-feedback data-page-id={pageId} aria-labelledby={`${pageId}-feedback-title`}>
+  <h2 id={`${pageId}-feedback-title`}>这篇解释对你有帮助吗？</h2>
+  <div class="feedback-votes" role="group" aria-label="页面反馈">
+    <button type="button" data-feedback-vote="helpful" aria-pressed="false">👍 有帮助</button>
+    <button type="button" data-feedback-vote="needs-improvement" aria-pressed="false">👎 需要改进</button>
+  </div>
+  <p class="feedback-status" data-feedback-status role="status" aria-live="polite"></p>
+  <fieldset class="feedback-reasons" data-feedback-reasons hidden>
+    <legend>哪里需要改进？（可选）</legend>
+    <label><input type="radio" name={`feedback-reason-${pageId}`} value="too_complex" data-feedback-reason> 概念太难理解</label>
+    <label><input type="radio" name={`feedback-reason-${pageId}`} value="missing_example" data-feedback-reason> 缺少实际例子</label>
+    <label><input type="radio" name={`feedback-reason-${pageId}`} value="unclear_chart" data-feedback-reason> 图表不够清楚</label>
+    <label><input type="radio" name={`feedback-reason-${pageId}`} value="incomplete" data-feedback-reason> 内容不够完整</label>
+    <label><input type="radio" name={`feedback-reason-${pageId}`} value="questionable" data-feedback-reason> 数据或解释有疑问</label>
+  </fieldset>
+</section>
+
+<script>
+  type Vote = 'helpful' | 'needs-improvement';
+  type Reason = 'too_complex' | 'missing_example' | 'unclear_chart' | 'incomplete' | 'questionable';
+  type FeedbackResponse = { ok: boolean; vote?: Vote | null; reason?: Reason | null };
+
+  const isVote = (value: unknown): value is Vote => value === 'helpful' || value === 'needs-improvement';
+  const isReason = (value: unknown): value is Reason => [
+    'too_complex', 'missing_example', 'unclear_chart', 'incomplete', 'questionable',
+  ].includes(value as string);
+
+  document.querySelectorAll<HTMLElement>('[data-page-feedback]').forEach((root) => {
+    const pageId = root.dataset.pageId;
+    const voteButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-feedback-vote]')];
+    const status = root.querySelector<HTMLElement>('[data-feedback-status]');
+    const reasons = root.querySelector<HTMLFieldSetElement>('[data-feedback-reasons]');
+    const reasonInputs = [...root.querySelectorAll<HTMLInputElement>('[data-feedback-reason]')];
+    if (!pageId || !status || !reasons) return;
+
+    const setVote = (vote: Vote | null) => {
+      voteButtons.forEach((button) => {
+        button.setAttribute('aria-pressed', String(button.dataset.feedbackVote === vote));
+      });
+      reasons.hidden = vote !== 'needs-improvement';
+      if (vote !== 'needs-improvement') reasonInputs.forEach((input) => { input.checked = false; });
+    };
+
+    const setReason = (reason: Reason | null) => {
+      reasonInputs.forEach((input) => { input.checked = input.value === reason; });
+    };
+
+    const setBusy = (busy: boolean) => {
+      voteButtons.forEach((button) => { button.disabled = busy; });
+      reasonInputs.forEach((input) => { input.disabled = busy; });
+    };
+
+    const submit = async (vote: Vote, reason?: Reason) => {
+      setBusy(true);
+      status.textContent = '正在保存…';
+      try {
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { accept: 'application/json', 'content-type': 'application/json' },
+          body: JSON.stringify({ pageId, vote, ...(reason ? { reason } : {}) }),
+        });
+        const result = await response.json() as FeedbackResponse;
+        if (!response.ok || result.ok !== true) throw new Error('feedback unavailable');
+        setVote(vote);
+        if (reason) setReason(reason);
+        status.textContent = reason ? '感谢反馈' : '反馈已更新';
+      } catch {
+        status.textContent = '反馈暂时无法提交，请稍后再试';
+      } finally {
+        setBusy(false);
+      }
+    };
+
+    voteButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const vote = button.dataset.feedbackVote;
+        if (isVote(vote)) void submit(vote);
+      });
+    });
+
+    reasonInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        if (isReason(input.value)) void submit('needs-improvement', input.value);
+      });
+    });
+
+    void (async () => {
+      try {
+        const response = await fetch(`/api/feedback?pageId=${encodeURIComponent(pageId)}`, {
+          credentials: 'same-origin',
+          headers: { accept: 'application/json' },
+        });
+        if (!response.ok) return;
+        const result = await response.json() as FeedbackResponse;
+        if (result.ok !== true || !isVote(result.vote)) return;
+        setVote(result.vote);
+        if (isReason(result.reason)) setReason(result.reason);
+      } catch {
+        // Feedback is optional; keep the concept page usable when the API is unavailable.
+      }
+    })();
+  });
+</script>
+
+<style>
+  .page-feedback{margin:54px 0 0;padding:22px;background:var(--card);border:1px solid var(--line);border-radius:16px}.page-feedback h2{margin:0 0 16px;font:700 22px/1.3 var(--serif)}.feedback-votes{display:flex;flex-wrap:wrap;gap:10px}.feedback-votes button{min-height:44px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--ink);font:inherit;cursor:pointer}.feedback-votes button:hover{border-color:#9fc2b4;color:var(--green)}.feedback-votes button[aria-pressed="true"]{border-color:var(--green);background:var(--mint);color:var(--ink)}.feedback-votes button:focus-visible,.feedback-reasons input:focus-visible{outline:3px solid #a9d8c3;outline-offset:2px}.feedback-votes button:disabled,.feedback-reasons input:disabled{cursor:wait;opacity:.65}.feedback-status{min-height:1.7em;margin:10px 0 0;color:var(--muted);font-size:13px}.feedback-reasons{display:grid;gap:9px;margin:14px 0 0;padding:14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:13px}.feedback-reasons[hidden]{display:none}.feedback-reasons legend{padding:0;font-weight:700;color:var(--ink)}.feedback-reasons label{display:flex;align-items:center;gap:8px}.feedback-reasons input{accent-color:var(--green)}
+</style>
