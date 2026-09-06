@@ -8,8 +8,9 @@ source: 中国人民银行 / 全国银行间同业拆借中心
 definition:
   source: 中国人民银行
   effectiveFrom: 2019-08
-  asOf: 2025-08
-updatedAt: 2026-08-29
+  asOf: 2026-08
+updatedAt: 2026-08-20
+chart: lpr
 related: [policy-rate, monetary-policy, credit]
 graph: macro
 order: 6

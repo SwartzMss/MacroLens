@@ -11,6 +11,13 @@ import coreCpi from '../../data/indicators/core-cpi.json';
 import ppi from '../../data/indicators/ppi.json';
 import credit from '../../data/indicators/credit.json';
 import socialFinancing from '../../data/indicators/social-financing.json';
+import lpr from '../../data/indicators/lpr.json';
+
+export interface IndicatorSeries {
+  id: string;
+  label: string;
+  data: Array<{ date: string; value: number }>;
+}
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
@@ -20,6 +27,7 @@ export interface IndicatorDataset {
   sources: Array<{ title: string; url: string; sourceDate: string; coverage: string; role?: string }>;
   referenceValue?: number; referenceLabel?: string;
   data: Array<{ date: string; value: number }>;
+  series?: IndicatorSeries[];
 }
 
 export type IndicatorComparisonType =
@@ -41,6 +49,7 @@ const indicatorData = {
   ppi,
   credit,
   'social-financing': socialFinancing,
+  lpr,
 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {

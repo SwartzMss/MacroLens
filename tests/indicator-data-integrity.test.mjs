@@ -24,6 +24,7 @@ const contracts = {
   ppi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   credit: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'social-financing': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
+  lpr: { frequency: 'monthly', unit: '%', metric: 'rate', calculation: 'published' },
 };
 
 function readDataset(id) {
@@ -57,7 +58,11 @@ function isOfficialHost(value) {
   return protocol === 'https:' && (hostname === 'stats.gov.cn'
     || hostname.endsWith('.stats.gov.cn')
     || hostname === 'pbc.gov.cn'
-    || hostname.endsWith('.pbc.gov.cn'));
+    || hostname.endsWith('.pbc.gov.cn')
+    || hostname === 'chinamoney.com.cn'
+    || hostname.endsWith('.chinamoney.com.cn')
+    || hostname === 'shibor.org'
+    || hostname.endsWith('.shibor.org'));
 }
 
 function nextMonth(value) {
@@ -126,7 +131,7 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
 });
 
 test('registry resolves every V1 dataset and observations are continuous by semantics', () => {
-  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi', 'credit', 'social-financing'];
+  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi', 'credit', 'social-financing', 'lpr'];
   for (const id of Object.keys(contracts)) {
     const dataset = getIndicatorData(id);
     assert.equal(dataset.id, id, `${id} must resolve through indicatorRegistry`);
