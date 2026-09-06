@@ -55,7 +55,6 @@ const groups = [...grouped];
         <div><dt>时间关系</dt><dd>{metadata.lag}</dd></div>
         <div class="relationship-detail-explanation"><dt>解释</dt><dd>{metadata.explanation}</dd></div>
       </dl>
-      <small class="relationship-detail-note">这是手工维护的解释性关系，不代表确定因果。</small>
     </div>
   </details>;
   return <div class:list={cardClasses}>{linkedSummary}</div>;
