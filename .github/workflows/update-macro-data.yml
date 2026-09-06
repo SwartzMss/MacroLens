@@ -62,6 +62,7 @@ jobs:
             data/indicators/industrial-production.json
             data/indicators/retail-sales.json
             data/indicators/fixed-asset-investment.json
+            data/indicators/unemployment-rate.json
             data/indicators/cpi.json
             data/indicators/core-cpi.json
             data/indicators/ppi.json

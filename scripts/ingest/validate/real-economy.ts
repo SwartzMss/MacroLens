@@ -26,6 +26,7 @@ function periodRank(date: string, id: RealEconomyDatasetId): number {
 
 function validPeriod(date: string, id: RealEconomyDatasetId): boolean {
   if (id === 'gdp') return /^\d{4}-Q[1-4]$/.test(date);
+  if (id === 'unemployment-rate') return /^\d{4}-(?:0[1-9]|1[0-2])$/.test(date);
   if (id === 'fixed-asset-investment') return /^\d{4}-01–(?:02|0[3-9]|1[0-2])$/.test(date);
   return /^\d{4}-(?:01–02|0[3-9]|1[0-2])$/.test(date);
 }
@@ -35,6 +36,11 @@ function nextPeriod(date: string, id: RealEconomyDatasetId): string {
     const match = date.match(/^(\d{4})-Q([1-4])$/)!;
     const quarter = Number(match[2]);
     return quarter === 4 ? `${Number(match[1]) + 1}-Q1` : `${match[1]}-Q${quarter + 1}`;
+  }
+  if (id === 'unemployment-rate') {
+    const year = Number(date.slice(0, 4));
+    const month = Number(date.slice(-2));
+    return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
   }
   const year = Number(date.slice(0, 4));
   const month = id === 'fixed-asset-investment'
@@ -51,7 +57,7 @@ export function validateRealEconomyObservations(
   options: { requireYearStart?: boolean } = {},
 ): void {
   if (!Array.isArray(observations) || observations.length === 0) fail(`${id} dataset requires observations`);
-  if (options.requireYearStart !== false && id !== 'gdp' && observations[0]?.date.match(/^\d{4}-01–02$/) === null) {
+  if (options.requireYearStart !== false && id !== 'gdp' && id !== 'unemployment-rate' && observations[0]?.date.match(/^\d{4}-01–02$/) === null) {
     fail(`${id} observations must start with the official Jan-Feb combined period`);
   }
   let previous = '';

@@ -35,7 +35,7 @@ function valueLabel(indicator: IndicatorDataset): string {
   if (indicator.metric === 'mom') return '环比';
   if (indicator.metric === 'cumulative_yoy') return '累计同比';
   if (indicator.metric === 'index') return '指数';
-  if (indicator.metric === 'rate') return '利率水平';
+  if (indicator.metric === 'rate') return '率水平';
   return indicator.metric;
 }
 
@@ -88,7 +88,7 @@ function comparisonMethod(indicator: IndicatorDataset): string {
     return '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。';
   }
   if (indicator.metric === 'rate') {
-    return '利率/比率水平按数据集公布的月度读数展示；近期变化相对于上月。';
+    return '率水平按数据集公布的月度读数展示；近期变化相对于上月。';
   }
   if (indicator.metric === 'yoy') {
     return '同比增速用于比较与上年同月的变化；近期变化相对于上月。';

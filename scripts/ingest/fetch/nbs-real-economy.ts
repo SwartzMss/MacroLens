@@ -30,6 +30,8 @@ type NbsStructuredValue = {
   _name?: string;
   i_showname?: string;
   du_name?: string;
+  da?: string;
+  da_name?: string;
 };
 
 type NbsStructuredRow = {
@@ -69,6 +71,12 @@ const NBS_STRUCTURED_MAPPINGS: Partial<Record<RealEconomyDatasetId, StructuredSe
     cid: '5129067b149d4ddfbec1ffc478d35bfb',
     indicators: {
       A040102: { id: '7e570cf8071c4734a7d78d9f0a70fbe1', title: '固定资产投资额累计增长 (%)' },
+    },
+  },
+  'unemployment-rate': {
+    cid: 'ee3b7046b390415b9b7745e3d16f6052',
+    indicators: {
+      A0E01: { id: '3888eac6062945a79c8a27e5f13d4953', title: '全国城镇调查失业率 (%)' },
     },
   },
 };
@@ -134,6 +142,7 @@ function publicationTitlePattern(id: RealEconomyDatasetId): RegExp {
   if (id === 'gdp') return /国内生产总值.*初步核算结果/;
   if (id === 'industrial-production') return /规模以上工业增加值/;
   if (id === 'retail-sales') return /社会消费品零售总额/;
+  if (id === 'unemployment-rate') return /月份国民经济/;
   return /固定资产投资/;
 }
 
@@ -142,6 +151,7 @@ const REAL_ECONOMY_DATASET_IDS: RealEconomyDatasetId[] = [
   'industrial-production',
   'retail-sales',
   'fixed-asset-investment',
+  'unemployment-rate',
 ];
 
 function discoverRealEconomyPublicationCandidates(
@@ -158,7 +168,7 @@ function discoverRealEconomyPublicationCandidates(
     if (!dateMatch || !validIsoDate(dateMatch[1])) fail(`Publication date missing or invalid for: ${title}`);
     const url = new URL(match[1], NBS_INDEX).toString();
     if (new URL(url).origin !== NBS_ORIGIN) fail(`NBS publication is not hosted by stats.gov.cn: ${url}`);
-    candidates.push({ title, url, sourceDate: dateMatch[1], coverage: publicationCoverageFromTitle(title, id) });
+    candidates.push({ title, url, sourceDate: dateMatch[1], coverage: publicationCoverageFromTitle(title, id, dateMatch[1]) });
   }
   return candidates;
 }
@@ -186,6 +196,11 @@ function buildNbsQueryUrlForCode(code: string): string {
 
 export function buildNbsQueryUrls(contract: RealEconomyContract): Record<string, string> {
   if (contract.sourceKind !== 'national-data') fail(`National Data URL requested for ${contract.id}`);
+  if (contract.id === 'unemployment-rate') {
+    const mapping = structuredMappingFor(contract);
+    const periodRange = structuredPeriodRange();
+    return Object.fromEntries(contract.sourceCodes.map((code) => [code, buildStructuredPageUrl(mapping, code, periodRange)]));
+  }
   return Object.fromEntries(contract.sourceCodes.map((code) => [code, buildNbsQueryUrlForCode(code)]));
 }
 
@@ -266,7 +281,7 @@ function buildStructuredDataRequest(contract: RealEconomyContract, now = new Dat
   };
 }
 
-function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): string {
+function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId, sourceDate = ''): string {
   if (id === 'gdp') return '';
   const canonicalTitle = canonical(title);
   const annualFixedAssetMatch = canonicalTitle.match(/^(\d{4})年全国固定资产投资基本情况/);
@@ -278,11 +293,16 @@ function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId): 
   if (id === 'retail-sales' && halfYearMatch) {
     return `${halfYearMatch[1]}-06 to ${halfYearMatch[1]}-06`;
   }
-  const match = canonicalTitle.match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/);
+  const match = canonicalTitle.match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/)
+    ?? (id === 'unemployment-rate'
+      ? canonicalTitle.match(/^(\d{1,2})-(\d{1,2})月份/)
+      : null);
   if (!match) fail(`NBS publication title has no period: ${title}`);
-  const year = match[1];
-  const startMonth = Number(match[2]);
-  const endMonth = Number(match[3] ?? match[2]);
+  const hasExplicitYear = match[1].length === 4;
+  const year = hasExplicitYear ? match[1] : sourceDate.slice(0, 4);
+  const startMonth = Number(hasExplicitYear ? match[2] : match[1]);
+  const endMonth = Number(hasExplicitYear ? (match[3] ?? match[2]) : match[2]);
+  if (!/^\d{4}$/.test(year)) fail(`NBS publication title has no inferable year: ${title}`);
   if (!Number.isInteger(startMonth) || startMonth < 1 || startMonth > 12 || !Number.isInteger(endMonth) || endMonth < startMonth || endMonth > 12) {
     fail(`NBS publication title has invalid period: ${title}`);
   }
@@ -300,7 +320,13 @@ function metadataText(payload: NbsPayload, officialMethodologyText: string): str
 
 function requireNationalDataMethodology(payload: NbsPayload, contract: RealEconomyContract, officialMethodologyText: string): void {
   const text = metadataText(payload, officialMethodologyText);
-  const checks: Array<[string, boolean]> = contract.id === 'industrial-production'
+  const checks: Array<[string, boolean]> = contract.id === 'unemployment-rate'
+    ? [
+      ['unemployment series title', text.includes('全国城镇调查失业率')],
+      ['unemployment rate metric', text.includes('城镇调查失业率') && text.includes('%')],
+      ['unemployment national scope', text.includes('全国')],
+    ]
+    : contract.id === 'industrial-production'
     ? [
       ['industrial series title', text.includes('规模以上工业增加值')],
       ['industrial YoY metric', text.includes('同比')],
@@ -346,6 +372,10 @@ function normalizeMonthlyWirePeriod(valuecode: string, display: string, rule: Re
   }
   if (rule === 'monthly') {
     if (month < 3 || combinedDisplay) return undefined;
+    return year + '-' + String(month).padStart(2, '0');
+  }
+  if (rule === 'monthly-rate') {
+    if (combinedDisplay || lastMonth !== month) fail('Monthly NBS rate returned a combined period: ' + valuecode);
     return year + '-' + String(month).padStart(2, '0');
   }
   const cumulativeEnd = lastMonth ?? month;
@@ -396,6 +426,9 @@ function parseNbsStructuredDataPayload(
         fail(`NBS structured indicator metadata changed for ${indicator.code}`);
       }
       if (value.du_name !== '%') fail(`NBS structured indicator unit changed for ${indicator.code}`);
+      if (contract.id === 'unemployment-rate' && value.da !== NBS_NATIONAL_AREA.value) {
+        fail(`NBS structured unemployment scope is not national for ${periodWireCode}`);
+      }
       indicatorNames.set(indicator.code, value.i_showname.trim());
       const valueText = String(value.value ?? '').trim();
       if (!valueText) continue;
@@ -405,6 +438,7 @@ function parseNbsStructuredDataPayload(
         wds: [
           { wdcode: 'zb', valuecode: indicator.code },
           { wdcode: 'sj', valuecode: periodCode, value: row.name },
+          ...(value.da ? [{ wdcode: 'da', valuecode: value.da, value: value.da_name ?? '' }] : []),
         ],
         data: { hasdata: true, data: valueText },
       });
@@ -450,6 +484,11 @@ function latestStructuredDataMonth(payload: NbsPayload): Date {
 
 function nextCoveragePeriod(date: string, id: RealEconomyDatasetId): string | undefined {
   const year = Number(date.slice(0, 4));
+  if (id === 'unemployment-rate') {
+    const month = Number(date.slice(-2));
+    if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) return undefined;
+    return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
+  }
   const month = id === 'fixed-asset-investment'
     ? Number(date.slice(-2))
     : date.includes('01–02') ? 2 : Number(date.slice(-2));
@@ -545,6 +584,9 @@ export function parseNbsRealEconomyResponse(
       if (!periodValue || !seriesCode || !contract.sourceCodes.includes(seriesCode)) {
         fail('NBS data node does not match the ' + contract.id + ' series contract');
       }
+      if (contract.id === 'unemployment-rate' && nodeValue(node, 'da') !== NBS_NATIONAL_AREA.value) {
+        fail('NBS unemployment response is not scoped to the national series');
+      }
       const rule = contract.sourceCodeRules[seriesCode];
       if (!rule) fail('NBS series code has no period rule: ' + seriesCode);
       const date = normalizeMonthlyWirePeriod(periodValue, nodeDisplayValue(node, 'sj'), rule);
@@ -568,6 +610,13 @@ export function parseNbsRealEconomyResponse(
   const first = observations[0];
   const last = observations.at(-1);
   if (!first || !last) fail('NBS response contains no observations');
+  if (contract.id === 'unemployment-rate') {
+    const publicationMonth = publication.coverage.match(/^(\d{4}-(?:0[1-9]|1[0-2])) to \1$/)?.[1];
+    if (!publicationMonth) fail('NBS unemployment publication must cover one exact month');
+    if (last.date !== publicationMonth) {
+      fail(`NBS unemployment data does not match publication month: ${last.date} != ${publicationMonth}`);
+    }
+  }
   const dataSources: IndicatorSource[] = [...sourcePeriods.entries()].map(([code, periods]) => ({
     title: `国家统计局：国家数据（${code}）`,
     url: dataUrls[code] ?? buildNbsQueryUrlForCode(code),

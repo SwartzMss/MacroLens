@@ -19,7 +19,7 @@ function parseScalar(value) {
 }
 
 function parseFrontmatter(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'document must have leading YAML frontmatter');
   return Object.fromEntries(match[1].split('\n').map((line) => {
     const colon = line.indexOf(':');
@@ -54,7 +54,8 @@ function assertConcept(id, terms, sourceUrls) {
   const document = readConcept(id);
   const metadata = parseFrontmatter(document);
   for (const [key, value] of Object.entries(approvedMetadata[id])) assert.deepEqual(metadata[key], value);
-  assert.doesNotMatch(document, /^chart:/m);
+  if (id === 'unemployment-rate') assert.match(document, /^chart: unemployment-rate$/m);
+  else assert.doesNotMatch(document, /^chart:/m);
   for (const term of terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
   for (const url of sourceUrls) assert.ok(document.includes(url), `${id} must cite ${url}`);
 }

@@ -16,7 +16,7 @@ import {
 import type { IndicatorDataset, NbsRealEconomyPublication, RealEconomyDatasetId } from './types.ts';
 import { validateRealEconomyDataset } from './validate/real-economy.ts';
 
-const IDS: RealEconomyDatasetId[] = ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'];
+const IDS: RealEconomyDatasetId[] = ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate'];
 type CliOptions = {
   fixtureIndex?: string;
   fixtureDir?: string;

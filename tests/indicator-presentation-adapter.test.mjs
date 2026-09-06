@@ -11,6 +11,7 @@ test('derives user-facing frequency and value labels', () => {
   assert.equal(getIndicatorPresentation(getIndicatorData('cpi')).valueLabel, '同比');
   assert.equal(getIndicatorPresentation(getIndicatorData('fixed-asset-investment')).valueLabel, '累计同比');
   assert.equal(getIndicatorPresentation(getIndicatorData('pmi')).valueLabel, '指数');
+  assert.equal(getIndicatorPresentation(getIndicatorData('unemployment-rate')).valueLabel, '率水平');
 });
 
 test('derives comparable recent-change labels without flattening indicator semantics', () => {
@@ -18,6 +19,7 @@ test('derives comparable recent-change labels without flattening indicator seman
   assert.equal(getIndicatorPresentation(getIndicatorData('cpi')).changeLabel, '较上月变化');
   assert.equal(getIndicatorPresentation(getIndicatorData('pmi')).changeLabel, '较上月变化');
   assert.equal(getIndicatorPresentation(getIndicatorData('fixed-asset-investment')).changeLabel, '较上一个累计期');
+  assert.equal(getIndicatorPresentation(getIndicatorData('unemployment-rate')).changeLabel, '较上月变化');
   const monthlyRate = { ...getIndicatorData('cpi'), metric: 'mom' };
   assert.equal(getIndicatorPresentation(monthlyRate).valueLabel, '环比');
   assert.equal(getIndicatorPresentation(monthlyRate).changeLabel, '较上月环比变化');

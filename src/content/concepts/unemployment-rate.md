@@ -7,6 +7,7 @@ category: labor
 source: 国家统计局
 definition: { source: 国家统计局劳动力调查制度, asOf: 2026-08 }
 updatedAt: 2026-08-31
+chart: unemployment-rate
 related: [employment, youth-unemployment, labor-force-participation, wages, gdp]
 graph: macro
 order: 2

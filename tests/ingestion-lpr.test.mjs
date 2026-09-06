@@ -134,7 +134,7 @@ test('LPR is registered, rendered by the generic multi-series chart, and schedul
   assert.match(workflow, /npm run ingest:lpr/);
   assert.match(workflow, /data\/indicators\/lpr\.json/);
   assert.match(page, /^chart: lpr$/m);
-  assert.match(adapter, /利率\/比率水平按数据集公布/);
+  assert.match(adapter, /率水平按数据集公布/);
   assert.doesNotMatch(adapter, /月度 LPR/);
   assert.doesNotMatch(fetchSource, /chinamoney\.com\.cn/);
 });
