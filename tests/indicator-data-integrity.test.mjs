@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
+import { CUSTOMS_TRADE_ALLOWED_GAPS } from '../scripts/ingest/validate/customs-trade.ts';
 import { validateRealEconomyObservations } from '../scripts/ingest/validate/real-economy.ts';
 import { coversPeriod, isDataSource } from './helpers/coverage.mjs';
 
@@ -88,9 +89,12 @@ function nextQuarter(value) {
   return quarter === 4 ? `${year + 1}-Q1` : `${year}-Q${quarter + 1}`;
 }
 
-function assertContinuous(data, next, id) {
+function assertContinuous(data, next, id, allowedGaps = new Set()) {
   for (let index = 1; index < data.length; index += 1) {
-    assert.equal(next(data[index - 1].date), data[index].date, `${id} gap before ${data[index].date}`);
+    const previous = data[index - 1].date;
+    const current = data[index].date;
+    if (allowedGaps.has(`${previous} -> ${current}`)) continue;
+    assert.equal(next(previous), current, `${id} gap before ${current}`);
   }
 }
 
@@ -141,11 +145,33 @@ test('registry resolves every V1 dataset and observations are continuous by sema
     const dataset = getIndicatorData(id);
     assert.equal(dataset.id, id, `${id} must resolve through indicatorRegistry`);
   }
-  for (const id of exactMonthlyIds) assertContinuous(getIndicatorData(id).data, nextMonth, id);
+  for (const id of exactMonthlyIds) {
+    const allowedGaps = ['exports', 'imports'].includes(id) ? CUSTOMS_TRADE_ALLOWED_GAPS : undefined;
+    assertContinuous(getIndicatorData(id).data, nextMonth, id, allowedGaps);
+  }
   assertContinuous(getIndicatorData('gdp').data, nextQuarter, 'gdp');
   for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     validateRealEconomyObservations(getIndicatorData(id).data, id);
   }
+});
+
+test('Customs continuity allows only the documented January 2026 gap', () => {
+  assert.deepEqual([...CUSTOMS_TRADE_ALLOWED_GAPS], ['2025-12 -> 2026-02']);
+  assert.doesNotThrow(() => assertContinuous(
+    [{ date: '2025-12' }, { date: '2026-02' }],
+    nextMonth,
+    'exports',
+    CUSTOMS_TRADE_ALLOWED_GAPS,
+  ));
+  assert.throws(
+    () => assertContinuous(
+      [{ date: '2025-12' }, { date: '2026-03' }],
+      nextMonth,
+      'exports',
+      CUSTOMS_TRADE_ALLOWED_GAPS,
+    ),
+    /exports gap before 2026-03/,
+  );
 });
 
 test('price datasets use the formal monthly release as data provenance', () => {
