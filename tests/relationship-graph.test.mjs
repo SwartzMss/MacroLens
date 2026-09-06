@@ -127,9 +127,33 @@ test('prefers explainable metadata direction over legacy symmetric relation type
   const cpiRelation = ppiRelations.find((item) => item.other.id === 'cpi');
   assert.equal(cpiRelation?.direction, 'outgoing');
 
+  const financingRelations = getConceptRelations('macro', 'social-financing');
+  const creditRelation = financingRelations.find((item) => item.other.id === 'credit');
+  assert.equal(creditRelation?.direction, 'symmetric');
+
   const legacyRelations = getConceptRelations('macro', 'inflation-pressure');
   const outputGapRelation = legacyRelations.find((item) => item.other.id === 'output-gap');
   assert.equal(outputGapRelation?.direction, 'symmetric');
+});
+
+test('applies the explainable direction matrix to every metadata-backed relation', () => {
+  const symmetricCanonicalTypes = new Set(['CORRELATES', 'OVERLAPS_WITH']);
+  for (const relation of explainableRelations) {
+    const sourceView = getConceptRelations('macro', relation.source).find((item) => relationKey(item.relation) === relationKey(relation) && item.other.id === relation.target);
+    const keepsSymmetry = relation.relation === 'synchronous_indicator' && symmetricCanonicalTypes.has(relation.type);
+    assert.equal(sourceView?.direction, keepsSymmetry ? 'symmetric' : 'outgoing', `${relation.source} -> ${relation.target}`);
+  }
+});
+
+test('keeps relationship metadata aligned with its source and target edge', () => {
+  const consumerPolicy = relations.find((item) => relationKey(item) === 'consumer-price-pressure|monetary-policy|AFFECTS');
+  assert.equal(consumerPolicy?.relation, 'leading_factor');
+  assert.equal(consumerPolicy?.lag, '数月至数个季度');
+  assert.match(consumerPolicy?.explanation ?? '', /消费价格压力是货币政策决策的重要输入/);
+
+  const policyRate = relations.find((item) => relationKey(item) === 'monetary-policy|policy-rate|USES');
+  assert.equal(policyRate?.lag, '同一政策决定时点');
+  assert.match(policyRate?.explanation ?? '', /设定或调整政策利率/);
 });
 
 test('keeps the relationship explorer unlinked from the primary product shell', () => {

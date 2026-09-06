@@ -33,13 +33,17 @@ MacroLens 已经通过 `data/relations/macro.json` 保存关系层，并通过 `
     "target": "gdp",
     "type": "CORRELATES",
     "relation": "leading_indicator",
-    "lag": "1-2 quarters",
-    "explanation": "PMI captures business activity changes before quarterly GDP is released."
+    "lag": "1—2 个季度",
+    "explanation": "PMI 可以在季度 GDP 发布前提示企业活动的变化。"
   }
 }
 ```
 
 `source` 和 `target` 使用稳定节点 ID，不复制展示名称。`type` 保留用于已有关系方向和分组语义；`relation` 是面向用户的宏观关系角色。`lag` 和 `explanation` 必须是非空字符串。没有纳入核心解释地图的历史关系仍按旧 schema 服务现有概念页，`/graph` 的核心关系视图不会为它们伪造解释。
+
+方向展示遵循两层语义：`leading_indicator`、`leading_factor`、`lagging_indicator` 和 `transmission` 始终按 `source → target` 展示；`synchronous_indicator` 只有在底层 `type` 为 `CORRELATES` 或 `OVERLAPS_WITH` 时保留 `↔`，以表达同步或重叠关系。没有 metadata 的历史关系继续完全沿用旧的对称判断。
+
+`lag` 和 `explanation` 是中文产品中的用户可见文案，必须与当前 `source → target` 边描述同一关系，不得把下一段传导或另一端的响应时间混入当前边。
 
 ## 页面与交互
 

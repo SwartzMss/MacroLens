@@ -88,9 +88,12 @@ export function getConceptRelations(graphId: string, conceptId: string): Concept
     const otherId = relation.source === conceptId ? relation.target : relation.source;
     const other = nodesById.get(otherId);
     if (!other) throw new Error(`Relation references missing node "${otherId}"`);
-    const direction = isExplainableRelation(relation)
-      ? relation.source === conceptId ? 'outgoing' : 'incoming'
-      : isSymmetricRelation(relation.type) ? 'symmetric' : relation.source === conceptId ? 'outgoing' : 'incoming';
+    const hasSymmetricExplainableSemantics = isExplainableRelation(relation)
+      && relation.relation === 'synchronous_indicator'
+      && isSymmetricRelation(relation.type);
+    const direction = hasSymmetricExplainableSemantics || (!isExplainableRelation(relation) && isSymmetricRelation(relation.type))
+      ? 'symmetric'
+      : relation.source === conceptId ? 'outgoing' : 'incoming';
     return [{ relation, other, direction }];
   });
 }

@@ -163,7 +163,7 @@ Expected: metadata、核心链路和 registry 校验通过；此时页面 `<deta
       transmission: '传导环节',
     };
 
-带 metadata 的关系输出 `<details class="relationship-card" data-explainable-relation>`，summary 复用现有两端节点、方向箭头和大写 `type` 标签；展开内容显示关系角色、`lag` 和 `explanation`，并补充“这是手工维护的解释性关系，不代表确定因果”。没有 metadata 的关系继续输出原来的 div card。
+带 metadata 的关系输出 `<details class="relationship-card" data-explainable-relation>`，summary 复用现有两端节点和方向箭头，并显示关系角色；展开内容显示关系角色、`lag` 和 `explanation`，且这些文案使用中文并描述当前 `source → target` 边。`leading_indicator`、`leading_factor`、`lagging_indicator` 和 `transmission` 使用单向箭头；`synchronous_indicator` 仅在底层 `CORRELATES` / `OVERLAPS_WITH` 时保留双向箭头。没有 metadata 的关系继续输出原来的 div card 和旧对称逻辑。
 
 - [ ] **Step 2: 保持节点链接和可访问性**
 
