@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import {
   discoverCustomsTradePublications,
   discoverLatestCustomsTradePublication,
+  fetchCustomsTradeIndex,
   parseCustomsTradePublication,
 } from '../scripts/ingest/fetch/customs-trade.ts';
 import { normalizeCustomsTradeDataset } from '../scripts/ingest/normalize/customs-trade.ts';
@@ -23,22 +24,25 @@ import {
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fixtureDir = path.join(here, 'fixtures', 'customs-trade');
 const publication = {
-  title: "China's Total Export & Import Values, Jul 2026 (in CNY)",
-  url: 'https://english.customs.gov.cn/Statics/customs-2026-07.html',
-  sourceDate: '2026-08-07',
+  title: "(1) China's Total Export & Import Values, Jul 2026(in CNY)",
+  url: 'https://english.customs.gov.cn/Statics/5c578c33-7560-476b-a6af-9431fb3d41aa.html',
+  sourceDate: '2026-08-10',
   coverage: '2026-07 to 2026-07',
 };
 const publicationHtml = fs.readFileSync(path.join(fixtureDir, 'publication-2026-07.html'), 'utf8');
 
 function source(id, date, value) {
+  const details = {
+    '2026-02': ['d11e30df-faa3-4a4d-9816-bada832cafe8', '2026-03-08'],
+    '2026-03': ['78463b33-7b5e-4e29-aee5-c65e42a69727', '2026-04-08'],
+    '2026-04': ['d90956e5-f66c-46b5-80d7-a62e5097a073', '2026-05-08'],
+    '2026-05': ['135af06e-2fd2-4ee9-8f7c-3978077e90a1', '2026-06-10'],
+    '2026-06': ['142befa2-8638-4657-89d1-40209514b007', '2026-07-15'],
+  }[date];
   return {
     title: `海关总署：China's Total Export & Import Values, ${date.slice(0, 7)} (in CNY)`,
-    url: 'https://english.customs.gov.cn/statics/report/monthly.html',
-    sourceDate: date === '2026-02' ? '2026-03-16'
-      : date === '2026-03' ? '2026-04-28'
-        : date === '2026-04' ? '2026-05-19'
-          : date === '2026-05' ? '2026-06-16'
-            : '2026-07-14',
+    url: `https://english.customs.gov.cn/Statics/${details?.[0] ?? '5c578c33-7560-476b-a6af-9431fb3d41aa'}.html`,
+    sourceDate: details?.[1] ?? '2026-08-10',
     coverage: `${date} to ${date}`,
     role: 'data',
     value,
@@ -99,6 +103,34 @@ test('discovers only the exact national RMB total publication', () => {
   );
 });
 
+test('hydrates the release date from the linked Preliminary Release page', () => {
+  const discovered = discoverLatestCustomsTradePublication(fs.readFileSync(path.join(fixtureDir, 'publication-index.html'), 'utf8'));
+  assert.equal(discovered.url, publication.url);
+  assert.equal(discovered.sourceDate, '');
+  const raw = parseCustomsTradePublication(discovered, publicationHtml);
+  assert.equal(raw.publication.sourceDate, '2026-08-10');
+  assert.equal(raw.dataSources[0].url, publication.url);
+  assert.throws(
+    () => parseCustomsTradePublication({ ...discovered, sourceDate: '2026-08-11' }, publicationHtml),
+    /disagrees with its page/,
+  );
+});
+
+test('keeps the HTTPS listing primary and supports the official legacy HTTP endpoint', async () => {
+  const calls = [];
+  const html = fs.readFileSync(path.join(fixtureDir, 'publication-index.html'), 'utf8');
+  const fetched = await fetchCustomsTradeIndex(async (url) => {
+    calls.push(url);
+    if (url.startsWith('https://')) throw new Error('simulated TLS failure');
+    return html;
+  });
+  assert.equal(fetched, html);
+  assert.deepEqual(calls, [
+    'https://english.customs.gov.cn/Statistics/Statistics?ColumnId=1&page=1',
+    'http://english.customs.gov.cn/Statistics/Statistics?ColumnId=1&page=1',
+  ]);
+});
+
 test('parses exact national export and import monthly YoY values and ignores cumulative YoY', () => {
   const raw = parseCustomsTradePublication(publication, publicationHtml);
   assert.deepEqual(raw.values, { exports: 17.8, imports: 21.2 });
@@ -108,6 +140,7 @@ test('parses exact national export and import monthly YoY values and ignores cum
   });
   assert.equal(raw.methodologyFingerprint, CUSTOMS_TRADE_METHODOLOGY_FINGERPRINT);
   assert.equal(raw.dataSources[0].role, 'data');
+  assert.equal(raw.dataSources[0].sourceDate, '2026-08-10');
 });
 
 test('fails closed for USD, cumulative-only, regional, duplicate, malformed, and wrong-month tables', () => {
@@ -151,7 +184,7 @@ test('normalizes both directions, preserves provenance, protects overlap, and is
   const raw = parseCustomsTradePublication(publication, publicationHtml);
   const normalized = normalizeCustomsTradeDataset(raw, dataset('exports'), 'exports');
   assert.deepEqual(normalized.data.at(-1), { date: '2026-07', value: 17.8 });
-  assert.equal(normalized.updatedAt, '2026-08-07');
+  assert.equal(normalized.updatedAt, '2026-08-10');
   assert.equal(normalized.sources.at(-1).coverage, '2026-07 to 2026-07');
   assert.deepEqual(normalizeCustomsTradeDataset(raw, normalized, 'exports'), normalized);
   const changed = parseCustomsTradePublication(publication, publicationHtml.replace('17.8', '18.8'));

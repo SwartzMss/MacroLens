@@ -7,7 +7,10 @@ import type {
 import { fetchText } from '../fetch-text.ts';
 import type { FetchTextOptions } from '../fetch-text.ts';
 
-export const CUSTOMS_TRADE_INDEX = 'https://english.customs.gov.cn/statics/report/monthly.html';
+// GACC's Statistics/Statistics page is the paginated Preliminary Release
+// listing. The similarly named Monthly Bulletin is USD-only and is not the
+// source for these RMB total-trade tables.
+export const CUSTOMS_TRADE_INDEX = 'https://english.customs.gov.cn/Statistics/Statistics?ColumnId=1&page=1';
 const CUSTOMS_ORIGIN_SUFFIX = '.customs.gov.cn';
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const COVERAGE_PATTERN = /^(\d{4})-(0[1-9]|1[0-2])\s+to\s+(\d{4})-(0[1-9]|1[0-2])$/;
@@ -48,6 +51,33 @@ function officialCustomsUrl(value: string): boolean {
   } catch {
     return false;
   }
+}
+
+function canonicalCustomsUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol)
+      || !(url.hostname === 'customs.gov.cn' || url.hostname.endsWith(CUSTOMS_ORIGIN_SUFFIX))) {
+      return '';
+    }
+    url.protocol = 'https:';
+    return url.toString();
+  } catch {
+    return '';
+  }
+}
+
+function legacyHttpUrl(value: string): string {
+  return value.replace(/^https:/, 'http:');
+}
+
+function publicationDateFromHtml(html: string): string {
+  const dateMatch = html.match(/class=["'][^"']*\batcl-date\b[^"']*["'][^>]*>\s*(\d{4})[./-](\d{2})[./-](\d{2})\s*</i)
+    ?? html.match(/(?:issue|publication|release)\s+date[^\d]*(\d{4})[./-](\d{2})[./-](\d{2})/i);
+  if (!dateMatch) fail('Official Customs publication is missing its publication date');
+  const sourceDate = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+  if (!validDate(sourceDate)) fail(`Invalid Customs publication date: ${sourceDate}`);
+  return sourceDate;
 }
 
 function sourceMonth(coverage: string): string {
@@ -210,7 +240,15 @@ export function parseCustomsTradePublication(
   html: string,
 ): RawCustomsTradePublication {
   const visible = textOf(html);
-  const coverage = validatePublicationIdentity(publication, visible);
+  const pageSourceDate = publicationDateFromHtml(html);
+  if (publication.sourceDate && publication.sourceDate !== pageSourceDate) {
+    fail(`Customs publication date disagrees with its page: ${publication.sourceDate} != ${pageSourceDate}`);
+  }
+  const resolvedPublication = {
+    ...publication,
+    sourceDate: publication.sourceDate || pageSourceDate,
+  };
+  const coverage = validatePublicationIdentity(resolvedPublication, visible);
   const table = findTradeTable(html);
   const month = sourceMonth(coverage);
   if (currentMonthFromHeader(table, month) !== month) {
@@ -221,14 +259,14 @@ export function parseCustomsTradePublication(
     imports: rowValue(table, isImportLabel, 'import'),
   } as const;
   const source: IndicatorSource = {
-    title: `海关总署：${publication.title}`,
-    url: publication.url,
-    sourceDate: publication.sourceDate,
+    title: `海关总署：${resolvedPublication.title}`,
+    url: resolvedPublication.url,
+    sourceDate: resolvedPublication.sourceDate,
     coverage,
     role: 'data',
   };
   return {
-    publication: { ...publication, coverage },
+    publication: { ...resolvedPublication, coverage },
     values,
     methodologyFingerprint: CUSTOMS_TRADE_METHODOLOGY_FINGERPRINT,
     dataSources: [source],
@@ -250,9 +288,11 @@ export function discoverCustomsTradePublications(indexHtml: string): CustomsTrad
     const anchorEnd = (match.index ?? 0) + match[0].length;
     const afterAnchor = indexHtml.slice(anchorEnd, anchorEnd + 500).split(/<a\b/i, 1)[0];
     const dateMatch = afterAnchor.match(/\b(\d{4})[-\/](\d{2})[-\/](\d{2})\b/);
+    // The real Preliminary Release index omits the release date; it is
+    // authoritative on the linked publication page and is hydrated there.
     const sourceDate = dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : '';
-    if (!sourceDate || !validDate(sourceDate)) fail(`Customs publication date missing or invalid: ${title}`);
-    const url = new URL(match[1], CUSTOMS_TRADE_INDEX).toString();
+    if (sourceDate && !validDate(sourceDate)) fail(`Customs publication date missing or invalid: ${title}`);
+    const url = canonicalCustomsUrl(new URL(match[1], CUSTOMS_TRADE_INDEX).toString());
     if (!officialCustomsUrl(url)) fail(`Customs publication is not hosted by customs.gov.cn: ${url}`);
     candidates.push({ title, url, sourceDate, coverage: coverageFromTitle(title) });
   }
@@ -278,9 +318,25 @@ export async function fetchCustomsTradePublication(
   publication: CustomsTradePublication,
   fetcher: TextFetcher = fetchText,
 ): Promise<RawCustomsTradePublication> {
-  return parseCustomsTradePublication(publication, await fetcher(publication.url));
+  let html: string;
+  try {
+    html = await fetcher(publication.url);
+  } catch (error) {
+    if (!publication.url.startsWith('https://') || fetcher !== fetchText) throw error;
+    html = await fetcher(legacyHttpUrl(publication.url));
+  }
+  return parseCustomsTradePublication(publication, html);
 }
 
 export async function fetchCustomsTradeIndex(fetcher: TextFetcher = fetchText): Promise<string> {
-  return fetcher(CUSTOMS_TRADE_INDEX);
+  try {
+    return await fetcher(CUSTOMS_TRADE_INDEX);
+  } catch (error) {
+    // The official listing currently serves its HTTP canonical endpoint
+    // without redirecting to HTTPS, while linked publication pages are
+    // canonicalised to HTTPS above. Keep HTTPS primary and retain a narrow
+    // compatibility fallback for that official legacy listing.
+    if (!CUSTOMS_TRADE_INDEX.startsWith('https://')) throw error;
+    return fetcher(legacyHttpUrl(CUSTOMS_TRADE_INDEX));
+  }
 }
