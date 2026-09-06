@@ -8,8 +8,8 @@ type Context = {
   };
 };
 
-const unavailable = (extra?: Record<string, unknown>) => Response.json(
-  { available: false, ...extra },
+const unavailable = () => Response.json(
+  { available: false },
   { headers: { 'Cache-Control': 'no-store' } },
 );
 
@@ -17,13 +17,7 @@ export async function onRequest({ request, env }: Context): Promise<Response> {
   if (request.method !== 'GET') {
     return new Response(null, { status: 405, headers: { Allow: 'GET' } });
   }
-  if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) {
-    return unavailable({
-      error: 'missing credentials',
-      accountId: Boolean(env.CLOUDFLARE_ACCOUNT_ID),
-      apiToken: Boolean(env.CLOUDFLARE_API_TOKEN),
-    });
-  }
+  if (!env.CLOUDFLARE_ACCOUNT_ID || !env.CLOUDFLARE_API_TOKEN) return unavailable();
 
   try {
     const endpoint = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(env.CLOUDFLARE_ACCOUNT_ID)}/analytics_engine/sql`;
@@ -54,15 +48,13 @@ export async function onRequest({ request, env }: Context): Promise<Response> {
     const total = parseVisitorCount(totalPayload, 'total');
     const today = parseVisitorCount(todayPayload, 'today');
 
-    if (total === null || today === null) {
-      return unavailable({ error: 'invalid analytics response' });
-    }
+    if (total === null || today === null) return unavailable();
 
     return Response.json(
       { available: true, total, today },
       { headers: { 'Cache-Control': 'no-store' } },
     );
-  } catch (error) {
-    return unavailable({ error: String(error) });
+  } catch {
+    return unavailable();
   }
 }
