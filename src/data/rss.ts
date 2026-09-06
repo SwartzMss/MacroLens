@@ -38,6 +38,10 @@ export function formatRssDate(value: Date | string): string {
   return asDate(value).toUTCString();
 }
 
+export function buildRssEventGuid(link: string, eventType: string, date: Date | string): string {
+  return `${link}#${eventType}-${asDate(date).toISOString()}`;
+}
+
 export function sortRssItems(items: RssItem[]): RssItem[] {
   return [...items].sort((left, right) => {
     const dateDifference = asDate(right.pubDate).getTime() - asDate(left.pubDate).getTime();
@@ -56,7 +60,7 @@ export function renderRssXml(feed: RssFeed): string {
       `      <title>${escapeXml(item.title)}</title>`,
       `      <description>${escapeXml(item.description)}</description>`,
       `      <link>${link}</link>`,
-      `      <guid isPermaLink="true">${guid}</guid>`,
+      `      <guid isPermaLink="false">${guid}</guid>`,
       `      <pubDate>${formatRssDate(item.pubDate)}</pubDate>`,
       `      <category>${escapeXml(item.category)}</category>`,
       '    </item>',

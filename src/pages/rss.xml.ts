@@ -2,7 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import type { APIRoute } from 'astro';
 import { getDashboardIndicators } from '../data/dashboard';
 import { getCategory } from '../data/categories';
-import { renderRssXml, type RssItem } from '../data/rss';
+import { buildRssEventGuid, renderRssXml, type RssItem } from '../data/rss';
 
 export const prerender = true;
 
@@ -16,7 +16,7 @@ function conceptItem(concept: CollectionEntry<'concepts'>, site?: URL): RssItem 
     title: concept.data.name,
     description: concept.data.subtitle,
     link: absoluteOrRelativeUrl(path, site),
-    guid: absoluteOrRelativeUrl(path, site),
+    guid: buildRssEventGuid(absoluteOrRelativeUrl(path, site), 'update', concept.data.updatedAt),
     pubDate: concept.data.updatedAt,
     category: getCategory(concept.data.category).label,
   };
@@ -32,7 +32,7 @@ export const GET: APIRoute = async ({ site }) => {
       title: `数据更新：${indicator.name}`,
       description: `${indicator.dataset.label} 数据已更新，最新观测期为 ${latestObservation.date}。`,
       link: absoluteOrRelativeUrl(path, site),
-      guid: `${absoluteOrRelativeUrl(path, site)}#data`,
+      guid: buildRssEventGuid(absoluteOrRelativeUrl(path, site), 'data', indicator.dataset.updatedAt),
       pubDate: indicator.dataset.updatedAt,
       category: '数据更新',
     };
