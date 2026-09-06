@@ -76,9 +76,9 @@ CLOUDFLARE_ACCOUNT_ID -> Pages Function variable
 CLOUDFLARE_API_TOKEN -> Pages Function secret（需要 Account Analytics Read）
 ~~~
 
-系统只统计 HTML `GET` 请求，并使用匿名 `HttpOnly; Secure; SameSite=Lax` cookie 生成 visitor identifier。不会采集 IP 地址、user-agent（UA）或 page views（页面访问次数）。
+系统只统计成功的 HTML `GET` 请求，并使用匿名 `HttpOnly; Secure; SameSite=Lax` cookie 生成 visitor identifier。Analytics Engine 只保存规范化 pathname 用于页面级 unique visitor 聚合；不会采集 IP 地址、user-agent（UA）、referrer、query string 或 fragment，也不使用 D1 保存页面访问明细或用户浏览历史。
 
-“累计访客”表示 Analytics Engine 保留周期内的累计 unique visitors，不代表永久历史累计；“今日访客”按上海时区日期统计。
+“累计访客”表示 Analytics Engine 保留周期内的累计 unique visitors，不代表永久历史累计；“今日访客”按上海时区日期统计。页面统计 API `/api/page-stats` 只返回 `/concepts/<stable-id>` 的 pathname 和 distinct visitor aggregate counts，不返回 visitor ID。
 
 ### 页面反馈（可选）
 

@@ -43,6 +43,19 @@ export function isEligibleVisitorRequest(request: Request, response: Response): 
     && (response.headers.get('content-type') ?? '').toLowerCase().startsWith('text/html');
 }
 
-export function visitorDataPoint(visitorId: string, shanghaiDate: string) {
-  return { blobs: [visitorId, shanghaiDate], indexes: [VISITOR_INDEX] };
+export function normalizePathname(pathname: string): string {
+  const withoutQuery = pathname.split(/[?#]/, 1)[0] || '/';
+  const collapsed = withoutQuery.replace(/\/{2,}/g, '/');
+  if (collapsed === '/') return '/';
+  return collapsed.replace(/\/+$/, '') || '/';
+}
+
+export function normalizeConceptPath(pathname: unknown): string | null {
+  if (typeof pathname !== 'string') return null;
+  const normalized = normalizePathname(pathname);
+  return /^\/concepts\/[^/]+$/.test(normalized) ? normalized : null;
+}
+
+export function visitorDataPoint(visitorId: string, shanghaiDate: string, pathname: string) {
+  return { blobs: [visitorId, shanghaiDate, normalizePathname(pathname)], indexes: [VISITOR_INDEX] };
 }
