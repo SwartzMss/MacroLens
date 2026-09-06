@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { validateGraphElements } from '../src/data/graphRegistry.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const graph = JSON.parse(readFileSync(`${root}data/relations/macro.json`, 'utf8'));
@@ -65,19 +66,25 @@ test('defines explainable metadata for the core macro chains', () => {
     ['industrial-production', 'industrial-activity', 'REFLECTS'],
     ['industrial-activity', 'economic-activity', 'COMPONENT_OF'],
     ['gdp', 'economic-activity', 'MEASURES'],
+    ['economic-activity', 'labor-market-conditions', 'AFFECTS'],
     ['employment', 'labor-market-conditions', 'REFLECTS'],
+    ['labor-market-conditions', 'household-income-conditions', 'AFFECTS'],
+    ['household-income-conditions', 'household-consumption', 'AFFECTS'],
+    ['household-consumption', 'consumption-activity', 'REFLECTS'],
     ['retail-sales', 'consumption-activity', 'REFLECTS'],
     ['consumption-activity', 'economic-activity', 'COMPONENT_OF'],
     ['ppi', 'producer-price-pressure', 'REFLECTS'],
     ['producer-price-pressure', 'downstream-price-pressure', 'AFFECTS'],
     ['downstream-price-pressure', 'consumer-price-pressure', 'AFFECTS'],
     ['cpi', 'consumer-price-pressure', 'REFLECTS'],
+    ['consumer-price-pressure', 'monetary-policy', 'AFFECTS'],
     ['monetary-policy', 'policy-rate', 'USES'],
     ['policy-rate', 'financing-conditions', 'AFFECTS'],
     ['financing-conditions', 'credit', 'AFFECTS'],
     ['credit', 'm2', 'AFFECTS'],
     ['credit', 'social-financing', 'OVERLAPS_WITH'],
     ['social-financing', 'real-economy-financing', 'MEASURES'],
+    ['real-economy-financing', 'investment-activity', 'AFFECTS'],
     ['fixed-asset-investment', 'investment-activity', 'REFLECTS'],
     ['investment-activity', 'economic-activity', 'COMPONENT_OF'],
   ];
@@ -85,6 +92,28 @@ test('defines explainable metadata for the core macro chains', () => {
     const relation = relations.find((item) => relationKey(item) === `${source}|${target}|${type}`);
     assert.ok(relation?.relation && relation.lag && relation.explanation, `core relation ${source} -> ${target} needs metadata`);
   }
+});
+
+test('validates graph uniqueness, endpoints, and explainable field boundaries at runtime', () => {
+  assert.doesNotThrow(() => validateGraphElements(graph));
+  const validNodes = [{ data: { id: 'a', label: 'A' } }, { data: { id: 'b', label: 'B' } }];
+
+  assert.throws(
+    () => validateGraphElements([{ data: { id: 'a', label: 'A' } }, { data: { id: 'a', label: 'Duplicate' } }]),
+    /Duplicate graph node ID: a/,
+  );
+  assert.throws(
+    () => validateGraphElements([...validNodes, { data: { source: 'a', target: 'missing', type: 'AFFECTS' } }]),
+    /Relation references missing node: missing/,
+  );
+  assert.throws(
+    () => validateGraphElements([...validNodes, { data: { source: 'a', target: 'b', type: 'AFFECTS' } }, { data: { source: 'a', target: 'b', type: 'AFFECTS' } }]),
+    /Duplicate graph relation: a\0b\0AFFECTS/,
+  );
+  assert.throws(
+    () => validateGraphElements([...validNodes, { data: { source: 'a', target: 'b', type: 'AFFECTS', causal_effect: 'high' } }]),
+    /Forbidden relationship field: causal_effect/,
+  );
 });
 
 test('keeps the relationship explorer unlinked from the primary product shell', () => {
@@ -109,6 +138,8 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(cards, /data-explainable-relation/);
   assert.match(cards, /lag/);
   assert.match(cards, /explanation/);
+  assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
+  assert.match(cards, /relationship-detail-endpoints/);
   assert.match(page, /展开|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.doesNotMatch(nav, /href=["']\/graph["']/);
