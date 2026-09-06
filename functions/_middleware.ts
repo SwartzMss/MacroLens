@@ -3,6 +3,7 @@ import {
   createVisitorId,
   getShanghaiDate,
   isEligibleVisitorRequest,
+  normalizePathname,
   parseVisitorCookie,
   visitorDataPoint,
   type VisitorEnv,
@@ -21,10 +22,11 @@ export async function onRequest({ request, env, next }: Context): Promise<Respon
   try {
     const existingId = parseVisitorCookie(request);
     const visitorId = existingId ?? createVisitorId();
+    const pathname = normalizePathname(new URL(request.url).pathname);
 
     if (env.ANALYTICS) {
       try {
-        env.ANALYTICS.writeDataPoint(visitorDataPoint(visitorId, getShanghaiDate()));
+        env.ANALYTICS.writeDataPoint(visitorDataPoint(visitorId, getShanghaiDate(), pathname));
       } catch {
         // Analytics is optional and must not prevent the visitor identity from being set.
       }

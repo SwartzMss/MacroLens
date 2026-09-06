@@ -19,7 +19,7 @@ const htmlResponse = () => new Response('<html></html>', {
   headers: { 'content-type': 'text/html; charset=utf-8' },
 });
 
-test('records an HTML GET with blob1 visitor id, blob2 Shanghai date, and fixed index', async () => {
+test('records an HTML GET with visitor id, Shanghai date, normalized pathname, and fixed index', async () => {
   const binding = analytics();
   const response = await onVisitorRequest({
     request: new Request('https://macrolens.example/concepts/gdp', {
@@ -32,6 +32,8 @@ test('records an HTML GET with blob1 visitor id, blob2 Shanghai date, and fixed 
   assert.deepEqual(binding.points[0].indexes, ['macrolens']);
   assert.match(binding.points[0].blobs[0], /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
   assert.match(binding.points[0].blobs[1], /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(binding.points[0].blobs[2], '/concepts/gdp');
+  assert.equal(binding.points[0].blobs.length, 3);
   const cookie = response.headers.get('set-cookie');
   assert.match(cookie, /macrolens_visitor=/);
   assert.match(cookie, /HttpOnly/);
@@ -43,13 +45,14 @@ test('reuses an existing valid visitor cookie without setting another one', asyn
   const binding = analytics();
   const visitorId = '123e4567-e89b-42d3-a456-426614174000';
   const response = await onVisitorRequest({
-    request: new Request('https://macrolens.example/', {
+    request: new Request('https://macrolens.example/concepts/m2/?from=home#details', {
       headers: { accept: 'text/html', cookie: `macrolens_visitor=${visitorId}` },
     }),
     env: { ANALYTICS: binding },
     next: async () => htmlResponse(),
   });
   assert.equal(binding.points[0].blobs[0], visitorId);
+  assert.equal(binding.points[0].blobs[2], '/concepts/m2');
   assert.equal(response.headers.has('set-cookie'), false);
 });
 
@@ -158,5 +161,5 @@ test('footer integration stays optional and documents the privacy and retention 
   assert.match(docs, /不代表永久历史累计/);
   assert.match(docs, /HttpOnly.*Secure.*SameSite=Lax/s);
   assert.match(docs, /IP.*UA|IP.*user-agent/i);
-  assert.match(docs, /page views|page-view|页面访问次数/i);
+  assert.match(docs, /page views|page-view|页面访问明细/i);
 });
