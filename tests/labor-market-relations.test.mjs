@@ -29,6 +29,8 @@ const expectedRelations = [
   ['wages', 'consumer-price-pressure', 'AFFECTS'],
   ['wages', 'consumption-activity', 'AFFECTS'],
   ['wages', 'household-income-conditions', 'AFFECTS'],
+  ['economic-activity', 'labor-market-conditions', 'AFFECTS'],
+  ['labor-market-conditions', 'household-income-conditions', 'AFFECTS'],
   ['labor-market-conditions', 'economic-activity', 'AFFECTS'],
 ];
 const relationKey = ({ source, target, type }) => `${source}\0${target}\0${type}`;

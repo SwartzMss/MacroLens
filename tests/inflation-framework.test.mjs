@@ -92,6 +92,7 @@ const expectedRelations = [
   ['inflation-expectations', 'real-interest-rate', 'AFFECTS'],
   ['output-gap', 'inflation-pressure', 'CORRELATES'],
   ['phillips-curve', 'inflation-slack-relationship', 'REFLECTS'],
+  ['downstream-price-pressure', 'consumer-price-pressure', 'AFFECTS'],
   ['producer-price-pressure', 'downstream-price-pressure', 'AFFECTS'],
   ['price-transmission', 'upstream-downstream-price-pass-through', 'REFLECTS'],
 ];
