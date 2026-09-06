@@ -4,3 +4,8 @@ compatibility_date = "2026-09-05"
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "macrolens_visitors"
+
+[[d1_databases]]
+binding = "FEEDBACK_DB"
+database_name = "macrolens_interactions"
+database_id = "c2719dd9-76cf-4361-81b3-b73d2f29816c"
