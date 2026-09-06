@@ -156,7 +156,7 @@ test('keeps relationship metadata aligned with its source and target edge', () =
   assert.match(policyRate?.explanation ?? '', /设定或调整政策利率/);
 });
 
-test('keeps the relationship explorer unlinked from the primary product shell', () => {
+test('keeps the relationship explorer discoverable from the primary product shell', () => {
   const page = readSource(graphPage);
   const component = readSource(explorerComponent);
   const cards = readSource(relationshipCards);
@@ -181,12 +181,40 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(cards, /metadata\.relation/);
   assert.match(cards, /metadata \? explainableLabels\[metadata\.relation\]/);
   assert.match(cards, /<dt>解释<\/dt>/);
+  assert.match(cards, /<details open/);
+  assert.doesNotMatch(cards, /<code>\{metadata\.relation\}<\/code>/);
   assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
   assert.match(cards, /relationship-detail-endpoints/);
-  assert.match(page, /展开|关系详情/);
+  assert.match(page, /关系类型|时间关系/);
+  assert.match(page, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
-  assert.doesNotMatch(nav, /href=["']\/graph["']/);
-  assert.doesNotMatch(home, /href=["']\/graph["']/);
+  assert.match(nav, /<a href=["']\/graph["']>宏观关系<\/a>/);
+  assert.match(home, /href=["']\/graph["']/);
+});
+
+test('makes the relationship map discoverable from the homepage', () => {
+  const home = readSource(homepage);
+  assert.match(home, /宏观关系|关系地图/);
+  assert.match(home, /领先|滞后|影响|相关/);
+});
+
+test('concept pages reuse canonical relationship metadata', () => {
+  const conceptPage = readSource(`${root}src/pages/concepts/[id].astro`);
+  const cards = readSource(relationshipCards);
+  assert.match(conceptPage, /getConceptRelations\(entry\.data\.graph, entry\.data\.id\)/);
+  assert.match(conceptPage, /<RelationshipCards conceptId=\{entry\.data\.id\}/);
+  assert.match(conceptPage, /relations=\{relations\}/);
+  assert.match(conceptPage, /concepts=\{allConcepts\}/);
+  assert.match(cards, /isExplainableRelation/);
+  assert.match(cards, /metadata\.lag/);
+  assert.match(cards, /metadata\.explanation/);
+});
+
+test('keeps legacy relationships lightweight without fabricated semantics', () => {
+  const cards = readSource(relationshipCards);
+  assert.match(cards, /if \(metadata\) return <details/);
+  assert.match(cards, /return <div class:list=\{cardClasses\}>\{linkedSummary\}<\/div>/);
+  assert.doesNotMatch(cards, /labels\[item\.relation\.type\].*metadata\.lag/);
 });
 
 test('does not reintroduce a node-link visualization', () => {

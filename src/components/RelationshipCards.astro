@@ -27,7 +27,7 @@ for (const relation of relations) {
 }
 const groups = [...grouped];
 ---
-{relations.length > 0 && <section class="relationship-block" aria-labelledby={`${conceptId}-relationships`}><div class="eyebrow">Relationship context</div><h2 id={`${conceptId}-relationships`}>它与其他概念如何关联</h2><div class="relationship-groups">{groups.map(([heading, items]) => <section class="relationship-group"><h3>{heading}</h3><div class="relationship-list">{items.map(item => {
+{relations.length > 0 && <section class="relationship-block" aria-labelledby={`${conceptId}-relationships`}><div class="eyebrow">关系脉络</div><h2 id={`${conceptId}-relationships`}>它与其他概念如何关联</h2><div class="relationship-groups">{groups.map(([heading, items]) => <section class="relationship-group"><h3>{heading}</h3><div class="relationship-list">{items.map(item => {
   const linked = conceptsById.get(item.other.id);
   const currentIsSource = item.relation.source === conceptId;
   const otherNode = linked ? <a href={`/concepts/${linked.data.id}`}>{linked.data.name}</a> : <span class="relationship-abstract">{item.other.label}<small>图谱概念</small></span>;
@@ -43,7 +43,7 @@ const groups = [...grouped];
     <span class="relationship-kind"><small>{labels[item.relation.type]}</small>{item.direction === 'symmetric' ? '↔' : '→'}</span>
     {currentIsSource ? otherNode : <span class="relationship-current">{conceptName}</span>}
   </div>;
-  if (metadata) return <details class:list={cardClasses} data-explainable-relation>
+  if (metadata) return <details open class:list={cardClasses} data-explainable-relation>
     <summary>{summaryText}</summary>
     <div class="relationship-detail">
       <div class="relationship-detail-endpoints">
@@ -51,7 +51,7 @@ const groups = [...grouped];
         <div><small>目标</small>{currentIsSource ? otherNode : <span class="relationship-current">{conceptName}</span>}</div>
       </div>
       <dl class="relationship-detail-grid">
-        <div><dt>关系类型</dt><dd>{explainableLabels[metadata.relation]} <code>{metadata.relation}</code></dd></div>
+        <div><dt>关系类型</dt><dd>{explainableLabels[metadata.relation]}</dd></div>
         <div><dt>时间关系</dt><dd>{metadata.lag}</dd></div>
         <div class="relationship-detail-explanation"><dt>解释</dt><dd>{metadata.explanation}</dd></div>
       </dl>
