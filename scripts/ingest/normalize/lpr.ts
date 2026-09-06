@@ -15,14 +15,12 @@ export function normalizeLprDataset(rawPublications: RawLprPublication[], existi
     { id: '1y', label: '1年期 LPR', data: mergeObservations(existingSeries.get('1y') ?? [], incoming['1y'], 'LPR 1Y') },
     { id: '5y-plus', label: '5年期以上 LPR', data: mergeObservations(existingSeries.get('5y-plus') ?? [], incoming['5y-plus'], 'LPR 5Y+') },
   ];
-  const firstPublication = rawPublications[0].publication;
-  const lastPublication = rawPublications.at(-1)!.publication;
-  const incomingSources: IndicatorSource[] = [{
-    title: '全国银行间同业拆借中心：LPR 历史数据',
-    url: firstPublication.url,
-    sourceDate: lastPublication.sourceDate,
-    coverage: `${firstPublication.month} to ${lastPublication.month}`,
-  }];
+  const incomingSources: IndicatorSource[] = rawPublications.map(({ publication }) => ({
+    title: `中国人民银行：${publication.title}`,
+    url: publication.url,
+    sourceDate: publication.sourceDate,
+    coverage: `${publication.month} to ${publication.month}`,
+  }));
   const sourceByKey = new Map<string, IndicatorSource>();
   for (const source of [...existing.sources, ...incomingSources]) sourceByKey.set(`${source.url}|${source.coverage}`, source);
   const sources = [...sourceByKey.values()].sort((left, right) => left.sourceDate.localeCompare(right.sourceDate) || left.coverage.localeCompare(right.coverage));

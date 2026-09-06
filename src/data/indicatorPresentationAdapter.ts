@@ -88,7 +88,7 @@ function comparisonMethod(indicator: IndicatorDataset): string {
     return '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。';
   }
   if (indicator.metric === 'rate') {
-    return '利率水平按全国银行间同业拆借中心公布的月度 LPR 展示；近期变化相对于上月。';
+    return '利率/比率水平按数据集公布的月度读数展示；近期变化相对于上月。';
   }
   if (indicator.metric === 'yoy') {
     return '同比增速用于比较与上年同月的变化；近期变化相对于上月。';

@@ -301,4 +301,4 @@ export const PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS = {
   'social-financing': 'pboc-social-financing|stock|published-yoy',
 } as const;
 
-export const LPR_METHODOLOGY_FINGERPRINT = 'cfets-lpr|1y-and-5y-plus|published-rate-level';
+export const LPR_METHODOLOGY_FINGERPRINT = 'pboc-lpr|1y-and-5y-plus|published-rate-level';
