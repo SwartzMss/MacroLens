@@ -21,10 +21,14 @@ export type IndicatorViewModel = {
   sourceLabel: string;
   coverage: string;
   sources: IndicatorPresentationSource[];
+  latestValue?: string;
+  latestEventDate?: string;
+  verifiedThrough?: string;
   series?: Array<{ id: string; label: string; data: Array<{ date: string; value: number }> }>;
 };
 
 function frequencyLabel(indicator: IndicatorDataset): string {
+  if (indicator.frequency === 'event') return '不定期（事件）';
   if (indicator.frequency === 'monthly') return '月度';
   if (indicator.frequency === 'quarterly') return '季度';
   return indicator.frequency;
@@ -40,6 +44,7 @@ function valueLabel(indicator: IndicatorDataset): string {
 }
 
 function inferredComparisonType(indicator: IndicatorDataset): IndicatorComparisonType {
+  if (indicator.frequency === 'event') return 'previous_event_level';
   if (indicator.metric === 'cumulative_yoy') return 'previous_cumulative_period';
   if (indicator.metric === 'mom') {
     return indicator.frequency === 'quarterly' ? 'previous_quarter_rate' : 'previous_month_rate';
@@ -57,6 +62,8 @@ function comparisonType(indicator: IndicatorDataset): IndicatorComparisonType {
 
 function changeLabel(indicator: IndicatorDataset): string {
   switch (comparisonType(indicator)) {
+    case 'previous_event_level':
+      return '较上次事件变化';
     case 'previous_cumulative_period':
       return '较上一个累计期';
     case 'previous_quarter_same_metric':
@@ -73,6 +80,7 @@ function changeLabel(indicator: IndicatorDataset): string {
 }
 
 function comparisonMethod(indicator: IndicatorDataset): string {
+  if (indicator.frequency === 'event') return '按官方生效日／操作日展示；近期变化相对于上次事件。水平区间沿用此前公布水平，不代表每日或每月新增观测。';
   if (indicator.frequency === 'quarterly' && indicator.metric === 'yoy') {
     return '同比增速用于比较与上年同季度的变化；近期变化相对于上一季度。';
   }
@@ -124,7 +132,12 @@ export function getIndicatorPresentation(indicator: IndicatorDataset, definition
     comparabilityNote: indicator.comparabilityNote,
     calculationDescription: calculationDescription(indicator),
     sourceLabel: normalizeSourceLabel(indicator.source),
-    coverage: `${first.date} 至 ${last.date}`,
+    coverage: `${first.date} 至 ${indicator.verifiedThrough ?? last.date}`,
+    ...(indicator.frequency === 'event' ? {
+      latestValue: `${last.value.toFixed(2)}${indicator.unit}`,
+      latestEventDate: last.date,
+      verifiedThrough: indicator.verifiedThrough,
+    } : {}),
     sources: indicator.sources.map(({ title, url, sourceDate, coverage, role }) => ({
       title,
       url,

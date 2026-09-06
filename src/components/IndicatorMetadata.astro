@@ -20,6 +20,14 @@ const { presentation } = Astro.props as { presentation: IndicatorViewModel };
   </div>
 
   <dl class="indicator-metadata-grid">
+    {presentation.latestValue && <>
+      <dt>当前水平（截至核验日）</dt>
+      <dd><strong>{presentation.latestValue}</strong></dd>
+      <dt>最近生效／操作日</dt>
+      <dd>{presentation.latestEventDate}</dd>
+      <dt>最近明确公布利率</dt>
+      <dd>{presentation.verifiedThrough}</dd>
+    </>}
     <dt>统计频率</dt>
     <dd>{presentation.frequencyLabel}</dd>
     <dt>变化口径</dt>

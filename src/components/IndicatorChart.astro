@@ -4,18 +4,16 @@ const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${indicator.id}`;
 const series = indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];
 ---
-<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify({series,unit:indicator.unit,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}折线图`}></div></div>
+<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify({series,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div></div>
 <script>
   import * as echarts from 'echarts';
+  import { buildIndicatorChartOption, type IndicatorChartConfig } from '../data/indicatorChartOption';
   document.querySelectorAll<HTMLElement>('[data-chart]').forEach((element) => {
     if (element.dataset.ready) return;
     element.dataset.ready = 'true';
-    const config: {series:{id:string,label:string,data:{date:string,value:number}[]}[],unit:string,referenceValue?:number,referenceLabel?:string} = JSON.parse(element.dataset.chart || '{}');
-    const series = config.series || [];
-    const dates = [...new Set(series.flatMap(({data}) => data.map(({date}) => date)))].sort();
+    const config: IndicatorChartConfig = JSON.parse(element.dataset.chart || '{}');
     const chart = echarts.init(element);
-    const colors = ['#0d6b50','#d66b32','#3a72a8','#8e5aa5'];
-    chart.setOption({animationDuration:700,tooltip:{trigger:'axis'},legend:series.length>1?{top:0}:undefined,grid:{left:44,right:20,top:series.length>1?38:28,bottom:38},xAxis:{type:'category',data:dates,axisLine:{lineStyle:{color:'#b9c2ba'}}},yAxis:{type:'value',name:config.unit,splitLine:{lineStyle:{color:'#e7e8e1'}}},series:series.map((item,index)=>{const values=new Map(item.data.map(({date,value})=>[date,value]));return {name:item.label,type:'line',data:dates.map(date=>values.get(date) ?? null),smooth:.25,symbolSize:7,lineStyle:{width:3,color:colors[index%colors.length]},itemStyle:{color:colors[index%colors.length]},areaStyle:series.length===1?{color:'rgba(13,107,80,.09)'}:undefined,markLine:index===0&&config.referenceValue!==undefined?{silent:true,symbol:'none',label:{formatter:config.referenceLabel||String(config.referenceValue)},data:[{yAxis:config.referenceValue}]}:undefined};})});
+    chart.setOption(buildIndicatorChartOption(config));
     new ResizeObserver(()=>chart.resize()).observe(element);
   });
 </script>

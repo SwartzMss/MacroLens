@@ -15,6 +15,7 @@ import lpr from '../../data/indicators/lpr.json';
 import unemploymentRate from '../../data/indicators/unemployment-rate.json';
 import exports from '../../data/indicators/exports.json';
 import imports from '../../data/indicators/imports.json';
+import policyRate from '../../data/indicators/policy-rate.json';
 
 export interface IndicatorSeries {
   id: string;
@@ -24,6 +25,8 @@ export interface IndicatorSeries {
 
 export interface IndicatorDataset {
   id: string; country: string; frequency: string;
+  chartType?: string;
+  verifiedThrough?: string;
   unit: string; metric: string; comparisonType?: IndicatorComparisonType; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
   calculation: string; calculationEffectiveFrom?: string; updatedAt: string; comparabilityNote: string;
   methodologyFingerprint: string; methodologyEffectiveFrom?: string;
@@ -34,6 +37,7 @@ export interface IndicatorDataset {
 }
 
 export type IndicatorComparisonType =
+  | 'previous_event_level'
   | 'previous_month_same_metric'
   | 'previous_month_level'
   | 'previous_month_rate'
@@ -56,6 +60,7 @@ const indicatorData = {
   'unemployment-rate': unemploymentRate,
   exports,
   imports,
+  'policy-rate': policyRate,
 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {
