@@ -10,6 +10,7 @@ test('exposes an accessible RSS subscription link in the footer', () => {
   const footer = layout.match(/<footer class="site-footer">([\s\S]*?)<\/footer>/)?.[1] ?? '';
 
   assert.match(footer, /<a href="\/rss\.xml" aria-label="订阅 MacroLens RSS">RSS 订阅<\/a>/);
+  assert.doesNotMatch(footer, /关系用于导航，文档用于解释，数据用于校验/);
   assert.match(layout, /<link rel="alternate" type="application\/rss\+xml" title="MacroLens 知识库更新" href="\/rss\.xml" \/>/);
 
   const nav = layout.match(/<nav[\s\S]*?<\/nav>/)?.[0] ?? '';
