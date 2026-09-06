@@ -138,6 +138,8 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(cards, /data-explainable-relation/);
   assert.match(cards, /lag/);
   assert.match(cards, /explanation/);
+  assert.match(cards, /metadata\.relation/);
+  assert.match(cards, /<dt>解释<\/dt>/);
   assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
   assert.match(cards, /relationship-detail-endpoints/);
   assert.match(page, /展开|关系详情/);
