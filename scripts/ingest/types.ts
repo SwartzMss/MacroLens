@@ -277,6 +277,6 @@ export const MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS = {
 export type MoneySupplyDatasetId = keyof typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
 
 export const PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS = {
-  credit: 'pboc-credit|financial-institutions-rmb-loans|published-balance-yoy',
+  credit: 'pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy',
   'social-financing': 'pboc-social-financing|stock|published-yoy',
 } as const;

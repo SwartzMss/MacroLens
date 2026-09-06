@@ -11,6 +11,17 @@ export function validatePBOCFinancialDataset(dataset: IndicatorDataset, id: PBOC
   if (dataset.metric !== 'yoy') throw new IngestionContractError(`PBOC financial metric must be yoy, got ${dataset.metric}`);
   if (dataset.calculation !== 'published') throw new IngestionContractError(`PBOC financial calculation must be published, got ${dataset.calculation}`);
   if (dataset.source !== 'PBOC') throw new IngestionContractError(`PBOC financial source must be PBOC, got ${dataset.source}`);
+  if (id === 'credit') {
+    if (dataset.calculationEffectiveFrom !== '2025-12') {
+      throw new MethodologyMismatchError('PBOC credit calculation must declare the published boundary from 2025-12');
+    }
+    if (!dataset.comparabilityNote.includes('2025-12')) {
+      throw new MethodologyMismatchError('PBOC credit comparability note must document the 2025-12 calculation boundary');
+    }
+    if (!dataset.sources.some((source) => source.role === 'methodology' && source.coverage === '2023-01 to 2023-12')) {
+      throw new IngestionContractError('PBOC credit requires the 2023 balance table as the historical YoY denominator source');
+    }
+  }
   if (dataset.methodologyFingerprint !== PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS[id]) {
     throw new MethodologyMismatchError(`PBOC financial methodology fingerprint mismatch for ${id}`);
   }

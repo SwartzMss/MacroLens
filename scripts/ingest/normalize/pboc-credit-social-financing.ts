@@ -4,6 +4,13 @@ import { mergeObservations } from '../validate/overlap.ts';
 import { nextMonth, pruneSources, validateMonthlyObservations } from '../validate/dataset.ts';
 import { validatePBOCFinancialDataset } from '../validate/pboc-credit-social-financing.ts';
 
+function prunePBOCFinancialSources(sources: IndicatorSource[], dates: string[]): IndicatorSource[] {
+  const methodologySources = sources.filter((source) => source.role === 'methodology');
+  const dataSources = sources.filter((source) => source.role !== 'methodology');
+  return [...pruneSources(dataSources, dates), ...methodologySources]
+    .sort((left, right) => left.sourceDate.localeCompare(right.sourceDate) || Number(left.role === 'methodology') - Number(right.role === 'methodology'));
+}
+
 function validateReports(rawReports: RawPBOCFinancialPublication[], id: PBOCFinancialDatasetId): void {
   if (!Array.isArray(rawReports) || rawReports.length === 0) throw new IngestionContractError('Fetched PBOC financial reports contain no observations');
   const observations = rawReports.map((report) => {
@@ -44,7 +51,7 @@ export function normalizePBOCFinancialDataset(
     ...existing.sources.filter((source) => !incomingSources.some((incomingSource) => incomingSource.url === source.url)),
     ...incomingSources,
   ];
-  const sources = pruneSources(candidates, data.map((observation) => observation.date));
+  const sources = prunePBOCFinancialSources(candidates, data.map((observation) => observation.date));
   const latestSource = sources.at(-1);
   if (!latestSource) throw new IngestionContractError('PBOC financial dataset contains no latest source after normalization');
   const normalized: IndicatorDataset = {

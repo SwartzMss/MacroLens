@@ -62,17 +62,26 @@ function datasetBeforeNovember(id) {
     chartTitle: id === 'credit' ? '金融机构人民币各项贷款余额同比增速' : '社会融资规模存量同比增速',
     source: 'PBOC',
     calculation: 'published',
+    ...(id === 'credit' ? { calculationEffectiveFrom: '2025-12' } : {}),
     updatedAt: '2025-12-15',
-    comparabilityNote: '官方公布同比增速；统计口径或覆盖范围变化时停止自动合并并更新可比性说明。',
+    comparabilityNote: id === 'credit'
+      ? '2025-11 及以前同比增速由官方余额计算；自 2025-12 起采用央行官方公布值；统计口径或覆盖范围变化时停止自动合并并更新可比性说明。'
+      : '官方公布同比增速；统计口径或覆盖范围变化时停止自动合并并更新可比性说明。',
     methodologyFingerprint: PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS[id],
     sources: [{
       title: '中国人民银行官方统计表',
       url: id === 'credit'
-        ? 'https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/12/2025121517273312027.pdf'
+        ? 'https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111817163388840.htm'
         : 'https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/12/2025121517152654772.pdf',
+      sourceDate: id === 'credit' ? '2025-11-18' : '2025-12-15',
+      coverage: id === 'credit' ? '2023-01 to 2023-12' : '2024-01 to 2025-11',
+      ...(id === 'credit' ? { role: 'methodology' } : {}),
+    }, ...(id === 'credit' ? [{
+      title: '中国人民银行官方统计表（2024-2025）',
+      url: 'https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/12/2025121517273312027.pdf',
       sourceDate: '2025-12-15',
       coverage: '2024-01 to 2025-11',
-    }],
+    }] : [])],
     data: historicalValues.map((value, index) => {
       const year = 2024 + Math.floor(index / 12);
       const month = String((index % 12) + 1).padStart(2, '0');
@@ -129,12 +138,13 @@ test('normalizes both datasets with continuity, official provenance, and overlap
   const social = normalizePBOCFinancialDataset([socialRaw], socialExisting, 'social-financing');
   assert.deepEqual(credit.data.at(-1), { date: '2025-11', value: 6.4 });
   assert.deepEqual(social.data.at(-1), { date: '2025-11', value: 8.5 });
+  assert.equal(credit.sources.some(({ role, coverage }) => role === 'methodology' && coverage === '2023-01 to 2023-12'), true);
   assert.doesNotThrow(() => validatePBOCFinancialDataset(credit, 'credit'));
   assert.doesNotThrow(() => validatePBOCFinancialDataset(social, 'social-financing'));
   const creditExistingThroughNovember = {
     ...creditExisting,
     updatedAt: '2025-12-12',
-    sources: [{ ...creditExisting.sources[0], coverage: '2024-01 to 2025-11' }, {
+    sources: [...creditExisting.sources, {
       title: '中国人民银行：2025年11月金融统计数据报告',
       url: moneyPublication.url,
       sourceDate: moneyPublication.sourceDate,
@@ -184,6 +194,10 @@ test('checked-in financial datasets use the official integrated report values an
   assert.deepEqual(credit.data.at(-1), { date: '2026-07', value: 5.1 });
   assert.deepEqual(social.data.at(-1), { date: '2026-07', value: 7.4 });
   assert.equal(credit.data.find(({ date }) => date === '2024-04')?.value, 9.6);
+  assert.equal(credit.calculation, 'published');
+  assert.equal(credit.calculationEffectiveFrom, '2025-12');
+  assert.equal(credit.methodologyFingerprint, 'pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy');
+  assert.equal(credit.sources.some(({ coverage, url }) => coverage === '2023-01 to 2023-12' && url.includes('2025111817163388840')), true);
   assert.equal(social.data.find(({ date }) => date === '2024-01')?.value, 9.5);
   assert.match(credit.sources.at(-1).url, /2026081416320925645/);
   assert.equal(social.sources.at(-1).url, credit.sources.at(-1).url);
