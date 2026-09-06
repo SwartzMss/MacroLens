@@ -1,0 +1,236 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/stats.css';
+
+const concepts = (await getCollection('concepts'))
+  .sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id));
+---
+<BaseLayout
+  title="内容统计｜MacroLens"
+  description="MacroLens 内容访问与页面反馈的聚合统计。"
+  noindex={true}
+>
+  <section class="stats-page shell" data-pagefind-ignore data-stats-root>
+    <header class="stats-head">
+      <div>
+        <div class="eyebrow">Product signals</div>
+        <h1>内容统计</h1>
+        <p class="lead">把访问量和页面反馈放在一起看，优先发现“很多人看，但解释还不够好”的内容。</p>
+      </div>
+      <button class="stats-refresh" type="button" data-stats-refresh>刷新数据</button>
+    </header>
+
+    <div class="stats-summary" aria-label="站点统计概览">
+      <article class="stats-kpi">
+        <span>累计访客</span>
+        <strong data-site-total>—</strong>
+        <small>全站 distinct visitor</small>
+      </article>
+      <article class="stats-kpi">
+        <span>今日访客</span>
+        <strong data-site-today>—</strong>
+        <small>上海时区</small>
+      </article>
+      <article class="stats-kpi">
+        <span>已有访问概念</span>
+        <strong data-tracked-pages>—</strong>
+        <small>有页面 UV 的概念数</small>
+      </article>
+      <article class="stats-kpi">
+        <span>页面反馈</span>
+        <strong data-feedback-total>—</strong>
+        <small data-feedback-rate>等待数据</small>
+      </article>
+    </div>
+
+    <div class="stats-source-state" data-stats-status role="status" aria-live="polite">正在加载统计数据…</div>
+
+    <section class="stats-panel" aria-labelledby="concept-stats-title">
+      <header class="stats-panel-head">
+        <div>
+          <h2 id="concept-stats-title">概念表现</h2>
+          <p>默认按累计页面 UV 排序。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
+        </div>
+      </header>
+
+      <div class="stats-table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th scope="col">概念</th>
+              <th scope="col">累计 UV</th>
+              <th scope="col">今日 UV</th>
+              <th scope="col">反馈数</th>
+              <th scope="col">有帮助率</th>
+              <th scope="col">状态</th>
+            </tr>
+          </thead>
+          <tbody data-stats-body>
+            {concepts.map(concept => (
+              <tr
+                data-page-id={concept.data.id}
+                data-path={`/concepts/${concept.data.id}`}
+                data-total-uv="0"
+                data-feedback-count="0"
+              >
+                <td class="stats-concept">
+                  <a href={`/concepts/${concept.data.id}`}>{concept.data.name}</a>
+                  <small>{concept.data.id}</small>
+                </td>
+                <td data-total-uv>—</td>
+                <td data-today-uv>—</td>
+                <td data-feedback-count>—</td>
+                <td data-helpful-rate>—</td>
+                <td data-priority><span class="stats-priority stats-priority-wait">待观察</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="stats-note">页面 UV 是“每个页面分别去重”的访问人数；同一个访客访问多个概念，会在多个页面各计 1，因此不要把各页面 UV 相加当成全站访客数。</p>
+    </section>
+  </section>
+
+  <script>
+    const root = document.querySelector<HTMLElement>('[data-stats-root]');
+    if (root) {
+      const refreshButton = root.querySelector<HTMLButtonElement>('[data-stats-refresh]');
+      const status = root.querySelector<HTMLElement>('[data-stats-status]');
+      const body = root.querySelector<HTMLTableSectionElement>('[data-stats-body]');
+      const siteTotal = root.querySelector<HTMLElement>('[data-site-total]');
+      const siteToday = root.querySelector<HTMLElement>('[data-site-today]');
+      const trackedPages = root.querySelector<HTMLElement>('[data-tracked-pages]');
+      const feedbackTotal = root.querySelector<HTMLElement>('[data-feedback-total]');
+      const feedbackRate = root.querySelector<HTMLElement>('[data-feedback-rate]');
+
+      const number = new Intl.NumberFormat('zh-CN');
+      const rows = () => body ? [...body.querySelectorAll<HTMLTableRowElement>('tr[data-page-id]')] : [];
+
+      const setText = (node: Element | null, value: string) => {
+        if (node) node.textContent = value;
+      };
+
+      const fetchJson = async (url: string) => {
+        const response = await fetch(url, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      };
+
+      const priority = (feedbackCount: number, helpfulRate: number | null) => {
+        if (feedbackCount < 5 || helpfulRate === null) return { label: '待观察', className: 'stats-priority-wait' };
+        if (helpfulRate < 70) return { label: '优先优化', className: 'stats-priority-action' };
+        if (helpfulRate >= 85) return { label: '表现良好', className: 'stats-priority-good' };
+        return { label: '继续观察', className: 'stats-priority-watch' };
+      };
+
+      const load = async () => {
+        if (refreshButton) refreshButton.disabled = true;
+        setText(status, '正在刷新统计数据…');
+
+        const [siteResult, pageResult, feedbackResult] = await Promise.allSettled([
+          fetchJson('/api/visitor-stats'),
+          fetchJson('/api/page-stats'),
+          fetchJson('/api/feedback-stats'),
+        ]);
+
+        const unavailable: string[] = [];
+        const site = siteResult.status === 'fulfilled' ? siteResult.value : null;
+        const pagePayload = pageResult.status === 'fulfilled' ? pageResult.value : null;
+        const feedbackPayload = feedbackResult.status === 'fulfilled' ? feedbackResult.value : null;
+
+        if (site?.available === true) {
+          setText(siteTotal, number.format(site.total));
+          setText(siteToday, number.format(site.today));
+        } else {
+          setText(siteTotal, '—');
+          setText(siteToday, '—');
+          unavailable.push('全站访客');
+        }
+
+        const pageStats = new Map<string, { total: number; today: number }>();
+        if (pagePayload?.available === true && Array.isArray(pagePayload.pages)) {
+          for (const page of pagePayload.pages) {
+            if (page && typeof page.path === 'string' && Number.isFinite(page.total) && Number.isFinite(page.today)) {
+              pageStats.set(page.path, { total: page.total, today: page.today });
+            }
+          }
+        } else {
+          unavailable.push('页面 UV');
+        }
+
+        const feedbackStats = new Map<string, {
+          feedbackCount: number;
+          helpful: number;
+          needsImprovement: number;
+          helpfulRate: number;
+        }>();
+        if (feedbackPayload?.available === true && Array.isArray(feedbackPayload.pages)) {
+          for (const page of feedbackPayload.pages) {
+            if (page && typeof page.pageId === 'string') feedbackStats.set(page.pageId, page);
+          }
+        } else {
+          unavailable.push('页面反馈');
+        }
+
+        let tracked = 0;
+        let feedbackCountTotal = 0;
+        let helpfulTotal = 0;
+
+        for (const row of rows()) {
+          const pageId = row.dataset.pageId ?? '';
+          const path = row.dataset.path ?? '';
+          const traffic = pageStats.get(path);
+          const feedback = feedbackStats.get(pageId);
+          const totalUv = traffic?.total ?? 0;
+          const todayUv = traffic?.today ?? 0;
+          const count = feedback?.feedbackCount ?? 0;
+          const rate = feedback ? feedback.helpfulRate : null;
+
+          if (totalUv > 0) tracked += 1;
+          feedbackCountTotal += count;
+          helpfulTotal += feedback?.helpful ?? 0;
+
+          row.dataset.totalUv = String(totalUv);
+          row.dataset.feedbackCount = String(count);
+          setText(row.querySelector('[data-total-uv]'), pagePayload?.available === true ? number.format(totalUv) : '—');
+          setText(row.querySelector('[data-today-uv]'), pagePayload?.available === true ? number.format(todayUv) : '—');
+          setText(row.querySelector('[data-feedback-count]'), feedbackPayload?.available === true ? number.format(count) : '—');
+          setText(row.querySelector('[data-helpful-rate]'), feedback && count > 0 ? `${rate?.toFixed(1)}%` : '—');
+
+          const state = priority(count, rate);
+          const priorityCell = row.querySelector('[data-priority]');
+          if (priorityCell) priorityCell.innerHTML = `<span class="stats-priority ${state.className}">${state.label}</span>`;
+        }
+
+        setText(trackedPages, pagePayload?.available === true ? number.format(tracked) : '—');
+        setText(feedbackTotal, feedbackPayload?.available === true ? number.format(feedbackCountTotal) : '—');
+        setText(
+          feedbackRate,
+          feedbackPayload?.available === true && feedbackCountTotal > 0
+            ? `整体有帮助率 ${((helpfulTotal / feedbackCountTotal) * 100).toFixed(1)}%`
+            : feedbackPayload?.available === true ? '暂无反馈' : '反馈数据不可用',
+        );
+
+        if (body && pagePayload?.available === true) {
+          const sorted = rows().sort((a, b) => {
+            const uvDiff = Number(b.dataset.totalUv ?? 0) - Number(a.dataset.totalUv ?? 0);
+            if (uvDiff !== 0) return uvDiff;
+            const feedbackDiff = Number(b.dataset.feedbackCount ?? 0) - Number(a.dataset.feedbackCount ?? 0);
+            if (feedbackDiff !== 0) return feedbackDiff;
+            return (a.dataset.pageId ?? '').localeCompare(b.dataset.pageId ?? '');
+          });
+          for (const row of sorted) body.append(row);
+        }
+
+        const now = new Intl.DateTimeFormat('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date());
+        setText(status, unavailable.length === 0 ? `已更新 · ${now}` : `已更新 · ${now} · ${unavailable.join('、')}不可用`);
+        if (refreshButton) refreshButton.disabled = false;
+      };
+
+      refreshButton?.addEventListener('click', load);
+      load();
+    }
+  </script>
+</BaseLayout>
