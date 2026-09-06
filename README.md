@@ -9,6 +9,7 @@
 - Relationship Explorer：用可读的关系卡片和传导路径解释指标之间的关联。
 - Dashboard：展示当前注册的 11 个 V1 官方指标，包括 PMI、货币供应量、GDP、工业生产、社零、固定资产投资、CPI、核心 CPI 和 PPI。
 - Macro Snapshot：基于已加载数据和显式规则生成确定性的宏观状态、证据和关注项。
+- RSS：通过 `/rss.xml` 订阅知识节点、内容和宏观指标数据更新。
 
 站点保留结构化关系数据，用于关系浏览、上下游推理和未来扩展；主产品体验以解释性页面、关系卡片和传导路径为主。
 
@@ -63,7 +64,7 @@ PUBLIC_SITE_URL=https://<实际的 Pages 域名或自定义域名>
 NODE_VERSION=24
 ~~~
 
-PUBLIC_SITE_URL 必须是站点真实、稳定的 http/https origin，不带路径。它用于 sitemap、canonical 和 Open Graph URL。Cloudflare Pages 的 main 构建缺少该变量时会直接失败，不会把当前 deployment 的 CF_PAGES_URL 静默用作 production canonical。
+PUBLIC_SITE_URL 必须是站点真实、稳定的 http/https origin，不带路径。它用于 sitemap、canonical、Open Graph 和 RSS URL。Cloudflare Pages 的 main 构建缺少该变量时会直接失败，不会把当前 deployment 的 CF_PAGES_URL 静默用作 production canonical。
 
 ### 访客统计（可选）
 
