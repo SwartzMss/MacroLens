@@ -273,6 +273,18 @@ main {
   color: var(--muted);
   font-size: 13px;
 }
+.footer-copy {
+  margin: 0;
+}
+.site-footer a {
+  color: var(--green);
+}
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .visitor-stats {
   display: flex;
   flex-wrap: wrap;
