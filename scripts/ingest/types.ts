@@ -159,10 +159,10 @@ export type RawLprPublication = {
   values: LprValues;
 };
 
-export type RealEconomyDatasetId = 'gdp' | 'industrial-production' | 'retail-sales' | 'fixed-asset-investment';
-export type RealEconomyPeriodKind = 'quarterly' | 'monthly-yoy' | 'cumulative-yoy';
+export type RealEconomyDatasetId = 'gdp' | 'industrial-production' | 'retail-sales' | 'fixed-asset-investment' | 'unemployment-rate';
+export type RealEconomyPeriodKind = 'quarterly' | 'monthly-yoy' | 'cumulative-yoy' | 'monthly-rate';
 export type RealEconomySourceKind = 'release-page' | 'national-data';
-export type RealEconomySeriesRule = 'combined' | 'monthly' | 'cumulative';
+export type RealEconomySeriesRule = 'combined' | 'monthly' | 'cumulative' | 'monthly-rate';
 export type RealEconomyContract = {
   id: RealEconomyDatasetId;
   sourceCodes: string[];
@@ -171,7 +171,7 @@ export type RealEconomyContract = {
   sourceKind: RealEconomySourceKind;
   frequency: 'quarterly' | 'monthly';
   unit: '%';
-  metric: 'yoy' | 'cumulative_yoy';
+  metric: 'yoy' | 'cumulative_yoy' | 'rate';
   calculation: 'published';
   periodKind: RealEconomyPeriodKind;
   methodologyFingerprint: string;
@@ -200,6 +200,7 @@ export const REAL_ECONOMY_METHODOLOGY_FINGERPRINTS = {
   'industrial-production': 'nbs-industrial-production|above-designated-size|real-yoy',
   'retail-sales': 'nbs-retail-sales|total-retail-sales|nominal-yoy',
   'fixed-asset-investment': 'nbs-fixed-asset-investment|excluding-rural-households|cumulative-yoy',
+  'unemployment-rate': 'nbs-unemployment-rate|national-urban-survey|published-level',
 } as const;
 
 export const REAL_ECONOMY_CONTRACTS: Record<RealEconomyDatasetId, RealEconomyContract> = {
@@ -254,6 +255,19 @@ export const REAL_ECONOMY_CONTRACTS: Record<RealEconomyDatasetId, RealEconomyCon
     calculation: 'published',
     periodKind: 'cumulative-yoy',
     methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS['fixed-asset-investment'],
+  },
+  'unemployment-rate': {
+    id: 'unemployment-rate',
+    sourceCodes: ['A0E01'],
+    sourceCodeRules: { A0E01: 'monthly-rate' },
+    sourceTitle: '全国城镇调查失业率',
+    sourceKind: 'national-data',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'rate',
+    calculation: 'published',
+    periodKind: 'monthly-rate',
+    methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS['unemployment-rate'],
   },
 };
 

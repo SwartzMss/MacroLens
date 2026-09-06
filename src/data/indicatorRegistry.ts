@@ -12,6 +12,7 @@ import ppi from '../../data/indicators/ppi.json';
 import credit from '../../data/indicators/credit.json';
 import socialFinancing from '../../data/indicators/social-financing.json';
 import lpr from '../../data/indicators/lpr.json';
+import unemploymentRate from '../../data/indicators/unemployment-rate.json';
 
 export interface IndicatorSeries {
   id: string;
@@ -50,6 +51,7 @@ const indicatorData = {
   credit,
   'social-financing': socialFinancing,
   lpr,
+  'unemployment-rate': unemploymentRate,
 } satisfies Record<string, IndicatorDataset>;
 
 export function getIndicatorData(id: string): IndicatorDataset {

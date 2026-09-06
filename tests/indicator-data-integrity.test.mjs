@@ -19,6 +19,7 @@ const contracts = {
   'industrial-production': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'retail-sales': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'fixed-asset-investment': { frequency: 'monthly', unit: '%', metric: 'cumulative_yoy', calculation: 'published' },
+  'unemployment-rate': { frequency: 'monthly', unit: '%', metric: 'rate', calculation: 'published' },
   cpi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'core-cpi': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   ppi: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
@@ -131,14 +132,14 @@ test('all V1 indicator datasets satisfy the explicit data contract', () => {
 });
 
 test('registry resolves every V1 dataset and observations are continuous by semantics', () => {
-  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi', 'credit', 'social-financing', 'lpr'];
+  const exactMonthlyIds = ['m0', 'm1', 'm2', 'pmi', 'cpi', 'core-cpi', 'ppi', 'credit', 'social-financing', 'lpr', 'unemployment-rate'];
   for (const id of Object.keys(contracts)) {
     const dataset = getIndicatorData(id);
     assert.equal(dataset.id, id, `${id} must resolve through indicatorRegistry`);
   }
   for (const id of exactMonthlyIds) assertContinuous(getIndicatorData(id).data, nextMonth, id);
   assertContinuous(getIndicatorData('gdp').data, nextQuarter, 'gdp');
-  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     validateRealEconomyObservations(getIndicatorData(id).data, id);
   }
 });

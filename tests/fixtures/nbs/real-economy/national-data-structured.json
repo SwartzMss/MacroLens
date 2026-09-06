@@ -75,6 +75,22 @@
           {"_id":"7e570cf8071c4734a7d78d9f0a70fbe1","value":"","_name":"固定资产投资","i_showname":"固定资产投资额累计增长 (%) ","du_name":"%"}
         ]}
       ]
+    },
+    "unemployment-rate": {
+      "success": true,
+      "state": 20000,
+      "message": "成功",
+      "data": [
+        {"code":"202607MM","name":"2026年7月","values":[
+          {"_id":"3888eac6062945a79c8a27e5f13d4953","value":"5.2","_name":"城镇调查失业率","i_showname":"全国城镇调查失业率 (%) ","du_name":"%","da":"000000000000","da_name":"国家"}
+        ]},
+        {"code":"202606MM","name":"2026年6月","values":[
+          {"_id":"3888eac6062945a79c8a27e5f13d4953","value":"5.0","_name":"城镇调查失业率","i_showname":"全国城镇调查失业率 (%) ","du_name":"%","da":"000000000000","da_name":"国家"}
+        ]},
+        {"code":"202605MM","name":"2026年5月","values":[
+          {"_id":"3888eac6062945a79c8a27e5f13d4953","value":"5.1","_name":"城镇调查失业率","i_showname":"全国城镇调查失业率 (%) ","du_name":"%","da":"000000000000","da_name":"国家"}
+        ]}
+      ]
     }
   }
 }

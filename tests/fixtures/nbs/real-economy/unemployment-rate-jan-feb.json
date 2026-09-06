@@ -1,0 +1,20 @@
+{
+  "publication": {
+    "title": "2027年1—2月份国民经济运行情况",
+    "url": "https://www.stats.gov.cn/sj/zxfb/202703/t20270315_1969001.html",
+    "sourceDate": "2027-03-15",
+    "coverage": "2027-02 to 2027-02"
+  },
+  "series": {
+    "title": "全国城镇调查失业率",
+    "code": "A0E01",
+    "unit": "%",
+    "frequency": "monthly"
+  },
+  "returndata": {
+    "datanodes": [
+      {"wds":[{"wdcode":"zb","valuecode":"A0E01"},{"wdcode":"sj","valuecode":"202701","value":"2027年1月"},{"wdcode":"da","valuecode":"000000000000","value":"全国"}],"data":{"hasdata":true,"data":"5.1"}},
+      {"wds":[{"wdcode":"zb","valuecode":"A0E01"},{"wdcode":"sj","valuecode":"202702","value":"2027年2月"},{"wdcode":"da","valuecode":"000000000000","value":"全国"}],"data":{"hasdata":true,"data":"5.2"}}
+    ]
+  }
+}

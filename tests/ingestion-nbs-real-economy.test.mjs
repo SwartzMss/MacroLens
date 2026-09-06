@@ -99,17 +99,17 @@ const metadata = {
 function dataset(id, data, overrides = {}) {
   const defaults = {
     ...metadata,
-    sources: [source(id === 'gdp' ? '2025-Q1 to 2025-Q2' : id === 'fixed-asset-investment' ? '2025-01–02 to 2026-01–07' : '2025-01–02 to 2026-07')],
+    sources: [source(id === 'gdp' ? '2025-Q1 to 2025-Q2' : id === 'fixed-asset-investment' ? '2025-01–02 to 2026-01–07' : id === 'unemployment-rate' ? '2025-01 to 2026-07' : '2025-01–02 to 2026-07')],
     id,
     frequency: id === 'gdp' ? 'quarterly' : 'monthly',
-    metric: id === 'fixed-asset-investment' ? 'cumulative_yoy' : 'yoy',
+    metric: id === 'fixed-asset-investment' ? 'cumulative_yoy' : id === 'unemployment-rate' ? 'rate' : 'yoy',
     methodologyFingerprint: REAL_ECONOMY_METHODOLOGY_FINGERPRINTS[id],
     data,
   };
   return { ...defaults, ...overrides };
 }
 
-test('validates all four exact real-economy dataset contracts', () => {
+test('validates all five exact real-economy dataset contracts', () => {
   assert.deepEqual(REAL_ECONOMY_CONTRACTS.gdp.sourceCodes, []);
   assert.equal(REAL_ECONOMY_CONTRACTS.gdp.sourceKind, 'release-page');
   assert.doesNotThrow(() => validateRealEconomyDataset(dataset('gdp', [
@@ -128,6 +128,11 @@ test('validates all four exact real-economy dataset contracts', () => {
     { date: '2025-01–03', value: 4.2 },
     { date: '2025-01–04', value: 4.0 },
   ]), 'fixed-asset-investment'));
+  assert.doesNotThrow(() => validateRealEconomyDataset(dataset('unemployment-rate', [
+    { date: '2025-01', value: 5.2 },
+    { date: '2025-02', value: 5.4 },
+    { date: '2025-03', value: 5.2 },
+  ], { sources: [source('2025-01 to 2025-03')] }), 'unemployment-rate'));
 });
 
 test('accepts the missing January and February single-month periods only for combined monthly series', () => {
@@ -200,17 +205,57 @@ test('rejects exact field and source contract mismatches', () => {
   );
 });
 
-test('parses official-shaped NBS responses for all four target series', () => {
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+test('parses official-shaped NBS responses for all five target series', () => {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     const parsed = parseFixture(id);
     assert.equal(parsed.id, id);
     assert.equal(parsed.unit, '%');
     assert.equal(parsed.methodologyFingerprint, REAL_ECONOMY_METHODOLOGY_FINGERPRINTS[id]);
     assert.deepEqual(parsed.observations.at(-1), {
-      date: id === 'gdp' ? '2026-Q2' : id === 'fixed-asset-investment' ? '2025-01–04' : '2025-04',
-      value: id === 'gdp' ? 4.3 : id === 'fixed-asset-investment' ? 4.0 : id === 'industrial-production' ? 6.1 : 5.1,
+      date: id === 'gdp' ? '2026-Q2' : id === 'fixed-asset-investment' ? '2025-01–04' : id === 'unemployment-rate' ? '2026-07' : '2025-04',
+      value: id === 'gdp' ? 4.3 : id === 'fixed-asset-investment' ? 4.0 : id === 'unemployment-rate' ? 5.2 : id === 'industrial-production' ? 6.1 : 5.1,
     });
   }
+});
+
+test('strictly validates unemployment scope, values, duplicates, and publication month', () => {
+  const payload = fixture('unemployment-rate');
+  const contract = REAL_ECONOMY_CONTRACTS['unemployment-rate'];
+  const parse = (candidate) => parseNbsRealEconomyResponse(candidate, candidate.publication, contract);
+
+  const wrongScope = structuredClone(payload);
+  wrongScope.returndata.datanodes[0].wds.find(({ wdcode }) => wdcode === 'da').valuecode = '110000000000';
+  assert.throws(() => parse(wrongScope), IngestionContractError);
+
+  const missingValue = structuredClone(payload);
+  missingValue.returndata.datanodes[1].data = { hasdata: false, data: '' };
+  assert.throws(() => parse(missingValue), IngestionContractError);
+
+  const malformedValue = structuredClone(payload);
+  malformedValue.returndata.datanodes[1].data.data = '待定';
+  assert.throws(() => parse(malformedValue), IngestionContractError);
+
+  const duplicate = structuredClone(payload);
+  duplicate.returndata.datanodes.push(duplicate.returndata.datanodes[0]);
+  assert.throws(() => parse(duplicate), IngestionContractError);
+
+  const wrongPublicationMonth = structuredClone(payload);
+  wrongPublicationMonth.publication.coverage = '2026-06 to 2026-06';
+  assert.throws(() => parse(wrongPublicationMonth), IngestionContractError);
+});
+
+test('preserves strict monthly continuity and rejects unemployment historical changes', () => {
+  assert.throws(() => validateRealEconomyObservations([
+    { date: '2026-05', value: 5.1 },
+    { date: '2026-07', value: 5.2 },
+  ], 'unemployment-rate'), IngestionContractError);
+
+  const raw = parseFixture('unemployment-rate');
+  const existing = existingFor('unemployment-rate');
+  assert.throws(() => normalizeRealEconomyDataset(raw, {
+    ...existing,
+    data: [{ ...existing.data[0], value: existing.data[0].value + 0.1 }],
+  }, 'unemployment-rate'), HistoricalMismatchError);
 });
 
 test('rejects a GDP release page that only exposes the current-quarter level table', () => {
@@ -326,6 +371,21 @@ test('maps official annual fixed-asset-investment titles to full-year coverage',
   assert.equal(publication.coverage, '2025-01–12 to 2025-01–12');
 });
 
+test('maps unemployment Jan-Feb joint releases to the ending month and parses the fixture', () => {
+  const publication = discoverLatestRealEconomyPublication(
+    '<a href="/sj/zxfb/202703/t20270315_1969001.html">2027年1—2月份国民经济运行情况</a> 2027-03-15',
+    'unemployment-rate',
+  );
+  assert.equal(publication.coverage, '2027-02 to 2027-02');
+
+  const payload = fixture('unemployment-rate-jan-feb');
+  const parsed = parseNbsRealEconomyResponse(payload, payload.publication, REAL_ECONOMY_CONTRACTS['unemployment-rate']);
+  assert.deepEqual(parsed.observations, [
+    { date: '2027-01', value: 5.1 },
+    { date: '2027-02', value: 5.2 },
+  ]);
+});
+
 test('routes real-economy live requests through the shared text fetch boundary', async () => {
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));
@@ -367,12 +427,13 @@ test('retrieves all five National Data series through the official structured en
     'industrial-production': '规模以上工业增加值同比增长按不变价格计算',
     'retail-sales': '社会消费品零售总额同比增长按现价计算',
     'fixed-asset-investment': '固定资产投资（不含农户）累计增长按可比口径计算',
+    'unemployment-rate': '全国城镇调查失业率（%）',
   };
   const calls = [];
-  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+  for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     const fixturePayload = structuredFixture.responses[id];
     const publication = JSON.parse(JSON.stringify(fixture(id)));
-    publication.publication.coverage = '';
+    publication.publication.coverage = id === 'unemployment-rate' ? '2026-07 to 2026-07' : '';
     const fetcher = async (url, options) => {
       calls.push({ id, url, options });
       if (url === publication.publication.url) return methodology[id];
@@ -388,7 +449,7 @@ test('retrieves all five National Data series through the official structured en
     assert.deepEqual(new Set(raw.seriesCode.split(',')), new Set(REAL_ECONOMY_CONTRACTS[id].sourceCodes));
     assert.deepEqual(raw.observations.map(({ date }) => date), id === 'fixed-asset-investment'
       ? ['2025-01–02', '2025-01–03', '2025-01–04']
-      : ['2025-01–02', '2025-03', '2025-04']);
+      : id === 'unemployment-rate' ? ['2026-05', '2026-06', '2026-07'] : ['2025-01–02', '2025-03', '2025-04']);
     assert.equal(raw.unit, '%');
     assert.equal(raw.frequency, 'monthly');
     assert.equal(raw.dataSources.length, REAL_ECONOMY_CONTRACTS[id].sourceCodes.length);
@@ -399,7 +460,7 @@ test('retrieves all five National Data series through the official structured en
   }
 
   const dataCalls = calls.filter(({ url }) => url === endpoint);
-  assert.equal(dataCalls.length, 3);
+  assert.equal(dataCalls.length, 4);
   for (const { id, options } of dataCalls) {
     assert.equal(options.method, 'POST');
     assert.equal(options.headers.accept, 'application/json, text/plain, */*');
@@ -413,7 +474,9 @@ test('retrieves all five National Data series through the official structured en
       ? ['ef1b1765960d45a29b4d7c4ca91be916', '21e7072e9f384209aedb56e69a18216e']
       : id === 'retail-sales'
         ? ['aaac57d54d2e465d91bc9f3ea1a8618e', 'e3ca151b53d347b78d1e179e5ebf1d33']
-        : ['7e570cf8071c4734a7d78d9f0a70fbe1']);
+        : id === 'fixed-asset-investment'
+          ? ['7e570cf8071c4734a7d78d9f0a70fbe1']
+          : ['3888eac6062945a79c8a27e5f13d4953']);
     assert.equal(new URL(calls.find((call) => call.id === id && call.url === endpoint).url).hostname, 'data.stats.gov.cn');
   }
   assert.ok(calls.every(({ url }) => !url.includes('/easyquery.htm')));
@@ -650,8 +713,8 @@ function existingFor(id) {
   });
 }
 
-test('normalizes all four NBS datasets while preserving period semantics and truthful coverage', () => {
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+test('normalizes all five NBS datasets while preserving period semantics and truthful coverage', () => {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     const raw = parseFixture(id);
     const normalized = normalizeRealEconomyDataset(raw, existingFor(id), id);
     assert.equal(normalized.id, id);
@@ -698,7 +761,7 @@ test('rejects an incoming real-economy sequence with a gap before merging', () =
 
 function seedTargets(directory) {
   fs.mkdirSync(directory, { recursive: true });
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     const existing = existingFor(id);
     fs.writeFileSync(path.join(directory, `${id}.json`), `${JSON.stringify(existing, null, 2)}\n`);
   }
@@ -711,6 +774,7 @@ function seedFixtureDirectory(directory) {
     'industrial-production': 'industrial-production.json',
     'retail-sales': 'retail-sales.json',
     'fixed-asset-investment': 'fixed-asset-investment.json',
+    'unemployment-rate': 'unemployment-rate.json',
   };
   for (const name of Object.values(names)) {
     const fixturePath = name === 'gdp-quarterly.json'
@@ -736,19 +800,20 @@ async function captureOutput(callback) {
   }
 }
 
-test('runs the fixture CLI for all four targets and is idempotent', async () => {
+test('runs the fixture CLI for all five targets and is idempotent', async () => {
   const targets = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-'));
   const fixtures = fs.mkdtempSync(path.join('/tmp', 'macrolens-nbs-real-economy-fixture-'));
   seedTargets(targets);
   const fixtureIndex = seedFixtureDirectory(fixtures);
   const args = ['--fixture-index', fixtureIndex, '--fixture-dir', fixtures, '--target-dir', targets];
   const firstOutput = await captureOutput(() => runRealEconomy(args));
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) assert.match(firstOutput, new RegExp(`${id}.*Changed: true`));
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) assert.match(firstOutput, new RegExp(`${id}.*Changed: true`));
   assert.equal(JSON.parse(fs.readFileSync(path.join(targets, 'gdp.json'), 'utf8')).data.at(-1).date, '2026-Q2');
   assert.equal(JSON.parse(fs.readFileSync(path.join(targets, 'industrial-production.json'), 'utf8')).data.at(-1).date, '2025-04');
-  const snapshots = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
+  assert.equal(JSON.parse(fs.readFileSync(path.join(targets, 'unemployment-rate.json'), 'utf8')).data.at(-1).date, '2026-07');
+  const snapshots = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
   const secondOutput = await captureOutput(() => runRealEconomy(args));
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     assert.match(secondOutput, new RegExp(`${id}.*Changed: false`));
     assert.equal(fs.readFileSync(path.join(targets, `${id}.json`), 'utf8'), snapshots.get(id));
   }
@@ -761,13 +826,13 @@ test('does not write any target when one NBS series has a historical mismatch', 
   const fixtureIndex = seedFixtureDirectory(fixtures);
   const args = ['--fixture-index', fixtureIndex, '--fixture-dir', fixtures, '--target-dir', targets];
   await runRealEconomy(args);
-  const before = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
+  const before = new Map(['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate'].map((id) => [id, fs.readFileSync(path.join(targets, `${id}.json`), 'utf8')]));
   const industrialPath = path.join(fixtures, 'industrial-production.json');
   const industrial = JSON.parse(fs.readFileSync(industrialPath, 'utf8'));
   industrial.returndata.datanodes[0].data.data = '9.9';
   fs.writeFileSync(industrialPath, `${JSON.stringify(industrial, null, 2)}\n`);
   await assert.rejects(() => runRealEconomy(args), HistoricalMismatchError);
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) assert.equal(fs.readFileSync(path.join(targets, `${id}.json`), 'utf8'), before.get(id));
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) assert.equal(fs.readFileSync(path.join(targets, `${id}.json`), 'utf8'), before.get(id));
 });
 
 test('help exits before reading or writing real-economy targets', async () => {
@@ -781,7 +846,7 @@ test('wires NBS real-economy ingestion into the reviewable scheduled workflow', 
   assert.match(workflow, /npm run ingest:pmi/);
   assert.match(workflow, /npm run ingest:pboc-money-supply/);
   assert.match(workflow, /npm run ingest:nbs-real-economy/);
-  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment']) {
+  for (const id of ['gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     assert.match(workflow, new RegExp(`data/indicators/${id}\\.json`));
   }
   assert.match(workflow, /create-pull-request/);
