@@ -35,7 +35,7 @@ const groups = [...grouped];
   const cardClasses = ['relationship-card', item.direction === 'symmetric' && 'is-symmetric', metadata && 'is-explainable'];
   const summaryText = <span class="relationship-summary-text">
     <span class="relationship-current">{currentIsSource ? conceptName : item.other.label}</span>
-    <span class="relationship-kind"><small>{labels[item.relation.type]}</small>{item.direction === 'symmetric' ? '↔' : '→'}</span>
+    <span class="relationship-kind"><small>{metadata ? explainableLabels[metadata.relation] : labels[item.relation.type]}</small>{item.direction === 'symmetric' ? '↔' : '→'}</span>
     <span class="relationship-current">{currentIsSource ? item.other.label : conceptName}</span>
   </span>;
   const linkedSummary = <div class="relationship-summary">

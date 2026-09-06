@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { validateGraphElements } from '../src/data/graphRegistry.ts';
+import { getConceptRelations, validateGraphElements } from '../src/data/graphRegistry.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const graph = JSON.parse(readFileSync(`${root}data/relations/macro.json`, 'utf8'));
@@ -55,6 +55,8 @@ test('defines explainable metadata for the core macro chains', () => {
     assert.ok(relation.lag.trim().length > 0);
     assert.equal(typeof relation.explanation, 'string');
     assert.ok(relation.explanation.trim().length > 0);
+    assert.doesNotMatch(relation.lag, /[a-z]/, 'lag copy should be localized for the Chinese UI');
+    assert.doesNotMatch(relation.explanation, /[a-z]/, 'explanation copy should be localized for the Chinese UI');
     assert.equal(Object.hasOwn(relation, 'causal_effect'), false);
     assert.equal(Object.hasOwn(relation, 'impact_strength'), false);
     assert.equal(Object.hasOwn(relation, 'confidence_score'), false);
@@ -116,6 +118,20 @@ test('validates graph uniqueness, endpoints, and explainable field boundaries at
   );
 });
 
+test('prefers explainable metadata direction over legacy symmetric relation types', () => {
+  const activityRelations = getConceptRelations('macro', 'activity');
+  const m2Relation = activityRelations.find((item) => item.other.id === 'm2');
+  assert.equal(m2Relation?.direction, 'incoming');
+
+  const ppiRelations = getConceptRelations('macro', 'ppi');
+  const cpiRelation = ppiRelations.find((item) => item.other.id === 'cpi');
+  assert.equal(cpiRelation?.direction, 'outgoing');
+
+  const legacyRelations = getConceptRelations('macro', 'inflation-pressure');
+  const outputGapRelation = legacyRelations.find((item) => item.other.id === 'output-gap');
+  assert.equal(outputGapRelation?.direction, 'symmetric');
+});
+
 test('keeps the relationship explorer unlinked from the primary product shell', () => {
   const page = readSource(graphPage);
   const component = readSource(explorerComponent);
@@ -139,6 +155,7 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(cards, /lag/);
   assert.match(cards, /explanation/);
   assert.match(cards, /metadata\.relation/);
+  assert.match(cards, /metadata \? explainableLabels\[metadata\.relation\]/);
   assert.match(cards, /<dt>解释<\/dt>/);
   assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
   assert.match(cards, /relationship-detail-endpoints/);
