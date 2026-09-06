@@ -42,4 +42,3 @@
 - 增加关系卡片结构测试，验证 explainable relation 默认可见并呈现关系类型、lag、explanation 和现有概念链接；验证 legacy relation 不出现伪造的解释字段。
 - 验证概念页仍调用 `getConceptRelations` 并把关系数据传给 `RelationshipCards`，而不是在 Markdown 中复制关系说明。
 - 保留并运行全部现有测试，另外运行 `npm run check` 和 `npm run build` 验证 Astro 静态生成。
-

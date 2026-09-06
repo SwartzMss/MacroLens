@@ -24,7 +24,6 @@ test('exposes the relationship map from the primary navigation', () => {
   assert.match(layout, /<a href=["']\/graph["']>宏观关系<\/a>/);
 });
 ```
-
 - [ ] **Step 2: 增加首页关系地图入口测试**
 
 追加：
@@ -198,4 +197,3 @@ PR body：
 - [x] npm run build
 - [x] No new relationship dataset or inferred causal logic added
 ```
-
