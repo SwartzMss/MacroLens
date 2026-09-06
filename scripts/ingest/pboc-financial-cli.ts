@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { fetchText } from './fetch-text.ts';
+import { canonicalText } from './fetch/pboc-money-supply.ts';
 import {
   discoverPBOCCreditPublications,
   discoverPBOCSocialFinancingPublications,
@@ -69,26 +70,10 @@ function nextMonth(date: string): string {
   return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
-async function loadCreditReports(options: CliOptions, publications: MoneySupplyPublication[]): Promise<RawPBOCFinancialPublication[]> {
-  const reports: RawPBOCFinancialPublication[] = [];
-  for (const publication of publications) {
-    const html = options.fixtureDir
-      ? await fs.readFile(`${options.fixtureDir}/report-${publication.month}.html`, 'utf8')
-      : await fetchText(publication.url);
-    reports.push(parsePBOCCreditReport(publication, html));
-  }
-  return reports;
-}
-
-async function loadSocialFinancingReports(options: CliOptions, publications: MoneySupplyPublication[]): Promise<RawPBOCFinancialPublication[]> {
-  const reports: RawPBOCFinancialPublication[] = [];
-  for (const publication of publications) {
-    const html = options.fixtureDir
-      ? await fs.readFile(`${options.fixtureDir}/social-financing-${publication.month}.html`, 'utf8')
-      : await fetchText(publication.url);
-    reports.push(parsePBOCSocialFinancingReport(publication, html));
-  }
-  return reports;
+async function loadReportHtml(options: CliOptions, publication: MoneySupplyPublication, kind: 'money-supply' | 'social-financing'): Promise<string> {
+  return options.fixtureDir
+    ? fs.readFile(`${options.fixtureDir}/${kind === 'money-supply' ? 'report' : 'social-financing'}-${publication.month}.html`, 'utf8')
+    : fetchText(publication.url);
 }
 
 export async function runPBOCFinancial(args: string[] = process.argv.slice(2)): Promise<void> {
@@ -102,9 +87,31 @@ export async function runPBOCFinancial(args: string[] = process.argv.slice(2)): 
   }
   const indexHtml = await loadIndex(options);
   const creditPublications = selectPBOCFinancialPublications(discoverPBOCCreditPublications(indexHtml), latestMonth(existing.get('credit')!));
-  const socialPublications = selectPBOCFinancialPublications(discoverPBOCSocialFinancingPublications(indexHtml), latestMonth(existing.get('social-financing')!));
-  const creditReports = await loadCreditReports(options, creditPublications);
-  const socialReports = await loadSocialFinancingReports(options, socialPublications);
+  const creditReports: RawPBOCFinancialPublication[] = [];
+  const socialReports: RawPBOCFinancialPublication[] = [];
+  const missingSocialMonths: string[] = [];
+  for (const publication of creditPublications) {
+    const html = await loadReportHtml(options, publication, 'money-supply');
+    creditReports.push(parsePBOCCreditReport(publication, html));
+    try {
+      socialReports.push(parsePBOCSocialFinancingReport(publication, html));
+    } catch (error) {
+      if (!canonicalText(html).includes('社会融资规模存量')) {
+        missingSocialMonths.push(publication.month);
+      } else {
+        throw error;
+      }
+    }
+  }
+  if (missingSocialMonths.length > 0) {
+    const separateSocialPublications = discoverPBOCSocialFinancingPublications(indexHtml);
+    for (const month of missingSocialMonths) {
+      const publication = separateSocialPublications.find((candidate) => candidate.month === month);
+      if (!publication) throw new IngestionContractError(`No official PBOC social-financing publication covers ${month}`);
+      socialReports.push(parsePBOCSocialFinancingReport(publication, await loadReportHtml(options, publication, 'social-financing')));
+    }
+  }
+  socialReports.sort((left, right) => left.publication.month.localeCompare(right.publication.month));
   validatePBOCFinancialReportRange(creditReports);
   validatePBOCFinancialReportRange(socialReports);
   const normalized = new Map<PBOCFinancialDatasetId, IndicatorDataset>([

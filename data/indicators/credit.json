@@ -15,22 +15,16 @@
   "methodologyFingerprint": "pboc-credit|financial-institutions-rmb-loans|published-balance-yoy",
   "sources": [
     {
-      "title": "中国人民银行货币统计表（2024）",
-      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111416484293445.pdf",
+      "title": "中国人民银行金融机构人民币信贷收支表（2024）",
+      "url": "https://www.pbc.gov.cn/eportal/fileDir/diaochatongjisi/resource/cms/2025/01/2025011418044360290.pdf",
       "sourceDate": "2025-01-14",
       "coverage": "2024-01 to 2024-12"
     },
     {
-      "title": "中国人民银行货币统计表（2025）",
-      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535682666.pdf",
-      "sourceDate": "2025-11-19",
-      "coverage": "2025-01 to 2025-10"
-    },
-    {
-      "title": "中国人民银行：2025年11月金融统计数据报告",
-      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025121217132789688/index.html",
-      "sourceDate": "2025-12-12",
-      "coverage": "2025-11 to 2025-11"
+      "title": "中国人民银行金融机构人民币信贷收支表（2025）",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/12/2025121517273312027.pdf",
+      "sourceDate": "2025-12-15",
+      "coverage": "2025-01 to 2025-11"
     },
     {
       "title": "中国人民银行：2025年金融统计数据报告",
@@ -96,11 +90,11 @@
     },
     {
       "date": "2024-04",
-      "value": 9.3
+      "value": 9.6
     },
     {
       "date": "2024-05",
-      "value": 9
+      "value": 9.3
     },
     {
       "date": "2024-06",
@@ -120,7 +114,7 @@
     },
     {
       "date": "2024-10",
-      "value": 7.8
+      "value": 8
     },
     {
       "date": "2024-11",
@@ -136,11 +130,11 @@
     },
     {
       "date": "2025-02",
-      "value": 7.4
+      "value": 7.3
     },
     {
       "date": "2025-03",
-      "value": 7.3
+      "value": 7.4
     },
     {
       "date": "2025-04",
@@ -152,7 +146,7 @@
     },
     {
       "date": "2025-06",
-      "value": 7
+      "value": 7.1
     },
     {
       "date": "2025-07",
@@ -164,47 +158,47 @@
     },
     {
       "date": "2025-09",
-      "value": 6.8
+      "value": 6.6
     },
     {
       "date": "2025-10",
-      "value": 6.8
+      "value": 6.5
     },
     {
       "date": "2025-11",
-      "value": 6.8
+      "value": 6.4
     },
     {
       "date": "2025-12",
-      "value": 6.7
+      "value": 6.4
     },
     {
       "date": "2026-01",
-      "value": 6.7
+      "value": 6.1
     },
     {
       "date": "2026-02",
-      "value": 6.7
+      "value": 6
     },
     {
       "date": "2026-03",
-      "value": 6.6
+      "value": 5.7
     },
     {
       "date": "2026-04",
-      "value": 6.6
+      "value": 5.6
     },
     {
       "date": "2026-05",
-      "value": 6.5
+      "value": 5.5
     },
     {
       "date": "2026-06",
-      "value": 6.5
+      "value": 5.2
     },
     {
       "date": "2026-07",
-      "value": 6.4
+      "value": 5.1
     }
   ]
 }

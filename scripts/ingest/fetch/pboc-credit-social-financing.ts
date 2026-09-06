@@ -7,16 +7,19 @@ import {
 
 export { discoverPBOCFinancialStatisticsPublications } from './pboc-money-supply.ts';
 
-const CREDIT_MARKER = '金融机构人民币各项贷款余额';
+const CREDIT_MARKERS = ['金融机构人民币各项贷款余额', '月末人民币贷款余额'] as const;
 const SOCIAL_FINANCING_MARKER = '社会融资规模存量';
 
 function validatedFingerprint(id: 'credit', canonical: string): typeof PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS.credit;
 function validatedFingerprint(id: 'social-financing', canonical: string): typeof PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS['social-financing'];
 function validatedFingerprint(id: PBOCFinancialDatasetId, canonical: string): string {
   const anchors = id === 'credit'
-    ? [`${CREDIT_MARKER}为`, '同比']
+    ? ['同比']
     : [`${SOCIAL_FINANCING_MARKER}为`, '同比'];
   if (!anchors.every((anchor) => canonical.includes(anchor))) {
+    throw new MethodologyMismatchError(`PBOC ${id} methodology or scope anchors are missing or changed`);
+  }
+  if (id === 'credit' && !CREDIT_MARKERS.some((marker) => canonical.includes(marker))) {
     throw new MethodologyMismatchError(`PBOC ${id} methodology or scope anchors are missing or changed`);
   }
   return PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS[id];
@@ -34,9 +37,12 @@ export function discoverPBOCSocialFinancingPublications(indexHtml: string): Mone
     .map(({ kind: _kind, ...publication }) => publication);
 }
 
-function parseSignedGrowth(text: string, label: string, suffixPattern: string): number {
-  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const matches = [...text.matchAll(new RegExp(`${escapedLabel}${suffixPattern}[^。；]*?同比(增长|下降)([^%。；]+)%`, 'g'))];
+function parseSignedGrowth(text: string, labels: readonly string[], suffixPattern: string): number {
+  const matches = labels.flatMap((label) => {
+    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return [...text.matchAll(new RegExp(`${escapedLabel}${suffixPattern}[^。；]*?同比(增长|下降)([^%。；]+)%`, 'g'))];
+  });
+  const label = labels.join('/');
   if (matches.length === 0) throw new IngestionContractError(`Missing ${label} YoY growth value`);
   if (matches.length > 1) throw new IngestionContractError(`Duplicate ${label} YoY growth value`);
   const numericText = matches[0][2].trim();
@@ -53,16 +59,16 @@ export function parsePBOCCreditReport(
   if (!publication.title.endsWith('金融统计数据报告')) {
     throw new IngestionContractError(`Credit must use a PBOC financial-statistics report: ${publication.title}`);
   }
-  if (!canonical.includes(CREDIT_MARKER)) {
+  if (!CREDIT_MARKERS.some((marker) => canonical.includes(marker))) {
     throw new MethodologyMismatchError('PBOC credit scope marker is missing or changed');
   }
-  if (!new RegExp(`${CREDIT_MARKER}(?:为|是)`).test(canonical)) {
+  if (!CREDIT_MARKERS.some((marker) => new RegExp(`${marker}(?:为|是|(?=\\d))`).test(canonical))) {
     throw new MethodologyMismatchError('PBOC credit scope marker is missing or changed');
   }
   const methodologyFingerprint = validatedFingerprint('credit', canonical);
   return {
     publication,
-    values: { credit: parseSignedGrowth(canonical, CREDIT_MARKER, '') },
+    values: { credit: parseSignedGrowth(canonical, CREDIT_MARKERS, '') },
     methodologyFingerprints: { ...PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS, credit: methodologyFingerprint },
   };
 }
@@ -72,8 +78,8 @@ export function parsePBOCSocialFinancingReport(
   html: string,
 ): RawPBOCFinancialPublication {
   const canonical = validatePBOCReportPage(publication, html);
-  if (!publication.title.endsWith('社会融资规模存量统计数据报告')) {
-    throw new IngestionContractError(`Social-financing must use a stock publication: ${publication.title}`);
+  if (!publication.title.endsWith('社会融资规模存量统计数据报告') && !publication.title.endsWith('金融统计数据报告')) {
+    throw new IngestionContractError(`Social-financing must use a PBOC financial-statistics or stock report: ${publication.title}`);
   }
   if (!canonical.includes(SOCIAL_FINANCING_MARKER)) {
     throw new MethodologyMismatchError('PBOC social-financing stock marker is missing or changed');
@@ -84,7 +90,7 @@ export function parsePBOCSocialFinancingReport(
   const methodologyFingerprint = validatedFingerprint('social-financing', canonical);
   return {
     publication,
-    values: { 'social-financing': parseSignedGrowth(canonical, SOCIAL_FINANCING_MARKER, '[^同比]*?') },
+    values: { 'social-financing': parseSignedGrowth(canonical, [SOCIAL_FINANCING_MARKER], '(?:为|是)[^同比]*?') },
     methodologyFingerprints: { ...PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS, 'social-financing': methodologyFingerprint },
   };
 }

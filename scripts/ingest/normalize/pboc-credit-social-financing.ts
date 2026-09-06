@@ -27,7 +27,8 @@ export function normalizePBOCFinancialDataset(
   const existingLatestMonth = existing.data.at(-1)?.date;
   if (!existingLatestMonth) throw new IngestionContractError(`Existing ${id} dataset contains no observations`);
   for (const report of rawReports) {
-    if (report.publication.month > existingLatestMonth && report.publication.sourceDate < existing.updatedAt) {
+    const sourceAlreadyCoversReport = existing.sources.some((source) => source.coverage.split(' to ')[1] >= report.publication.month);
+    if (report.publication.month > existingLatestMonth && report.publication.sourceDate < existing.updatedAt && !sourceAlreadyCoversReport) {
       throw new IngestionContractError(`Fetched PBOC publication is older than existing updatedAt: ${report.publication.sourceDate} < ${existing.updatedAt}`);
     }
   }

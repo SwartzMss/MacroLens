@@ -30,7 +30,7 @@ test('indicator detail provides structured user-facing metadata', () => {
   assert.doesNotMatch(source, /IndicatorDataset/);
   assert.doesNotMatch(source, /getIndicatorPresentation/);
   assert.match(source, /presentation\.comparisonMethod/);
-  assert.match(page, /!indicator.*entry\.data\.source/);
+  assert.match(page, /来源：\{entry\.data\.source\}/);
   assert.match(source, /<details/);
   assert.match(source, /来源详情/);
   assert.match(source, /MacroLens 于/);
