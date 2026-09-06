@@ -6,14 +6,70 @@
   "metric": "yoy",
   "label": "海关货物贸易进口金额同比增速",
   "chartTitle": "海关货物贸易进口金额同比增速",
-  "definitionEffectiveFrom": "2026-02",
+  "definitionEffectiveFrom": "2025-05",
   "definitionAsOf": "2026-08",
   "source": "GACC",
   "calculation": "published",
   "updatedAt": "2026-08-10",
-  "comparabilityNote": "这是海关总署按人民币计价发布的全国货物贸易进口金额月度同比增速，采用海关货物贸易统计口径，不是国际收支货物或服务进口，也不是美元口径、累计同比、进口数量或价格指数。2026年1—2月官方联合发布只提供累计同比，因此不把累计值拆成1月或2月；本历史序列从首个可识别的官方单月表2026年2月开始。若官方发布口径、币种或估价发生变化，应停止自动拼接并更新方法指纹。",
+  "comparabilityNote": "这是海关总署按人民币计价发布的全国货物贸易进口金额月度同比增速，采用海关货物贸易统计口径，不是国际收支货物或服务进口，也不是美元口径、累计同比、进口数量或价格指数。本次历史回溯从档案中首个可可靠识别的官方单月表2025年5月开始；2026年1—2月官方联合发布没有可用于单独识别1月的月度值，因此不把累计值拆成1月，2026年1月保留为空档并由2026年2月单月表接续。若官方发布口径、币种或估价发生变化，应停止自动拼接并更新方法指纹。",
   "methodologyFingerprint": "gacc-customs-goods-trade|rmb-value|monthly-published-yoy|national-total",
   "sources": [
+    {
+      "title": "海关总署：China's Total Export & Import Values, May 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/e1de19e3-750c-45a6-a222-6e356fa46a3c.html",
+      "sourceDate": "2025-06-10",
+      "coverage": "2025-05 to 2025-05",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Jun 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/970cabda-038f-4593-9697-16b0f3e52b55.html",
+      "sourceDate": "2025-07-15",
+      "coverage": "2025-06 to 2025-06",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Jul 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/04c99c26-a301-4272-a837-b8813fdea4a3.html",
+      "sourceDate": "2025-08-14",
+      "coverage": "2025-07 to 2025-07",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：2025年8月全国进出口总值表（人民币值）",
+      "url": "https://www.customs.gov.cn/Statics/444ba1b6-a96e-450e-b959-c6235ef0a3ff.html",
+      "sourceDate": "2025-10-09",
+      "coverage": "2025-08 to 2025-08",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Sep 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/baa07430-167f-40ed-a8f3-139c9e4b117c.html",
+      "sourceDate": "2025-10-29",
+      "coverage": "2025-09 to 2025-09",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Oct 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/e804db10-2816-45da-84f7-c8a002c84622.html",
+      "sourceDate": "2025-12-01",
+      "coverage": "2025-10 to 2025-10",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Nov 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/5b47c0fa-d9e3-4311-8b76-a588fdc74975.html",
+      "sourceDate": "2025-12-15",
+      "coverage": "2025-11 to 2025-11",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Dec 2025 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/0c8b6f31-ce9c-40d7-88cb-e7dbcb381c33.html",
+      "sourceDate": "2026-01-22",
+      "coverage": "2025-12 to 2025-12",
+      "role": "data"
+    },
     {
       "title": "海关总署：China's Total Export & Import Values, Feb 2026 (in CNY)",
       "url": "https://english.customs.gov.cn/Statics/d11e30df-faa3-4a4d-9816-bada832cafe8.html",
@@ -58,6 +114,38 @@
     }
   ],
   "data": [
+    {
+      "date": "2025-05",
+      "value": -2.1
+    },
+    {
+      "date": "2025-06",
+      "value": 2.3
+    },
+    {
+      "date": "2025-07",
+      "value": 4.8
+    },
+    {
+      "date": "2025-08",
+      "value": 1.7
+    },
+    {
+      "date": "2025-09",
+      "value": 7.5
+    },
+    {
+      "date": "2025-10",
+      "value": 1.4
+    },
+    {
+      "date": "2025-11",
+      "value": 1.7
+    },
+    {
+      "date": "2025-12",
+      "value": 4.4
+    },
     {
       "date": "2026-02",
       "value": 10.9

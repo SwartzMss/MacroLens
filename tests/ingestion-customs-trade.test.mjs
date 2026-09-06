@@ -180,6 +180,26 @@ test('validates dataset identity, official provenance, source coverage, and cont
   assert.throws(() => validateCustomsTradeDataset({ ...exports, comparabilityNote: '官方月度同比。' }, 'exports'), /goods trade/);
 });
 
+test('checked-in Customs history is aligned, sourced, and leaves January 2026 explicit', () => {
+  const expectedDates = [
+    '2025-05', '2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12',
+    '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07',
+  ];
+  const expectedValues = {
+    exports: [6.3, 7.2, 8, 4.8, 8.4, -0.8, 5.7, 5.2, 36.1, -0.7, 9.8, 13.8, 20.8, 17.8],
+    imports: [-2.1, 2.3, 4.8, 1.7, 7.5, 1.4, 1.7, 4.4, 10.9, 23.8, 20.6, 21.5, 29.4, 21.2],
+  };
+  for (const id of ['exports', 'imports']) {
+    const checkedIn = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
+    assert.doesNotThrow(() => validateCustomsTradeDataset(checkedIn, id));
+    assert.deepEqual(checkedIn.data.map(({ date }) => date), expectedDates);
+    assert.deepEqual(checkedIn.data.map(({ value }) => value), expectedValues[id]);
+    assert.equal(checkedIn.data.some(({ date }) => date === '2026-01'), false);
+    assert.equal(checkedIn.sources.length, expectedDates.length);
+    assert.ok(checkedIn.sources.every(({ url }) => /^https:\/\/(?:[a-z0-9-]+\.)*customs\.gov\.cn\//.test(url)));
+  }
+});
+
 test('normalizes both directions, preserves provenance, protects overlap, and is idempotent', () => {
   const raw = parseCustomsTradePublication(publication, publicationHtml);
   const normalized = normalizeCustomsTradeDataset(raw, dataset('exports'), 'exports');

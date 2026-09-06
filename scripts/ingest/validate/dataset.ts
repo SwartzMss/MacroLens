@@ -20,13 +20,18 @@ export function nextMonth(date: string): string {
   return month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
-export function validateMonthlyObservations(observations: Observation[], label: string): void {
+export function validateMonthlyObservations(
+  observations: Observation[],
+  label: string,
+  allowedGaps: ReadonlySet<string> = new Set(),
+): void {
   if (!Array.isArray(observations) || observations.length === 0) fail(`${label} dataset requires observations`);
   let previousDate = '';
   for (const observation of observations) {
     if (!DATE_PATTERN.test(observation.date)) fail(`Invalid ${label} observation date: ${observation.date}`);
     if (observation.date <= previousDate) fail(`${label} observations must be sorted and unique: ${observation.date}`);
-    if (previousDate && nextMonth(previousDate) !== observation.date) {
+    const gap = `${previousDate} -> ${observation.date}`;
+    if (previousDate && nextMonth(previousDate) !== observation.date && !allowedGaps.has(gap)) {
       fail(`${label} observations must be continuous: ${previousDate} -> ${observation.date}`);
     }
     if (!Number.isFinite(observation.value)) fail(`Invalid ${label} observation value: ${observation.date}=${observation.value}`);
