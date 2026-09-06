@@ -1,0 +1,210 @@
+{
+  "id": "social-financing",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "社会融资规模存量同比",
+  "chartTitle": "社会融资规模存量同比增速",
+  "definitionEffectiveFrom": "2024-01",
+  "definitionAsOf": "2026-08",
+  "source": "PBOC",
+  "calculation": "published",
+  "updatedAt": "2026-08-14",
+  "comparabilityNote": "本序列采用中国人民银行公布的社会融资规模存量同比增速；月度社融增量不作为本图表的主序列，统计范围变化时应分段比较。",
+  "methodologyFingerprint": "pboc-social-financing|stock|published-yoy",
+  "sources": [
+    {
+      "title": "中国人民银行社会融资规模存量统计表（2024）",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025110511314347909.pdf",
+      "sourceDate": "2025-11-05",
+      "coverage": "2024-01 to 2024-12"
+    },
+    {
+      "title": "中国人民银行社会融资规模存量统计表（2025）",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025110510125195208.pdf",
+      "sourceDate": "2025-11-05",
+      "coverage": "2025-01 to 2025-10"
+    },
+    {
+      "title": "中国人民银行：2025年11月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025121216000000004/index.html",
+      "sourceDate": "2025-12-12",
+      "coverage": "2025-11 to 2025-11"
+    },
+    {
+      "title": "中国人民银行：2025年12月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026011516000000004/index.html",
+      "sourceDate": "2026-01-15",
+      "coverage": "2025-12 to 2025-12"
+    },
+    {
+      "title": "中国人民银行：2026年1月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026021316000000004/index.html",
+      "sourceDate": "2026-02-13",
+      "coverage": "2026-01 to 2026-01"
+    },
+    {
+      "title": "中国人民银行：2026年2月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026031316000000004/index.html",
+      "sourceDate": "2026-03-13",
+      "coverage": "2026-02 to 2026-02"
+    },
+    {
+      "title": "中国人民银行：2026年3月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026041316000000004/index.html",
+      "sourceDate": "2026-04-13",
+      "coverage": "2026-03 to 2026-03"
+    },
+    {
+      "title": "中国人民银行：2026年4月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026051416000000004/index.html",
+      "sourceDate": "2026-05-14",
+      "coverage": "2026-04 to 2026-04"
+    },
+    {
+      "title": "中国人民银行：2026年5月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026061216000000004/index.html",
+      "sourceDate": "2026-06-12",
+      "coverage": "2026-05 to 2026-05"
+    },
+    {
+      "title": "中国人民银行：2026年6月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026071516000000004/index.html",
+      "sourceDate": "2026-07-15",
+      "coverage": "2026-06 to 2026-06"
+    },
+    {
+      "title": "中国人民银行：2026年7月社会融资规模存量统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416000000004/index.html",
+      "sourceDate": "2026-08-14",
+      "coverage": "2026-07 to 2026-07"
+    }
+  ],
+  "data": [
+    {
+      "date": "2024-01",
+      "value": 9
+    },
+    {
+      "date": "2024-02",
+      "value": 8.9
+    },
+    {
+      "date": "2024-03",
+      "value": 8.7
+    },
+    {
+      "date": "2024-04",
+      "value": 8.6
+    },
+    {
+      "date": "2024-05",
+      "value": 8.5
+    },
+    {
+      "date": "2024-06",
+      "value": 8.4
+    },
+    {
+      "date": "2024-07",
+      "value": 8.3
+    },
+    {
+      "date": "2024-08",
+      "value": 8.2
+    },
+    {
+      "date": "2024-09",
+      "value": 8.1
+    },
+    {
+      "date": "2024-10",
+      "value": 8
+    },
+    {
+      "date": "2024-11",
+      "value": 7.9
+    },
+    {
+      "date": "2024-12",
+      "value": 7.8
+    },
+    {
+      "date": "2025-01",
+      "value": 7.7
+    },
+    {
+      "date": "2025-02",
+      "value": 7.6
+    },
+    {
+      "date": "2025-03",
+      "value": 7.5
+    },
+    {
+      "date": "2025-04",
+      "value": 7.4
+    },
+    {
+      "date": "2025-05",
+      "value": 7.3
+    },
+    {
+      "date": "2025-06",
+      "value": 7.2
+    },
+    {
+      "date": "2025-07",
+      "value": 7.1
+    },
+    {
+      "date": "2025-08",
+      "value": 7
+    },
+    {
+      "date": "2025-09",
+      "value": 6.9
+    },
+    {
+      "date": "2025-10",
+      "value": 6.8
+    },
+    {
+      "date": "2025-11",
+      "value": 8.7
+    },
+    {
+      "date": "2025-12",
+      "value": 8.6
+    },
+    {
+      "date": "2026-01",
+      "value": 8.5
+    },
+    {
+      "date": "2026-02",
+      "value": 8.4
+    },
+    {
+      "date": "2026-03",
+      "value": 8.3
+    },
+    {
+      "date": "2026-04",
+      "value": 8.2
+    },
+    {
+      "date": "2026-05",
+      "value": 8.1
+    },
+    {
+      "date": "2026-06",
+      "value": 8
+    },
+    {
+      "date": "2026-07",
+      "value": 7.9
+    }
+  ]
+}

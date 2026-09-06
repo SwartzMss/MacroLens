@@ -119,12 +119,24 @@ export type MoneySupplyPublication = {
   month: string;
 };
 
+export type PBOCFinancialPublication = MoneySupplyPublication & {
+  kind: 'money-supply' | 'social-financing';
+};
+
 export type MoneySupplyValues = { m0: number; m1: number; m2: number };
 
 export type RawMoneySupplyPublication = {
   publication: MoneySupplyPublication;
   values: MoneySupplyValues;
   methodologyFingerprints: typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
+};
+
+export type PBOCFinancialDatasetId = 'credit' | 'social-financing';
+export type PBOCFinancialValues = Record<PBOCFinancialDatasetId, number>;
+export type RawPBOCFinancialPublication = {
+  publication: MoneySupplyPublication;
+  values: Partial<PBOCFinancialValues>;
+  methodologyFingerprints: typeof PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS;
 };
 
 export type RealEconomyDatasetId = 'gdp' | 'industrial-production' | 'retail-sales' | 'fixed-asset-investment';
@@ -263,3 +275,8 @@ export const MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS = {
 } as const;
 
 export type MoneySupplyDatasetId = keyof typeof MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS;
+
+export const PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS = {
+  credit: 'pboc-credit|financial-institutions-rmb-loans|published-balance-yoy',
+  'social-financing': 'pboc-social-financing|stock|published-yoy',
+} as const;

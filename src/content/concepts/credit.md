@@ -5,6 +5,7 @@ subtitle: 银行把资金配置给谁、期限多长，以及需求是否愿意�
 country: CN
 category: credit
 source: 中国人民银行
+chart: credit
 definition:
   source: 中国人民银行金融统计制度
   asOf: 2025-08

@@ -5,6 +5,7 @@ subtitle: 从实体经济一侧观察，它从金融体系获得了多少资金
 country: CN
 category: credit
 source: 中国人民银行
+chart: social-financing
 definition:
   source: 中国人民银行
   asOf: 2025-08

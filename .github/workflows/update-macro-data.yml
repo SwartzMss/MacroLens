@@ -34,6 +34,9 @@ jobs:
       - name: Fetch and validate PBOC money supply
         run: npm run ingest:pboc-money-supply -- --target-dir data/indicators
 
+      - name: Fetch and validate PBOC credit and social financing
+        run: npm run ingest:pboc-financial -- --target-dir data/indicators
+
       - name: Fetch and validate NBS real-economy indicators
         run: npm run ingest:nbs-real-economy -- --target-dir data/indicators
 
@@ -49,6 +52,8 @@ jobs:
             data/indicators/m0.json
             data/indicators/m1.json
             data/indicators/m2.json
+            data/indicators/credit.json
+            data/indicators/social-financing.json
             data/indicators/gdp.json
             data/indicators/industrial-production.json
             data/indicators/retail-sales.json
