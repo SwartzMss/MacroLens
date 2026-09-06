@@ -15,7 +15,7 @@
 **Files:**
 - Modify: `tests/relationship-graph.test.mjs`
 
-- [ ] **Step 1: 增加导航入口测试**
+- [x] **Step 1: 增加导航入口测试**
 
 追加：
 
@@ -24,7 +24,7 @@ test('exposes the relationship map from the primary navigation', () => {
   assert.match(layout, /<a href=["']\/graph["']>宏观关系<\/a>/);
 });
 ```
-- [ ] **Step 2: 增加首页关系地图入口测试**
+- [x] **Step 2: 增加首页关系地图入口测试**
 
 追加：
 
@@ -36,7 +36,7 @@ test('makes the relationship map discoverable from the homepage', () => {
 });
 ```
 
-- [ ] **Step 3: 增加概念页复用关系模型测试**
+- [x] **Step 3: 增加概念页复用关系模型测试**
 
 追加：
 
@@ -53,7 +53,7 @@ test('concept pages reuse canonical relationship metadata', () => {
 });
 ```
 
-- [ ] **Step 4: 增加旧关系不伪造语义的测试**
+- [x] **Step 4: 增加旧关系不伪造语义的测试**
 
 追加：
 
@@ -65,7 +65,7 @@ test('keeps legacy relationships lightweight without fabricated semantics', () =
 });
 ```
 
-- [ ] **Step 5: 运行 focused test，确认新契约失败**
+- [x] **Step 5: 运行 focused test，确认新契约失败**
 
 运行 `node --import tsx --test tests/relationship-graph.test.mjs`。预期现有关系模型测试通过，导航和首页入口测试因当前没有 `/graph` 产品入口而失败。
 
@@ -75,11 +75,11 @@ test('keeps legacy relationships lightweight without fabricated semantics', () =
 - Modify: `src/layouts/BaseLayout.astro`
 - Modify: `src/pages/index.astro`
 
-- [ ] **Step 1: 在主导航加入宏观关系链接**
+- [x] **Step 1: 在主导航加入宏观关系链接**
 
 在“主题”和“搜索”之间加入 `<a href="/graph">宏观关系</a>`，保持现有导航顺序、静态链接和 sticky header 行为。
 
-- [ ] **Step 2: 在首页加入产品入口卡**
+- [x] **Step 2: 在首页加入产品入口卡**
 
 在 `MacroSnapshot` 后加入：
 
@@ -100,15 +100,15 @@ test('keeps legacy relationships lightweight without fabricated semantics', () =
 </section>
 ```
 
-- [ ] **Step 3: 添加响应式入口卡样式**
+- [x] **Step 3: 添加响应式入口卡样式**
 
 复用 `--card`、`--line`、`--green`、`--muted` 增加卡片、hover、focus-visible 和小屏布局样式，不引入脚本。
 
-- [ ] **Step 4: 运行 focused test，确认入口 GREEN**
+- [x] **Step 4: 运行 focused test，确认入口 GREEN**
 
 运行 `node --import tsx --test tests/relationship-graph.test.mjs`，确认导航和首页入口测试通过。
 
-- [ ] **Step 5: Commit 入口变更**
+- [x] **Step 5: Commit 入口变更**
 
 ```bash
 git add src/layouts/BaseLayout.astro src/pages/index.astro tests/relationship-graph.test.mjs
@@ -122,27 +122,27 @@ git commit -m "feat: expose macro relationship map entry points"
 - Modify: `src/components/RelationshipExplorer.astro`
 - Modify: `src/pages/graph.astro`
 
-- [ ] **Step 1: 让解释性关系详情默认展开**
+- [x] **Step 1: 让解释性关系详情默认展开**
 
 将 explainable 分支的 `<details>` 改为带 `open` 属性的详情卡，保留现有 `summary`、来源/目标、关系类型、时间关系和解释，让概念页首次加载即可阅读语义。
 
-- [ ] **Step 2: 保持链接、方向和旧关系分支**
+- [x] **Step 2: 保持链接、方向和旧关系分支**
 
 继续使用 `currentIsSource` 和 `item.direction` 渲染端点、箭头与对称关系；保留真实概念的 `/concepts/<id>` 链接和抽象节点的“图谱概念”标签。没有 metadata 时继续渲染 `linkedSummary` 的轻量 `<div>`，不提供默认 `lag` 或解释。
 
-- [ ] **Step 3: 移除主 UI 中的内部关系枚举**
+- [x] **Step 3: 移除主 UI 中的内部关系枚举**
 
 保留中文 `explainableLabels` 映射，只显示“领先指标”“同步指标”“传导环节”等用户语言；删除 `metadata.relation` 的 `<code>` 输出，避免暴露 `leading_indicator` 等内部 schema。
 
-- [ ] **Step 4: 调整关系浏览器说明**
+- [x] **Step 4: 调整关系浏览器说明**
 
 将 `RelationshipExplorer` controls 文案和 `/graph` 页面说明改成正常中文，明确可阅读关系类型、时间关系和解释；保留手工维护、非确定因果和静态浏览边界，不增加实时推断。
 
-- [ ] **Step 5: 运行 focused test，确认关系 UI GREEN**
+- [x] **Step 5: 运行 focused test，确认关系 UI GREEN**
 
 运行 `node --import tsx --test tests/relationship-graph.test.mjs`，确认关系方向、metadata、页面结构和入口测试全部通过。
 
-- [ ] **Step 6: Commit 关系页面变更**
+- [x] **Step 6: Commit 关系页面变更**
 
 ```bash
 git add src/components/RelationshipCards.astro src/components/RelationshipExplorer.astro src/pages/graph.astro tests/relationship-graph.test.mjs
@@ -154,27 +154,27 @@ git commit -m "feat: productize explainable relations on concept pages"
 **Files:**
 - Verify: `src/layouts/BaseLayout.astro`, `src/pages/index.astro`, `src/components/RelationshipCards.astro`, `src/components/RelationshipExplorer.astro`, `src/pages/graph.astro`, `tests/relationship-graph.test.mjs`
 
-- [ ] **Step 1: 运行完整测试**
+- [x] **Step 1: 运行完整测试**
 
 运行 `npm test`，预期全部测试通过、0 failures。
 
-- [ ] **Step 2: 运行 Astro 检查**
+- [x] **Step 2: 运行 Astro 检查**
 
 运行 `npm run check`，预期退出码为 0。
 
-- [ ] **Step 3: 运行静态构建**
+- [x] **Step 3: 运行静态构建**
 
 运行 `npm run build`，预期静态站点构建成功、`dist/graph/index.html` 生成且 Pagefind 索引完成。
 
-- [ ] **Step 4: 检查变更边界**
+- [x] **Step 4: 检查变更边界**
 
 运行 `git diff --check origin/main...HEAD`、`git diff --stat origin/main...HEAD` 和 `git status --short --branch`；预期只包含 #95 的设计、导航、首页入口、关系卡片/说明和测试，不新增第二套关系数据或关系路由。
 
-- [ ] **Step 5: 请求代码审查**
+- [x] **Step 5: 请求代码审查**
 
 以 `origin/main` 为 base、当前功能头提交为 head，检查导航发现性、概念页静态渲染、方向/对称性、旧关系兼容性、可访问性和内部 schema 是否泄露；修复 Critical/Important 问题后再创建 PR。
 
-- [ ] **Step 6: 推送并创建 PR**
+- [x] **Step 6: 推送并创建 PR**
 
 ```bash
 git push -u origin codex/issue-95-macro-relationship

@@ -156,7 +156,7 @@ test('keeps relationship metadata aligned with its source and target edge', () =
   assert.match(policyRate?.explanation ?? '', /设定或调整政策利率/);
 });
 
-test('keeps the relationship explorer unlinked from the primary product shell', () => {
+test('keeps the relationship explorer discoverable from the primary product shell', () => {
   const page = readSource(graphPage);
   const component = readSource(explorerComponent);
   const cards = readSource(relationshipCards);
