@@ -16,12 +16,20 @@ type Context = {
 
 export async function onRequest({ request, env, next }: Context): Promise<Response> {
   const response = await next();
-  if (!isEligibleVisitorRequest(request, response) || !env.ANALYTICS) return response;
+  if (!isEligibleVisitorRequest(request, response)) return response;
 
   try {
     const existingId = parseVisitorCookie(request);
     const visitorId = existingId ?? createVisitorId();
-    env.ANALYTICS.writeDataPoint(visitorDataPoint(visitorId, getShanghaiDate()));
+
+    if (env.ANALYTICS) {
+      try {
+        env.ANALYTICS.writeDataPoint(visitorDataPoint(visitorId, getShanghaiDate()));
+      } catch {
+        // Analytics is optional and must not prevent the visitor identity from being set.
+      }
+    }
+
     if (existingId) return response;
 
     const headers = new Headers(response.headers);
