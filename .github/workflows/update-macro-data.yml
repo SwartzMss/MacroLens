@@ -1,7 +1,7 @@
 name: Update macro data
 
-# The ingestion CLIs fetch official NBS (stats.gov.cn) and PBOC (pbc.gov.cn)
-# publication sources.
+# The ingestion CLIs fetch official NBS (stats.gov.cn), PBOC (pbc.gov.cn), and
+# GACC (customs.gov.cn) publication sources.
 
 on:
   workflow_dispatch:
@@ -46,6 +46,9 @@ jobs:
       - name: Fetch and validate NBS price indicators
         run: npm run ingest:nbs-prices -- --target-dir data/indicators
 
+      - name: Fetch and validate official GACC customs trade
+        run: npm run ingest:customs-trade -- --target-dir data/indicators
+
       - name: Open macro data update pull request
         uses: peter-evans/create-pull-request@v8
         with:
@@ -66,6 +69,8 @@ jobs:
             data/indicators/cpi.json
             data/indicators/core-cpi.json
             data/indicators/ppi.json
+            data/indicators/exports.json
+            data/indicators/imports.json
           branch: automation/update-macro-data
           delete-branch: true
           commit-message: 'data: update macro indicators'

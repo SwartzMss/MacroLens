@@ -12,6 +12,7 @@
     "ingest:pboc-financial": "node --import tsx scripts/ingest/pboc-financial-cli.ts",
     "ingest:nbs-real-economy": "node --import tsx scripts/ingest/real-economy-cli.ts",
     "ingest:nbs-prices": "node --import tsx scripts/ingest/price-cli.ts",
+    "ingest:customs-trade": "node --import tsx scripts/ingest/customs-trade-cli.ts",
     "ingest:lpr": "node --import tsx scripts/ingest/lpr-cli.ts",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",

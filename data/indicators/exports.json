@@ -1,0 +1,86 @@
+{
+  "id": "exports",
+  "country": "CN",
+  "frequency": "monthly",
+  "unit": "%",
+  "metric": "yoy",
+  "label": "海关货物贸易出口金额同比增速",
+  "chartTitle": "海关货物贸易出口金额同比增速",
+  "definitionEffectiveFrom": "2026-02",
+  "definitionAsOf": "2026-08",
+  "source": "GACC",
+  "calculation": "published",
+  "updatedAt": "2026-08-10",
+  "comparabilityNote": "这是海关总署按人民币计价发布的全国货物贸易出口金额月度同比增速，采用海关货物贸易统计口径，不是国际收支货物或服务出口，也不是美元口径、累计同比、出口数量或价格指数。2026年1—2月官方联合发布只提供累计同比，因此不把累计值拆成1月或2月；本历史序列从首个可识别的官方单月表2026年2月开始。若官方发布口径、币种或估价发生变化，应停止自动拼接并更新方法指纹。",
+  "methodologyFingerprint": "gacc-customs-goods-trade|rmb-value|monthly-published-yoy|national-total",
+  "sources": [
+    {
+      "title": "海关总署：China's Total Export & Import Values, Feb 2026 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/d11e30df-faa3-4a4d-9816-bada832cafe8.html",
+      "sourceDate": "2026-03-08",
+      "coverage": "2026-02 to 2026-02",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Mar 2026 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/78463b33-7b5e-4e29-aee5-c65e42a69727.html",
+      "sourceDate": "2026-04-08",
+      "coverage": "2026-03 to 2026-03",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Apr 2026 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/d90956e5-f66c-46b5-80d7-a62e5097a073.html",
+      "sourceDate": "2026-05-08",
+      "coverage": "2026-04 to 2026-04",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, May 2026 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/135af06e-2fd2-4ee9-8f7c-3978077e90a1.html",
+      "sourceDate": "2026-06-10",
+      "coverage": "2026-05 to 2026-05",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：China's Total Export & Import Values, Jun 2026 (in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/142befa2-8638-4657-89d1-40209514b007.html",
+      "sourceDate": "2026-07-15",
+      "coverage": "2026-06 to 2026-06",
+      "role": "data"
+    },
+    {
+      "title": "海关总署：(1) China's Total Export & Import Values, Jul 2026(in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/5c578c33-7560-476b-a6af-9431fb3d41aa.html",
+      "sourceDate": "2026-08-10",
+      "coverage": "2026-07 to 2026-07",
+      "role": "data"
+    }
+  ],
+  "data": [
+    {
+      "date": "2026-02",
+      "value": 36.1
+    },
+    {
+      "date": "2026-03",
+      "value": -0.7
+    },
+    {
+      "date": "2026-04",
+      "value": 9.8
+    },
+    {
+      "date": "2026-05",
+      "value": 13.8
+    },
+    {
+      "date": "2026-06",
+      "value": 20.8
+    },
+    {
+      "date": "2026-07",
+      "value": 17.8
+    }
+  ]
+}
