@@ -109,7 +109,12 @@ test('returns unavailable for missing credentials, upstream failure, and invalid
   const missing = await onStatsRequest({
     request: new Request('https://macrolens.example/api/visitor-stats'), env: {},
   });
-  assert.deepEqual(await missing.json(), { available: false });
+  assert.deepEqual(await missing.json(), {
+    available: false,
+    error: 'missing credentials',
+    accountId: false,
+    apiToken: false,
+  });
   const originalFetch = globalThis.fetch;
   try {
     globalThis.fetch = async () => new Response('failure', { status: 500 });
@@ -117,13 +122,13 @@ test('returns unavailable for missing credentials, upstream failure, and invalid
       request: new Request('https://macrolens.example/api/visitor-stats'),
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
     });
-    assert.deepEqual(await failed.json(), { available: false });
+    assert.deepEqual(await failed.json(), { available: false, error: 'Error: Cloudflare API 500: failure' });
     globalThis.fetch = async () => Response.json({ data: [{ total: '-1', today: '0' }] });
     const malformed = await onStatsRequest({
       request: new Request('https://macrolens.example/api/visitor-stats'),
       env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
     });
-    assert.deepEqual(await malformed.json(), { available: false });
+    assert.deepEqual(await malformed.json(), { available: false, error: 'invalid analytics response' });
   } finally {
     globalThis.fetch = originalFetch;
   }

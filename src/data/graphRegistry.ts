@@ -7,14 +7,44 @@ export const relationTypes = [
 
 export type RelationType = typeof relationTypes[number];
 export type RelationNode = { id: string; label: string; kind?: string };
-export type Relation = { source: string; target: string; type: RelationType };
+export const explainableRelationTypes = [
+  'leading_indicator',
+  'leading_factor',
+  'synchronous_indicator',
+  'lagging_indicator',
+  'transmission',
+] as const;
+export type ExplainableRelationType = typeof explainableRelationTypes[number];
+export type RelationshipMetadata = {
+  relation: ExplainableRelationType;
+  lag: string;
+  explanation: string;
+};
+export type Relation = { source: string; target: string; type: RelationType } & Partial<RelationshipMetadata>;
 export type ConceptRelation = { relation: Relation; other: RelationNode; direction: 'incoming' | 'outgoing' | 'symmetric' };
 
 const symmetricTypes = new Set<RelationType>(['CORRELATES', 'OVERLAPS_WITH']);
 
+export function isExplainableRelation(relation: Relation): relation is Relation & RelationshipMetadata {
+  return explainableRelationTypes.includes(relation.relation as ExplainableRelationType)
+    && typeof relation.lag === 'string'
+    && relation.lag.trim().length > 0
+    && typeof relation.explanation === 'string'
+    && relation.explanation.trim().length > 0;
+}
+
 function parseGraph(elements: typeof macro) {
   const nodes = elements.filter(item => 'id' in item.data).map(item => item.data as RelationNode);
   const relations = elements.filter(item => 'source' in item.data).map(item => item.data as Relation);
+  for (const relation of relations) {
+    if (!relationTypes.includes(relation.type)) throw new Error(`Unknown graph relation type: ${relation.type}`);
+    const hasMetadata = relation.relation !== undefined || relation.lag !== undefined || relation.explanation !== undefined;
+    if (!hasMetadata) continue;
+    if (relation.relation !== undefined && !explainableRelationTypes.includes(relation.relation as ExplainableRelationType)) {
+      throw new Error(`Unknown explainable relationship type: ${relation.relation}`);
+    }
+    if (!isExplainableRelation(relation)) throw new Error(`Incomplete explainable relationship metadata: ${relation.source} -> ${relation.target}`);
+  }
   return { nodes, relations };
 }
 
@@ -39,6 +69,17 @@ export function getConceptRelations(graphId: string, conceptId: string): Concept
     const direction = isSymmetricRelation(relation.type) ? 'symmetric' : relation.source === conceptId ? 'outgoing' : 'incoming';
     return [{ relation, other, direction }];
   });
+}
+
+export function getExplainableConceptRelations(graphId: string, conceptId: string): ConceptRelation[] {
+  return getConceptRelations(graphId, conceptId).filter(item => isExplainableRelation(item.relation));
+}
+
+export function getExplainableRelationData(graphId: string) {
+  const { nodes, relations } = getRelationData(graphId);
+  const explainableRelations = relations.filter(isExplainableRelation);
+  const nodeIds = new Set(explainableRelations.flatMap(relation => [relation.source, relation.target]));
+  return { nodes: nodes.filter(node => nodeIds.has(node.id)), relations: explainableRelations };
 }
 
 export function getRelatedNodeIds(graphId: string, conceptId: string) {

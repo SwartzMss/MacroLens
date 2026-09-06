@@ -7,6 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const graph = JSON.parse(readFileSync(`${root}data/relations/macro.json`, 'utf8'));
 const graphPage = `${root}src/pages/graph.astro`;
 const explorerComponent = `${root}src/components/RelationshipExplorer.astro`;
+const relationshipCards = `${root}src/components/RelationshipCards.astro`;
 const layout = `${root}src/layouts/BaseLayout.astro`;
 const homepage = `${root}src/pages/index.astro`;
 
@@ -15,6 +16,14 @@ const readSource = (path) => existsSync(path) ? readFileSync(path, 'utf8') : '';
 const nodes = graph.filter((element) => 'id' in element.data).map((element) => element.data);
 const relations = graph.filter((element) => 'source' in element.data).map((element) => element.data);
 const relationKey = (relation) => `${relation.source}|${relation.target}|${relation.type}`;
+const explainableRelations = relations.filter((relation) => 'relation' in relation);
+const explainableRelationTypes = new Set([
+  'leading_indicator',
+  'leading_factor',
+  'synchronous_indicator',
+  'lagging_indicator',
+  'transmission',
+]);
 
 test('keeps the canonical graph structurally valid and complete', () => {
   const nodeIds = new Set(nodes.map((node) => node.id));
@@ -37,22 +46,71 @@ test('keeps the canonical graph structurally valid and complete', () => {
   for (const relation of expectedRelations) assert.ok(relationKeys.has(relation.join('|')), `missing ${relation.join(' -- ')}`);
 });
 
+test('defines explainable metadata for the core macro chains', () => {
+  assert.ok(explainableRelations.length >= 20, 'core macro chains need at least 20 explainable relations');
+  for (const relation of explainableRelations) {
+    assert.ok(explainableRelationTypes.has(relation.relation), `unknown explainable relation type: ${relation.relation}`);
+    assert.equal(typeof relation.lag, 'string');
+    assert.ok(relation.lag.trim().length > 0);
+    assert.equal(typeof relation.explanation, 'string');
+    assert.ok(relation.explanation.trim().length > 0);
+    assert.equal(Object.hasOwn(relation, 'causal_effect'), false);
+    assert.equal(Object.hasOwn(relation, 'impact_strength'), false);
+    assert.equal(Object.hasOwn(relation, 'confidence_score'), false);
+  }
+
+  const requiredCoreRelations = [
+    ['pmi', 'business-activity-conditions', 'REFLECTS'],
+    ['business-activity-conditions', 'economic-activity', 'CORRELATES'],
+    ['industrial-production', 'industrial-activity', 'REFLECTS'],
+    ['industrial-activity', 'economic-activity', 'COMPONENT_OF'],
+    ['gdp', 'economic-activity', 'MEASURES'],
+    ['employment', 'labor-market-conditions', 'REFLECTS'],
+    ['retail-sales', 'consumption-activity', 'REFLECTS'],
+    ['consumption-activity', 'economic-activity', 'COMPONENT_OF'],
+    ['ppi', 'producer-price-pressure', 'REFLECTS'],
+    ['producer-price-pressure', 'downstream-price-pressure', 'AFFECTS'],
+    ['downstream-price-pressure', 'consumer-price-pressure', 'AFFECTS'],
+    ['cpi', 'consumer-price-pressure', 'REFLECTS'],
+    ['monetary-policy', 'policy-rate', 'USES'],
+    ['policy-rate', 'financing-conditions', 'AFFECTS'],
+    ['financing-conditions', 'credit', 'AFFECTS'],
+    ['credit', 'm2', 'AFFECTS'],
+    ['credit', 'social-financing', 'OVERLAPS_WITH'],
+    ['social-financing', 'real-economy-financing', 'MEASURES'],
+    ['fixed-asset-investment', 'investment-activity', 'REFLECTS'],
+    ['investment-activity', 'economic-activity', 'COMPONENT_OF'],
+  ];
+  for (const [source, target, type] of requiredCoreRelations) {
+    const relation = relations.find((item) => relationKey(item) === `${source}|${target}|${type}`);
+    assert.ok(relation?.relation && relation.lag && relation.explanation, `core relation ${source} -> ${target} needs metadata`);
+  }
+});
+
 test('keeps the relationship explorer unlinked from the primary product shell', () => {
   const page = readSource(graphPage);
   const component = readSource(explorerComponent);
+  const cards = readSource(relationshipCards);
   const nav = readSource(layout);
   const home = readSource(homepage);
 
-  assert.match(page, /getRelationData\(['"]macro['"]\)/);
+  assert.match(page, /getExplainableRelationData/);
   assert.match(page, /RelationshipExplorer/);
   assert.match(component, /data-explorer/);
   assert.match(component, /data-explorer-select/);
   assert.match(component, /data-explorer-panel/);
   assert.match(component, /RelationshipCards/);
-  assert.match(component, /getConceptRelations/);
+  assert.match(component, /getExplainableConceptRelations/);
   assert.match(component, /上游|下游|它受什么影响/);
   assert.match(component, /<noscript>/);
   assert.match(component, /图谱概念/);
+  assert.match(cards, /<details/);
+  assert.match(cards, /<summary/);
+  assert.match(cards, /data-explainable-relation/);
+  assert.match(cards, /lag/);
+  assert.match(cards, /explanation/);
+  assert.match(page, /展开|关系详情/);
+  assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.doesNotMatch(nav, /href=["']\/graph["']/);
   assert.doesNotMatch(home, /href=["']\/graph["']/);
 });
