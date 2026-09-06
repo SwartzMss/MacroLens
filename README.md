@@ -90,6 +90,27 @@ CLOUDFLARE_API_TOKEN -> Pages Function secret（需要 Account Analytics Read）
 npx wrangler d1 migrations apply <DATABASE_NAME> --remote
 ~~~
 
+### 如何查看统计
+
+生产站部署后，日常查看优先使用下面几个入口：
+
+~~~text
+/stats                 人类可读的内容统计概览（访问 + 页面反馈）
+/api/page-stats        页面级 total / today UV 原始聚合
+/api/visitor-stats     全站 total / today visitor 原始聚合
+/api/feedback-stats    页面反馈原始聚合
+~~~
+
+`/stats` 会把全站访客、概念页 UV 和 D1 页面反馈合并到同一张表中，用于发现“高访问 + 低有帮助率”的优先优化页面。该页面不加入主导航、使用 `noindex`，并排除在 Pagefind 索引之外；但它不是鉴权边界，知道 URL 的人仍可访问聚合数据。如果以后需要真正的私有后台，应再使用 Cloudflare Access 等方式保护。
+
+页面反馈原始记录保存在 D1 的 `page_feedback` 表中。需要排查单条记录时，可直接查询生产数据库：
+
+~~~bash
+npx wrangler d1 execute macrolens_interactions --remote --command "SELECT * FROM page_feedback ORDER BY updated_at DESC;"
+~~~
+
+统计接口只返回聚合结果，不返回匿名 visitor ID。页面级 UV 从引入 pathname 记录后开始积累，旧的 Analytics Engine 历史记录不会回填页面路径。
+
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 /MacroLens base。首页、/concepts、/topics、/graph、/search、Pagefind 资源和图表资源均使用根路径。
 
 内容位于 src/content/concepts，指标数据位于 data/indicators，关系数据位于 data/relations。
