@@ -181,9 +181,12 @@ test('keeps the relationship explorer unlinked from the primary product shell', 
   assert.match(cards, /metadata\.relation/);
   assert.match(cards, /metadata \? explainableLabels\[metadata\.relation\]/);
   assert.match(cards, /<dt>解释<\/dt>/);
+  assert.match(cards, /<details open/);
+  assert.doesNotMatch(cards, /<code>\{metadata\.relation\}<\/code>/);
   assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
   assert.match(cards, /relationship-detail-endpoints/);
-  assert.match(page, /展开|关系详情/);
+  assert.match(page, /关系类型|时间关系/);
+  assert.match(page, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.match(nav, /<a href=["']\/graph["']>宏观关系<\/a>/);
   assert.match(home, /href=["']\/graph["']/);
