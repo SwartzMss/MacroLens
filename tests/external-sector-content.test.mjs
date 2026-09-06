@@ -184,6 +184,7 @@ test('exports and imports separate customs values from BOP flows and price-volum
     'CIF', '国内需求', '投入品', '月度', '季节性',
   ], ['https://www.customs.gov.cn/', 'https://www.safe.gov.cn/', 'https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm']);
   for (const id of ['exports', 'imports']) {
+    assert.match(readConcept(id), new RegExp(`^chart: ${id}$`, 'm'));
     assert.doesNotMatch(readConcept(id), /海关统计(?:的)?(?:出口|进口)与国际收支(?:经常账户)?(?:出口|进口)完全相同/);
   }
 });

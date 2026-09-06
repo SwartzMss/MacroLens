@@ -316,3 +316,55 @@ export const PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS = {
 } as const;
 
 export const LPR_METHODOLOGY_FINGERPRINT = 'pboc-lpr|1y-and-5y-plus|published-rate-level';
+
+export type CustomsTradeDatasetId = 'exports' | 'imports';
+export type CustomsTradeDirection = 'export' | 'import';
+export type CustomsTradePublication = {
+  title: string;
+  url: string;
+  sourceDate: string;
+  coverage: string;
+};
+export type CustomsTradeContract = {
+  id: CustomsTradeDatasetId;
+  direction: CustomsTradeDirection;
+  sourceTitle: string;
+  frequency: 'monthly';
+  unit: '%';
+  metric: 'yoy';
+  calculation: 'published';
+  methodologyFingerprint: string;
+};
+export type RawCustomsTradePublication = {
+  publication: CustomsTradePublication;
+  values: Record<CustomsTradeDatasetId, number>;
+  methodologyFingerprint: string;
+  dataSources: IndicatorSource[];
+  observations: Record<CustomsTradeDatasetId, Observation>;
+};
+
+export const CUSTOMS_TRADE_METHODOLOGY_FINGERPRINT =
+  'gacc-customs-goods-trade|rmb-value|monthly-published-yoy|national-total';
+
+export const CUSTOMS_TRADE_CONTRACTS: Record<CustomsTradeDatasetId, CustomsTradeContract> = {
+  exports: {
+    id: 'exports',
+    direction: 'export',
+    sourceTitle: '海关货物贸易出口金额同比增速',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    methodologyFingerprint: CUSTOMS_TRADE_METHODOLOGY_FINGERPRINT,
+  },
+  imports: {
+    id: 'imports',
+    direction: 'import',
+    sourceTitle: '海关货物贸易进口金额同比增速',
+    frequency: 'monthly',
+    unit: '%',
+    metric: 'yoy',
+    calculation: 'published',
+    methodologyFingerprint: CUSTOMS_TRADE_METHODOLOGY_FINGERPRINT,
+  },
+};

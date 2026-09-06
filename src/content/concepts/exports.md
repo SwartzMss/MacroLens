@@ -9,6 +9,7 @@ definition: { source: 海关统计、SAFE 与 IMF BPM6, asOf: 2026-09 }
 updatedAt: 2026-09-02
 related: [imports, trade-balance, trade-volume-and-price, exchange-rate, current-account]
 graph: macro
+chart: exports
 order: 6
 level: basic
 topics: [balance-of-payments]
