@@ -13,6 +13,12 @@ export type IndicatorSource = {
 
 export type Observation = { date: string; value: number };
 
+export type IndicatorSeries = {
+  id: string;
+  label: string;
+  data: Observation[];
+};
+
 export type IndicatorDataset = {
   id: string;
   country: string;
@@ -34,6 +40,7 @@ export type IndicatorDataset = {
   referenceValue?: number;
   referenceLabel?: string;
   data: Observation[];
+  series?: IndicatorSeries[];
 };
 
 export type PriceDatasetId = 'cpi' | 'core-cpi' | 'ppi';
@@ -137,6 +144,19 @@ export type RawPBOCFinancialPublication = {
   publication: MoneySupplyPublication;
   values: Partial<PBOCFinancialValues>;
   methodologyFingerprints: typeof PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS;
+};
+
+export type LprSeriesId = '1y' | '5y-plus';
+export type LprValues = Record<LprSeriesId, number>;
+export type LprPublication = {
+  title: string;
+  url: string;
+  sourceDate: string;
+  month: string;
+};
+export type RawLprPublication = {
+  publication: LprPublication;
+  values: LprValues;
 };
 
 export type RealEconomyDatasetId = 'gdp' | 'industrial-production' | 'retail-sales' | 'fixed-asset-investment';
@@ -280,3 +300,5 @@ export const PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS = {
   credit: 'pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy',
   'social-financing': 'pboc-social-financing|stock|published-yoy',
 } as const;
+
+export const LPR_METHODOLOGY_FINGERPRINT = 'pboc-lpr|1y-and-5y-plus|published-rate-level';

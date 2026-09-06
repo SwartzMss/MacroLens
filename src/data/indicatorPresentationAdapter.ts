@@ -21,6 +21,7 @@ export type IndicatorViewModel = {
   sourceLabel: string;
   coverage: string;
   sources: IndicatorPresentationSource[];
+  series?: Array<{ id: string; label: string; data: Array<{ date: string; value: number }> }>;
 };
 
 function frequencyLabel(indicator: IndicatorDataset): string {
@@ -34,6 +35,7 @@ function valueLabel(indicator: IndicatorDataset): string {
   if (indicator.metric === 'mom') return '环比';
   if (indicator.metric === 'cumulative_yoy') return '累计同比';
   if (indicator.metric === 'index') return '指数';
+  if (indicator.metric === 'rate') return '利率水平';
   return indicator.metric;
 }
 
@@ -85,6 +87,9 @@ function comparisonMethod(indicator: IndicatorDataset): string {
   if (indicator.metric === 'index') {
     return '指数反映当月调查结果；近期变化相对于上月，50 为荣枯线参考。';
   }
+  if (indicator.metric === 'rate') {
+    return '利率/比率水平按数据集公布的月度读数展示；近期变化相对于上月。';
+  }
   if (indicator.metric === 'yoy') {
     return '同比增速用于比较与上年同月的变化；近期变化相对于上月。';
   }
@@ -103,7 +108,8 @@ function calculationDescription(indicator: IndicatorDataset): string {
 }
 
 export function getIndicatorPresentation(indicator: IndicatorDataset, definition = ''): IndicatorViewModel {
-  const sorted = [...indicator.data].sort((left, right) => left.date.localeCompare(right.date));
+  const allObservations = indicator.series?.flatMap(({ data }) => data) ?? indicator.data;
+  const sorted = [...allObservations].sort((left, right) => left.date.localeCompare(right.date));
   const first = sorted.at(0);
   const last = sorted.at(-1);
   if (!first || !last) throw new Error('Indicator dataset must contain at least one observation');
@@ -126,5 +132,6 @@ export function getIndicatorPresentation(indicator: IndicatorDataset, definition
       coverage,
       ...(role ? { role } : {}),
     })),
+    ...(indicator.series ? { series: indicator.series } : {}),
   };
 }
