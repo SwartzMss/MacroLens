@@ -73,4 +73,3 @@ MacroLens 已经通过 `data/relations/macro.json` 保存关系层，并通过 `
 - Node 数据契约测试：节点唯一、边唯一、端点存在、核心关系类型合法，metadata 类型和必填字段完整，禁止未批准的关系类型。
 - 组件源码契约测试：`/graph` 使用现有 registry 和 explorer，关系 card 包含详情入口/展开标记及非因果免责声明，导航和首页不重复推广新路由。
 - 完整验证：`npm test`、`npm run check`、`npm run build`。visitor statistics 的已知基线测试失败与本功能分离记录，不改变本 PR 的业务范围。
-
