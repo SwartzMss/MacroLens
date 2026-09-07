@@ -16,37 +16,13 @@ import unemploymentRate from '../../data/indicators/unemployment-rate.json';
 import exports from '../../data/indicators/exports.json';
 import imports from '../../data/indicators/imports.json';
 import policyRate from '../../data/indicators/policy-rate.json';
+import {
+  IndicatorDatasetValidationError,
+  validateIndicatorDataset,
+} from '../domain/indicatorDataset';
+import type { IndicatorDataset } from '../domain/indicatorDataset';
 
-export interface IndicatorSeries {
-  id: string;
-  label: string;
-  data: Array<{ date: string; value: number }>;
-}
-
-export interface IndicatorDataset {
-  id: string; country: string; frequency: string;
-  chartType?: string;
-  verifiedThrough?: string;
-  unit: string; metric: string; comparisonType?: IndicatorComparisonType; label: string; chartTitle: string; definitionEffectiveFrom?: string; definitionAsOf?: string; source: string;
-  calculation: string; calculationEffectiveFrom?: string; updatedAt: string; comparabilityNote: string;
-  methodologyFingerprint: string; methodologyEffectiveFrom?: string;
-  sources: Array<{ title: string; url: string; sourceDate: string; coverage: string; role?: string }>;
-  referenceValue?: number; referenceLabel?: string;
-  data: Array<{ date: string; value: number }>;
-  series?: IndicatorSeries[];
-}
-
-export type IndicatorComparisonType =
-  | 'previous_event_level'
-  | 'previous_month_same_metric'
-  | 'previous_month_level'
-  | 'previous_month_rate'
-  | 'previous_quarter_same_metric'
-  | 'previous_quarter_level'
-  | 'previous_quarter_rate'
-  | 'previous_cumulative_period';
-
-const indicatorData = {
+const rawIndicatorData = {
   m0, m1, m2, pmi, gdp,
   'industrial-production': industrialProduction,
   'retail-sales': retailSales,
@@ -61,7 +37,26 @@ const indicatorData = {
   exports,
   imports,
   'policy-rate': policyRate,
-} satisfies Record<string, IndicatorDataset>;
+} as const;
+
+export function validateRegisteredIndicatorDataset(id: string, input: unknown): IndicatorDataset {
+  try {
+    const dataset = validateIndicatorDataset(input);
+    if (dataset.id !== id) throw new Error(`Registered indicator id mismatch: ${id} != ${dataset.id}`);
+    return dataset;
+  } catch (error) {
+    if (error instanceof IndicatorDatasetValidationError) {
+      throw new IndicatorDatasetValidationError(id, error.issues);
+    }
+    throw error;
+  }
+}
+
+const indicatorData: Record<string, IndicatorDataset> = Object.fromEntries(
+  Object.entries(rawIndicatorData).map(([id, input]) => {
+    return [id, validateRegisteredIndicatorDataset(id, input)];
+  }),
+);
 
 export function getIndicatorData(id: string): IndicatorDataset {
   if (!Object.prototype.hasOwnProperty.call(indicatorData, id)) throw new Error(`Unknown indicator dataset: ${id}`);

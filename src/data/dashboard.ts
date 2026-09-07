@@ -1,4 +1,5 @@
-import { getIndicatorData, type IndicatorDataset } from './indicatorRegistry';
+import { getIndicatorData } from './indicatorRegistry';
+import type { IndicatorDataset } from '../domain/indicatorDataset';
 
 export const dashboardIndicatorIds = [
   'gdp', 'pmi', 'm0', 'm1', 'm2',

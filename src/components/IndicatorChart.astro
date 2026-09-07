@@ -1,5 +1,5 @@
 ---
-import type { IndicatorDataset } from '../data/indicatorRegistry';
+import type { IndicatorDataset } from '../domain/indicatorDataset';
 const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${indicator.id}`;
 const series = indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];

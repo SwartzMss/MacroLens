@@ -1,49 +1,20 @@
-export type IndicatorSource = {
-  title: string;
-  url: string;
-  sourceDate: string;
-  coverage: string;
-  role?: 'data' | 'methodology';
-  request?: {
-    url: string;
-    method: 'GET' | 'POST';
-    body?: string;
-  };
-};
+import type {
+  IndicatorSource,
+  IndicatorDatasetValidationIssue,
+  Observation,
+} from '../../src/domain/indicatorDataset.ts';
 
-export type Observation = { date: string; value: number };
-
-export type IndicatorSeries = {
-  id: string;
-  label: string;
-  data: Observation[];
-};
-
-export type IndicatorDataset = {
-  id: string;
-  country: string;
-  frequency: string;
-  chartType?: string;
-  verifiedThrough?: string;
-  unit: string;
-  metric: string;
-  label: string;
-  chartTitle: string;
-  definitionEffectiveFrom?: string;
-  definitionAsOf?: string;
-  source: string;
-  calculation: string;
-  calculationEffectiveFrom?: string;
-  updatedAt: string;
-  comparabilityNote: string;
-  methodologyFingerprint: string;
-  methodologyEffectiveFrom?: string;
-  sources: IndicatorSource[];
-  referenceValue?: number;
-  referenceLabel?: string;
-  data: Observation[];
-  series?: IndicatorSeries[];
-};
+export type {
+  IndicatorChartType,
+  IndicatorComparisonType,
+  IndicatorDataset,
+  IndicatorDatasetValidationIssue,
+  IndicatorFrequency,
+  IndicatorSeries,
+  IndicatorSource,
+  IndicatorSourceRole,
+  Observation,
+} from '../../src/domain/indicatorDataset.ts';
 
 export type PriceDatasetId = 'cpi' | 'core-cpi' | 'ppi';
 export type NbsPricePublication = {
@@ -281,9 +252,12 @@ export class HistoricalMismatchError extends Error {
 }
 
 export class IngestionContractError extends Error {
-  constructor(message: string) {
+  readonly issues?: IndicatorDatasetValidationIssue[];
+
+  constructor(message: string, issues?: IndicatorDatasetValidationIssue[]) {
     super(message);
     this.name = 'IngestionContractError';
+    this.issues = issues;
   }
 }
 
