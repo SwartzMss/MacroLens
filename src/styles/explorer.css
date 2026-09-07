@@ -65,6 +65,20 @@
 .explorer-node-head {
   padding: 10px 0 2px;
 }
+.explorer-node-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.node-type-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--green);
+  background: #e8f1ec;
+  font-size: 11px;
+  font-weight: 800;
+}
 .explorer-node-head h2 {
   margin: 8px 0 10px;
   font: 700 32px/1.25 var(--serif);

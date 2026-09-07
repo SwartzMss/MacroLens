@@ -88,7 +88,7 @@ export function buildConceptKnowledge({
   const directRelations = graphId ? getConceptRelations(graphId, conceptId) : [];
   const directIndicatorIds = new Set(
     directRelations
-      .filter(({ other }) => other.kind === 'indicator')
+      .filter(({ other }) => other.type === 'indicator')
       .map(({ other }) => other.id),
   );
   const indicatorOrder = unique(
