@@ -130,7 +130,7 @@ test('LPR is registered, rendered by the generic multi-series chart, and schedul
   const adapter = fs.readFileSync(path.join(here, '..', 'src', 'data', 'indicatorPresentationAdapter.ts'), 'utf8');
   const fetchSource = fs.readFileSync(path.join(here, '..', 'scripts', 'ingest', 'fetch', 'lpr.ts'), 'utf8');
   assert.match(chart, /indicator\.series/);
-  assert.match(chart, /legend/);
+  assert.match(chart, /buildIndicatorChartOption/);
   assert.match(workflow, /npm run ingest:lpr/);
   assert.match(workflow, /data\/indicators\/lpr\.json/);
   assert.match(page, /^chart: lpr$/m);

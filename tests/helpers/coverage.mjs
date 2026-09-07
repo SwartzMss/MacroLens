@@ -1,4 +1,5 @@
 function periodRank(period) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(period)) return Date.parse(`${period}T00:00:00Z`);
   const quarter = period.match(/^(\d{4})-Q([1-4])$/);
   if (quarter) return Number(quarter[1]) * 4 + Number(quarter[2]);
 

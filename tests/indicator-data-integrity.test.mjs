@@ -27,6 +27,7 @@ const contracts = {
   credit: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   'social-financing': { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   lpr: { frequency: 'monthly', unit: '%', metric: 'rate', calculation: 'published' },
+  'policy-rate': { frequency: 'event', chartType: 'step', unit: '%', metric: 'rate', calculation: 'published' },
   exports: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
   imports: { frequency: 'monthly', unit: '%', metric: 'yoy', calculation: 'published' },
 };
@@ -36,6 +37,10 @@ function readDataset(id) {
 }
 
 function dateKey(value, frequency) {
+  if (frequency === 'event') {
+    assert.ok(isIsoDate(value), `invalid event date: ${value}`);
+    return Date.parse(value);
+  }
   if (frequency === 'quarterly') {
     const match = value.match(/^(\d{4})-Q([1-4])$/);
     assert.ok(match, `invalid quarterly period: ${value}`);

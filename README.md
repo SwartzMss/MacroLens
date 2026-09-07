@@ -19,6 +19,7 @@
 
 - NBS PMI
 - PBOC M0/M1/M2
+- PBOC 7 天期逆回购政策利率（实际生效／操作日的阶梯序列，详见 [采集说明](docs/policy-rate-ingestion.md)）
 - NBS GDP、工业生产、社零、固定资产投资
 - NBS CPI、核心 CPI、PPI
 

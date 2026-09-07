@@ -23,6 +23,8 @@ export type IndicatorDataset = {
   id: string;
   country: string;
   frequency: string;
+  chartType?: string;
+  verifiedThrough?: string;
   unit: string;
   metric: string;
   label: string;

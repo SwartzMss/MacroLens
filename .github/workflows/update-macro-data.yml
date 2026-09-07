@@ -40,6 +40,9 @@ jobs:
       - name: Fetch and validate official LPR
         run: npm run ingest:lpr -- --target data/indicators/lpr.json
 
+      - name: Fetch and validate official PBOC policy rate
+        run: npm run ingest:policy-rate -- --target data/indicators/policy-rate.json
+
       - name: Fetch and validate NBS real-economy indicators
         run: npm run ingest:nbs-real-economy -- --target-dir data/indicators
 
@@ -61,6 +64,7 @@ jobs:
             data/indicators/credit.json
             data/indicators/social-financing.json
             data/indicators/lpr.json
+            data/indicators/policy-rate.json
             data/indicators/gdp.json
             data/indicators/industrial-production.json
             data/indicators/retail-sales.json
