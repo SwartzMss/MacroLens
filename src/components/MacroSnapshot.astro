@@ -1,18 +1,26 @@
 ---
-import type { MacroSnapshot, SnapshotConclusion, SnapshotSignal } from '../data/macroSnapshot';
+import type {
+  MacroDomainState,
+  MacroSnapshot,
+  SnapshotConclusion,
+  SnapshotEvidence,
+} from '../data/macroSnapshot';
 import '../styles/snapshot.css';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
-const signalById = new Map(snapshot.signals.map((signal) => [signal.id, signal]));
-const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ''}`;
+
+const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ` ${unit}`}`;
 const formatChange = (change: number | null, changeUnit: string) => {
   if (change === null) return '—';
   const suffix = changeUnit === 'percentage-points' ? ' 个百分点' : changeUnit === 'points' ? ' 点' : '';
   return `${change > 0 ? '+' : ''}${change.toFixed(1)}${suffix}`;
 };
-const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => conclusion.evidenceIds
-  .map((id) => signalById.get(id))
-  .filter((signal): signal is SnapshotSignal => Boolean(signal));
+const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotConclusion): SnapshotEvidence[] => {
+  const evidenceById = new Map(domain.evidence.map((evidence) => [evidence.id, evidence]));
+  return conclusion.evidenceIds
+    .map((id) => evidenceById.get(id))
+    .filter((evidence): evidence is SnapshotEvidence => Boolean(evidence));
+};
 ---
 
 <section class="snapshot section" aria-labelledby="snapshot-title">
@@ -20,72 +28,82 @@ const evidenceSignals = (conclusion: SnapshotConclusion): SnapshotSignal[] => co
     <div>
       <div class="eyebrow">Macro snapshot</div>
       <h2 id="snapshot-title">这一期，宏观信号如何组合？</h2>
-      <p>把已发布的指标事实与明确规则分开呈现，帮助你理解快照是如何生成的。</p>
+      <p>把已发布的指标事实、领域状态与明确规则分开呈现，帮助你理解快照是如何生成的。</p>
     </div>
     <div class="snapshot-meta">
-      <span>快照更新：{snapshot.asOf}</span>
+      <span>数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</span>
+      <span>{snapshot.freshness.note}</span>
     </div>
   </div>
 
   <div class="snapshot-disclaimer">这是基于已存数据的规则化观察，不构成投资建议或投资决策。</div>
 
-  <section class="snapshot-phase" aria-labelledby="snapshot-phase-title">
+  <section class="snapshot-synthesis" aria-labelledby="snapshot-synthesis-title">
     <div>
-      <div class="eyebrow">Current phase</div>
-      <h3 id="snapshot-phase-title">{snapshot.phase.label}</h3>
+      <div class="eyebrow">Cross-domain synthesis</div>
+      <h3 id="snapshot-synthesis-title">{snapshot.synthesis.label}</h3>
     </div>
-    <div>
-      <p>{snapshot.phase.explanation}</p>
-      <div class="snapshot-evidence-links">
-        {snapshot.phase.evidenceIds.map((id) => {
-          const signal = signalById.get(id);
-          return signal ? <a href={signal.conceptHref}>{signal.name}</a> : null;
-        })}
-      </div>
-    </div>
+    <p>{snapshot.synthesis.explanation}</p>
   </section>
 
-  <section class="snapshot-signals" aria-labelledby="snapshot-signals-title">
+  <section class="snapshot-domains" aria-labelledby="snapshot-domains-title">
     <div class="section-head">
       <div>
-        <div class="eyebrow">Facts & interpretations</div>
-        <h3 id="snapshot-signals-title">指标事实与规则解释</h3>
+        <div class="eyebrow">Domain evidence</div>
+        <h3 id="snapshot-domains-title">领域状态与证据</h3>
       </div>
-      <p>读数、变化和解释分开展示</p>
+      <p>不同频率、观测期和数据来源分别保留</p>
     </div>
-    <div class="snapshot-signal-grid">
-      {snapshot.signals.map((signal) => <article class="snapshot-signal" data-signal-family={signal.family}>
-        <div class="snapshot-signal-top"><a href={signal.conceptHref}>{signal.name}</a><span>{signal.valueLabel} · {signal.period}</span></div>
-        <div class="snapshot-signal-value">{formatValue(signal.latest, signal.unit)}</div>
-        <div class="snapshot-signal-change">{signal.changeLabel} {formatChange(signal.change, signal.changeUnit)}</div>
-        <div class="snapshot-fact"><strong>事实</strong><p>{signal.fact}</p></div>
-        <div class="snapshot-interpretation"><strong>解释</strong><p>{signal.interpretation}</p></div>
+
+    <div class="snapshot-domain-grid">
+      {snapshot.domains.map((domain) => <article class="snapshot-domain" data-domain={domain.id}>
+        <header class="snapshot-domain-head">
+          <div>
+            <div class="eyebrow">{domain.id}</div>
+            <h4>{domain.label}</h4>
+          </div>
+          <span class="snapshot-domain-state">{domain.state}</span>
+        </header>
+        <p class="snapshot-domain-explanation">{domain.explanation}</p>
+
+        <div class="snapshot-domain-evidence">
+          {domain.evidence.map((evidence) => <article class="snapshot-evidence">
+            <div class="snapshot-evidence-head">
+              <a href={evidence.conceptHref}>{evidence.name}</a>
+              <span>{evidence.valueLabel}</span>
+            </div>
+            <div class="snapshot-evidence-value">{formatValue(evidence.latest, evidence.unit)}</div>
+            <div class="snapshot-evidence-change">{evidence.changeLabel} {formatChange(evidence.change, evidence.changeUnit)}</div>
+            <dl class="snapshot-evidence-meta">
+              <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
+              <div><dt>频率</dt><dd>{evidence.isEvent ? '事件观察' : evidence.frequency}</dd></div>
+              <div><dt>更新</dt><dd>{evidence.updatedAt}</dd></div>
+              {evidence.verifiedThrough ? <div><dt>核验至</dt><dd>{evidence.verifiedThrough}</dd></div> : null}
+            </dl>
+          </article>)}
+        </div>
+
+        <div class="snapshot-domain-conclusions">
+          <section aria-labelledby={`snapshot-${domain.id}-risks`}>
+            <div class="eyebrow">Risks to notice</div>
+            <h5 id={`snapshot-${domain.id}-risks`}>需要留意</h5>
+            {domain.risks.length > 0 ? <ul>{domain.risks.map((conclusion) => <li>
+              <strong>{conclusion.title}</strong>
+              <p>{conclusion.explanation}</p>
+              <div class="snapshot-evidence-links">{evidenceForConclusion(domain, conclusion).map((evidence) => <a href={evidence.conceptHref}>{evidence.name}</a>)}</div>
+            </li>)}</ul> : <p class="snapshot-empty">当前没有触发独立风险规则。</p>}
+          </section>
+          <section aria-labelledby={`snapshot-${domain.id}-watch`}>
+            <div class="eyebrow">Watch next</div>
+            <h5 id={`snapshot-${domain.id}-watch`}>下一期观察</h5>
+            {domain.watchNext.length > 0 ? <ul>{domain.watchNext.map((conclusion) => <li>
+              <strong>{conclusion.title}</strong>
+              <p>{conclusion.explanation}</p>
+              <div class="snapshot-evidence-links">{evidenceForConclusion(domain, conclusion).map((evidence) => <a href={evidence.conceptHref}>{evidence.name}</a>)}</div>
+            </li>)}</ul> : <p class="snapshot-empty">暂无额外观察项。</p>}
+          </section>
+        </div>
       </article>)}
     </div>
   </section>
-
-  <div class="snapshot-conclusions">
-    <section class="snapshot-conclusion-group" aria-labelledby="snapshot-risks-title">
-      <div class="eyebrow">Risks to notice</div>
-      <h3 id="snapshot-risks-title">需要留意的信号</h3>
-      {snapshot.risks.length > 0 ? <ul>
-        {snapshot.risks.map((conclusion) => <li>
-          <strong>{conclusion.title}</strong>
-          <p>{conclusion.explanation}</p>
-          <div class="snapshot-evidence-links">{evidenceSignals(conclusion).map((signal) => <a href={signal.conceptHref}>{signal.name}</a>)}</div>
-        </li>)}
-      </ul> : <p class="snapshot-empty">当前没有触发独立风险规则。</p>}
-    </section>
-    <section class="snapshot-conclusion-group" aria-labelledby="snapshot-watch-title">
-      <div class="eyebrow">Watch next</div>
-      <h3 id="snapshot-watch-title">下一期观察什么</h3>
-      <ul>
-        {snapshot.watchNext.map((conclusion) => <li>
-          <strong>{conclusion.title}</strong>
-          <p>{conclusion.explanation}</p>
-          <div class="snapshot-evidence-links">{evidenceSignals(conclusion).map((signal) => <a href={signal.conceptHref}>{signal.name}</a>)}</div>
-        </li>)}
-      </ul>
-    </section>
-  </div>
 </section>

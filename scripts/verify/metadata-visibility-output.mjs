@@ -20,7 +20,7 @@ for (const page of pages) {
 const dashboard = readFileSync(pages[0], 'utf8');
 const gdp = readFileSync(pages[1], 'utf8');
 const credit = readFileSync(pages[2], 'utf8');
-assert.match(dashboard, /快照更新/);
+assert.match(dashboard, /数据集更新时间范围/);
 assert.match(gdp, /如何阅读/);
 assert.match(gdp, /来源详情/);
 assert.match(gdp, /数据更新/);

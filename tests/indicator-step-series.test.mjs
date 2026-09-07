@@ -13,8 +13,8 @@ test('event presentation distinguishes the last change from the last rate verifi
   assert.equal(view.frequencyLabel, '不定期（事件）');
   assert.equal(view.latestValue, '1.40%');
   assert.equal(view.latestEventDate, '2025-05-08');
-  assert.equal(view.verifiedThrough, '2026-09-01');
-  assert.equal(view.coverage, '2024-07-19 至 2026-09-01');
+  assert.equal(view.verifiedThrough, data.verifiedThrough);
+  assert.equal(view.coverage, `2024-07-19 至 ${data.verifiedThrough}`);
   assert.equal(view.changeLabel, '较上次事件变化');
   assert.doesNotMatch(view.comparisonMethod, /上月|月度读数/);
   assert.match(view.comparisonMethod, /水平区间沿用此前公布水平/);
@@ -33,7 +33,7 @@ test('step chart uses actual elapsed time and holds the prior level until each c
   assert.deepEqual(points.slice(0, -1).map(({ value }) => value), dataset.data.map(({ date, value }) => [Date.parse(`${date}T00:00:00Z`), value]));
   assert.equal(points.at(-1).symbol, 'none');
   assert.match(points.at(-1).name, /非新增事件/);
-  assert.deepEqual(points.at(-1).value, [Date.parse('2026-09-01T00:00:00Z'), 1.4]);
+  assert.deepEqual(points.at(-1).value, [Date.parse(`${dataset.verifiedThrough}T00:00:00Z`), 1.4]);
   assert.equal(JSON.stringify(dataset), before);
 
   // Exercise ECharts itself, not only the option shape: each vertical segment

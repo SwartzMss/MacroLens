@@ -109,17 +109,22 @@ test('protects every recorded event and unchanged historical overlap, including 
 
 test('canonical history contains only baseline and real changes with exact official provenance', () => {
   const dataset = getIndicatorData('policy-rate');
+  const fixtureHistory = canonical();
   validatePolicyRateDataset(dataset);
-  assert.deepEqual(dataset, canonical());
+  assert.deepEqual(dataset.data, fixtureHistory.data);
+  assert.deepEqual(dataset.sources.slice(0, fixtureHistory.sources.length - 1), fixtureHistory.sources.slice(0, -1));
   assert.deepEqual(dataset.data, [
     { date: '2024-07-19', value: 1.8 }, { date: '2024-07-22', value: 1.7 },
     { date: '2024-09-27', value: 1.5 }, { date: '2025-05-08', value: 1.4 },
   ]);
-  assert.equal(dataset.verifiedThrough, '2026-09-01');
+  assert.ok(dataset.verifiedThrough >= fixtureHistory.verifiedThrough);
+  assert.equal(dataset.updatedAt, dataset.sources.at(-1).sourceDate);
+  assert.equal(dataset.sources.at(-1).coverage, `${dataset.verifiedThrough} to ${dataset.verifiedThrough}`);
+  assert.match(dataset.sources.at(-1).url, new RegExp(dataset.verifiedThrough.replaceAll('-', '')));
   assert.equal(dataset.methodologyEffectiveFrom, '2024-07-22');
   assert.match(dataset.comparabilityNote, /并非首次执行/);
   assert.match(dataset.comparabilityNote, /LPR、DR007、R007/);
-  assert.throws(() => validatePolicyRateDataset({ ...dataset, data: [...dataset.data, { date: '2026-09-01', value: 1.4 }] }), /synthetic/);
+  assert.throws(() => validatePolicyRateDataset({ ...dataset, data: [...dataset.data, { date: dataset.verifiedThrough, value: 1.4 }] }), /synthetic/);
 });
 
 test('new unchanged-rate confirmations update provenance without adding events', () => {
