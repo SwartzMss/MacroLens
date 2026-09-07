@@ -191,13 +191,15 @@ test('rejects an indicator dataset with an invalid series contract', () => {
 });
 
 test('generic indicator validation accepts a monthly percentage dataset', () => {
-  assert.doesNotThrow(() => validateIndicatorDataset({
+  const input = {
     ...existingDataset,
     source: 'PBOC',
     unit: '%',
     metric: 'yoy',
     calculation: 'published',
-  }));
+  };
+  const validated = validateIndicatorDataset(input);
+  assert.strictEqual(validated, input);
 });
 
 test('generic observation merging reports the series label on mismatch', () => {
