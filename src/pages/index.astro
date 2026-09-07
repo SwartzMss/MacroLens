@@ -10,7 +10,7 @@ import { buildMacroSnapshot } from '../data/macroSnapshot';
 const concepts = await getCollection('concepts');
 const { nodes } = getRelationData('macro');
 const dashboardIndicators = getDashboardIndicators();
-const snapshot = buildMacroSnapshot(dashboardIndicators);
+const snapshot = buildMacroSnapshot();
 const relation = (source: string, target: string, type: Parameters<typeof requireRelation>[3]) => requireRelation('macro', source, target, type);
 const paths = [
   { title:'货币政策传导', description:'从政策决策与工具，走到融资条件、信贷和货币。', relations:[relation('central-bank','monetary-policy','IMPLEMENTS'),relation('monetary-policy','policy-rate','USES'),relation('monetary-policy','rrr','USES'),relation('monetary-policy','omo','USES'),relation('policy-rate','financing-conditions','AFFECTS'),relation('rrr','financing-conditions','AFFECTS'),relation('omo','financing-conditions','AFFECTS'),relation('financing-conditions','credit','AFFECTS'),relation('credit','m2','AFFECTS'),relation('m2','activity','CORRELATES')] },

@@ -8,6 +8,7 @@ import { analyzeLabor } from '../src/data/macroSnapshot/labor.ts';
 import { analyzePolicyFinancialConditions } from '../src/data/macroSnapshot/policyFinancialConditions.ts';
 import { analyzePrices } from '../src/data/macroSnapshot/prices.ts';
 import {
+  buildMacroSnapshot,
   getMacroSnapshotIndicators,
   macroIndicatorIds,
   makeEvidence,
@@ -129,4 +130,41 @@ test('external reports exports and imports divergence', () => {
 
   assert.equal(external.state, 'divergent');
   assert.match(external.explanation, /出口|进口/);
+});
+
+test('synthesis preserves conflicting domain directions', () => {
+  const snapshot = buildMacroSnapshot(makeMacroIndicators({
+    'unemployment-rate': data([{ date: '2026-07', value: 5 }, { date: '2026-08', value: 5.3 }]),
+    pmi: data([{ date: '2026-08', value: 51 }, { date: '2026-09', value: 51 }]),
+    gdp: data([{ date: '2026-Q2', value: 4 }, { date: '2026-Q3', value: 4 }]),
+    'industrial-production': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'retail-sales': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 5 }, { date: '2026-01–09', value: 5 }]),
+  }));
+
+  assert.match(snapshot.synthesis.label, /混合|分化|谨慎/);
+  assert.ok(snapshot.synthesis.supportingDomainIds.includes('growth'));
+  assert.ok(snapshot.synthesis.conflictingDomainIds.includes('labor'));
+  assert.equal(snapshot.risks.length, snapshot.domains.flatMap(item => item.risks).length);
+});
+
+test('snapshot rejects missing and unexpected indicator input', () => {
+  const indicators = getMacroSnapshotIndicators();
+  const missing = { ...indicators };
+  delete missing.m2;
+
+  assert.throws(() => buildMacroSnapshot(missing), /m2/);
+  assert.throws(() => buildMacroSnapshot({ ...indicators, extra: indicators.m2 }), /unexpected|extra/i);
+});
+
+test('freshness is a range and evidence retains heterogeneous periods', () => {
+  const snapshot = buildMacroSnapshot();
+  const evidence = snapshot.domains.flatMap(item => item.evidence);
+
+  assert.ok(snapshot.freshness.earliestUpdatedAt);
+  assert.ok(snapshot.freshness.latestUpdatedAt);
+  assert.match(snapshot.freshness.note, /各|分别|频率/);
+  assert.ok(evidence.some(item => item.frequency === 'quarterly'));
+  assert.ok(evidence.some(item => item.isEvent));
+  assert.ok(evidence.every(item => item.updatedAt));
 });
