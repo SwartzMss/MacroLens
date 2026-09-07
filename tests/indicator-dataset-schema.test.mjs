@@ -7,6 +7,7 @@ import {
   IndicatorDatasetValidationError,
   validateIndicatorDataset,
 } from '../src/domain/indicatorDataset.ts';
+import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
 import { validateIndicatorDataset as validateIngestionDataset } from '../scripts/ingest/validate/dataset.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -108,3 +109,10 @@ test('rejects invalid enum and source metadata with field paths', () => {
   );
 });
 
+test('registry exposes structurally validated datasets without changing ids', () => {
+  const files = fs.readdirSync(indicatorsDir).filter((file) => file.endsWith('.json'));
+  for (const file of files) {
+    const id = file.slice(0, -5);
+    assert.equal(getIndicatorData(id).id, id);
+  }
+});

@@ -1,5 +1,5 @@
 import type { EChartsOption } from 'echarts';
-import type { IndicatorSeries } from './indicatorRegistry';
+import type { IndicatorSeries } from '../domain/indicatorDataset';
 
 export type IndicatorChartConfig = {
   series: IndicatorSeries[];

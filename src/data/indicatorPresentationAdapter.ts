@@ -1,4 +1,4 @@
-import type { IndicatorComparisonType, IndicatorDataset } from './indicatorRegistry';
+import type { IndicatorComparisonType, IndicatorDataset } from '../domain/indicatorDataset';
 import { normalizeSourceLabel } from './sourceLabelNormalizer';
 
 export type IndicatorPresentationSource = {
