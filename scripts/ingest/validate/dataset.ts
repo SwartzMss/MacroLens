@@ -1,5 +1,9 @@
 import { IngestionContractError } from '../types.ts';
 import type { IndicatorDataset, IndicatorSource, Observation } from '../types.ts';
+import {
+  IndicatorDatasetValidationError,
+  validateIndicatorDataset as validateStructuralIndicatorDataset,
+} from '../../../src/domain/indicatorDataset.ts';
 
 const DATE_PATTERN = /^\d{4}-(?:0[1-9]|1[0-2])$/;
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -39,16 +43,21 @@ export function validateMonthlyObservations(
   }
 }
 
-export function validateIndicatorDataset(dataset: IndicatorDataset, options: DatasetValidationOptions = {}): void {
-  for (const field of ['id', 'country', 'frequency', 'unit', 'metric', 'label', 'chartTitle', 'source', 'calculation', 'updatedAt', 'comparabilityNote', 'methodologyFingerprint']) {
-    if (typeof dataset[field as keyof IndicatorDataset] !== 'string' || !dataset[field as keyof IndicatorDataset]) {
-      fail(`Missing indicator field: ${field}`);
+export function validateIndicatorDataset(input: unknown, options: DatasetValidationOptions = {}): IndicatorDataset {
+  let dataset: IndicatorDataset;
+  try {
+    dataset = validateStructuralIndicatorDataset(input);
+  } catch (error) {
+    if (error instanceof IndicatorDatasetValidationError) {
+      throw new IngestionContractError(error.message, error.issues);
     }
+    throw error;
   }
-  if (!Array.isArray(dataset.sources) || dataset.sources.length === 0) fail('Indicator dataset requires source provenance');
+  if (dataset.sources.length === 0) fail('Indicator dataset requires source provenance');
+  const coveragePattern = options.coveragePattern ?? COVERAGE_PATTERN;
   for (const source of dataset.sources) {
-    const coverage = source.coverage.match(options.coveragePattern ?? COVERAGE_PATTERN);
-    if (!source.title || !/^https:\/\//.test(source.url) || !coverage || (coverage[2] !== undefined && coverage[1] > coverage[2])) {
+    const coverage = source.coverage.match(coveragePattern);
+    if (!coverage || (coverage[2] !== undefined && coverage[1] > coverage[2])) {
       fail(`Invalid indicator source: ${source.url}`);
     }
     if (!ISO_DATE_PATTERN.test(source.sourceDate)) fail(`Invalid indicator source date: ${source.sourceDate}`);
@@ -63,6 +72,7 @@ export function validateIndicatorDataset(dataset: IndicatorDataset, options: Dat
   if (latestSource?.sourceDate !== dataset.updatedAt) {
     fail(`Indicator updatedAt must match the latest source date: ${dataset.updatedAt} != ${latestSource?.sourceDate}`);
   }
+  return dataset;
 }
 
 function monthsBetween(start: string, end: string): string[] {
