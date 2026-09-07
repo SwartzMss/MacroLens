@@ -5,6 +5,16 @@ import {
   type DashboardIndicatorId,
 } from './dashboard';
 import { getIndicatorPresentation } from './indicatorPresentationAdapter';
+import { getIndicatorData } from './indicatorRegistry';
+import { makeIndicatorEvidence } from './macroSnapshot/evidence';
+import { macroIndicatorIds, type MacroIndicatorMap } from './macroSnapshot/types';
+
+export { macroIndicatorIds } from './macroSnapshot/types';
+export type { MacroIndicatorMap } from './macroSnapshot/types';
+export const getMacroSnapshotIndicators = (): MacroIndicatorMap => Object.fromEntries(
+  macroIndicatorIds.map(id => [id, getIndicatorData(id)]),
+) as MacroIndicatorMap;
+export const makeEvidence = makeIndicatorEvidence;
 
 export const macroSnapshotRulesVersion = '2026-09-05.2';
 
@@ -97,7 +107,7 @@ function changeInterpretation(change: number | null): 'improving' | 'weakening' 
   return 'stable';
 }
 
-function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
+function makeLegacyEvidence(indicator: DashboardIndicator): SnapshotEvidence {
   const presentation = getIndicatorPresentation(indicator.dataset);
   return {
     id: indicator.id,
@@ -116,7 +126,7 @@ function makeEvidence(indicator: DashboardIndicator): SnapshotEvidence {
 }
 
 function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
-  const evidence = makeEvidence(indicator);
+  const evidence = makeLegacyEvidence(indicator);
   const momentum = changeInterpretation(indicator.change);
   const level = indicator.latest.value > 50
     ? '高于 50 的扩张区间'
@@ -131,7 +141,7 @@ function classifyPmi(indicator: DashboardIndicator): SnapshotSignal {
 }
 
 function classifyGrowth(indicator: DashboardIndicator): SnapshotSignal {
-  const evidence = makeEvidence(indicator);
+  const evidence = makeLegacyEvidence(indicator);
   const momentum = changeInterpretation(indicator.change);
   const level = indicator.latest.value > 0 ? '正增长' : indicator.latest.value < 0 ? '负增长' : '零增长';
   const momentumText = momentum === 'improving' ? '改善' : momentum === 'weakening' ? '走弱或放缓' : '基本稳定';
@@ -144,7 +154,7 @@ function classifyGrowth(indicator: DashboardIndicator): SnapshotSignal {
 }
 
 function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
-  const evidence = makeEvidence(indicator);
+  const evidence = makeLegacyEvidence(indicator);
   const weakening = isWeakening(indicator.change);
   return {
     ...evidence,
@@ -157,7 +167,7 @@ function classifyMonetaryGrowth(indicator: DashboardIndicator): SnapshotSignal {
 }
 
 function classifyPriceYoy(indicator: DashboardIndicator): SnapshotSignal {
-  const evidence = makeEvidence(indicator);
+  const evidence = makeLegacyEvidence(indicator);
   const momentum = changeInterpretation(indicator.change);
   const level = indicator.latest.value > 0 ? '同比上涨' : indicator.latest.value < 0 ? '同比下降' : '同比持平';
   const momentumText = momentum === 'improving' ? '动能上行' : momentum === 'weakening' ? '动能回落' : '动能基本稳定';
