@@ -40,7 +40,7 @@ export function analyzePolicyFinancialConditions(indicators: MacroIndicatorMap):
     ? 'mixed'
     : policyState === 'tightening' && lprState === 'stable'
       ? 'mixed'
-      : policyState !== 'stable' && lprState !== 'stable' && policyState !== lprState
+    : policyState !== 'stable' && lprState !== 'stable'
         ? 'mixed'
         : policyState !== 'stable'
           ? policyState

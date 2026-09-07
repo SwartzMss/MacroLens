@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { getDashboardIndicators } from '../src/data/dashboard.ts';
 import { analyzeCreditLiquidity } from '../src/data/macroSnapshot/creditLiquidity.ts';
 import { analyzeExternal } from '../src/data/macroSnapshot/external.ts';
@@ -15,6 +17,9 @@ import {
 } from '../src/data/macroSnapshot.ts';
 
 const data = observations => ({ data: observations });
+const snapshotComponent = fileURLToPath(new URL('../src/components/MacroSnapshot.astro', import.meta.url));
+const snapshotStyles = fileURLToPath(new URL('../src/styles/snapshot.css', import.meta.url));
+const homepage = fileURLToPath(new URL('../src/pages/index.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -167,4 +172,62 @@ test('freshness is a range and evidence retains heterogeneous periods', () => {
   assert.ok(evidence.some(item => item.frequency === 'quarterly'));
   assert.ok(evidence.some(item => item.isEvent));
   assert.ok(evidence.every(item => item.updatedAt));
+});
+
+test('snapshot UI renders domain evidence without exposing implementation metadata', () => {
+  const component = readFileSync(snapshotComponent, 'utf8');
+  const styles = readFileSync(snapshotStyles, 'utf8');
+  const page = readFileSync(homepage, 'utf8');
+
+  assert.match(component, /snapshot\.synthesis/);
+  assert.match(component, /snapshot\.domains/);
+  assert.match(component, /domain\.evidence/);
+  assert.match(component, /observationPeriod/);
+  assert.match(component, /updatedAt/);
+  assert.doesNotMatch(component, /snapshot\.phase|snapshot\.signals|rulesVersion|Macro Score|confidence score/);
+  assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
+  assert.match(page, /MacroDashboard/);
+  assert.match(page, /MacroSnapshot/);
+  assert.match(page, /buildMacroSnapshot/);
+});
+
+test('domain conclusions reference evidence from the same domain', () => {
+  const snapshot = buildMacroSnapshot();
+
+  for (const domain of snapshot.domains) {
+    const evidenceIds = new Set(domain.evidence.map(item => item.id));
+    for (const conclusion of [...domain.risks, ...domain.watchNext]) {
+      assert.ok(
+        conclusion.evidenceIds.every(id => evidenceIds.has(id)),
+        `${domain.id}/${conclusion.id} must reference local evidence`,
+      );
+    }
+  }
+});
+
+test('domain classifications do not depend on presentation labels', () => {
+  const original = buildMacroSnapshot();
+  const relabeled = Object.fromEntries(macroIndicatorIds.map(id => {
+    const dataset = getMacroSnapshotIndicators()[id];
+    return [id, {
+      ...dataset,
+      label: `renamed-${id}`,
+      ...(dataset.series ? {
+        series: dataset.series.map(series => ({ ...series, label: `renamed-${series.id}` })),
+      } : {}),
+    }];
+  }));
+  const renamed = buildMacroSnapshot(relabeled);
+
+  assert.deepEqual(
+    renamed.domains.map(domain => [domain.id, domain.state]),
+    original.domains.map(domain => [domain.id, domain.state]),
+  );
+  assert.equal(renamed.synthesis.label, original.synthesis.label);
+});
+
+test('snapshot model has no score, confidence, or investment-advice output', () => {
+  const output = JSON.stringify(buildMacroSnapshot());
+
+  assert.doesNotMatch(output, /score|confidence|投资建议|投资决策/i);
 });

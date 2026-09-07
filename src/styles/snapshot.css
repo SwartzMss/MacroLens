@@ -16,8 +16,9 @@
 }
 
 .snapshot-head p,
-.snapshot-phase p,
-.snapshot-conclusion-group p {
+.snapshot-synthesis p,
+.snapshot-domain-explanation,
+.snapshot-domain-conclusions p {
   color: var(--muted);
   margin: 0;
 }
@@ -25,9 +26,10 @@
 .snapshot-meta {
   display: grid;
   gap: 4px;
+  max-width: 420px;
   color: var(--muted);
   font-size: 13px;
-  white-space: nowrap;
+  text-align: right;
 }
 
 .snapshot-disclaimer {
@@ -38,9 +40,9 @@
   font-size: 13px;
 }
 
-.snapshot-phase {
+.snapshot-synthesis {
   display: grid;
-  grid-template-columns: minmax(180px, 0.35fr) 1fr;
+  grid-template-columns: minmax(220px, 0.45fr) 1fr;
   gap: 24px;
   align-items: center;
   margin-top: 18px;
@@ -50,58 +52,86 @@
   border-radius: 16px;
 }
 
-.snapshot-phase h3,
-.snapshot-conclusion-group h3,
-.snapshot-signals h3 {
+.snapshot-synthesis h3,
+.snapshot-domains h3 {
   font: 700 26px var(--serif);
   margin: 4px 0;
 }
 
-.snapshot-evidence-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.snapshot-evidence-links a {
-  color: var(--green);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.snapshot-signals {
+.snapshot-domains {
   margin-top: 40px;
 }
 
-.snapshot-signals .section-head {
+.snapshot-domains .section-head {
   margin-bottom: 14px;
 }
 
-.snapshot-signal-grid {
+.snapshot-domain-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
-.snapshot-signal {
+.snapshot-domain {
   min-width: 0;
-  padding: 18px;
+  padding: 20px;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
 }
 
-.snapshot-signal-top,
-.snapshot-signal-change {
+.snapshot-domain-head,
+.snapshot-evidence-head,
+.snapshot-evidence-change {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.snapshot-domain-head {
+  align-items: start;
+}
+
+.snapshot-domain-head h4 {
+  margin: 4px 0 0;
+  font: 700 24px/1.2 var(--serif);
+}
+
+.snapshot-domain-state {
+  padding: 5px 9px;
+  border: 1px solid #b9d7c8;
+  border-radius: 999px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.snapshot-domain-explanation {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.snapshot-domain-evidence {
+  display: grid;
   gap: 10px;
+  margin-top: 18px;
+}
+
+.snapshot-evidence {
+  padding: 14px;
+  background: #fbfaf5;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.snapshot-evidence-head {
   color: var(--muted);
   font-size: 12px;
 }
 
-.snapshot-signal-top a {
+.snapshot-evidence-head a {
   overflow: hidden;
   color: var(--green);
   font-weight: 700;
@@ -109,84 +139,107 @@
   white-space: nowrap;
 }
 
-.snapshot-signal-value {
-  margin: 12px 0 0;
+.snapshot-evidence-value {
+  margin-top: 8px;
   color: var(--green);
-  font: 800 32px/1.1 var(--serif);
+  font: 800 28px/1.1 var(--serif);
 }
 
-.snapshot-fact,
-.snapshot-interpretation {
-  margin-top: 14px;
+.snapshot-evidence-change {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.snapshot-evidence-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.snapshot-evidence-meta div {
+  min-width: 0;
+}
+
+.snapshot-evidence-meta dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.snapshot-evidence-meta dd {
+  margin: 2px 0 0;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.snapshot-domain-conclusions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.snapshot-domain-conclusions h5 {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.snapshot-domain-conclusions ul {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 14px 0 0;
+  list-style: none;
+}
+
+.snapshot-domain-conclusions li {
   padding-top: 12px;
   border-top: 1px solid var(--line);
 }
 
-.snapshot-fact strong,
-.snapshot-interpretation strong {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-
-.snapshot-fact p,
-.snapshot-interpretation p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.snapshot-interpretation {
-  border-top-color: #b9d7c8;
-}
-
-.snapshot-interpretation strong {
-  color: var(--green);
-}
-
-.snapshot-conclusions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 40px;
-}
-
-.snapshot-conclusion-group {
-  padding: 22px;
-  background: #fffaf0;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-}
-
-.snapshot-conclusion-group ul {
-  display: grid;
-  gap: 16px;
-  padding: 0;
-  margin: 18px 0 0;
-  list-style: none;
-}
-
-.snapshot-conclusion-group li {
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-
-.snapshot-conclusion-group li:first-child {
+.snapshot-domain-conclusions li:first-child {
   padding-top: 0;
   border-top: 0;
 }
 
-.snapshot-conclusion-group li strong {
-  font-size: 15px;
+.snapshot-domain-conclusions li strong {
+  font-size: 13px;
+}
+
+.snapshot-domain-conclusions li p {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.snapshot-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.snapshot-evidence-links a {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .snapshot-empty {
-  margin-top: 18px !important;
+  margin-top: 14px !important;
+  font-size: 12px;
 }
 
 @media (max-width: 1000px) {
-  .snapshot-signal-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .snapshot-domain-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -198,15 +251,12 @@
   }
 
   .snapshot-meta {
-    white-space: normal;
+    max-width: none;
+    text-align: left;
   }
 
-  .snapshot-phase,
-  .snapshot-conclusions {
-    grid-template-columns: 1fr;
-  }
-
-  .snapshot-signal-grid {
+  .snapshot-synthesis,
+  .snapshot-domain-conclusions {
     grid-template-columns: 1fr;
   }
 }
