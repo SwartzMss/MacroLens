@@ -7,7 +7,9 @@ import RelationshipCards from '../../components/RelationshipCards.astro';
 import RelatedConcepts from '../../components/RelatedConcepts.astro';
 import PrerequisiteConcepts from '../../components/PrerequisiteConcepts.astro';
 import PageFeedback from '../../components/PageFeedback.astro';
+import ConceptKnowledgeOverview from '../../components/ConceptKnowledgeOverview.astro';
 import { buildConceptCatalog } from '../../data/conceptCatalog';
+import { buildConceptKnowledge } from '../../data/conceptKnowledge';
 import { topicRegistry } from '../../data/topics';
 import { getIndicatorData } from '../../data/indicatorRegistry';
 import { getIndicatorPresentation } from '../../data/indicatorPresentationAdapter';
@@ -33,5 +35,20 @@ const catalog = buildConceptCatalog(allConcepts, topicRegistry);
 const prerequisites = entry.data.prerequisites.map(id => catalog.byId.get(id)).filter(Boolean);
 const conceptsByStableId = new Map(allConcepts.map(concept => [concept.data.id, concept]));
 const relatedConcepts = entry.data.related.map(id => conceptsByStableId.get(id)).filter(Boolean);
+const knowledge = buildConceptKnowledge({
+  graphId: entry.data.graph,
+  conceptId: entry.data.id,
+  summary: entry.data.subtitle,
+  relatedIds: entry.data.related,
+  concepts: allConcepts,
+});
 ---
-<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / {categoryLabel} / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><PrerequisiteConcepts concepts={prerequisites} /><Content />{presentation && <IndicatorMetadata presentation={presentation} />}{indicator && <IndicatorChart indicator={indicator} />}<PageFeedback pageId={entry.data.id} /><RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} /><RelatedConcepts concepts={relatedConcepts} /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>
+<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / {categoryLabel} / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} /><PrerequisiteConcepts concepts={prerequisites} /><details class="concept-long-form" open><summary>详细说明与统计边界</summary><div class="concept-long-form-content"><Content /></div></details>{presentation && <IndicatorMetadata presentation={presentation} />}{indicator && <IndicatorChart indicator={indicator} />}<PageFeedback pageId={entry.data.id} /><RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} /><RelatedConcepts concepts={relatedConcepts} /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>
+<style>
+.concept-long-form{margin-top:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.concept-long-form>summary{padding:14px 0;color:var(--green);cursor:pointer;font-weight:800;list-style:none}
+.concept-long-form>summary::-webkit-details-marker{display:none}
+.concept-long-form>summary::after{content:'−';float:right;font-size:20px;font-weight:400}
+.concept-long-form:not([open])>summary::after{content:'+'}
+.concept-long-form-content{padding-bottom:8px}
+</style>
