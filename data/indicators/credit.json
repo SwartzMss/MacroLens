@@ -16,17 +16,17 @@
   "methodologyFingerprint": "pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy",
   "sources": [
     {
+      "title": "中国人民银行金融机构人民币信贷收支表（2024）",
+      "url": "https://www.pbc.gov.cn/eportal/fileDir/diaochatongjisi/resource/cms/2025/01/2025011418044360290.pdf",
+      "sourceDate": "2025-01-14",
+      "coverage": "2024-01 to 2024-12"
+    },
+    {
       "title": "中国人民银行金融机构人民币信贷收支表（2023，2024 年同比分母）",
       "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111817163388840.htm",
       "sourceDate": "2025-11-18",
       "coverage": "2023-01 to 2023-12",
       "role": "methodology"
-    },
-    {
-      "title": "中国人民银行金融机构人民币信贷收支表（2024）",
-      "url": "https://www.pbc.gov.cn/eportal/fileDir/diaochatongjisi/resource/cms/2025/01/2025011418044360290.pdf",
-      "sourceDate": "2025-01-14",
-      "coverage": "2024-01 to 2024-12"
     },
     {
       "title": "中国人民银行金融机构人民币信贷收支表（2025）",
