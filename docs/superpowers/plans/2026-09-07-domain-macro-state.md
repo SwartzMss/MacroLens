@@ -103,7 +103,7 @@ export type SnapshotConclusion = { id: string; title: string; explanation: strin
 export type MacroDomainId = 'growth' | 'prices' | 'credit-liquidity' | 'policy-financial-conditions' | 'labor' | 'external';
 export type MacroDomainStateValue = 'strengthening' | 'weakening' | 'stable' | 'mixed' | 'divergent' | 'easing' | 'tightening' | 'elevated' | 'notable';
 export type MacroDomainState = { id: MacroDomainId; label: string; state: MacroDomainStateValue; explanation: string; evidence: SnapshotEvidence[]; risks: SnapshotConclusion[]; watchNext: SnapshotConclusion[] };
-export type MacroSynthesis = { label: string; explanation: string; supportingDomainIds: MacroDomainId[]; conflictingDomainIds: MacroDomainId[] };
+export type MacroSynthesis = { label: string; explanation: string; supportingDomainIds: MacroDomainId[]; conflictingDomainIds: MacroDomainId[]; contextualDomainIds: MacroDomainId[] };
 export type MacroSnapshot = {
   rulesVersion: string;
   freshness: { earliestUpdatedAt: string; latestUpdatedAt: string; note: string };
@@ -305,7 +305,7 @@ Use `m0`, `m1`, and `m2` as the monetary group and `credit` plus `social-financi
 
 - [ ] **Step 4: Implement `analyzePolicyFinancialConditions`.**
 
-Use `makeIndicatorEvidence` for `policy-rate` and `lpr`. Classify a lower policy-rate event change as `easing`, a higher change as `tightening`, and no change as `stable`. Classify LPR levels independently; if policy and LPR direction disagree, return `mixed`, otherwise use the policy direction or LPR direction. Include event/series wording in the explanation and do not call either observation proof of economic outcomes. Evidence IDs must remain `policy-rate`, `lpr:1y`, and `lpr:5y-plus`.
+Use `makeIndicatorEvidence` for `policy-rate` and `lpr`. Classify a lower policy-rate event change as `easing`, a higher change as `tightening`, and no change as `stable`. Convert LPR level changes into financial-condition direction: lower LPR is `easing`, higher LPR is `tightening`, and unchanged LPR is `stable`; if both sources move in the same direction, preserve that direction, while opposite non-stable directions return `mixed`. Include event/series wording in the explanation and do not call either observation proof of economic outcomes. Evidence IDs must remain `policy-rate`, `lpr:1y`, and `lpr:5y-plus`.
 
 - [ ] **Step 5: Implement `analyzeLabor`.**
 
@@ -377,7 +377,7 @@ Expected: FAIL because `buildMacroSnapshot` still exposes the V1 phase model and
 
 - [ ] **Step 3: Implement `deriveSynthesis`.**
 
-In `synthesis.ts`, accept only `MacroDomainState[]`. Define `directionalPositive = ['strengthening', 'easing']`, `directionalNegative = ['weakening', 'tightening', 'elevated']`, and treat `mixed`, `divergent`, `stable`, and `notable` as qualified. Return supporting and conflicting domain ID arrays in input order. If both directional groups are non-empty, return a mixed label naming both groups; otherwise return improvement, weakening-pressure, or mixed/qualified wording. Do not calculate a number.
+In `synthesis.ts`, accept only `MacroDomainState[]`. Interpret state together with domain identity: only Growth / Activity and Labor can populate supporting or conflicting domain ID arrays, while Prices, Credit & Liquidity, Policy / Financial Conditions, and External populate `contextualDomainIds`. If activity-oriented domains point in opposite directions, return a qualified label naming both groups; otherwise name a local improvement/weakening direction only when the activity-oriented evidence supports it. Never map `strengthening`/`easing` or `weakening`/`tightening` to universal positive/negative buckets, and do not calculate a number.
 
 - [ ] **Step 4: Implement facade validation and orchestration.**
 

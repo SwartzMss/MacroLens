@@ -28,7 +28,7 @@ export {
   type SnapshotEvidence,
 } from './macroSnapshot/types';
 
-export const macroSnapshotRulesVersion = '2026-09-07.1';
+export const macroSnapshotRulesVersion = '2026-09-07.2';
 
 export const getMacroSnapshotIndicators = (): MacroIndicatorMap => Object.fromEntries(
   macroIndicatorIds.map(id => [id, getIndicatorData(id)]),

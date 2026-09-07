@@ -156,6 +156,7 @@ type MacroSynthesis = {
   explanation: string;
   supportingDomainIds: MacroDomainId[];
   conflictingDomainIds: MacroDomainId[];
+  contextualDomainIds: MacroDomainId[];
 };
 
 type MacroSnapshot = {
@@ -232,12 +233,13 @@ Evidence: exports and imports.
 
 ## Synthesis
 
-`deriveSynthesis(domains)` accepts only domain states. It creates a concise label and names supporting/conflicting domains using deterministic rules:
+`deriveSynthesis(domains)` accepts only domain states. It creates a concise label and names supporting, conflicting, and contextual domains using deterministic, domain-aware rules:
 
-- If directional domain states conflict, return a mixed/qualified synthesis and list both groups.
-- If several domains strengthen without a conflicting weakening domain, return an improvement-oriented synthesis while naming the domains.
-- If several domains weaken without a conflicting strengthening domain, return a weakening-pressure synthesis while naming the domains.
-- If domain states are mostly stable, divergent, or not comparable, return a mixed synthesis rather than forcing directionality.
+- Only Growth / Activity and Labor `strengthening`/`weakening` states may support or conflict with a top-level activity direction.
+- Prices, Credit & Liquidity, Policy / Financial Conditions, and External remain contextual regardless of whether their local state is `strengthening`, `weakening`, `easing`, or `tightening`; those states must not be treated as a universal macro polarity.
+- If Growth / Activity and Labor directions conflict, return a qualified synthesis and list both groups.
+- If several activity-oriented domains strengthen or weaken without a conflicting activity-oriented domain, return a direction-specific synthesis while naming the domains.
+- If no activity-oriented domain has a clear direction, return a contextual synthesis rather than forcing directionality.
 
 The synthesis never computes or exposes a score. Flattened top-level `risks` and `watchNext` are stable-order concatenations of domain outputs and do not run another set of rules.
 

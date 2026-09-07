@@ -16,12 +16,12 @@ function conclusion(
   return { id, title, explanation, kind, evidenceIds };
 }
 
-function levelDirection(evidence: SnapshotEvidence[]): 'strengthening' | 'weakening' | 'stable' {
+function financialConditionDirection(evidence: SnapshotEvidence[]): 'easing' | 'tightening' | 'stable' {
   const changes = evidence.map(item => item.change).filter((change): change is number => change !== null);
   const improving = changes.filter(change => change > 0.0001).length;
-  const weakening = changes.filter(change => change < -0.0001).length;
-  if (improving > weakening) return 'strengthening';
-  if (weakening > improving) return 'weakening';
+  const tightening = changes.filter(change => change < -0.0001).length;
+  if (tightening > improving) return 'easing';
+  if (improving > tightening) return 'tightening';
   return 'stable';
 }
 
@@ -35,16 +35,12 @@ export function analyzePolicyFinancialConditions(indicators: MacroIndicatorMap):
     : policyChange !== null && policyChange > 0.0001
       ? 'tightening'
       : 'stable';
-  const lprState = levelDirection(lprEvidence);
-  const state: MacroDomainState['state'] = policyState === 'easing' && lprState === 'stable'
-    ? 'mixed'
-    : policyState === 'tightening' && lprState === 'stable'
-      ? 'mixed'
-    : policyState !== 'stable' && lprState !== 'stable'
-        ? 'mixed'
-        : policyState !== 'stable'
-          ? policyState
-          : lprState;
+  const lprState = financialConditionDirection(lprEvidence);
+  const state: MacroDomainState['state'] = policyState === 'stable'
+    ? lprState
+    : lprState === 'stable' || policyState === lprState
+      ? policyState
+      : 'mixed';
   const evidenceIds = evidence.map(item => item.id);
   const risks = state === 'mixed'
     ? [conclusion(

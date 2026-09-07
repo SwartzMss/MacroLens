@@ -9,6 +9,7 @@ import { analyzeGrowth } from '../src/data/macroSnapshot/growth.ts';
 import { analyzeLabor } from '../src/data/macroSnapshot/labor.ts';
 import { analyzePolicyFinancialConditions } from '../src/data/macroSnapshot/policyFinancialConditions.ts';
 import { analyzePrices } from '../src/data/macroSnapshot/prices.ts';
+import { deriveSynthesis } from '../src/data/macroSnapshot/synthesis.ts';
 import {
   buildMacroSnapshot,
   getMacroSnapshotIndicators,
@@ -32,6 +33,15 @@ const makeMacroIndicators = (overrides = {}) => {
     }];
   }));
 };
+const domainState = (id, state) => ({
+  id,
+  label: id,
+  state,
+  explanation: '',
+  evidence: [],
+  risks: [],
+  watchNext: [],
+});
 
 test('exposes all registered macro datasets without changing the Dashboard set', () => {
   const macro = getMacroSnapshotIndicators();
@@ -115,6 +125,27 @@ test('policy domain retains policy event and each LPR series', () => {
   assert.ok(policy.evidence.every(item => item.observationPeriod && item.updatedAt));
 });
 
+test('policy and LPR cuts both map to easing financial conditions', () => {
+  const easingIndicators = makeMacroIndicators({
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-01', value: 1.7 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 2.9 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 3.5 }, { date: '2026-09', value: 3.4 }] },
+      ],
+    },
+  });
+  const easing = analyzePolicyFinancialConditions(easingIndicators);
+
+  assert.equal(easing.state, 'easing');
+
+  const stablePolicy = analyzePolicyFinancialConditions(makeMacroIndicators({
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-01', value: 1.8 }]),
+    lpr: easingIndicators.lpr,
+  }));
+  assert.equal(stablePolicy.state, 'easing');
+});
+
 test('labor weakens independently from a positive growth domain', () => {
   const indicators = makeMacroIndicators({
     'unemployment-rate': data([{ date: '2026-07', value: 5 }, { date: '2026-08', value: 5.3 }]),
@@ -151,6 +182,19 @@ test('synthesis preserves conflicting domain directions', () => {
   assert.ok(snapshot.synthesis.supportingDomainIds.includes('growth'));
   assert.ok(snapshot.synthesis.conflictingDomainIds.includes('labor'));
   assert.equal(snapshot.risks.length, snapshot.domains.flatMap(item => item.risks).length);
+});
+
+test('synthesis interprets domain direction instead of globally scoring states', () => {
+  const synthesis = deriveSynthesis([
+    domainState('growth', 'strengthening'),
+    domainState('prices', 'strengthening'),
+    domainState('policy-financial-conditions', 'easing'),
+  ]);
+
+  assert.deepEqual(synthesis.supportingDomainIds, ['growth']);
+  assert.deepEqual(synthesis.conflictingDomainIds, []);
+  assert.deepEqual(synthesis.contextualDomainIds, ['prices', 'policy-financial-conditions']);
+  assert.match(synthesis.explanation, /分别|背景|不纳入/);
 });
 
 test('snapshot rejects missing and unexpected indicator input', () => {

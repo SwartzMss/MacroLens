@@ -74,6 +74,7 @@ export type MacroSynthesis = {
   explanation: string;
   supportingDomainIds: MacroDomainId[];
   conflictingDomainIds: MacroDomainId[];
+  contextualDomainIds: MacroDomainId[];
 };
 
 export type MacroSnapshot = {
