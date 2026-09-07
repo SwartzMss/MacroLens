@@ -9,8 +9,8 @@
   "chartTitle": "中国人民银行7天期逆回购操作利率",
   "source": "PBOC",
   "calculation": "published",
-  "updatedAt": "2026-09-01",
-  "verifiedThrough": "2026-09-01",
+  "updatedAt": "2026-09-07",
+  "verifiedThrough": "2026-09-07",
   "comparabilityNote": "仅记录起始已知水平和官方调息生效日／操作日的利率变化，不补造月度或每日观测。水平区间表示沿用此前公布的利率；末端仅延伸至最近一次明确公布该利率的公告日期。2024-07-19 为历史起始水平，并非首次执行该利率的日期；2024-07-22 起改为固定利率、数量招标并强化主要政策利率地位，此前的操作利率不代表完全相同的政策框架。该利率不同于 LPR、DR007、R007；传导并非即时或等比例。",
   "methodologyFingerprint": "pboc-7d-reverse-repo|published-rate|effective-operation-date|step-changes|fixed-rate-from-2024-07-22",
   "methodologyEffectiveFrom": "2024-07-22",
@@ -40,10 +40,10 @@
       "coverage": "2025-05-08 to 2025-05-08"
     },
     {
-      "title": "公开市场业务交易公告 [2026]第170号",
-      "url": "https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125431/125475/2026090108544487779/index.html",
-      "sourceDate": "2026-09-01",
-      "coverage": "2026-09-01 to 2026-09-01"
+      "title": "公开市场业务交易公告 [2026]第174号",
+      "url": "https://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125431/125475/2026090709060799588/index.html",
+      "sourceDate": "2026-09-07",
+      "coverage": "2026-09-07 to 2026-09-07"
     }
   ],
   "data": [
