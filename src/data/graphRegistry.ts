@@ -15,10 +15,17 @@ export const explainableRelationTypes = [
   'transmission',
 ] as const;
 export type ExplainableRelationType = typeof explainableRelationTypes[number];
+export type RelationshipEvidence = {
+  title: string;
+  url: string;
+};
 export type RelationshipMetadata = {
   relation: ExplainableRelationType;
   lag: string;
   explanation: string;
+  applicability: string[];
+  limitations: string[];
+  evidence: RelationshipEvidence[];
 };
 export type Relation = { source: string; target: string; type: RelationType } & Partial<RelationshipMetadata>;
 export type ConceptRelation = { relation: Relation; other: RelationNode; direction: 'incoming' | 'outgoing' | 'symmetric' };
@@ -31,7 +38,23 @@ export function isExplainableRelation(relation: Relation): relation is Relation 
     && typeof relation.lag === 'string'
     && relation.lag.trim().length > 0
     && typeof relation.explanation === 'string'
-    && relation.explanation.trim().length > 0;
+    && relation.explanation.trim().length > 0
+    && Array.isArray(relation.applicability)
+    && relation.applicability.length > 0
+    && relation.applicability.every((item) => typeof item === 'string' && item.trim().length > 0)
+    && Array.isArray(relation.limitations)
+    && relation.limitations.length > 0
+    && relation.limitations.every((item) => typeof item === 'string' && item.trim().length > 0)
+    && Array.isArray(relation.evidence)
+    && relation.evidence.length > 0
+    && relation.evidence.every((item) => {
+      if (typeof item !== 'object' || item === null) return false;
+      const evidence = item as Partial<RelationshipEvidence>;
+      return typeof evidence.title === 'string'
+        && evidence.title.trim().length > 0
+        && typeof evidence.url === 'string'
+        && evidence.url.startsWith('https://');
+    });
 }
 
 export function validateGraphElements(elements: readonly RawGraphElement[]) {
@@ -54,7 +77,8 @@ export function validateGraphElements(elements: readonly RawGraphElement[]) {
     for (const field of forbiddenFields) {
       if (Object.hasOwn(relation, field)) throw new Error(`Forbidden relationship field: ${field}`);
     }
-    const hasMetadata = relation.relation !== undefined || relation.lag !== undefined || relation.explanation !== undefined;
+    const metadataFields = ['relation', 'lag', 'explanation', 'applicability', 'limitations', 'evidence'] as const;
+    const hasMetadata = metadataFields.some((field) => Object.hasOwn(relation, field));
     if (!hasMetadata) continue;
     if (relation.relation !== undefined && !explainableRelationTypes.includes(relation.relation as ExplainableRelationType)) {
       throw new Error(`Unknown explainable relationship type: ${relation.relation}`);

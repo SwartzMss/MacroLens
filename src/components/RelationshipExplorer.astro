@@ -22,7 +22,7 @@ const panels = nodes.map((node) => ({ node, relations: getExplainableConceptRela
     <select id="explorer-node" data-explorer-select>
       {nodes.map((node) => <option value={node.id} selected={node.id === initialNode.id}>{node.label}</option>)}
     </select>
-    <p>可阅读“它受什么影响”“它影响什么”“与什么相关”等分组；关系卡片会直接展示关系类型、时间关系和解释。</p>
+    <p>可阅读“它受什么影响”“它影响什么”“与什么相关”等分组；展开关系卡片可查看类型、时间关系、解释、适用条件、局限和证据来源。</p>
   </div>
   <div class="explorer-panels" data-explorer-panels>
     {panels.map(({ node, relations }) => <section class="explorer-panel" data-explorer-panel data-node-id={node.id} hidden={node.id !== initialNode.id}>

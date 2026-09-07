@@ -9,13 +9,13 @@ const concepts = await getCollection('concepts');
 const { nodes } = getExplainableRelationData('macro');
 ---
 
-<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的关系类型、时间关系和解释。">
+<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的关系类型、时间关系、适用条件、局限和证据。">
   <div class="shell graph-page">
     <header class="graph-page-head">
       <div class="eyebrow">Relationship explorer</div>
       <h1>按节点浏览关系</h1>
-      <p class="lead">选择一个指标或概念，阅读它受什么影响、影响什么，以及与什么通常相关；直接查看关系类型、时间关系和解释。</p>
-      <p class="graph-disclaimer">这是由 MacroLens 手工维护的解释性关系浏览器，不代表确定因果，不做实时预测，也不提供投资建议。</p>
+      <p class="lead">选择一个指标或概念，阅读它受什么影响、影响什么，以及与什么通常相关；展开卡片查看关系类型、时间关系、适用条件、局限和证据来源。</p>
+      <p class="graph-disclaimer">这是由 MacroLens 手工维护的解释性关系浏览器，用于整理经验关系及其边界；不代表确定因果，不做实时预测，也不提供投资建议。</p>
     </header>
     <RelationshipExplorer nodes={nodes} concepts={concepts} initialNodeId="m2" />
   </div>

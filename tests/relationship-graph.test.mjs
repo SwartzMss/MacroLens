@@ -55,6 +55,15 @@ test('defines explainable metadata for the core macro chains', () => {
     assert.ok(relation.lag.trim().length > 0);
     assert.equal(typeof relation.explanation, 'string');
     assert.ok(relation.explanation.trim().length > 0);
+    assert.ok(Array.isArray(relation.applicability));
+    assert.ok(relation.applicability.length > 0);
+    assert.ok(relation.applicability.every((item) => typeof item === 'string' && item.trim().length > 0));
+    assert.ok(Array.isArray(relation.limitations));
+    assert.ok(relation.limitations.length > 0);
+    assert.ok(relation.limitations.every((item) => typeof item === 'string' && item.trim().length > 0));
+    assert.ok(Array.isArray(relation.evidence));
+    assert.ok(relation.evidence.length > 0);
+    assert.ok(relation.evidence.every((item) => item && typeof item.title === 'string' && item.title.trim() && /^https:\/\//.test(item.url)));
     assert.doesNotMatch(relation.lag, /[a-z]/, 'lag copy should be localized for the Chinese UI');
     assert.doesNotMatch(relation.explanation, /[a-z]/, 'explanation copy should be localized for the Chinese UI');
     assert.equal(Object.hasOwn(relation, 'causal_effect'), false);
@@ -92,7 +101,15 @@ test('defines explainable metadata for the core macro chains', () => {
   ];
   for (const [source, target, type] of requiredCoreRelations) {
     const relation = relations.find((item) => relationKey(item) === `${source}|${target}|${type}`);
-    assert.ok(relation?.relation && relation.lag && relation.explanation, `core relation ${source} -> ${target} needs metadata`);
+    assert.ok(
+      relation?.relation
+        && relation.lag
+        && relation.explanation
+        && relation.applicability?.length
+        && relation.limitations?.length
+        && relation.evidence?.length,
+      `core relation ${source} -> ${target} needs complete metadata`,
+    );
   }
 });
 
@@ -115,6 +132,15 @@ test('validates graph uniqueness, endpoints, and explainable field boundaries at
   assert.throws(
     () => validateGraphElements([...validNodes, { data: { source: 'a', target: 'b', type: 'AFFECTS', causal_effect: 'high' } }]),
     /Forbidden relationship field: causal_effect/,
+  );
+  assert.throws(
+    () => validateGraphElements([...validNodes, {
+      data: {
+        source: 'a', target: 'b', type: 'AFFECTS', relation: 'leading_indicator', lag: '数月', explanation: '解释',
+        applicability: [], limitations: ['边界'], evidence: [{ title: '来源', url: 'https://example.com/source' }],
+      },
+    }]),
+    /Incomplete explainable relationship metadata: a -> b/,
   );
 });
 
@@ -179,6 +205,12 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(cards, /lag/);
   assert.match(cards, /explanation/);
   assert.match(cards, /metadata\.relation/);
+  assert.match(cards, /metadata\.applicability/);
+  assert.match(cards, /metadata\.limitations/);
+  assert.match(cards, /metadata\.evidence/);
+  assert.match(cards, /适用条件/);
+  assert.match(cards, /局限与边界/);
+  assert.match(cards, /证据 \/ 来源/);
   assert.match(cards, /metadata \? explainableLabels\[metadata\.relation\]/);
   assert.match(cards, /<dt>解释<\/dt>/);
   assert.match(cards, /<details open/);
@@ -186,6 +218,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.doesNotMatch(cards, /const summary = <div class="relationship-summary">/);
   assert.match(cards, /relationship-detail-endpoints/);
   assert.match(page, /关系类型|时间关系/);
+  assert.match(page, /适用条件|局限|证据来源/);
   assert.match(page, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.match(nav, /<a href=["']\/graph["']>宏观关系<\/a>/);
