@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getDashboardIndicators } from '../src/data/dashboard.ts';
+import { analyzeCreditLiquidity } from '../src/data/macroSnapshot/creditLiquidity.ts';
+import { analyzeExternal } from '../src/data/macroSnapshot/external.ts';
 import { analyzeGrowth } from '../src/data/macroSnapshot/growth.ts';
+import { analyzeLabor } from '../src/data/macroSnapshot/labor.ts';
+import { analyzePolicyFinancialConditions } from '../src/data/macroSnapshot/policyFinancialConditions.ts';
 import { analyzePrices } from '../src/data/macroSnapshot/prices.ts';
 import {
   getMacroSnapshotIndicators,
@@ -83,4 +87,46 @@ test('prices retain divergent CPI, core CPI, and PPI evidence', () => {
   assert.equal(prices.state, 'divergent');
   assert.match(prices.explanation, /CPI|核心|PPI/);
   assert.doesNotMatch(prices.explanation, /意味着|导致|必然/);
+});
+
+test('credit separates money growth from credit and social-financing growth', () => {
+  const credit = analyzeCreditLiquidity(makeMacroIndicators({
+    m2: data([{ date: '2026-07', value: 7 }, { date: '2026-08', value: 8 }]),
+    credit: data([{ date: '2026-07', value: 9 }, { date: '2026-08', value: 8 }]),
+    'social-financing': data([{ date: '2026-07', value: 9 }, { date: '2026-08', value: 8 }]),
+  }));
+
+  assert.equal(credit.state, 'mixed');
+  assert.match(credit.explanation, /货币|信贷|社会融资/);
+  assert.doesNotMatch(credit.explanation, /意味着|导致|必然/);
+});
+
+test('policy domain retains policy event and each LPR series', () => {
+  const policy = analyzePolicyFinancialConditions(getMacroSnapshotIndicators());
+
+  assert.ok(policy.evidence.some(item => item.id === 'policy-rate' && item.isEvent));
+  assert.deepEqual(policy.evidence.filter(item => item.seriesId).map(item => item.id), ['lpr:1y', 'lpr:5y-plus']);
+  assert.ok(policy.evidence.every(item => item.observationPeriod && item.updatedAt));
+});
+
+test('labor weakens independently from a positive growth domain', () => {
+  const indicators = makeMacroIndicators({
+    'unemployment-rate': data([{ date: '2026-07', value: 5 }, { date: '2026-08', value: 5.3 }]),
+    gdp: data([{ date: '2026-Q2', value: 4 }, { date: '2026-Q3', value: 4 }]),
+  });
+  const labor = analyzeLabor(indicators);
+  const growth = analyzeGrowth(indicators);
+
+  assert.equal(labor.state, 'weakening');
+  assert.notEqual(growth.state, 'weakening');
+});
+
+test('external reports exports and imports divergence', () => {
+  const external = analyzeExternal(makeMacroIndicators({
+    exports: data([{ date: '2026-07', value: 5 }, { date: '2026-08', value: 6 }]),
+    imports: data([{ date: '2026-07', value: 4 }, { date: '2026-08', value: 2 }]),
+  }));
+
+  assert.equal(external.state, 'divergent');
+  assert.match(external.explanation, /出口|进口/);
 });
