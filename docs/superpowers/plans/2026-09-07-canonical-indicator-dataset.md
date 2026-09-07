@@ -136,14 +136,15 @@ Update the existing generic ingestion test so it proves the semantic wrapper ret
 
 ```js
 test('generic indicator validation accepts a monthly percentage dataset', () => {
-  const validated = validateIndicatorDataset({
+  const input = {
     ...existingDataset,
     source: 'PBOC',
     unit: '%',
     metric: 'yoy',
     calculation: 'published',
-  });
-  assert.strictEqual(validated, existingDataset);
+  };
+  const validated = validateIndicatorDataset(input);
+  assert.strictEqual(validated, input);
 });
 ```
 
