@@ -387,6 +387,8 @@ export function validateIndicatorDataset(
 
 Before replacing the function, retain the existing source validation behavior by moving its coverage-pattern loop into the shown composition and preserving the existing `ISO_DATE_PATTERN` and `IngestionContractError` declarations. The existing `coveragePattern`, `validateObservations`, and `coverageCoversDates` options must continue to control source-specific behavior. The default observation validator remains `validateMonthlyObservations`; the policy-rate and price validators continue to provide their own date/coverage rules.
 
+When the shared validator throws `IndicatorDatasetValidationError`, wrap it as `IngestionContractError` at this ingestion boundary and copy the structured `issues` onto the ingestion error. This preserves existing ingestion error typing while keeping path-aware details available to ingestion callers. Other errors must be rethrown unchanged.
+
 - [ ] **Step 3: Validate at the single-file writer boundary**
 
 Update `scripts/ingest/write/indicator.ts` to import `IndicatorDataset` and `validateIndicatorDataset` from the shared domain module and validate before serializing:
@@ -439,6 +441,8 @@ git commit -m "refactor: share indicator contract with ingestion"
 - Modify: `src/data/indicatorPresentationAdapter.ts:1`
 - Modify: `src/data/indicatorChartOption.ts:1-3`
 - Modify: `src/data/dashboard.ts:1`
+- Modify: `src/components/IndicatorChart.astro:1-4`
+- Modify: `tests/indicator-presentation.test.mjs:9-17` to inspect the canonical domain type location
 - Test: `tests/indicator-dataset-schema.test.mjs`
 - Test: `tests/indicator-data-integrity.test.mjs`
 
@@ -480,7 +484,7 @@ Keep `getIndicatorData`'s unknown-id error and lookup semantics unchanged.
 
 - [ ] **Step 2: Update consumer type imports**
 
-Use the canonical domain module directly:
+Use the canonical domain module directly in all runtime consumers, including the chart component:
 
 ```ts
 // src/data/indicatorPresentationAdapter.ts
@@ -492,7 +496,12 @@ import type { IndicatorSeries } from '../domain/indicatorDataset';
 // src/data/dashboard.ts
 import { getIndicatorData } from './indicatorRegistry';
 import type { IndicatorDataset } from '../domain/indicatorDataset';
+
+// src/components/IndicatorChart.astro
+import type { IndicatorDataset } from '../domain/indicatorDataset';
 ```
+
+Update the existing presentation structure test to read `src/domain/indicatorDataset.ts` when checking persisted fields such as `calculationEffectiveFrom`, because the registry no longer owns that interface.
 
 Leave all presentation, chart, dashboard, and snapshot behavior unchanged.
 
