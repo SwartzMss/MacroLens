@@ -305,7 +305,7 @@ Use `m0`, `m1`, and `m2` as the monetary group and `credit` plus `social-financi
 
 - [ ] **Step 4: Implement `analyzePolicyFinancialConditions`.**
 
-Use `makeIndicatorEvidence` for `policy-rate` and `lpr`. Classify a lower policy-rate event change as `easing`, a higher change as `tightening`, and no change as `stable`. Convert LPR level changes into financial-condition direction: lower LPR is `easing`, higher LPR is `tightening`, and unchanged LPR is `stable`; if both sources move in the same direction, preserve that direction, while opposite non-stable directions return `mixed`. Include event/series wording in the explanation and do not call either observation proof of economic outcomes. Evidence IDs must remain `policy-rate`, `lpr:1y`, and `lpr:5y-plus`.
+Use `makeIndicatorEvidence` for `policy-rate` and `lpr`. Classify a lower policy-rate event change as the last-event direction `easing`, a higher change as `tightening`, and no change as `stable`; when `verifiedThrough` is later than the last event date, expire that event direction into current policy state `stable` while retaining the last-event direction in the explanation/evidence. Convert LPR level changes into financial-condition direction: lower LPR is `easing`, higher LPR is `tightening`, and unchanged LPR is `stable`; if both current sources move in the same direction, preserve that direction, while opposite non-stable directions return `mixed`. Include event/series wording in the explanation and do not call either observation proof of economic outcomes. Evidence IDs must remain `policy-rate`, `lpr:1y`, and `lpr:5y-plus`.
 
 - [ ] **Step 5: Implement `analyzeLabor`.**
 

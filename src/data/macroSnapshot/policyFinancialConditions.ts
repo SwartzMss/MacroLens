@@ -25,16 +25,21 @@ function financialConditionDirection(evidence: SnapshotEvidence[]): 'easing' | '
   return 'stable';
 }
 
+function eventDirection(change: number | null): 'easing' | 'tightening' | 'stable' {
+  if (change !== null && change < -0.0001) return 'easing';
+  if (change !== null && change > 0.0001) return 'tightening';
+  return 'stable';
+}
+
 export function analyzePolicyFinancialConditions(indicators: MacroIndicatorMap): MacroDomainState {
   const policyEvidence = makeIndicatorEvidence(indicators['policy-rate'], 'policy-rate');
   const lprEvidence = makeIndicatorEvidence(indicators.lpr, 'lpr');
   const evidence = [...policyEvidence, ...lprEvidence];
-  const policyChange = policyEvidence[0].change;
-  const policyState: 'easing' | 'tightening' | 'stable' = policyChange !== null && policyChange < -0.0001
-    ? 'easing'
-    : policyChange !== null && policyChange > 0.0001
-      ? 'tightening'
-      : 'stable';
+  const latestPolicyEvent = policyEvidence[0];
+  const lastEventDirection = eventDirection(latestPolicyEvent.change);
+  const eventIsCurrent = !latestPolicyEvent.verifiedThrough
+    || latestPolicyEvent.observationPeriod >= latestPolicyEvent.verifiedThrough;
+  const policyState: 'easing' | 'tightening' | 'stable' = eventIsCurrent ? lastEventDirection : 'stable';
   const lprState = financialConditionDirection(lprEvidence);
   const state: MacroDomainState['state'] = policyState === 'stable'
     ? lprState
@@ -63,7 +68,7 @@ export function analyzePolicyFinancialConditions(indicators: MacroIndicatorMap):
     id: 'policy-financial-conditions',
     label: '政策与金融条件',
     state,
-    explanation: `政策利率按事件/阶梯语义记录为${policyState}，LPR 系列按各自水平变化记录为${lprState}；这两类证据不直接证明经济结果。`,
+    explanation: `政策利率最近一次事件（${latestPolicyEvent.observationPeriod}）方向为${lastEventDirection}${eventIsCurrent ? '' : `，已核验至${latestPolicyEvent.verifiedThrough}且期间无新事件，当前政策变动状态为稳定`}; LPR 系列按各自水平变化记录为${lprState}；这两类证据不直接证明经济结果。`,
     evidence,
     risks,
     watchNext,

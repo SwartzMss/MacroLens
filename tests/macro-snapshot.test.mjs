@@ -146,6 +146,27 @@ test('policy and LPR cuts both map to easing financial conditions', () => {
   assert.equal(stablePolicy.state, 'easing');
 });
 
+test('policy event direction expires into stable after verified-through', () => {
+  const policy = analyzePolicyFinancialConditions(makeMacroIndicators({
+    'policy-rate': {
+      data: [
+        { date: '2024-09-27', value: 1.5 },
+        { date: '2025-05-08', value: 1.4 },
+      ],
+      verifiedThrough: '2026-09-07',
+    },
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 3.5 }, { date: '2026-09', value: 3.5 }] },
+      ],
+    },
+  }));
+
+  assert.equal(policy.state, 'stable');
+  assert.match(policy.explanation, /最后一次|核验|稳定/);
+});
+
 test('labor weakens independently from a positive growth domain', () => {
   const indicators = makeMacroIndicators({
     'unemployment-rate': data([{ date: '2026-07', value: 5 }, { date: '2026-08', value: 5.3 }]),

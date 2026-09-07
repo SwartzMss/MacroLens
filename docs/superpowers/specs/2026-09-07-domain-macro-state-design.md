@@ -210,9 +210,9 @@ Evidence: M0, M1, M2, credit, and social financing.
 
 Evidence: policy-rate event series and every LPR series.
 
-- Policy-rate observations retain event/step semantics and use the last actual event plus `verifiedThrough` context.
+- Policy-rate observations retain event/step semantics. The last actual event direction is evidence, but when `verifiedThrough` is later than that event date, the current policy-change state is `stable` until another event occurs.
 - LPR observations retain separate series identity and level semantics.
-- A policy-rate move and unchanged LPR levels can produce mixed or qualified evidence; neither is treated as direct proof of realized financing demand or economic outcomes.
+- A current policy-rate move and unchanged LPR levels can produce qualified evidence; a stale last policy event must not keep the current state `easing` or `tightening` indefinitely. Neither series is treated as direct proof of realized financing demand or economic outcomes.
 - The domain may describe easing/tightening/stability in policy or quoted financing conditions only, with risks/watch items tied to the exact event/series evidence.
 
 ### Labor
@@ -275,6 +275,7 @@ Replace the V1 phase-centric macro snapshot assertions with focused domain fixtu
 - conflicting domains yield a mixed/qualified synthesis;
 - quarterly, monthly, and event observation periods remain visible;
 - `updatedAt`/`verifiedThrough` context remains per evidence and no top-level max date is presented as a universal as-of claim;
+- a policy-rate event direction expires into a stable current state after a later `verifiedThrough` date with no new event;
 - changing presentation labels does not change classification;
 - missing/duplicate input is rejected;
 - all domain conclusions have evidence IDs that resolve to domain evidence;
