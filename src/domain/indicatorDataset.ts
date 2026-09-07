@@ -72,7 +72,7 @@ export type IndicatorDatasetValidationIssue = {
 };
 
 function formatPath(path: Array<string | number>): string {
-  return path.reduce((result, segment) => (
+  return path.reduce<string>((result, segment) => (
     typeof segment === 'number'
       ? `${result}[${segment}]`
       : result ? `${result}.${segment}` : segment

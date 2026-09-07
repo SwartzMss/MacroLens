@@ -9,8 +9,8 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 test('indicator metadata presents calculation method changes at their effective date', () => {
   const metadata = fs.readFileSync(path.join(root, 'src', 'components', 'IndicatorMetadata.astro'), 'utf8');
   const adapter = fs.readFileSync(path.join(root, 'src', 'data', 'indicatorPresentationAdapter.ts'), 'utf8');
-  const registry = fs.readFileSync(path.join(root, 'src', 'data', 'indicatorRegistry.ts'), 'utf8');
-  assert.match(registry, /calculationEffectiveFrom\?: string/);
+  const domain = fs.readFileSync(path.join(root, 'src', 'domain', 'indicatorDataset.ts'), 'utf8');
+  assert.match(domain, /calculationEffectiveFrom\?: string/);
   assert.match(adapter, /previousMonth\(value: string\)/);
   assert.match(adapter, /及以前：由官方余额计算；\$\{indicator\.calculationEffectiveFrom\} 起：央行官方公布值/);
   assert.match(adapter, /calculationDescription/);

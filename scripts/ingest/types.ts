@@ -1,12 +1,6 @@
 import type {
-  IndicatorChartType,
-  IndicatorComparisonType,
-  IndicatorDataset,
-  IndicatorDatasetValidationIssue,
-  IndicatorFrequency,
-  IndicatorSeries,
   IndicatorSource,
-  IndicatorSourceRole,
+  IndicatorDatasetValidationIssue,
   Observation,
 } from '../../src/domain/indicatorDataset.ts';
 
