@@ -1,5 +1,5 @@
 ---
-import { isExplainableRelation, type ConceptRelation, type ExplainableRelationType, type RelationType } from '../data/graphRegistry';
+import { isExplainableRelation, macroNodeTypeLabels, type ConceptRelation, type ExplainableRelationType, type RelationType } from '../data/graphRegistry';
 type ConceptLink = { data: { id: string; name: string } };
 const { conceptId, conceptName, relations, concepts = [] } = Astro.props as { conceptId: string; conceptName: string; relations: ConceptRelation[]; concepts?: ConceptLink[] };
 const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
@@ -30,7 +30,7 @@ const groups = [...grouped];
 {relations.length > 0 && <section class="relationship-block" aria-labelledby={`${conceptId}-relationships`}><div class="eyebrow">关系脉络</div><h2 id={`${conceptId}-relationships`}>它与其他概念如何关联</h2><div class="relationship-groups">{groups.map(([heading, items]) => <section class="relationship-group"><h3>{heading}</h3><div class="relationship-list">{items.map(item => {
   const linked = conceptsById.get(item.other.id);
   const currentIsSource = item.relation.source === conceptId;
-  const otherNode = linked ? <a href={`/concepts/${linked.data.id}`}>{linked.data.name}</a> : <span class="relationship-abstract">{item.other.label}<small>图谱概念</small></span>;
+  const otherNode = linked ? <a href={`/concepts/${linked.data.id}`}>{linked.data.name}</a> : <span class="relationship-abstract">{item.other.label}<small>图谱概念 · {macroNodeTypeLabels[item.other.type]}</small></span>;
   const metadata = isExplainableRelation(item.relation) ? item.relation : null;
   const cardClasses = ['relationship-card', item.direction === 'symmetric' && 'is-symmetric', metadata && 'is-explainable'];
   const summaryText = <span class="relationship-summary-text">

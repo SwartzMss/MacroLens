@@ -1,5 +1,5 @@
 ---
-import { getExplainableConceptRelations, type RelationNode } from '../data/graphRegistry';
+import { getExplainableConceptRelations, macroNodeTypeLabels, macroNodeTypes, type RelationNode } from '../data/graphRegistry';
 import RelationshipCards from './RelationshipCards.astro';
 
 type ConceptLink = { data: { id: string; name: string } };
@@ -14,20 +14,23 @@ const conceptsById = new Set(concepts.map((concept) => concept.data.id));
 const initialNode = nodes.find((node) => node.id === initialNodeId) ?? nodes[0];
 if (!initialNode) throw new Error('The relationship explorer must contain an initial node');
 const panels = nodes.map((node) => ({ node, relations: getExplainableConceptRelations('macro', node.id) }));
+const nodeGroups = macroNodeTypes
+  .map((type) => ({ type, nodes: nodes.filter((node) => node.type === type) }))
+  .filter((group) => group.nodes.length > 0);
 ---
 
 <section class="explorer-shell" data-explorer>
   <div class="explorer-controls">
     <label for="explorer-node">选择一个节点</label>
     <select id="explorer-node" data-explorer-select>
-      {nodes.map((node) => <option value={node.id} selected={node.id === initialNode.id}>{node.label}</option>)}
+      {nodeGroups.map((group) => <optgroup label={macroNodeTypeLabels[group.type]}>{group.nodes.map((node) => <option value={node.id} selected={node.id === initialNode.id}>{node.label}</option>)}</optgroup>)}
     </select>
     <p>可阅读“它受什么影响”“它影响什么”“与什么相关”等分组；展开关系卡片可查看类型、时间关系、解释、适用条件、局限和证据来源。</p>
   </div>
   <div class="explorer-panels" data-explorer-panels>
     {panels.map(({ node, relations }) => <section class="explorer-panel" data-explorer-panel data-node-id={node.id} hidden={node.id !== initialNode.id}>
       <header class="explorer-node-head">
-        <div class="eyebrow">Selected node</div>
+        <div class="explorer-node-type"><span class="eyebrow">Selected node</span><span class="node-type-chip">{macroNodeTypeLabels[node.type]}</span></div>
         <h2 tabindex="-1">{node.label}</h2>
         {conceptsById.has(node.id) ? <a href={`/concepts/${node.id}`}>打开概念页 →</a> : <p>图谱概念：用于解释关系，不单独提供概念页。</p>}
       </header>

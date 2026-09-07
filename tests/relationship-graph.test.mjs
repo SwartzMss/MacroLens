@@ -115,10 +115,10 @@ test('defines explainable metadata for the core macro chains', () => {
 
 test('validates graph uniqueness, endpoints, and explainable field boundaries at runtime', () => {
   assert.doesNotThrow(() => validateGraphElements(graph));
-  const validNodes = [{ data: { id: 'a', label: 'A' } }, { data: { id: 'b', label: 'B' } }];
+  const validNodes = [{ data: { id: 'a', label: 'A', type: 'concept' } }, { data: { id: 'b', label: 'B', type: 'concept' } }];
 
   assert.throws(
-    () => validateGraphElements([{ data: { id: 'a', label: 'A' } }, { data: { id: 'a', label: 'Duplicate' } }]),
+    () => validateGraphElements([{ data: { id: 'a', label: 'A', type: 'concept' } }, { data: { id: 'a', label: 'Duplicate', type: 'concept' } }]),
     /Duplicate graph node ID: a/,
   );
   assert.throws(
@@ -194,6 +194,9 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(component, /data-explorer/);
   assert.match(component, /data-explorer-select/);
   assert.match(component, /data-explorer-panel/);
+  assert.match(component, /macroNodeTypeLabels/);
+  assert.match(component, /<optgroup/);
+  assert.match(component, /node\.type/);
   assert.match(component, /RelationshipCards/);
   assert.match(component, /getExplainableConceptRelations/);
   assert.match(component, /上游|下游|它受什么影响/);

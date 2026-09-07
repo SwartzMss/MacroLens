@@ -1,12 +1,31 @@
 import macro from '../../data/relations/macro.json';
 
+export const macroNodeTypes = ['indicator', 'concept', 'mechanism', 'state'] as const;
+export type MacroNodeType = typeof macroNodeTypes[number];
+export const macroNodeTypeLabels: Record<MacroNodeType, string> = {
+  indicator: '指标',
+  concept: '概念',
+  mechanism: '机制',
+  state: '宏观状态',
+};
+
+export function isMacroNodeType(value: unknown): value is MacroNodeType {
+  return typeof value === 'string' && macroNodeTypes.includes(value as MacroNodeType);
+}
+
 export const relationTypes = [
   'CAUSES', 'AFFECTS', 'REFLECTS', 'CORRELATES', 'COMPONENT_OF',
   'IMPLEMENTS', 'USES', 'OVERLAPS_WITH', 'MEASURES', 'DERIVED_FROM'
 ] as const;
 
 export type RelationType = typeof relationTypes[number];
-export type RelationNode = { id: string; label: string; kind?: string };
+export type RelationNode = {
+  id: string;
+  label: string;
+  type: MacroNodeType;
+  /** Compatibility alias for existing indicator consumers. */
+  kind?: 'indicator';
+};
 export const explainableRelationTypes = [
   'leading_indicator',
   'leading_factor',
@@ -63,6 +82,10 @@ export function validateGraphElements(elements: readonly RawGraphElement[]) {
   const nodeIds = new Set<string>();
   for (const node of nodes) {
     if (nodeIds.has(node.id)) throw new Error(`Duplicate graph node ID: ${node.id}`);
+    if (!isMacroNodeType(node.type)) throw new Error(`Invalid macro node type for ${node.id}: ${String(node.type)}`);
+    if (node.kind !== undefined && (node.kind !== 'indicator' || node.type !== 'indicator')) {
+      throw new Error(`Inconsistent legacy node kind for ${node.id}: ${node.kind}`);
+    }
     nodeIds.add(node.id);
   }
   const relationKeys = new Set<string>();
