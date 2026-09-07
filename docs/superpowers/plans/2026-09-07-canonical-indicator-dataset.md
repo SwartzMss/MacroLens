@@ -16,7 +16,7 @@
 - Create: `tests/indicator-dataset-schema.test.mjs`
 - Modify: `tests/ingestion-pmi.test.mjs:194-207` to assert the existing generic validator returns its validated dataset
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `tests/indicator-dataset-schema.test.mjs` with a small structurally valid dataset factory and tests for the public behavior required by issue #116:
 
@@ -148,7 +148,7 @@ test('generic indicator validation accepts a monthly percentage dataset', () => 
 });
 ```
 
-- [ ] **Step 2: Run the focused tests and verify the expected red state**
+- [x] **Step 2: Run the focused tests and verify the expected red state**
 
 Run:
 
@@ -158,7 +158,7 @@ node --import tsx --test tests/indicator-dataset-schema.test.mjs tests/ingestion
 
 Expected: the new test file cannot yet import `src/domain/indicatorDataset.ts`, and the existing generic validator test fails because the current ingestion validator returns `undefined`. Record this red result before adding the initial shared-module scaffold in Task 2; after the scaffold exists, rerun until the failures are assertion failures rather than module-loading errors.
 
-- [ ] **Step 3: Commit the failing-test change**
+- [x] **Step 3: Commit the failing-test change**
 
 ```bash
 git add tests/indicator-dataset-schema.test.mjs tests/ingestion-pmi.test.mjs
@@ -171,7 +171,7 @@ git commit -m "test: define canonical indicator dataset contract"
 - Create: `src/domain/indicatorDataset.ts`
 - Test: `tests/indicator-dataset-schema.test.mjs`
 
-- [ ] **Step 1: Add the initial shared-module scaffold after the red test**
+- [x] **Step 1: Add the initial shared-module scaffold after the red test**
 
 Create `src/domain/indicatorDataset.ts` with only the runtime names needed by the test import: `IndicatorDatasetValidationError` and a pass-through `validateIndicatorDataset(input: unknown): unknown` that returns the input. This scaffold exists only to make the test failures expectation-based; it must not be treated as the completed validator.
 
@@ -183,7 +183,7 @@ node --import tsx --test tests/indicator-dataset-schema.test.mjs tests/ingestion
 
 Expected: valid-shape tests that only exercise the pass-through return may run, while invalid enum, invalid source, invalid nested value, and ingestion return assertions fail as normal assertions.
 
-- [ ] **Step 2: Complete the canonical type definitions and enums**
+- [x] **Step 2: Complete the canonical type definitions and enums**
 
 Define the persisted contract in `src/domain/indicatorDataset.ts`:
 
@@ -257,7 +257,7 @@ export type IndicatorDataset = {
 };
 ```
 
-- [ ] **Step 3: Add the path-aware validation error and structural checks**
+- [x] **Step 3: Add the path-aware validation error and structural checks**
 
 Implement `IndicatorDatasetValidationIssue`, `IndicatorDatasetValidationError`, and `validateIndicatorDataset(input: unknown): IndicatorDataset` in the same module. The implementation must:
 
@@ -268,6 +268,7 @@ Implement `IndicatorDatasetValidationIssue`, `IndicatorDatasetValidationError`, 
 - require `sources` and `data` to be arrays;
 - validate each observation's `date` as a non-empty string and `value` as finite;
 - validate each series' `id`, `label`, and nested observations;
+- reject sparse `sources` and `series` arrays instead of skipping holes;
 - validate source title, `https://` URL, source date, coverage, role, and optional request shape;
 - validate methodology fingerprint as a non-empty string;
 - collect issues with paths such as `['series', 1, 'data', 2, 'value']`;
@@ -296,7 +297,7 @@ function formatPath(path: Array<string | number>): string {
 
 Do not add chronological, continuity, coverage, overlap, or methodology-fingerprint comparison rules to this module.
 
-- [ ] **Step 4: Run the focused tests and verify green**
+- [x] **Step 4: Run the focused tests and verify green**
 
 Run:
 
@@ -306,7 +307,7 @@ node --import tsx --test tests/indicator-dataset-schema.test.mjs tests/ingestion
 
 Expected: the direct shared shape and error tests pass; the existing ingestion-return assertion remains red until Task 3 composes the shared validator in the ingestion layer.
 
-- [ ] **Step 5: Commit the shared domain implementation**
+- [x] **Step 5: Commit the shared domain implementation**
 
 ```bash
 git add src/domain/indicatorDataset.ts
@@ -322,7 +323,7 @@ git commit -m "feat: add canonical indicator dataset validator"
 - Test: `tests/indicator-dataset-schema.test.mjs`
 - Test: existing ingestion validator suites under `tests/ingestion-*.test.mjs`
 
-- [ ] **Step 1: Replace the duplicated ingestion-domain declarations with re-exports**
+- [x] **Step 1: Replace the duplicated ingestion-domain declarations with re-exports**
 
 At the top of `scripts/ingest/types.ts`, re-export the shared types:
 
@@ -341,7 +342,7 @@ export type {
 
 Delete the local `IndicatorSource`, `Observation`, `IndicatorSeries`, and `IndicatorDataset` declarations. Leave all ingestion-only types and constants in this file unchanged.
 
-- [ ] **Step 2: Compose structural and semantic validation**
+- [x] **Step 2: Compose structural and semantic validation**
 
 In `scripts/ingest/validate/dataset.ts`, import the shared validator under an alias. Keep the existing `nextMonth`, `validateMonthlyObservations`, `monthsBetween`, `coverageCoversDates`, and `pruneSources` implementations unchanged. Replace only the current top-level field/source checks and the function signature with this composition:
 
@@ -389,7 +390,7 @@ Before replacing the function, retain the existing source validation behavior by
 
 When the shared validator throws `IndicatorDatasetValidationError`, wrap it as `IngestionContractError` at this ingestion boundary and copy the structured `issues` onto the ingestion error. This preserves existing ingestion error typing while keeping path-aware details available to ingestion callers. Other errors must be rethrown unchanged.
 
-- [ ] **Step 3: Validate at the single-file writer boundary**
+- [x] **Step 3: Validate at the single-file writer boundary**
 
 Update `scripts/ingest/write/indicator.ts` to import `IndicatorDataset` and `validateIndicatorDataset` from the shared domain module and validate before serializing:
 
@@ -417,7 +418,7 @@ export function writeIndicatorDataset(filePath: string, dataset: IndicatorDatase
 
 Do not add ingestion semantic checks to the writer; callers remain responsible for source-specific validation before writing.
 
-- [ ] **Step 4: Run focused and existing ingestion tests**
+- [x] **Step 4: Run focused and existing ingestion tests**
 
 Run:
 
@@ -427,7 +428,7 @@ node --import tsx --test tests/indicator-dataset-schema.test.mjs tests/ingestion
 
 Expected: all selected tests pass, including the return-value assertion and the existing continuity, provenance, overlap, and methodology failures.
 
-- [ ] **Step 5: Commit the ingestion integration**
+- [x] **Step 5: Commit the ingestion integration**
 
 ```bash
 git add scripts/ingest/types.ts scripts/ingest/validate/dataset.ts scripts/ingest/write/indicator.ts tests/indicator-dataset-schema.test.mjs
@@ -446,7 +447,7 @@ git commit -m "refactor: share indicator contract with ingestion"
 - Test: `tests/indicator-dataset-schema.test.mjs`
 - Test: `tests/indicator-data-integrity.test.mjs`
 
-- [ ] **Step 1: Remove registry-local interfaces and validate imports at module initialization**
+- [x] **Step 1: Remove registry-local interfaces and validate imports at module initialization**
 
 In `src/data/indicatorRegistry.ts`, preserve the existing 18 JSON imports, delete the local `IndicatorSeries`, `IndicatorDataset`, and `IndicatorComparisonType` declarations, and replace the `satisfies`-only check with runtime validation:
 
@@ -471,18 +472,29 @@ const rawIndicatorData = {
   'policy-rate': policyRate,
 } as const;
 
-const indicatorData: Record<string, IndicatorDataset> = Object.fromEntries(
-  Object.entries(rawIndicatorData).map(([id, input]) => {
+export function validateRegisteredIndicatorDataset(id: string, input: unknown): IndicatorDataset {
+  try {
     const dataset = validateIndicatorDataset(input);
     if (dataset.id !== id) throw new Error(`Registered indicator id mismatch: ${id} != ${dataset.id}`);
-    return [id, dataset];
+    return dataset;
+  } catch (error) {
+    if (error instanceof IndicatorDatasetValidationError) {
+      throw new IndicatorDatasetValidationError(id, error.issues);
+    }
+    throw error;
+  }
+}
+
+const indicatorData: Record<string, IndicatorDataset> = Object.fromEntries(
+  Object.entries(rawIndicatorData).map(([id, input]) => {
+    return [id, validateRegisteredIndicatorDataset(id, input)];
   }),
 );
 ```
 
 Keep `getIndicatorData`'s unknown-id error and lookup semantics unchanged.
 
-- [ ] **Step 2: Update consumer type imports**
+- [x] **Step 2: Update consumer type imports**
 
 Use the canonical domain module directly in all runtime consumers, including the chart component:
 
@@ -505,7 +517,7 @@ Update the existing presentation structure test to read `src/domain/indicatorDat
 
 Leave all presentation, chart, dashboard, and snapshot behavior unchanged.
 
-- [ ] **Step 3: Add registry-level assertions to the contract test**
+- [x] **Step 3: Add registry-level assertions to the contract test**
 
 Extend `tests/indicator-dataset-schema.test.mjs` with:
 
@@ -521,7 +533,9 @@ test('registry exposes structurally validated datasets without changing ids', ()
 });
 ```
 
-- [ ] **Step 4: Run registry and consumer tests**
+Also test that sparse source/series arrays are rejected and that a structural registry failure includes the registered key while preserving the validator error type and issue paths.
+
+- [x] **Step 4: Run registry and consumer tests**
 
 Run:
 
@@ -531,7 +545,7 @@ node --import tsx --test tests/indicator-dataset-schema.test.mjs tests/indicator
 
 Expected: all selected tests pass and no output or semantic assertions change.
 
-- [ ] **Step 5: Commit the runtime integration**
+- [x] **Step 5: Commit the runtime integration**
 
 ```bash
 git add src/data/indicatorRegistry.ts src/data/indicatorPresentationAdapter.ts src/data/indicatorChartOption.ts src/data/dashboard.ts tests/indicator-dataset-schema.test.mjs tests/indicator-data-integrity.test.mjs
@@ -543,7 +557,7 @@ git commit -m "refactor: validate registered indicator datasets"
 **Files:**
 - Modify only files already listed in Tasks 1-4 if verification exposes a concrete issue.
 
-- [ ] **Step 1: Confirm the duplicated contract is gone**
+- [x] **Step 1: Confirm the duplicated contract is gone**
 
 Run:
 
@@ -555,7 +569,7 @@ git status --short
 
 Expected: no competing `IndicatorDataset`, `IndicatorSeries`, or `IndicatorComparisonType` declarations remain in the two old locations; only intentional re-exports or imports remain, and `git diff --check` is clean.
 
-- [ ] **Step 2: Run the full test suite**
+- [x] **Step 2: Run the full test suite**
 
 Run:
 
@@ -565,7 +579,7 @@ npm test
 
 Expected: 0 failures and no cancelled or skipped tests.
 
-- [ ] **Step 3: Run type checking, build, and output verification**
+- [x] **Step 3: Run type checking, build, and output verification**
 
 Run each command from the worktree:
 
@@ -577,7 +591,7 @@ npm run test:output
 
 Expected: each command exits with status 0. The build must complete without changing the checked-in data or generated source files.
 
-- [ ] **Step 4: Inspect the final diff for scope and output stability**
+- [x] **Step 4: Inspect the final diff for scope and output stability**
 
 Run:
 
@@ -589,7 +603,7 @@ git status --short
 
 Confirm the final change is limited to the shared domain contract, validator tests, ingestion/runtime wiring, and the committed design/plan documents; no indicator JSON or unrelated product behavior changed.
 
-- [ ] **Step 5: Commit any final test-only correction and capture the final SHA**
+- [x] **Step 5: Commit any final test-only correction and capture the final SHA**
 
 If the previous steps require a correction, run the relevant focused test, then commit it with a scoped message. Finally run:
 

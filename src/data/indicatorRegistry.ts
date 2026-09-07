@@ -16,7 +16,10 @@ import unemploymentRate from '../../data/indicators/unemployment-rate.json';
 import exports from '../../data/indicators/exports.json';
 import imports from '../../data/indicators/imports.json';
 import policyRate from '../../data/indicators/policy-rate.json';
-import { validateIndicatorDataset } from '../domain/indicatorDataset';
+import {
+  IndicatorDatasetValidationError,
+  validateIndicatorDataset,
+} from '../domain/indicatorDataset';
 import type { IndicatorDataset } from '../domain/indicatorDataset';
 
 const rawIndicatorData = {
@@ -36,11 +39,22 @@ const rawIndicatorData = {
   'policy-rate': policyRate,
 } as const;
 
-const indicatorData: Record<string, IndicatorDataset> = Object.fromEntries(
-  Object.entries(rawIndicatorData).map(([id, input]) => {
+export function validateRegisteredIndicatorDataset(id: string, input: unknown): IndicatorDataset {
+  try {
     const dataset = validateIndicatorDataset(input);
     if (dataset.id !== id) throw new Error(`Registered indicator id mismatch: ${id} != ${dataset.id}`);
-    return [id, dataset];
+    return dataset;
+  } catch (error) {
+    if (error instanceof IndicatorDatasetValidationError) {
+      throw new IndicatorDatasetValidationError(id, error.issues);
+    }
+    throw error;
+  }
+}
+
+const indicatorData: Record<string, IndicatorDataset> = Object.fromEntries(
+  Object.entries(rawIndicatorData).map(([id, input]) => {
+    return [id, validateRegisteredIndicatorDataset(id, input)];
   }),
 );
 

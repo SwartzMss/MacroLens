@@ -126,4 +126,3 @@ Existing ingestion tests will remain the coverage for continuity, provenance cov
 - Modify registry and consumer imports to use the shared domain types and validate registered JSON.
 - Create focused validator tests and update only affected ingestion assertions.
 - Add no data-file changes unless required by a failing structural validation test.
-

@@ -226,14 +226,18 @@ export function validateIndicatorDataset(input: unknown): IndicatorDataset {
   if (!Array.isArray(input.sources)) {
     issues.push({ path: ['sources'], message: 'must be an array' });
   } else {
-    input.sources.forEach((source, index) => validateSource(source, ['sources', index], issues));
+    for (let index = 0; index < input.sources.length; index += 1) {
+      validateSource(input.sources[index], ['sources', index], issues);
+    }
   }
   validateObservationArray(input.data, ['data'], issues);
   if (input.series !== undefined) {
     if (!Array.isArray(input.series)) {
       issues.push({ path: ['series'], message: 'must be an array' });
     } else {
-      input.series.forEach((series, index) => validateSeries(series, ['series', index], issues));
+      for (let index = 0; index < input.series.length; index += 1) {
+        validateSeries(input.series[index], ['series', index], issues);
+      }
     }
   }
 

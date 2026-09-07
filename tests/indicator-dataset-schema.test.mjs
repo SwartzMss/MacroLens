@@ -7,7 +7,10 @@ import {
   IndicatorDatasetValidationError,
   validateIndicatorDataset,
 } from '../src/domain/indicatorDataset.ts';
-import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
+import {
+  getIndicatorData,
+  validateRegisteredIndicatorDataset,
+} from '../src/data/indicatorRegistry.ts';
 import { validateIndicatorDataset as validateIngestionDataset } from '../scripts/ingest/validate/dataset.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -106,6 +109,25 @@ test('rejects invalid enum and source metadata with field paths', () => {
   assert.throws(
     () => validateIndicatorDataset(dataset({ sources: [{ title: '', url: 'not-a-url', sourceDate: 1, coverage: '' }] })),
     /sources\[0\]\.(title|url|sourceDate|coverage)/i,
+  );
+});
+
+test('rejects sparse source and series arrays instead of skipping holes', () => {
+  assert.throws(
+    () => validateIndicatorDataset(dataset({ sources: new Array(1) })),
+    /sources\[0\] must be an object/i,
+  );
+  assert.throws(
+    () => validateIndicatorDataset(dataset({ series: new Array(1) })),
+    /series\[0\] must be an object/i,
+  );
+});
+
+test('registry validation includes the registered key in structural errors', () => {
+  assert.throws(
+    () => validateRegisteredIndicatorDataset('broken-indicator', { data: [], sources: [] }),
+    (error) => error instanceof IndicatorDatasetValidationError
+      && error.message.startsWith('indicator "broken-indicator":'),
   );
 });
 
