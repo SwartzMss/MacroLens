@@ -2,9 +2,10 @@
 import type { IndicatorDataset } from '../domain/indicatorDataset';
 const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${indicator.id}`;
+const unitLabel = indicator.unit === 'index' ? '点' : indicator.unit;
 const series = indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];
 ---
-<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {indicator.unit}</span></div><div class="chart" id={id} data-chart={JSON.stringify({series,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div></div>
+<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {unitLabel}</span></div><div class="chart" id={id} data-chart={JSON.stringify({series,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div></div>
 <script>
   import * as echarts from 'echarts';
   import { buildIndicatorChartOption, type IndicatorChartConfig } from '../data/indicatorChartOption';

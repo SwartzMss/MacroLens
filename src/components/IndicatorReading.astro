@@ -1,0 +1,25 @@
+---
+import type { IndicatorDataset } from '../domain/indicatorDataset';
+import { getIndicatorReading } from '../data/indicatorReading';
+const { indicator } = Astro.props as { indicator: IndicatorDataset };
+const { rows, presentation, isEvent } = getIndicatorReading(indicator);
+---
+<div class="indicator-reading">
+  <div class="reading-topline">
+    <h2>最新读数</h2>
+    <span>{presentation.frequencyLabel} · {presentation.valueLabel === '率水平' ? '水平值' : presentation.valueLabel}</span>
+  </div>
+  <div class="reading-values">
+    {rows.map(row => <div class="reading-value-card">
+      <div class="reading-series">{row.label}</div>
+      <div class="reading-number">{row.value}<small>{row.unit}</small></div>
+      <p class="reading-period">{isEvent ? '最近生效 / 操作日' : '观察期'}：<time>{row.period}</time></p>
+      <p class="reading-change">{presentation.changeLabel} <strong>{row.change}</strong></p>
+      {row.previousPeriod && <p class="reading-comparison">对比期：{row.previousPeriod}</p>}
+    </div>)}
+  </div>
+  <p class="reading-note">{isEvent
+    ? `已核验至 ${indicator.verifiedThrough ?? rows[0].period}；期间沿用最近公布水平，不代表每天发生新的利率调整。`
+    : presentation.comparisonMethod}</p>
+  <p class="reading-update">数据更新：<time>{indicator.updatedAt}</time> · <a href={`#${indicator.id}-sources`}>查看口径与来源 ↓</a></p>
+</div>

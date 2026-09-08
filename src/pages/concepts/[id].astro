@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import IndicatorChart from '../../components/IndicatorChart.astro';
+import IndicatorReading from '../../components/IndicatorReading.astro';
+import '../../styles/concept-detail.css';
 import IndicatorMetadata from '../../components/IndicatorMetadata.astro';
 import RelationshipCards from '../../components/RelationshipCards.astro';
 import RelatedConcepts from '../../components/RelatedConcepts.astro';
@@ -42,13 +44,64 @@ const knowledge = buildConceptKnowledge({
   relatedIds: entry.data.related,
   concepts: allConcepts,
 });
+const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length > 0 || knowledge.limitations.length > 0 || knowledge.evidence.length > 0;
+const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
+const sectionLinks = [
+  { id: `${entry.data.id}-overview`, label: '概览' },
+  ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
+  ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解' }] : []),
+  { id: `${entry.data.id}-detail`, label: '详解' },
+  ...(presentation ? [{ id: `${entry.data.id}-sources`, label: '来源' }] : []),
+  ...(hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
+];
+const articleHeadings = headings.filter(heading => heading.depth === 2);
 ---
-<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}><header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / {categoryLabel} / {entry.data.name}</div><h1 class="concept-title">{entry.data.name}</h1><p class="lead">{entry.data.subtitle}</p><div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country}</span></div></div></header><div class="shell concept-layout"><article class="prose" data-pagefind-body><ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} /><PrerequisiteConcepts concepts={prerequisites} /><details class="concept-long-form" open><summary>详细说明与统计边界</summary><div class="concept-long-form-content"><Content /></div></details>{presentation && <IndicatorMetadata presentation={presentation} />}{indicator && <IndicatorChart indicator={indicator} />}<PageFeedback pageId={entry.data.id} /><RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} /><RelatedConcepts concepts={relatedConcepts} /></article><aside class="side-nav"><b>本页内容</b>{headings.filter(h=>h.depth===2).map(h=><a href={`#${h.slug}`}>{h.text}</a>)}</aside></div></BaseLayout>
-<style>
-.concept-long-form{margin-top:12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.concept-long-form>summary{padding:14px 0;color:var(--green);cursor:pointer;font-weight:800;list-style:none}
-.concept-long-form>summary::-webkit-details-marker{display:none}
-.concept-long-form>summary::after{content:'−';float:right;font-size:20px;font-weight:400}
-.concept-long-form:not([open])>summary::after{content:'+'}
-.concept-long-form-content{padding-bottom:8px}
-</style>
+<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle}>
+  <div class="concept-detail-page">
+    <header class="page-head detail-header" id={`${entry.data.id}-overview`}>
+      <div class="shell">
+        <div class="breadcrumbs"><a href="/">首页</a> / <a href={`/concepts#${entry.data.category}`}>{categoryLabel}</a> / {entry.data.name}</div>
+        <h1 class="concept-title">{entry.data.name}</h1>
+        <p class="lead">{entry.data.subtitle}</p>
+        <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
+      </div>
+    </header>
+    <nav class="detail-jumps" aria-label="本页区块" data-detail-navigation>
+      <div class="shell detail-jump-inner">
+        <div class="detail-jump-links">{sectionLinks.map(link => <a href={`#${link.id}`}>{link.label}</a>)}</div>
+        {articleHeadings.length > 0 && <details class="detail-mobile-toc">
+          <summary>目录</summary>
+          <div class="detail-toc-menu">{articleHeadings.map(heading => <a href={`#${heading.slug}`}>{heading.text}</a>)}</div>
+        </details>}
+      </div>
+    </nav>
+    <div class="shell concept-layout detail-layout">
+      <article class="prose detail-article" data-pagefind-body>
+        {indicator && <section class="detail-data" id={`${entry.data.id}-data`} aria-label="最新数据与趋势">
+          <IndicatorReading indicator={indicator} />
+          <IndicatorChart indicator={indicator} />
+        </section>}
+        <PrerequisiteConcepts concepts={prerequisites} />
+        {hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
+        <details class="concept-long-form" id={`${entry.data.id}-detail`} open>
+          <summary>详细说明与统计边界</summary>
+          <div class="concept-long-form-content"><Content /></div>
+        </details>
+        {presentation && <section id={`${entry.data.id}-sources`} aria-label="数据口径与来源"><IndicatorMetadata presentation={presentation} /></section>}
+        <PageFeedback pageId={entry.data.id} />
+        {hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">
+          <RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} />
+          <RelatedConcepts concepts={relatedConcepts} />
+        </section>}
+      </article>
+      <aside class="side-nav detail-side-nav">
+        <nav aria-label="完整页内目录" data-detail-navigation>
+          <b>本页内容</b>
+          {sectionLinks.map(link => <a href={`#${link.id}`}>{link.label}</a>)}
+          {articleHeadings.length > 0 && <div class="detail-chapters"><b>正文目录</b>{articleHeadings.map(heading => <a href={`#${heading.slug}`}>{heading.text}</a>)}</div>}
+        </nav>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>
+<script>import '../../scripts/concept-navigation';</script>
