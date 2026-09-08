@@ -26,7 +26,7 @@ const formatChange = (change: number | null, changeUnit: string) => {
         <span>{signal.observationPeriod}</span>
       </div>
       <div class="home-signal-value">{formatValue(signal.latest, signal.unit)}</div>
-      <div class:list={['home-signal-change', signal.change !== null && signal.change < 0 && 'is-negative']}>
+      <div class="home-signal-change">
         <span>{signal.changeLabel}</span>
         <strong>{formatChange(signal.change, signal.changeUnit)}</strong>
       </div>

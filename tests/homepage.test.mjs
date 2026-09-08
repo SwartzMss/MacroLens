@@ -86,3 +86,10 @@ test('hero brand visual does not duplicate a concrete macro relationship chain',
   assert.match(hero, /看懂钱，如何流动/);
   assert.doesNotMatch(hero, /央行\s*\/\s*政策|政策利率|融资条件|信贷与货币|经济活动/);
 });
+
+test('notable signals do not classify raw change direction as negative', () => {
+  const component = readFileSync(`${homeDirectory}/NotableSignals.astro`, 'utf8');
+  const styles = readFileSync(`${root}src/styles/home.css`, 'utf8');
+  assert.doesNotMatch(component, /is-negative|change\s*<\s*0/);
+  assert.doesNotMatch(styles, /\.home-signal-change\.is-negative/);
+});
