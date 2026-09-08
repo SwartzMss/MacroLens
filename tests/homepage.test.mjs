@@ -40,3 +40,20 @@ test('homepage learning paths link only to existing concepts', () => {
     for (const step of path.steps) assert.ok(conceptIds.has(step.id), `${path.title}/${step.id}`);
   }
 });
+
+test('homepage components expose the required semantic sections and links', () => {
+  const source = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
+  const styles = readFileSync(`${root}src/styles/home.css`, 'utf8');
+
+  for (const id of ['home-hero', 'macro-state', 'notable-signals', 'relationship-preview', 'learning-paths']) {
+    assert.match(source, new RegExp(`id=["']${id}["']`));
+  }
+  assert.match(source, /domain\.state/);
+  assert.match(source, /domain\.explanation/);
+  assert.match(source, /signal\.conceptHref/);
+  assert.match(source, /relation\.source/);
+  assert.match(source, /relation\.target/);
+  assert.match(source, /\/graph/);
+  assert.match(styles, /:focus-visible/);
+  assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
+});

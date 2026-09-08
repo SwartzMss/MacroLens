@@ -1,0 +1,35 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { LearningPath } from '../../data/home';
+
+const { paths, concepts } = Astro.props as {
+  paths: LearningPath[];
+  concepts: CollectionEntry<'concepts'>[];
+};
+const conceptIds = new Set(concepts.map((concept) => concept.data.id));
+const conceptHref = (id: string) => {
+  if (!conceptIds.has(id)) throw new Error(`Homepage learning path references missing concept: ${id}`);
+  return `/concepts/${id}`;
+};
+---
+
+<section class="home-section home-learning" id="learning-paths" aria-labelledby="learning-paths-title">
+  <div class="home-section-heading">
+    <div>
+      <div class="eyebrow">Start learning</div>
+      <h2 id="learning-paths-title">从一条路径开始</h2>
+    </div>
+    <p>先建立方向感，再进入完整概念库。</p>
+  </div>
+
+  <div class="learning-path-grid">
+    {paths.map((path) => <article class="learning-path-card">
+      <div class="learning-path-number">{path.number}</div>
+      <h3>{path.title}</h3>
+      <p>{path.description}</p>
+      <ol>
+        {path.steps.map((step) => <li><a href={conceptHref(step.id)}>{step.label}</a></li>)}
+      </ol>
+    </article>)}
+  </div>
+</section>

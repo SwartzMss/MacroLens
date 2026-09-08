@@ -1,0 +1,27 @@
+---
+const { relationshipHref = '/graph' } = Astro.props as { relationshipHref?: string };
+---
+
+<section class="home-hero" id="home-hero" aria-labelledby="home-hero-title">
+  <div class="home-hero-copy">
+    <div class="eyebrow">Macroeconomics, made legible</div>
+    <h1 id="home-hero-title">看懂经济，<br /><span>而不只是看数据。</span></h1>
+    <p class="lead">从数据、关系到传导，建立你的宏观经济认知框架。</p>
+    <div class="home-hero-actions">
+      <a class="home-button home-button-primary" href="#macro-state">看当前宏观状态</a>
+      <a class="home-button home-button-secondary" href={relationshipHref}>探索宏观关系</a>
+    </div>
+  </div>
+
+  <aside class="home-hero-map" aria-label="从政策到经济活动的关系预览">
+    <div class="home-brand-line">看懂钱，如何流动。</div>
+    <p>宏观指标不是独立变化的。</p>
+    <ol class="home-chain home-chain-hero">
+      <li><span>央行 / 政策</span><b aria-hidden="true">↓</b></li>
+      <li><span>政策利率</span><b aria-hidden="true">↓</b></li>
+      <li><span>融资条件</span><b aria-hidden="true">↓</b></li>
+      <li><span>信贷与货币</span><b aria-hidden="true">↓</b></li>
+      <li><span>经济活动</span></li>
+    </ol>
+  </aside>
+</section>

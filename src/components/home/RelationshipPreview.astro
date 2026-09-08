@@ -1,0 +1,51 @@
+---
+import { isSymmetricRelation, type Relation, type RelationNode, type RelationType } from '../../data/graphRegistry';
+import type { CollectionEntry } from 'astro:content';
+
+const { relations, nodes, concepts = [] } = Astro.props as {
+  relations: Relation[];
+  nodes: RelationNode[];
+  concepts?: CollectionEntry<'concepts'>[];
+};
+const nodesById = new Map(nodes.map((node) => [node.id, node]));
+const conceptsById = new Map(concepts.map((concept) => [concept.data.id, concept]));
+const relationLabels: Record<RelationType, string> = {
+  CAUSES: '导致',
+  AFFECTS: '影响',
+  REFLECTS: '反映',
+  CORRELATES: '通常相关',
+  COMPONENT_OF: '构成',
+  IMPLEMENTS: '实施',
+  USES: '使用',
+  OVERLAPS_WITH: '范围重叠',
+  MEASURES: '衡量',
+  DERIVED_FROM: '派生自',
+};
+const nodeLabel = (id: string) => conceptsById.get(id)?.data.name ?? nodesById.get(id)?.label ?? id;
+const nodeHref = (id: string) => conceptsById.has(id) ? `/concepts/${id}` : undefined;
+---
+
+<section class="home-section home-relationships" id="relationship-preview" aria-labelledby="relationship-preview-title">
+  <div class="home-section-heading home-section-heading-wide">
+    <div>
+      <div class="eyebrow">Relationships &amp; transmission</div>
+      <h2 id="relationship-preview-title">经济是如何传导的？</h2>
+    </div>
+    <p>谁影响谁、通过什么路径、在什么条件下成立，才是理解宏观变化的下一步。</p>
+  </div>
+
+  <div class="relationship-preview-panel">
+    <div class="home-brand-line">从政策，到融资，再到活动。</div>
+    <ol class="relationship-chain">
+      {relations.map((relation) => <li data-relation-type={relation.type}>
+        {nodeHref(relation.source) ? <a href={nodeHref(relation.source)}>{nodeLabel(relation.source)}</a> : <span>{nodeLabel(relation.source)}</span>}
+        <b class:list={[isSymmetricRelation(relation.type) && 'is-symmetric']} aria-label={relationLabels[relation.type]}>
+          <small>{relationLabels[relation.type]}</small>
+          <span aria-hidden="true">{isSymmetricRelation(relation.type) ? '↔' : '→'}</span>
+        </b>
+        {nodeHref(relation.target) ? <a href={nodeHref(relation.target)}>{nodeLabel(relation.target)}</a> : <span>{nodeLabel(relation.target)}</span>}
+      </li>)}
+    </ol>
+    <a class="home-button home-button-secondary" href="/graph">探索完整宏观关系图 →</a>
+  </div>
+</section>
