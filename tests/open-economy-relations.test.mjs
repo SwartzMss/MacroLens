@@ -28,11 +28,19 @@ const expected = [
   ['carry-trade', 'exchange-rate', 'AFFECTS'],
 ].map(([source, target, type]) => key({ source, target, type })).sort();
 
-test('registers five indicators and two abstract open-economy nodes', () => {
+test('registers open-economy nodes with stable labels and semantic types', () => {
   assert.equal(new Set(nodes.map(node => node.id)).size, nodes.length);
   for (const [id, label] of Object.entries(expectedNodes)) assert.equal(nodes.find(node => node.id === id)?.label, label);
-  for (const id of ['capital-controls', 'impossible-trinity', 'interest-rate-parity', 'usd-cnh', 'carry-trade']) {
-    assert.equal(nodes.find(node => node.id === id)?.kind, 'indicator');
+  const expectedTypes = {
+    'capital-controls': 'concept',
+    'impossible-trinity': 'concept',
+    'interest-rate-parity': 'mechanism',
+    'usd-cnh': 'indicator',
+    'carry-trade': 'mechanism',
+  };
+  for (const [id, type] of Object.entries(expectedTypes)) {
+    assert.equal(nodes.find(node => node.id === id)?.type, type);
+    assert.equal(Object.hasOwn(nodes.find(node => node.id === id), 'kind'), type === 'indicator');
     assert.equal(existsSync(`${concepts}${id}.md`), true);
   }
   for (const id of ['open-economy-policy-tradeoffs', 'cross-currency-pricing-relations']) {
