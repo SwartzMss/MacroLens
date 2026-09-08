@@ -100,7 +100,6 @@
   font-size: 13px;
 }
 
-.home-chain,
 .relationship-chain {
   display: grid;
   gap: 0;
@@ -109,17 +108,31 @@
   list-style: none;
 }
 
-.home-chain li {
+.home-brand-steps {
   display: grid;
-  gap: 5px;
+  gap: 10px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-brand-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   color: var(--ink);
+  font-size: 14px;
   font-weight: 800;
 }
 
-.home-chain li b {
+.home-brand-steps li span {
   color: var(--amber);
-  font-size: 22px;
-  line-height: 1;
+  font: 800 13px/1 var(--serif);
+}
+
+.home-brand-steps li b {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .home-section {

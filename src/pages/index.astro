@@ -8,6 +8,7 @@ import RelationshipPreview from '../components/home/RelationshipPreview.astro';
 import LearningPaths from '../components/home/LearningPaths.astro';
 import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals, learningPaths } from '../data/home';
 import { buildMacroSnapshot } from '../data/macroSnapshot';
+import '../styles/home.css';
 const snapshot = buildMacroSnapshot();
 const concepts = await getCollection('concepts');
 const signals = getNotableSignals(snapshot);

@@ -75,3 +75,14 @@ test('homepage is a narrative entry point and full snapshot has its own route', 
   assert.ok(order.every((index) => index >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
 });
+
+test('homepage loads its presentation stylesheet', () => {
+  const home = readFileSync(homepagePath, 'utf8');
+  assert.match(home, /import\s+['"]\.\.\/styles\/home\.css['"]/);
+});
+
+test('hero brand visual does not duplicate a concrete macro relationship chain', () => {
+  const hero = readFileSync(`${homeDirectory}/HomeHero.astro`, 'utf8');
+  assert.match(hero, /看懂钱，如何流动/);
+  assert.doesNotMatch(hero, /央行\s*\/\s*政策|政策利率|融资条件|信贷与货币|经济活动/);
+});
