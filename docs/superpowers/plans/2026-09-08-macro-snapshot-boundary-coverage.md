@@ -89,7 +89,7 @@ test('prices keep negative, zero, and elevated positive readings separate', () =
 
 - [ ] **Step 4: Run focused tests and confirm the new tests are green**
 
-Run: `npm test -- tests/macro-snapshot.test.mjs`
+Run: `node --import tsx --test tests/macro-snapshot.test.mjs`
 
 Expected: the focused test file passes, including the new growth and price cases.
 
@@ -181,7 +181,7 @@ test('unchanged readings remain stable without spurious snapshot conclusions', (
 
 - [ ] **Step 4: Run focused tests**
 
-Run: `npm test -- tests/macro-snapshot.test.mjs`
+Run: `node --import tsx --test tests/macro-snapshot.test.mjs`
 
 Expected: policy direction, stale-event, and unchanged-snapshot tests pass.
 
@@ -274,7 +274,7 @@ test('rising price pressure stays contextual when activity slows', () => {
 
 - [ ] **Step 4: Run focused tests and inspect evidence ownership**
 
-Run: `npm test -- tests/macro-snapshot.test.mjs`
+Run: `node --import tsx --test tests/macro-snapshot.test.mjs`
 
 Expected: all conflict tests pass, with no evidence ID from another domain used in a domain conclusion.
 

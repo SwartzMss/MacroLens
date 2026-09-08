@@ -35,10 +35,10 @@ No production files under `src/` will change. Test inputs will use deterministic
 Run the focused macro snapshot test, then the full required checks:
 
 ```bash
-npm test -- tests/macro-snapshot.test.mjs
+node --import tsx --test tests/macro-snapshot.test.mjs
 npm test
 npm run check
 npm run build
 ```
 
-The PR will contain only the spec commit and the test coverage change, with no changes to Macro Snapshot production rules.
+The PR will contain the approved process documents and the test coverage change, with no changes to Macro Snapshot production rules.
