@@ -28,7 +28,7 @@ const nodeHref = (id: string) => conceptsById.has(id) ? `/concepts/${id}` : unde
 <section class="home-section home-relationships" id="relationship-preview" aria-labelledby="relationship-preview-title">
   <div class="home-section-heading home-section-heading-wide">
     <div>
-      <div class="eyebrow">Relationships &amp; transmission</div>
+      <div class="eyebrow">03 / 理解联系</div>
       <h2 id="relationship-preview-title">经济是如何传导的？</h2>
     </div>
     <p>谁影响谁、通过什么路径、在什么条件下成立，才是理解宏观变化的下一步。</p>
@@ -36,16 +36,17 @@ const nodeHref = (id: string) => conceptsById.has(id) ? `/concepts/${id}` : unde
 
   <div class="relationship-preview-panel">
     <div class="home-brand-line">从政策，到融资，再到活动。</div>
-    <ol class="relationship-chain">
-      {relations.map((relation) => <li data-relation-type={relation.type}>
-        {nodeHref(relation.source) ? <a href={nodeHref(relation.source)}>{nodeLabel(relation.source)}</a> : <span>{nodeLabel(relation.source)}</span>}
-        <b class:list={[isSymmetricRelation(relation.type) && 'is-symmetric']} aria-label={relationLabels[relation.type]}>
+    <ol class="relationship-chain" aria-label="从中央银行到消费与投资的关系路径">
+      {relations.map((relation, index) => <li data-relation-type={relation.type}>
+        {index === 0 && <div class="relationship-node">{nodeHref(relation.source) ? <a href={nodeHref(relation.source)}>{nodeLabel(relation.source)}</a> : <span>{nodeLabel(relation.source)}</span>}</div>}
+        <div class:list={['relationship-connector', isSymmetricRelation(relation.type) && 'is-symmetric']}>
+          <span aria-hidden="true">{isSymmetricRelation(relation.type) ? '↕' : '↓'}</span>
           <small>{relationLabels[relation.type]}</small>
-          <span aria-hidden="true">{isSymmetricRelation(relation.type) ? '↔' : '→'}</span>
-        </b>
-        {nodeHref(relation.target) ? <a href={nodeHref(relation.target)}>{nodeLabel(relation.target)}</a> : <span>{nodeLabel(relation.target)}</span>}
+        </div>
+        <div class="relationship-node">{nodeHref(relation.target) ? <a href={nodeHref(relation.target)}>{nodeLabel(relation.target)}</a> : <span>{nodeLabel(relation.target)}</span>}</div>
       </li>)}
     </ol>
+    <p class="relationship-note">沿箭头阅读关系。传导效果取决于具体条件；“通常相关”不等于因果关系。</p>
     <a class="home-button home-button-secondary" href="/graph">探索完整宏观关系图 →</a>
   </div>
 </section>

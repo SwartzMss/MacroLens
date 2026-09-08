@@ -93,10 +93,10 @@ test('rejects unknown, self, duplicate, and cyclic prerequisites', () => {
 const conceptsDirectory = fileURLToPath(new URL('../src/content/concepts/', import.meta.url));
 
 function parseFrontmatter(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'concept must have leading YAML frontmatter');
   const values = {};
-  for (const line of match[1].split('\n')) {
+  for (const line of match[1].split(/\r?\n/)) {
     const field = line.match(/^([a-zA-Z][\w]*):\s*(.*)$/);
     if (!field) continue;
     const [, key, rawValue] = field;

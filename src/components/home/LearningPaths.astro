@@ -16,7 +16,7 @@ const conceptHref = (id: string) => {
 <section class="home-section home-learning" id="learning-paths" aria-labelledby="learning-paths-title">
   <div class="home-section-heading">
     <div>
-      <div class="eyebrow">Start learning</div>
+      <div class="eyebrow">04 / 从这里开始</div>
       <h2 id="learning-paths-title">从一条路径开始</h2>
     </div>
     <p>先建立方向感，再进入完整概念库。</p>
@@ -28,8 +28,9 @@ const conceptHref = (id: string) => {
       <h3>{path.title}</h3>
       <p>{path.description}</p>
       <ol>
-        {path.steps.map((step) => <li><a href={conceptHref(step.id)}>{step.label}</a></li>)}
+        {path.steps.map((step, index) => <li><a href={conceptHref(step.id)}><span class="learning-step-index">{index + 1}</span>{step.label}</a></li>)}
       </ol>
+      <a class="home-inline-link learning-start" href={conceptHref(path.steps[0].id)}>开始第一步：{path.steps[0].label} →</a>
     </article>)}
   </div>
 </section>

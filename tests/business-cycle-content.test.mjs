@@ -18,7 +18,7 @@ function parseScalar(value) {
 }
 
 function parseFrontmatter(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'document must have leading YAML frontmatter');
   return Object.fromEntries(match[1].split('\n').map((line) => {
     const colon = line.indexOf(':');

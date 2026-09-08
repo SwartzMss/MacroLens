@@ -19,7 +19,7 @@ const nodes = getHomepageRelationNodes();
   title="MacroLens｜看懂经济，而不只是看数据"
   description="从数据、关系到传导，建立你的宏观经济认知框架。"
 >
-  <HomeHero relationshipHref="/graph" />
+  <HomeHero signal={signals[0]} relationshipHref="/graph" />
   <MacroStateSummary snapshot={snapshot} />
   <NotableSignals signals={signals} />
   <RelationshipPreview relations={relations} nodes={nodes} concepts={concepts} />

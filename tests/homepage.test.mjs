@@ -4,7 +4,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { buildMacroSnapshot } from '../src/data/macroSnapshot.ts';
 import { getRelationData } from '../src/data/graphRegistry.ts';
-import { getHomepageRelationshipPreview, getNotableSignals, learningPaths } from '../src/data/home.ts';
+import { getHomepageRelationshipPreview, getNotableSignals, learningPaths, formatSignalChange, getPmiReading, getHomeSynthesis, localizeExplanation } from '../src/data/home.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const conceptsDirectory = `${root}src/content/concepts`;
@@ -81,10 +81,29 @@ test('homepage loads its presentation stylesheet', () => {
   assert.match(home, /import\s+['"]\.\.\/styles\/home\.css['"]/);
 });
 
-test('hero brand visual does not duplicate a concrete macro relationship chain', () => {
-  const hero = readFileSync(`${homeDirectory}/HomeHero.astro`, 'utf8');
-  assert.match(hero, /看懂钱，如何流动/);
-  assert.doesNotMatch(hero, /央行\s*\/\s*政策|政策利率|融资条件|信贷与货币|经济活动/);
+test('PMI reading distinguishes direction from the expansion threshold', () => {
+  const pmi = getNotableSignals(buildMacroSnapshot())[0];
+  assert.equal(getPmiReading({ ...pmi, latest: 49.8, change: .6 }), '较上月回升 0.6 点，低于 50 荣枯线。');
+  assert.equal(getPmiReading({ ...pmi, latest: 50.2, change: -.2 }), '较上月回落 0.2 点，高于 50 荣枯线。');
+  assert.equal(getPmiReading({ ...pmi, latest: 50, change: 0 }), '与上月持平，位于 50 荣枯线。');
+  assert.match(getPmiReading({ ...pmi, change: null }), /暂无上期可比读数/);
+});
+
+test('signal changes retain rate units and handle absent and rounded-zero changes', () => {
+  const signals = getNotableSignals(buildMacroSnapshot());
+  const labor = signals.find(signal => signal.id === 'unemployment-rate');
+  assert.equal(formatSignalChange({ ...labor, change: .2 }), '+0.2 个百分点');
+  assert.equal(formatSignalChange({ ...signals[0], change: -.6 }), '-0.6 点');
+  assert.equal(formatSignalChange({ ...labor, change: null }), '暂无可比数据');
+  assert.equal(formatSignalChange({ ...labor, change: -.00001 }), '0.0 个百分点');
+});
+
+test('homepage synthesis preserves opposing signals and localizes rule labels', () => {
+  const snapshot = buildMacroSnapshot();
+  const mixed = { ...snapshot, synthesis: { ...snapshot.synthesis, supportingDomainIds: ['growth'], conflictingDomainIds: ['labor'] } };
+  assert.match(getHomeSynthesis(mixed), /增长.*改善；劳动.*偏弱/);
+  assert.match(getHomeSynthesis({ ...snapshot, synthesis: { ...snapshot.synthesis, supportingDomainIds: [], conflictingDomainIds: [] } }), /尚未形成一致方向/);
+  assert.equal(localizeExplanation('方向为weakening和strengthening；政策为stable。'), '方向为走弱和走强；政策为稳定。');
 });
 
 test('notable signals do not classify raw change direction as negative', () => {
