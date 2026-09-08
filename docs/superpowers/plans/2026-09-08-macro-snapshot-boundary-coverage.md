@@ -232,7 +232,8 @@ test('policy easing does not erase weak growth in synthesis', () => {
     'industrial-production': data([{ date: '2026-08', value: -1 }, { date: '2026-09', value: -1 }]),
     'retail-sales': data([{ date: '2026-08', value: -1 }, { date: '2026-09', value: -1 }]),
     'fixed-asset-investment': data([{ date: '2026-01–08', value: -1 }, { date: '2026-01–09', value: -1 }]),
-    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-01', value: 1.7 }]),
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-07', value: 1.7 }]),
+    'unemployment-rate': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
     lpr: {
       series: [
         { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
@@ -264,6 +265,7 @@ test('rising price pressure stays contextual when activity slows', () => {
     cpi: data([{ date: '2026-08', value: 4 }, { date: '2026-09', value: 5 }]),
     'core-cpi': data([{ date: '2026-08', value: 3 }, { date: '2026-09', value: 4 }]),
     ppi: data([{ date: '2026-08', value: 2 }, { date: '2026-09', value: 3 }]),
+    'unemployment-rate': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
   }));
 
   assert.equal(snapshot.domains.find(domain => domain.id === 'growth').state, 'weakening');
