@@ -25,7 +25,7 @@ export function buildIndicatorChartOption(config: IndicatorChartConfig): ECharts
     xAxis: step
       ? { type: 'time', min: timestamp(dates[0]), max: timestamp(config.verifiedThrough ?? dates.at(-1)!), axisLabel: { formatter: '{yyyy}-{MM}-{dd}', hideOverlap: true } }
       : { type: 'category', data: dates, axisLine: { lineStyle: { color: '#b9c2ba' } } },
-    yAxis: { type: 'value', name: config.unit, splitLine: { lineStyle: { color: '#e7e8e1' } } },
+    yAxis: { type: 'value', name: config.unit === 'index' ? '点' : config.unit, splitLine: { lineStyle: { color: '#e7e8e1' } } },
     series: series.map((item, index) => {
       const values = new Map(item.data.map(({ date, value }) => [date, value]));
       const last = item.data.at(-1)!;
