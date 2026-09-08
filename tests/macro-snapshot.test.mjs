@@ -93,6 +93,42 @@ test('growth reports PMI below 50 while other activity remains positive', () => 
   assert.ok(growth.evidence.some(item => item.id === 'pmi'));
 });
 
+test('growth keeps PMI below, at, and above the expansion threshold distinct', () => {
+  const states = [49.9, 50, 50.1].map(value => analyzeGrowth(makeMacroIndicators({
+    pmi: data([{ date: '2026-08', value }, { date: '2026-09', value }]),
+    gdp: data([{ date: '2026-Q2', value: 4 }, { date: '2026-Q3', value: 4 }]),
+    'industrial-production': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'retail-sales': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 5 }, { date: '2026-01–09', value: 5 }]),
+  })).state);
+
+  assert.deepEqual(states, ['mixed', 'strengthening', 'strengthening']);
+});
+
+test('growth treats exact momentum boundaries as neutral', () => {
+  const indicatorIds = ['pmi', 'gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'];
+  const cases = [
+    { name: 'exact weakening boundary', previous: 0.2, expectedState: 'stable', expectedRisk: false },
+    { name: 'just below weakening boundary', previous: 0.21, expectedState: 'weakening', expectedRisk: true },
+    { name: 'exact improving boundary', previous: -0.2, expectedState: 'stable', expectedRisk: false },
+    { name: 'just above improving boundary', previous: -0.21, expectedState: 'strengthening', expectedRisk: false },
+  ];
+
+  for (const item of cases) {
+    const indicators = makeMacroIndicators(Object.fromEntries(indicatorIds.map(id => [
+      id,
+      data([{ date: id === 'gdp' ? '2026-Q2' : '2026-08', value: item.previous }, {
+        date: id === 'gdp' ? '2026-Q3' : '2026-09',
+        value: 0,
+      }]),
+    ])));
+    const growth = analyzeGrowth(indicators);
+
+    assert.equal(growth.state, item.expectedState, item.name);
+    assert.equal(growth.risks.some(risk => risk.id === 'growth-synchronised-weakening'), item.expectedRisk, item.name);
+  }
+});
+
 test('prices retain divergent CPI, core CPI, and PPI evidence', () => {
   const prices = analyzePrices(makeMacroIndicators({
     cpi: data([{ date: '2026-08', value: 0.8 }, { date: '2026-09', value: 1 }]),
@@ -103,6 +139,24 @@ test('prices retain divergent CPI, core CPI, and PPI evidence', () => {
   assert.equal(prices.state, 'divergent');
   assert.match(prices.explanation, /CPI|核心|PPI/);
   assert.doesNotMatch(prices.explanation, /意味着|导致|必然/);
+});
+
+test('prices keep negative, zero, and elevated positive readings separate', () => {
+  const readings = [
+    { value: -1, change: -0.2, expectedState: 'weakening' },
+    { value: 0, change: 0, expectedState: 'stable' },
+    { value: 6, change: 1, expectedState: 'strengthening' },
+  ];
+
+  for (const item of readings) {
+    const prices = analyzePrices(makeMacroIndicators({
+      cpi: data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+      'core-cpi': data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+      ppi: data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+    }));
+
+    assert.equal(prices.state, item.expectedState, `price value ${item.value}`);
+  }
 });
 
 test('credit separates money growth from credit and social-financing growth', () => {
