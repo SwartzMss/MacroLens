@@ -17,7 +17,7 @@
 
 - [ ] **Step 1: Add strict growth threshold tests**
 
-Add a named test that runs `analyzeGrowth` for PMI values `49.9`, `50`, and `50.1`, while GDP, industrial production, retail sales, and fixed-asset investment remain positive and unchanged:
+Add a named test that runs `analyzeGrowth` for PMI values `49.9`, `50`, and `50.1`, while three activity indicators remain positive and fixed-asset investment remains neutral and unchanged. This makes the PMI contribution observable in the final domain state:
 
 ```js
 test('growth keeps PMI below, at, and above the expansion threshold distinct', () => {
@@ -26,10 +26,10 @@ test('growth keeps PMI below, at, and above the expansion threshold distinct', (
     gdp: data([{ date: '2026-Q2', value: 4 }, { date: '2026-Q3', value: 4 }]),
     'industrial-production': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
     'retail-sales': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
-    'fixed-asset-investment': data([{ date: '2026-01–08', value: 5 }, { date: '2026-01–09', value: 5 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 0 }, { date: '2026-01–09', value: 0 }]),
   })).state);
 
-  assert.deepEqual(states, ['mixed', 'strengthening', 'strengthening']);
+  assert.deepEqual(states, ['mixed', 'stable', 'strengthening']);
 });
 ```
 
