@@ -11,6 +11,7 @@ const explorerComponent = `${root}src/components/RelationshipExplorer.astro`;
 const relationshipCards = `${root}src/components/RelationshipCards.astro`;
 const layout = `${root}src/layouts/BaseLayout.astro`;
 const homepage = `${root}src/pages/index.astro`;
+const homeRelationshipPreview = `${root}src/components/home/RelationshipPreview.astro`;
 
 const readSource = (path) => existsSync(path) ? readFileSync(path, 'utf8') : '';
 
@@ -187,7 +188,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   const component = readSource(explorerComponent);
   const cards = readSource(relationshipCards);
   const nav = readSource(layout);
-  const home = readSource(homepage);
+  const home = `${readSource(homepage)}\n${readSource(homeRelationshipPreview)}`;
 
   assert.match(page, /getExplainableRelationData/);
   assert.match(page, /RelationshipExplorer/);
@@ -229,9 +230,9 @@ test('keeps the relationship explorer discoverable from the primary product shel
 });
 
 test('makes the relationship map discoverable from the homepage', () => {
-  const home = readSource(homepage);
-  assert.match(home, /宏观关系|关系地图/);
-  assert.match(home, /领先|滞后|影响|相关/);
+  const home = `${readSource(homepage)}\n${readSource(homeRelationshipPreview)}`;
+  assert.match(home, /经济是如何传导|完整宏观关系图/);
+  assert.match(home, /影响|相关/);
 });
 
 test('concept pages reuse canonical relationship metadata', () => {

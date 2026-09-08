@@ -64,15 +64,13 @@ test('dashboard markup uses presentation labels and keeps engineering metadata i
   assert.match(source, /dataset\.metric/);
 });
 
-test('dashboard styles are responsive and homepage preserves current sections', () => {
+test('dashboard styles remain responsive while homepage uses a compact signal view', () => {
   const styles = readFileSync(dashboardStyles, 'utf8');
   const page = readFileSync(homepage, 'utf8');
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(styles, /dashboard-grid/);
   assert.doesNotMatch(styles, /dashboard-changes/);
   assert.match(styles, /\.indicator-change\.is-negative/);
-  assert.match(page, /MacroDashboard/);
-  assert.match(page, /TransmissionPaths/);
-  assert.match(page, /先认识两种“钱”/);
-  assert.doesNotMatch(page, /每条关系均来自 canonical dataset/);
+  assert.match(page, /NotableSignals/);
+  assert.doesNotMatch(page, /<MacroDashboard|<MacroSnapshot|TransmissionPaths/);
 });

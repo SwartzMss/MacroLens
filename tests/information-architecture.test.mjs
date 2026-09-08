@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { topicIds, topicRegistry } from '../src/data/topics.ts';
+import { learningPaths } from '../src/data/home.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const topicsIndex = `${root}src/pages/topics/index.astro`;
@@ -65,8 +66,9 @@ test('concept links in the catalog remain stable concept routes', () => {
 
 test('homepage remains a curated entry point', () => {
   const homepage = readFileSync(`${root}src/pages/index.astro`, 'utf8');
-  assert.match(homepage, /href="\/concepts\/m1"/);
-  assert.match(homepage, /href="\/concepts\/m2"/);
+  assert.match(homepage, /LearningPaths/);
+  assert.ok(learningPaths.some((path) => path.steps.some((step) => step.id === 'm1')));
+  assert.ok(learningPaths.some((path) => path.steps.some((step) => step.id === 'm2')));
   assert.doesNotMatch(homepage, /topicRegistry|topics\.map/);
 });
 

@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MacroSnapshot from '../components/MacroSnapshot.astro';
+import { buildMacroSnapshot } from '../data/macroSnapshot';
+
+const snapshot = buildMacroSnapshot();
+---
+
+<BaseLayout
+  title="Macro Snapshot｜MacroLens"
+  description="查看 MacroLens 完整的规则化宏观状态、领域证据、风险与下一期观察。"
+>
+  <div class="shell">
+    <MacroSnapshot snapshot={snapshot} />
+  </div>
+</BaseLayout>

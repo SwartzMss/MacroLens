@@ -1,0 +1,36 @@
+---
+import type { HomepageNotableSignal } from '../../data/home';
+
+const { signals } = Astro.props as { signals: HomepageNotableSignal[] };
+const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ` ${unit}`}`;
+const formatChange = (change: number | null, changeUnit: string) => {
+  if (change === null) return '—';
+  const suffix = changeUnit === 'percentage-points' ? ' 个百分点' : changeUnit === 'points' ? ' 点' : '';
+  return `${change > 0 ? '+' : ''}${change.toFixed(1)}${suffix}`;
+};
+---
+
+<section class="home-section home-signals" id="notable-signals" aria-labelledby="notable-signals-title">
+  <div class="home-section-heading">
+    <div>
+      <div class="eyebrow">Signals to notice</div>
+      <h2 id="notable-signals-title">现在值得关注</h2>
+    </div>
+    <p>先看变化，再回到指标的定义和图表。</p>
+  </div>
+
+  <div class="home-signal-grid">
+    {signals.map((signal) => <article class="home-signal-card">
+      <div class="home-signal-topline">
+        <a href={signal.conceptHref}>{signal.name}</a>
+        <span>{signal.observationPeriod}</span>
+      </div>
+      <div class="home-signal-value">{formatValue(signal.latest, signal.unit)}</div>
+      <div class="home-signal-change">
+        <span>{signal.changeLabel}</span>
+        <strong>{formatChange(signal.change, signal.changeUnit)}</strong>
+      </div>
+      <a class="home-signal-detail" href={signal.conceptHref}>查看定义与图表 →</a>
+    </article>)}
+  </div>
+</section>

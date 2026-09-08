@@ -1,32 +1,27 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import MacroDashboard from '../components/MacroDashboard.astro';
-import MacroSnapshot from '../components/MacroSnapshot.astro';
-import TransmissionPaths from '../components/TransmissionPaths.astro';
-import { getRelationData, requireRelation } from '../data/graphRegistry';
-import { getDashboardIndicators } from '../data/dashboard';
+import HomeHero from '../components/home/HomeHero.astro';
+import MacroStateSummary from '../components/home/MacroStateSummary.astro';
+import NotableSignals from '../components/home/NotableSignals.astro';
+import RelationshipPreview from '../components/home/RelationshipPreview.astro';
+import LearningPaths from '../components/home/LearningPaths.astro';
+import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals, learningPaths } from '../data/home';
 import { buildMacroSnapshot } from '../data/macroSnapshot';
-const concepts = await getCollection('concepts');
-const { nodes } = getRelationData('macro');
-const dashboardIndicators = getDashboardIndicators();
+import '../styles/home.css';
 const snapshot = buildMacroSnapshot();
-const relation = (source: string, target: string, type: Parameters<typeof requireRelation>[3]) => requireRelation('macro', source, target, type);
-const paths = [
-  { title:'货币政策传导', description:'从政策决策与工具，走到融资条件、信贷和货币。', relations:[relation('central-bank','monetary-policy','IMPLEMENTS'),relation('monetary-policy','policy-rate','USES'),relation('monetary-policy','rrr','USES'),relation('monetary-policy','omo','USES'),relation('policy-rate','financing-conditions','AFFECTS'),relation('rrr','financing-conditions','AFFECTS'),relation('omo','financing-conditions','AFFECTS'),relation('financing-conditions','credit','AFFECTS'),relation('credit','m2','AFFECTS'),relation('m2','activity','CORRELATES')] },
-  { title:'经济活动线索', description:'不同指标从生产、消费、投资和企业经营侧观察经济活动。', relations:[relation('pmi','business-activity-conditions','REFLECTS'),relation('business-activity-conditions','economic-activity','CORRELATES'),relation('gdp','economic-activity','MEASURES'),relation('industrial-production','industrial-activity','REFLECTS'),relation('industrial-activity','economic-activity','COMPONENT_OF'),relation('retail-sales','consumption-activity','REFLECTS'),relation('consumption-activity','economic-activity','COMPONENT_OF'),relation('fixed-asset-investment','investment-activity','REFLECTS'),relation('investment-activity','economic-activity','COMPONENT_OF')] },
-  { title:'价格观察路径', description:'生产端、居民消费端与核心价格指标提供不同观察角度。', relations:[relation('ppi','producer-price-pressure','REFLECTS'),relation('ppi','cpi','CORRELATES'),relation('cpi','consumer-price-pressure','REFLECTS'),relation('core-cpi','cpi','DERIVED_FROM'),relation('core-cpi','underlying-price-pressure','REFLECTS')] }
-];
+const concepts = await getCollection('concepts');
+const signals = getNotableSignals(snapshot);
+const relations = getHomepageRelationshipPreview();
+const nodes = getHomepageRelationNodes();
 ---
-<BaseLayout><div class="shell">
-<section class="hero"><div><div class="eyebrow">Macroeconomics, made legible</div><h1>看懂钱，<br>如何流动。</h1><p class="lead">MacroLens 用清晰的概念、可追溯的关系和真实世界的数据，帮你建立宏观经济的直觉。</p></div><p class="hero-note">第一条学习路径从 M1 / M2 开始：它们是什么、为何变化，以及为什么“钱变多”不等于资产和物价必然上涨。</p></section>
-<MacroDashboard indicators={dashboardIndicators} />
-<MacroSnapshot snapshot={snapshot} />
-<section class="section relationship-entry"><div class="section-head"><div><div class="eyebrow">Macro relationships</div><h2>看懂指标之间的关系</h2></div><p>从关系开始继续探索</p></div><a class="relationship-entry-card" href="/graph"><div><div class="number">关系</div><h3>宏观关系地图</h3><p>阅读谁影响谁、哪些指标领先或滞后，以及这些关系在宏观传导中如何连接。</p></div><span aria-hidden="true">打开关系地图 →</span></a></section>
-<section class="section"><div class="section-head"><div><div class="eyebrow">Start here</div><h2>先认识两种“钱”</h2></div><p>约 10 分钟完成</p></div><div class="grid"><a class="concept-card" href="/concepts/m1"><div class="number">M1</div><h3>交易中的钱</h3><p>理解高流动性货币如何反映企业与居民的资金活跃程度。</p><div class="tags"><span class="tag">定义口径</span><span class="tag">情景解读</span><span class="tag">历史数据</span></div></a><a class="concept-card" href="/concepts/m2"><div class="number">M2</div><h3>更宽的货币总量</h3><p>理解存款、信贷与广义货币，以及“水多”为什么不必然上涨。</p><div class="tags"><span class="tag">信用派生</span><span class="tag">传导机制</span><span class="tag">常见误区</span></div></a></div></section>
-<section class="section"><div class="section-head"><div><div class="eyebrow">Money → Credit</div><h2>继续走进融资链条</h2></div><p>从现金到借贷成本</p></div><div class="grid"><a class="concept-card" href="/concepts/m0"><div class="number">M0</div><h3>流通中的现金</h3><p>看懂最窄的一层货币，以及节日、支付方式与现金需求。</p></a><a class="concept-card" href="/concepts/credit"><div class="number">贷</div><h3>人民币贷款与信贷</h3><p>区分余额、增量、期限和部门，理解贷款如何创造存款。</p></a><a class="concept-card" href="/concepts/social-financing"><div class="number">社融</div><h3>社会融资规模</h3><p>从实体经济一侧观察贷款、债券和其他融资渠道。</p></a><a class="concept-card" href="/concepts/lpr"><div class="number">LPR</div><h3>贷款定价参考</h3><p>区分政策利率、LPR、实际贷款利率与信用需求。</p></a></div></section>
-<section class="section"><div class="section-head"><div><div class="eyebrow">Transmission</div><h2>顺着关系理解传导</h2></div></div><TransmissionPaths paths={paths} nodes={nodes} concepts={concepts} /></section>
-</div></BaseLayout>
-<style>
-.relationship-entry-card{display:flex;align-items:center;justify-content:space-between;gap:28px;padding:28px 32px;background:var(--card);border:1px solid var(--line);border-radius:18px;transition:.2s}.relationship-entry-card:hover{transform:translateY(-3px);border-color:#9fc2b4;box-shadow:0 14px 30px #174a3820}.relationship-entry-card:focus-visible{outline:3px solid #a9d8c3;outline-offset:4px}.relationship-entry-card .number{font:800 32px/1 var(--serif);color:var(--green)}.relationship-entry-card h3{font:700 24px var(--serif);margin:14px 0 8px}.relationship-entry-card p{color:var(--muted);margin:0}.relationship-entry-card>span{color:var(--green);font-weight:700;white-space:nowrap}@media(max-width:560px){.relationship-entry-card{align-items:flex-start;flex-direction:column;gap:18px;padding:24px}.relationship-entry-card>span{white-space:normal}}
-</style>
+<BaseLayout
+  title="MacroLens｜看懂经济，而不只是看数据"
+  description="从数据、关系到传导，建立你的宏观经济认知框架。"
+>
+  <HomeHero relationshipHref="/graph" />
+  <MacroStateSummary snapshot={snapshot} />
+  <NotableSignals signals={signals} />
+  <RelationshipPreview relations={relations} nodes={nodes} concepts={concepts} />
+  <LearningPaths paths={learningPaths} concepts={concepts} />
+</BaseLayout>
