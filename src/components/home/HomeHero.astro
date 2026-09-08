@@ -1,27 +1,26 @@
 ---
-const { relationshipHref = '/graph' } = Astro.props as { relationshipHref?: string };
+import { getPmiReading, type HomepageNotableSignal } from '../../data/home';
+const { signal, relationshipHref = '/graph' } = Astro.props as { signal: HomepageNotableSignal; relationshipHref?: string };
 ---
 
 <section class="home-hero" id="home-hero" aria-labelledby="home-hero-title">
   <div class="home-hero-copy">
-    <div class="eyebrow">Macroeconomics, made legible</div>
-    <h1 id="home-hero-title">看懂经济，<br /><span>而不只是看数据。</span></h1>
-    <p class="lead">从数据、关系到传导，建立你的宏观经济认知框架。</p>
+    <div class="eyebrow">MacroLens · 宏观经济观察与学习</div>
+    <h1 id="home-hero-title">看懂经济，<br /><span>而不只是<span class="home-title-word">看数据。</span></span></h1>
+    <p class="lead">从一个指标出发，理解它释放的信号，<br class="home-desktop-break" />再看它与经济的联系。</p>
     <div class="home-hero-actions">
       <a class="home-button home-button-primary" href="#macro-state">看当前宏观状态</a>
       <a class="home-button home-button-secondary" href={relationshipHref}>探索宏观关系</a>
     </div>
+    <a class="home-learning-entry" href="#learning-paths">刚开始了解宏观？从一条学习路径开始 →</a>
   </div>
 
-  <aside class="home-hero-map" aria-label="MacroLens 的宏观理解路径">
-    <div class="home-brand-line">看懂钱，如何流动。</div>
-    <p>把原始读数变成可以继续探索的宏观理解。</p>
-    <ol class="home-brand-steps">
-      <li><span>01</span><b>Data</b></li>
-      <li><span>02</span><b>Signals</b></li>
-      <li><span>03</span><b>Relationships</b></li>
-      <li><span>04</span><b>Transmission</b></li>
-      <li><span>05</span><b>Understanding</b></li>
-    </ol>
+  <aside class="home-hero-map" aria-labelledby="home-observation-title">
+    <div class="home-observation-top"><span class="eyebrow">从一个信号开始</span><time>{signal.observationPeriod}</time></div>
+    <h2 id="home-observation-title">{signal.name}</h2>
+    <div class="home-observation-value">{signal.latest.toFixed(1)}<span>指数</span></div>
+    <p class="home-observation-reading">{getPmiReading(signal)}</p>
+    <p>读数的变化与所处位置，是理解景气的两个角度。</p>
+    <a class="home-inline-link" href={signal.conceptHref}>了解 PMI 与荣枯线 →</a>
   </aside>
 </section>

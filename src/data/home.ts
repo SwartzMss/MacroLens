@@ -1,6 +1,41 @@
 import type { Relation, RelationNode } from './graphRegistry';
 import { getRelationData, requireRelation } from './graphRegistry';
-import type { MacroSnapshot, SnapshotEvidence } from './macroSnapshot';
+import type { MacroSnapshot, SnapshotEvidence, MacroDomainStateValue } from './macroSnapshot';
+
+export const homeStateLabels: Record<MacroDomainStateValue, string> = {
+  strengthening: '走强', weakening: '走弱', stable: '稳定', mixed: '信号不一',
+  divergent: '分化', easing: '宽松', tightening: '收紧', elevated: '偏高', notable: '值得关注',
+};
+
+export function localizeExplanation(text: string): string {
+  return text.replace(/\b(strengthening|weakening|stable|mixed|divergent|easing|tightening|elevated|notable)\b/g,
+    state => homeStateLabels[state as MacroDomainStateValue]);
+}
+
+export function getHomeSynthesis(snapshot: MacroSnapshot): string {
+  const labels = (ids: string[]) => snapshot.domains.filter(domain => ids.includes(domain.id)).map(domain => domain.label).join('、');
+  const { supportingDomainIds, conflictingDomainIds } = snapshot.synthesis;
+  const parts = [
+    supportingDomainIds.length ? `${labels(supportingDomainIds)}的信号改善` : '',
+    conflictingDomainIds.length ? `${labels(conflictingDomainIds)}的信号偏弱` : '',
+  ].filter(Boolean);
+  return `${parts.length ? parts.join('；') : '增长与劳动信号尚未形成一致方向'}。价格、融资与政策等领域需分别观察。`;
+}
+
+export function formatSignalChange(signal: SnapshotEvidence): string {
+  if (signal.change === null) return '暂无可比数据';
+  const suffix = signal.unit === '%' || signal.changeUnit === 'percentage-points'
+    ? ' 个百分点' : signal.changeUnit === 'points' ? ' 点' : ` ${signal.unit}`;
+  const rounded = Number(signal.change.toFixed(1));
+  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}${suffix}`;
+}
+
+export function getPmiReading(signal: SnapshotEvidence): string {
+  const position = signal.latest > 50 ? '高于' : signal.latest < 50 ? '低于' : '位于';
+  const direction = signal.change === null ? '暂无上期可比读数' : Math.abs(signal.change) < 0.05
+    ? '与上月持平' : `较上月${signal.change > 0 ? '回升' : '回落'} ${Math.abs(signal.change).toFixed(1)} 点`;
+  return `${direction}，${position} 50 荣枯线。`;
+}
 
 export const homepageNotableSignalIds = [
   'pmi', 'gdp', 'fixed-asset-investment', 'unemployment-rate', 'm2',

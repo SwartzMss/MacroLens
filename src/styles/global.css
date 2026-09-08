@@ -11,6 +11,12 @@
   --serif: "Noto Serif SC", "Songti SC", Georgia, serif;
   --sans: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
+
+@media (max-width: 380px) {
+  .site-header .nav { gap: 10px; }
+  .site-header .brand { font-size: 18px; }
+  .site-header .nav a { white-space: nowrap; }
+}
 * {
   box-sizing: border-box;
 }
