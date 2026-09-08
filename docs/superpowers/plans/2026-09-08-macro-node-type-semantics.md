@@ -235,4 +235,3 @@ gh pr create --repo SwartzMss/MacroLens --base main --head codex/issue-129-macro
 ```
 
 The PR body must state that `central-bank` and `government` are temporarily classified as broad `concept` nodes because the current four-type taxonomy lacks an actor/institution category, and must include `Closes #129`, the verification results, and the explicit no-relationship-change scope.
-
