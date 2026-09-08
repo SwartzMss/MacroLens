@@ -200,6 +200,21 @@ test('policy and LPR cuts both map to easing financial conditions', () => {
   assert.equal(stablePolicy.state, 'easing');
 });
 
+test('current policy-rate increases map to tightening conditions', () => {
+  const tightening = analyzePolicyFinancialConditions(makeMacroIndicators({
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-07', value: 1.9 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 3.5 }, { date: '2026-09', value: 3.5 }] },
+      ],
+    },
+  }));
+
+  assert.equal(tightening.state, 'tightening');
+  assert.deepEqual(tightening.risks, []);
+});
+
 test('policy event direction expires into stable after verified-through', () => {
   const policy = analyzePolicyFinancialConditions(makeMacroIndicators({
     'policy-rate': {
@@ -218,7 +233,46 @@ test('policy event direction expires into stable after verified-through', () => 
   }));
 
   assert.equal(policy.state, 'stable');
+  assert.deepEqual(policy.risks, []);
   assert.match(policy.explanation, /最后一次|核验|稳定/);
+});
+
+test('unchanged readings remain stable without spurious snapshot conclusions', () => {
+  const unchanged = data([{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }]);
+  const unchangedPmi = data([{ date: '2026-08', value: 50 }, { date: '2026-09', value: 50 }]);
+  const snapshot = buildMacroSnapshot(makeMacroIndicators({
+    gdp: data([{ date: '2026-Q2', value: 0 }, { date: '2026-Q3', value: 0 }]),
+    pmi: unchangedPmi,
+    'industrial-production': unchanged,
+    'retail-sales': unchanged,
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 0 }, { date: '2026-01–09', value: 0 }]),
+    cpi: unchanged,
+    'core-cpi': unchanged,
+    ppi: unchanged,
+    m0: unchanged,
+    m1: unchanged,
+    m2: unchanged,
+    credit: unchanged,
+    'social-financing': unchanged,
+    'policy-rate': data([{ date: '2026-08-01', value: 0 }, { date: '2026-09-01', value: 0 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }] },
+      ],
+    },
+    'unemployment-rate': unchanged,
+    exports: unchanged,
+    imports: unchanged,
+  }));
+
+  assert.deepEqual(snapshot.domains.map(domain => domain.state), [
+    'stable', 'stable', 'stable', 'stable', 'stable', 'stable',
+  ]);
+  assert.deepEqual(snapshot.synthesis.supportingDomainIds, []);
+  assert.deepEqual(snapshot.synthesis.conflictingDomainIds, []);
+  assert.deepEqual(snapshot.risks, []);
+  assert.deepEqual(snapshot.watchNext, []);
 });
 
 test('labor weakens independently from a positive growth domain', () => {

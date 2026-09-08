@@ -112,7 +112,7 @@ Add the mirror case to the existing easing test and assert that a current policy
 ```js
 test('current policy-rate increases map to tightening conditions', () => {
   const tightening = analyzePolicyFinancialConditions(makeMacroIndicators({
-    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-01', value: 1.9 }]),
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-07', value: 1.9 }]),
     lpr: {
       series: [
         { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
@@ -143,9 +143,10 @@ Construct a snapshot where every single-series indicator has two zero observatio
 ```js
 test('unchanged readings remain stable without spurious snapshot conclusions', () => {
   const unchanged = data([{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }]);
+  const unchangedPmi = data([{ date: '2026-08', value: 50 }, { date: '2026-09', value: 50 }]);
   const snapshot = buildMacroSnapshot(makeMacroIndicators({
     gdp: data([{ date: '2026-Q2', value: 0 }, { date: '2026-Q3', value: 0 }]),
-    pmi: unchanged,
+    pmi: unchangedPmi,
     'industrial-production': unchanged,
     'retail-sales': unchanged,
     'fixed-asset-investment': data([{ date: '2026-01–08', value: 0 }, { date: '2026-01–09', value: 0 }]),
