@@ -475,7 +475,22 @@
   }
 
   .relationship-chain li {
-    grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 16px 0;
+  }
+
+  .relationship-chain li:first-child {
+    padding-top: 0;
+  }
+
+  .relationship-chain li > span:last-child,
+  .relationship-chain li > a:last-child {
+    text-align: left;
+  }
+
+  .relationship-chain b {
+    justify-content: flex-start;
   }
 
   .relationship-preview-panel > .home-button {
