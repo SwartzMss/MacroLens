@@ -93,6 +93,42 @@ test('growth reports PMI below 50 while other activity remains positive', () => 
   assert.ok(growth.evidence.some(item => item.id === 'pmi'));
 });
 
+test('growth keeps PMI below, at, and above the expansion threshold distinct', () => {
+  const states = [49.9, 50, 50.1].map(value => analyzeGrowth(makeMacroIndicators({
+    pmi: data([{ date: '2026-08', value }, { date: '2026-09', value }]),
+    gdp: data([{ date: '2026-Q2', value: 4 }, { date: '2026-Q3', value: 4 }]),
+    'industrial-production': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'retail-sales': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 0 }, { date: '2026-01–09', value: 0 }]),
+  })).state);
+
+  assert.deepEqual(states, ['mixed', 'stable', 'strengthening']);
+});
+
+test('growth treats exact momentum boundaries as neutral', () => {
+  const indicatorIds = ['pmi', 'gdp', 'industrial-production', 'retail-sales', 'fixed-asset-investment'];
+  const cases = [
+    { name: 'exact weakening boundary', previous: 0.2, expectedState: 'stable', expectedRisk: false },
+    { name: 'just below weakening boundary', previous: 0.21, expectedState: 'weakening', expectedRisk: true },
+    { name: 'exact improving boundary', previous: -0.2, expectedState: 'stable', expectedRisk: false },
+    { name: 'just above improving boundary', previous: -0.21, expectedState: 'strengthening', expectedRisk: false },
+  ];
+
+  for (const item of cases) {
+    const indicators = makeMacroIndicators(Object.fromEntries(indicatorIds.map(id => [
+      id,
+      data([{ date: id === 'gdp' ? '2026-Q2' : '2026-08', value: item.previous }, {
+        date: id === 'gdp' ? '2026-Q3' : '2026-09',
+        value: 0,
+      }]),
+    ])));
+    const growth = analyzeGrowth(indicators);
+
+    assert.equal(growth.state, item.expectedState, item.name);
+    assert.equal(growth.risks.some(risk => risk.id === 'growth-synchronised-weakening'), item.expectedRisk, item.name);
+  }
+});
+
 test('prices retain divergent CPI, core CPI, and PPI evidence', () => {
   const prices = analyzePrices(makeMacroIndicators({
     cpi: data([{ date: '2026-08', value: 0.8 }, { date: '2026-09', value: 1 }]),
@@ -105,6 +141,24 @@ test('prices retain divergent CPI, core CPI, and PPI evidence', () => {
   assert.doesNotMatch(prices.explanation, /意味着|导致|必然/);
 });
 
+test('prices keep negative, zero, and elevated positive readings separate', () => {
+  const readings = [
+    { value: -1, change: -0.2, expectedState: 'weakening' },
+    { value: 0, change: 0, expectedState: 'stable' },
+    { value: 6, change: 1, expectedState: 'strengthening' },
+  ];
+
+  for (const item of readings) {
+    const prices = analyzePrices(makeMacroIndicators({
+      cpi: data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+      'core-cpi': data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+      ppi: data([{ date: '2026-08', value: item.value - item.change }, { date: '2026-09', value: item.value }]),
+    }));
+
+    assert.equal(prices.state, item.expectedState, `price value ${item.value}`);
+  }
+});
+
 test('credit separates money growth from credit and social-financing growth', () => {
   const credit = analyzeCreditLiquidity(makeMacroIndicators({
     m2: data([{ date: '2026-07', value: 7 }, { date: '2026-08', value: 8 }]),
@@ -115,6 +169,65 @@ test('credit separates money growth from credit and social-financing growth', ()
   assert.equal(credit.state, 'mixed');
   assert.match(credit.explanation, /货币|信贷|社会融资/);
   assert.doesNotMatch(credit.explanation, /意味着|导致|必然/);
+});
+
+test('credit keeps improving liquidity separate from weakening transmission', () => {
+  const credit = analyzeCreditLiquidity(makeMacroIndicators({
+    m0: data([{ date: '2026-07', value: 7 }, { date: '2026-08', value: 8 }]),
+    m1: data([{ date: '2026-07', value: 7 }, { date: '2026-08', value: 8 }]),
+    m2: data([{ date: '2026-07', value: 7 }, { date: '2026-08', value: 8 }]),
+    credit: data([{ date: '2026-07', value: 8.3 }, { date: '2026-08', value: 8 }]),
+    'social-financing': data([{ date: '2026-07', value: 8.3 }, { date: '2026-08', value: 8 }]),
+  }));
+
+  assert.equal(credit.state, 'mixed');
+  assert.equal(credit.risks[0].id, 'credit-liquidity-divergence');
+  assert.deepEqual(credit.risks[0].evidenceIds, [
+    'm0', 'm1', 'm2', 'credit', 'social-financing',
+  ]);
+});
+
+test('policy easing does not erase weak growth in synthesis', () => {
+  const snapshot = buildMacroSnapshot(makeMacroIndicators({
+    pmi: data([{ date: '2026-08', value: 49 }, { date: '2026-09', value: 49 }]),
+    gdp: data([{ date: '2026-Q2', value: -1 }, { date: '2026-Q3', value: -1 }]),
+    'industrial-production': data([{ date: '2026-08', value: -1 }, { date: '2026-09', value: -1 }]),
+    'retail-sales': data([{ date: '2026-08', value: -1 }, { date: '2026-09', value: -1 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: -1 }, { date: '2026-01–09', value: -1 }]),
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-07', value: 1.7 }]),
+    'unemployment-rate': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 3.5 }, { date: '2026-09', value: 3.5 }] },
+      ],
+    },
+  }));
+
+  assert.equal(snapshot.domains.find(domain => domain.id === 'growth').state, 'weakening');
+  assert.equal(snapshot.domains.find(domain => domain.id === 'policy-financial-conditions').state, 'easing');
+  assert.deepEqual(snapshot.synthesis.supportingDomainIds, []);
+  assert.deepEqual(snapshot.synthesis.conflictingDomainIds, ['growth']);
+  assert.ok(snapshot.synthesis.contextualDomainIds.includes('policy-financial-conditions'));
+});
+
+test('rising price pressure stays contextual when activity slows', () => {
+  const snapshot = buildMacroSnapshot(makeMacroIndicators({
+    pmi: data([{ date: '2026-08', value: 50 }, { date: '2026-09', value: 50 }]),
+    gdp: data([{ date: '2026-Q2', value: 1 }, { date: '2026-Q3', value: 0 }]),
+    'industrial-production': data([{ date: '2026-08', value: 1 }, { date: '2026-09', value: 0 }]),
+    'retail-sales': data([{ date: '2026-08', value: 1 }, { date: '2026-09', value: 0 }]),
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 1 }, { date: '2026-01–09', value: 0 }]),
+    cpi: data([{ date: '2026-08', value: 4 }, { date: '2026-09', value: 5 }]),
+    'core-cpi': data([{ date: '2026-08', value: 3 }, { date: '2026-09', value: 4 }]),
+    ppi: data([{ date: '2026-08', value: 2 }, { date: '2026-09', value: 3 }]),
+    'unemployment-rate': data([{ date: '2026-08', value: 5 }, { date: '2026-09', value: 5 }]),
+  }));
+
+  assert.equal(snapshot.domains.find(domain => domain.id === 'growth').state, 'weakening');
+  assert.equal(snapshot.domains.find(domain => domain.id === 'prices').state, 'strengthening');
+  assert.deepEqual(snapshot.synthesis.conflictingDomainIds, ['growth']);
+  assert.ok(snapshot.synthesis.contextualDomainIds.includes('prices'));
 });
 
 test('policy domain retains policy event and each LPR series', () => {
@@ -146,6 +259,21 @@ test('policy and LPR cuts both map to easing financial conditions', () => {
   assert.equal(stablePolicy.state, 'easing');
 });
 
+test('current policy-rate increases map to tightening conditions', () => {
+  const tightening = analyzePolicyFinancialConditions(makeMacroIndicators({
+    'policy-rate': data([{ date: '2026-08-01', value: 1.8 }, { date: '2026-09-07', value: 1.9 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 3 }, { date: '2026-09', value: 3 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 3.5 }, { date: '2026-09', value: 3.5 }] },
+      ],
+    },
+  }));
+
+  assert.equal(tightening.state, 'tightening');
+  assert.deepEqual(tightening.risks, []);
+});
+
 test('policy event direction expires into stable after verified-through', () => {
   const policy = analyzePolicyFinancialConditions(makeMacroIndicators({
     'policy-rate': {
@@ -164,7 +292,46 @@ test('policy event direction expires into stable after verified-through', () => 
   }));
 
   assert.equal(policy.state, 'stable');
+  assert.deepEqual(policy.risks, []);
   assert.match(policy.explanation, /最后一次|核验|稳定/);
+});
+
+test('unchanged readings remain stable without spurious snapshot conclusions', () => {
+  const unchanged = data([{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }]);
+  const unchangedPmi = data([{ date: '2026-08', value: 50 }, { date: '2026-09', value: 50 }]);
+  const snapshot = buildMacroSnapshot(makeMacroIndicators({
+    gdp: data([{ date: '2026-Q2', value: 0 }, { date: '2026-Q3', value: 0 }]),
+    pmi: unchangedPmi,
+    'industrial-production': unchanged,
+    'retail-sales': unchanged,
+    'fixed-asset-investment': data([{ date: '2026-01–08', value: 0 }, { date: '2026-01–09', value: 0 }]),
+    cpi: unchanged,
+    'core-cpi': unchanged,
+    ppi: unchanged,
+    m0: unchanged,
+    m1: unchanged,
+    m2: unchanged,
+    credit: unchanged,
+    'social-financing': unchanged,
+    'policy-rate': data([{ date: '2026-08-01', value: 0 }, { date: '2026-09-01', value: 0 }]),
+    lpr: {
+      series: [
+        { id: '1y', label: '1年期 LPR', data: [{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }] },
+        { id: '5y-plus', label: '5年期以上 LPR', data: [{ date: '2026-08', value: 0 }, { date: '2026-09', value: 0 }] },
+      ],
+    },
+    'unemployment-rate': unchanged,
+    exports: unchanged,
+    imports: unchanged,
+  }));
+
+  assert.deepEqual(snapshot.domains.map(domain => domain.state), [
+    'stable', 'stable', 'stable', 'stable', 'stable', 'stable',
+  ]);
+  assert.deepEqual(snapshot.synthesis.supportingDomainIds, []);
+  assert.deepEqual(snapshot.synthesis.conflictingDomainIds, []);
+  assert.deepEqual(snapshot.risks, []);
+  assert.deepEqual(snapshot.watchNext, []);
 });
 
 test('labor weakens independently from a positive growth domain', () => {
