@@ -57,3 +57,21 @@ test('homepage components expose the required semantic sections and links', () =
   assert.match(styles, /:focus-visible/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
 });
+
+test('homepage is a narrative entry point and full snapshot has its own route', () => {
+  const home = readFileSync(homepagePath, 'utf8');
+  const homeComponents = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
+  const snapshot = readFileSync(snapshotPagePath, 'utf8');
+  for (const name of ['HomeHero', 'MacroStateSummary', 'NotableSignals', 'RelationshipPreview', 'LearningPaths']) {
+    assert.match(home, new RegExp(name));
+  }
+  assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths/);
+  assert.match(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
+  assert.match(snapshot, /MacroSnapshot/);
+  assert.match(snapshot, /buildMacroSnapshot/);
+
+  const order = ['HomeHero', 'MacroStateSummary', 'NotableSignals', 'RelationshipPreview', 'LearningPaths']
+    .map((name) => home.indexOf(name));
+  assert.ok(order.every((index) => index >= 0));
+  assert.deepEqual([...order].sort((a, b) => a - b), order);
+});

@@ -20,7 +20,7 @@ import {
 const data = observations => ({ data: observations });
 const snapshotComponent = fileURLToPath(new URL('../src/components/MacroSnapshot.astro', import.meta.url));
 const snapshotStyles = fileURLToPath(new URL('../src/styles/snapshot.css', import.meta.url));
-const homepage = fileURLToPath(new URL('../src/pages/index.astro', import.meta.url));
+const snapshotPage = fileURLToPath(new URL('../src/pages/snapshot.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -409,7 +409,7 @@ test('freshness is a range and evidence retains heterogeneous periods', () => {
 test('snapshot UI renders domain evidence without exposing implementation metadata', () => {
   const component = readFileSync(snapshotComponent, 'utf8');
   const styles = readFileSync(snapshotStyles, 'utf8');
-  const page = readFileSync(homepage, 'utf8');
+  const page = readFileSync(snapshotPage, 'utf8');
 
   assert.match(component, /snapshot\.synthesis/);
   assert.match(component, /snapshot\.domains/);
@@ -418,7 +418,6 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /updatedAt/);
   assert.doesNotMatch(component, /snapshot\.phase|snapshot\.signals|rulesVersion|Macro Score|confidence score/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
-  assert.match(page, /MacroDashboard/);
   assert.match(page, /MacroSnapshot/);
   assert.match(page, /buildMacroSnapshot/);
 });
