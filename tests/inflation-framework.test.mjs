@@ -73,6 +73,9 @@ const approvedSources = {
 const expectedIndicatorLabels = new Map([
   ['gdp-deflator', 'GDP 平减指数'],
   ['inflation-expectations', '通胀预期'],
+]);
+
+const expectedMechanismLabels = new Map([
   ['phillips-curve', '菲利普斯曲线'],
   ['price-transmission', '价格传导'],
 ]);
@@ -177,6 +180,11 @@ test('registers inflation framework graph nodes with stable labels', () => {
     assert.equal(nodes.get(id)?.label, label, `missing indicator node ${id}`);
     assert.equal(nodes.get(id)?.kind, 'indicator', `${id} must be an indicator node`);
   }
+  for (const [id, label] of expectedMechanismLabels) {
+    assert.equal(nodes.get(id)?.label, label, `missing mechanism node ${id}`);
+    assert.equal(nodes.get(id)?.type, 'mechanism', `${id} must be a mechanism node`);
+    assert.equal(Object.hasOwn(nodes.get(id), 'kind'), false, `${id} must not retain the legacy indicator kind`);
+  }
   for (const [id, label] of expectedAbstractLabels) {
     assert.equal(nodes.get(id)?.label, label, `missing abstract node ${id}`);
     assert.equal(Object.hasOwn(nodes.get(id), 'kind'), false, `${id} must remain an abstract node`);
@@ -189,7 +197,7 @@ test('uses exactly the approved non-causal inflation framework relations', () =>
   const nodes = new Map(rawNodes.map((node) => [node.id, node]));
   const relations = elements.filter((item) => 'source' in item.data).map((item) => item.data);
   const relationKeys = relations.map(relationKey);
-  const clusterNodeIds = new Set([...expectedIndicatorLabels.keys(), ...expectedAbstractLabels.keys()]);
+  const clusterNodeIds = new Set([...expectedIndicatorLabels.keys(), ...expectedMechanismLabels.keys(), ...expectedAbstractLabels.keys()]);
   const expectedRelationKeys = expectedRelations.map(([source, target, type]) => relationKey({ source, target, type }));
   const clusterRelations = relations.filter(
     (relation) => clusterNodeIds.has(relation.source) || clusterNodeIds.has(relation.target),
