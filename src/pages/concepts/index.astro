@@ -5,6 +5,7 @@ import { categories, categoryIds, getCategory, type CategoryId } from '../../dat
 import { buildConceptCatalog } from '../../data/conceptCatalog';
 import { topicRegistry } from '../../data/topics';
 import '../../styles/concept-index.css';
+import '../../styles/catalog-header.css';
 
 const concepts = await getCollection('concepts');
 const catalog = buildConceptCatalog(concepts, topicRegistry);
@@ -23,15 +24,15 @@ const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ i
 const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
 <BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
-  <header class="index-head"><div class="shell"><div class="eyebrow">Concept atlas</div><h1>从哪里开始理解宏观经济？</h1><p class="lead">按领域、主题和难度浏览现有概念。每篇内容都把定义、关系和数据放回同一张理解地图。</p><div class="index-summary"><b data-filter-count>{concepts.length} 个概念</b> · <b>{categoryGroups.length}</b> 个领域</div></div></header>
+  <header class="index-head"><div class="shell"><div class="eyebrow">概念目录</div><h1>找到你想理解的概念</h1><p class="lead">按领域、难度和主题筛选，也可以从推荐起点开始。</p><div class="index-summary"><b data-filter-count aria-live="polite">{concepts.length} 个概念</b> · <b>{categoryGroups.length}</b> 个领域</div></div></header>
   <div class="shell concept-index">
     <form class="concept-filters" data-concept-filters>
       <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
-      <div class="filter-field"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
       <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
+      <div class="filter-field filter-topic"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
     </form>
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
-      <header><div><div class="eyebrow">{group.id}</div><h2>{group.label}</h2><p>{group.description}</p></div><span>{group.items.length} 个概念</span></header>
+      <header><div><h2>{group.label}</h2><p>{group.description}</p></div><span>{group.items.length} 个概念</span></header>
       <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
         <div><span class="category-chip">{group.label}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
         <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">阅读概念 →</b>
