@@ -1,0 +1,24 @@
+.search-wrap { margin-top: 44px; }
+.search-wrap h1 { font: 800 clamp(32px, 4vw, 48px)/1.2 var(--serif); margin: 12px 0 16px; }
+.search-wrap > p { color: var(--muted); }
+#search {
+  --pagefind-ui-primary: var(--green);
+  --pagefind-ui-text: var(--ink);
+  --pagefind-ui-background: var(--card);
+  --pagefind-ui-border: var(--line);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 12px;
+  --pagefind-ui-font: inherit;
+}
+#search .pagefind-ui__result { padding: 20px 0; }
+#search .pagefind-ui__result-inner { min-width: 0; margin-top: 0; }
+#search .pagefind-ui__result-title { font-family: var(--serif); line-height: 1.4; }
+#search .pagefind-ui__result-link { color: var(--green); }
+#search .pagefind-ui__result-excerpt { min-width: 0; color: var(--muted); line-height: 1.75; overflow-wrap: anywhere; }
+#search mark { background: #dcebe0; color: var(--ink); border-radius: 3px; }
+#search input:focus-visible, #search button:focus-visible, #search a:focus-visible { outline: 3px solid #a9d8c3; outline-offset: 3px; }
+@media(max-width:560px) {
+  .search-wrap { margin-top: 28px; }
+  #search { margin-top: 22px; }
+  #search .pagefind-ui__search-input { font-size: 16px; }
+}
