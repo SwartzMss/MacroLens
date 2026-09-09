@@ -1,0 +1,19 @@
+.index-head {
+  padding: 44px 0 30px;
+  border-bottom: 1px solid var(--line);
+}
+.index-head h1 {
+  font: 800 clamp(32px, 4vw, 48px)/1.2 var(--serif);
+  letter-spacing: -.03em;
+  text-wrap: balance;
+  margin: 12px 0 16px;
+}
+.index-head .lead { max-width: 760px; font-size: 17px; margin: 0; }
+.index-summary { margin-top: 18px; color: var(--muted); font-size: 14px; }
+.index-summary b { color: var(--green); }
+@media (max-width: 560px) {
+  .index-head { padding: 28px 0 22px; }
+  .index-head h1 { font-size: 30px; margin: 10px 0 12px; }
+  .index-head .lead { font-size: 15px; line-height: 1.65; }
+  .index-summary { margin-top: 14px; }
+}
