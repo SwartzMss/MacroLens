@@ -200,7 +200,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(component, /node\.type/);
   assert.match(component, /RelationshipCards/);
   assert.match(component, /getExplainableConceptRelations/);
-  assert.match(component, /上游|下游|它受什么影响/);
+  assert.match(page, /上游|下游|它受什么影响/);
   assert.match(component, /<noscript>/);
   assert.match(component, /图谱概念/);
   assert.match(cards, /<details/);
@@ -260,5 +260,5 @@ test('does not reintroduce a node-link visualization', () => {
 
   assert.doesNotMatch(page, /echarts|RelationshipGraph|graph-canvas|force/i);
   assert.doesNotMatch(component, /echarts|Cytoscape|graph-canvas|force/i);
-  assert.match(component, /它受什么影响|它影响什么|与什么相关/);
+  assert.match(page, /它受什么影响|它影响什么|与什么相关/);
 });
