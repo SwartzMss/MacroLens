@@ -3,6 +3,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { buildConceptCatalog, type ConceptEntry } from '../../data/conceptCatalog';
 import { topicRegistry, type Topic } from '../../data/topics';
+import { getCategory } from '../../data/categories';
+import '../../styles/catalog-header.css';
 
 export async function getStaticPaths() {
   const concepts = await getCollection('concepts');
@@ -11,17 +13,23 @@ export async function getStaticPaths() {
 }
 
 const { topic, concepts } = Astro.props as { topic: Topic; concepts: ConceptEntry[] };
+const conceptNames = new Map((await getCollection('concepts')).map(concept => [concept.data.id, concept.data.name]));
 ---
 <BaseLayout title={`${topic.label}｜主题地图｜MacroLens`} description={topic.description}>
-  <header class="page-head"><div class="shell"><div class="breadcrumbs"><a href="/">首页</a> / <a href="/topics">主题</a> / {topic.label}</div><div class="eyebrow">{topic.category}</div><h1 class="concept-title">{topic.label}</h1><p class="lead">{topic.description}</p><div class="meta"><span>{concepts.length} 个概念</span><span>按概念顺序浏览</span></div></div></header>
+  <header class="index-head"><div class="shell"><nav class="breadcrumbs" aria-label="面包屑"><a href="/">首页</a> / <a href="/topics">主题</a> / <span aria-current="page">{topic.label}</span></nav><div class="eyebrow">{getCategory(topic.category).label}</div><h1>{topic.label}</h1><p class="lead">{topic.description}</p><div class="index-summary"><b>{concepts.length} 个概念</b> · 按概念顺序浏览</div></div></header>
   <div class="shell topic-detail"><div class="topic-concept-grid">
     {concepts.map((concept, index) => <a class="topic-concept-card" href={`/concepts/${concept.data.id}`}>
       <div class="topic-concept-number">{String(index + 1).padStart(2, '0')}</div>
-      <div><div class="topic-card-meta"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{concept.data.prerequisites.length > 0 && <span class="prerequisite-hint">建议先理解</span>}</div><h2>{concept.data.name}</h2><p>{concept.data.subtitle}</p></div>
+      <div><div class="topic-card-meta"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span></div><h2>{concept.data.name}</h2><p>{concept.data.subtitle}</p>{concept.data.prerequisites.length > 0 && <p class="prerequisite-hint">建议先理解：{concept.data.prerequisites.map(id => conceptNames.get(id) ?? id).join('、')}</p>}</div>
       <b aria-hidden="true">→</b>
     </a>)}
   </div></div>
 </BaseLayout>
 <style>
+.breadcrumbs{margin-bottom:16px;font-size:12px;line-height:1.6}
+.topic-concept-card:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.topic-concept-card p.prerequisite-hint{display:block;background:transparent;padding:0;margin-top:10px;color:var(--muted);font-size:12px;line-height:1.6}
+
 .topic-detail{padding:42px 0 90px}.topic-concept-grid{display:grid;gap:12px}.topic-concept-card{display:grid;grid-template-columns:54px minmax(0,1fr) 28px;align-items:center;gap:18px;padding:20px 22px;background:var(--card);border:1px solid var(--line);border-radius:14px}.topic-concept-card:hover{border-color:#9fc2b4;box-shadow:0 10px 24px #174a3815}.topic-concept-number{color:var(--green);font:800 24px var(--serif)}.topic-card-meta{display:flex;gap:8px;flex-wrap:wrap}.level-chip,.prerequisite-hint{display:inline-block;padding:3px 8px;border-radius:20px;background:#e8f1ec;color:var(--green);font-size:11px}.prerequisite-hint{background:#f7ead7;color:#9a5d13}.topic-concept-card h2{font:700 23px var(--serif);margin:9px 0 4px}.topic-concept-card p{color:var(--muted);margin:0}.topic-concept-card>b{color:var(--green);font-size:20px}@media(max-width:560px){.topic-concept-card{grid-template-columns:40px minmax(0,1fr) 20px;gap:10px;padding:16px}.topic-concept-card h2{font-size:20px}}
+@media(max-width:560px){.topic-detail{padding:20px 0 60px}.topic-concept-card{grid-template-columns:24px minmax(0,1fr);align-items:start;gap:8px}.topic-concept-card>b{display:none}.topic-concept-number{font-size:18px;padding-top:3px}.topic-concept-card p{font-size:14px;line-height:1.65}}
 </style>
