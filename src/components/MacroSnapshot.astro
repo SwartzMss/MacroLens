@@ -6,6 +6,7 @@ import type {
   SnapshotEvidence,
 } from '../data/macroSnapshot';
 import '../styles/snapshot.css';
+import { homeStateLabels, localizeExplanation } from '../data/home';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 
@@ -43,7 +44,7 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
       <div class="eyebrow">Cross-domain synthesis</div>
       <h3 id="snapshot-synthesis-title">{snapshot.synthesis.label}</h3>
     </div>
-    <p>{snapshot.synthesis.explanation}</p>
+    <p>{localizeExplanation(snapshot.synthesis.explanation)}</p>
   </section>
 
   <section class="snapshot-domains" aria-labelledby="snapshot-domains-title">
@@ -62,9 +63,9 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
             <div class="eyebrow">{domain.id}</div>
             <h4>{domain.label}</h4>
           </div>
-          <span class="snapshot-domain-state">{domain.state}</span>
+          <span class="snapshot-domain-state">{homeStateLabels[domain.state]}</span>
         </header>
-        <p class="snapshot-domain-explanation">{domain.explanation}</p>
+        <p class="snapshot-domain-explanation">{localizeExplanation(domain.explanation)}</p>
 
         <div class="snapshot-domain-evidence">
           {domain.evidence.map((evidence) => <article class="snapshot-evidence">
@@ -88,8 +89,8 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
             <div class="eyebrow">Risks to notice</div>
             <h5 id={`snapshot-${domain.id}-risks`}>需要留意</h5>
             {domain.risks.length > 0 ? <ul>{domain.risks.map((conclusion) => <li>
-              <strong>{conclusion.title}</strong>
-              <p>{conclusion.explanation}</p>
+              <strong>{localizeExplanation(conclusion.title)}</strong>
+              <p>{localizeExplanation(conclusion.explanation)}</p>
               <div class="snapshot-evidence-links">{evidenceForConclusion(domain, conclusion).map((evidence) => <a href={evidence.conceptHref}>{evidence.name}</a>)}</div>
             </li>)}</ul> : <p class="snapshot-empty">当前没有触发独立风险规则。</p>}
           </section>
@@ -97,8 +98,8 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
             <div class="eyebrow">Watch next</div>
             <h5 id={`snapshot-${domain.id}-watch`}>下一期观察</h5>
             {domain.watchNext.length > 0 ? <ul>{domain.watchNext.map((conclusion) => <li>
-              <strong>{conclusion.title}</strong>
-              <p>{conclusion.explanation}</p>
+              <strong>{localizeExplanation(conclusion.title)}</strong>
+              <p>{localizeExplanation(conclusion.explanation)}</p>
               <div class="snapshot-evidence-links">{evidenceForConclusion(domain, conclusion).map((evidence) => <a href={evidence.conceptHref}>{evidence.name}</a>)}</div>
             </li>)}</ul> : <p class="snapshot-empty">暂无额外观察项。</p>}
           </section>
