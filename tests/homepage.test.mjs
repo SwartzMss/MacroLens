@@ -9,7 +9,7 @@ import { getHomepageRelationshipPreview, getNotableSignals, learningPaths, forma
 const root = fileURLToPath(new URL('../', import.meta.url));
 const conceptsDirectory = `${root}src/content/concepts`;
 const homeDirectory = `${root}src/components/home`;
-const componentNames = ['HomeHero', 'MacroStateSummary', 'NotableSignals', 'RelationshipPreview', 'LearningPaths'];
+const componentNames = ['HomeHero', 'MacroStateSummary', 'LatestReading', 'RelationshipPreview', 'LearningPaths'];
 const homepagePath = `${root}src/pages/index.astro`;
 const snapshotPagePath = `${root}src/pages/snapshot.astro`;
 
@@ -45,7 +45,7 @@ test('homepage components expose the required semantic sections and links', () =
   const source = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
   const styles = readFileSync(`${root}src/styles/home.css`, 'utf8');
 
-  for (const id of ['home-hero', 'macro-state', 'notable-signals', 'relationship-preview', 'learning-paths']) {
+  for (const id of ['home-hero', 'macro-state', 'relationship-preview', 'learning-paths']) {
     assert.match(source, new RegExp(`id=["']${id}["']`));
   }
   assert.match(source, /domain\.state/);
@@ -62,15 +62,15 @@ test('homepage is a narrative entry point and full snapshot has its own route', 
   const home = readFileSync(homepagePath, 'utf8');
   const homeComponents = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
   const snapshot = readFileSync(snapshotPagePath, 'utf8');
-  for (const name of ['HomeHero', 'MacroStateSummary', 'NotableSignals', 'RelationshipPreview', 'LearningPaths']) {
+  for (const name of ['HomeHero', 'MacroStateSummary', 'RelationshipPreview', 'LearningPaths']) {
     assert.match(home, new RegExp(name));
   }
-  assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths/);
-  assert.match(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
+  assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths|<NotableSignals/);
+  assert.doesNotMatch(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
   assert.match(snapshot, /MacroSnapshot/);
   assert.match(snapshot, /buildMacroSnapshot/);
 
-  const order = ['HomeHero', 'MacroStateSummary', 'NotableSignals', 'RelationshipPreview', 'LearningPaths']
+  const order = ['HomeHero', 'MacroStateSummary', 'RelationshipPreview', 'LearningPaths']
     .map((name) => home.indexOf(name));
   assert.ok(order.every((index) => index >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);
@@ -106,9 +106,15 @@ test('homepage synthesis preserves opposing signals and localizes rule labels', 
   assert.equal(localizeExplanation('方向为weakening和strengthening；政策为stable。'), '方向为走弱和走强；政策为稳定。');
 });
 
-test('notable signals do not classify raw change direction as negative', () => {
-  const component = readFileSync(`${homeDirectory}/NotableSignals.astro`, 'utf8');
+test('latest readings do not classify raw change direction as negative', () => {
+  const component = readFileSync(`${homeDirectory}/LatestReading.astro`, 'utf8');
   const styles = readFileSync(`${root}src/styles/home.css`, 'utf8');
   assert.doesNotMatch(component, /is-negative|change\s*<\s*0/);
   assert.doesNotMatch(styles, /\.home-signal-change\.is-negative/);
+});
+
+test('policy rate changes preserve hundredths of a percentage point', () => {
+  const policy = buildMacroSnapshot().domains.find(domain => domain.id === 'policy-financial-conditions').evidence[0];
+  assert.equal(formatSignalChange({ ...policy, change: -.05 }), '-0.05 个百分点');
+  assert.equal(formatSignalChange({ ...policy, change: .15 }), '+0.15 个百分点');
 });

@@ -1,0 +1,23 @@
+---
+import type { SnapshotEvidence } from '../../data/macroSnapshot';
+import { formatSignalChange, getPmiReading } from '../../data/home';
+
+const { signal } = Astro.props as { signal: SnapshotEvidence };
+const valueLabel = signal.metric === 'rate'
+  ? signal.id === 'unemployment-rate' ? '失业率' : '利率'
+  : signal.valueLabel;
+---
+
+<div class="home-reading" data-indicator={signal.id}>
+  <div class="home-reading-heading">
+    <a class="home-reading-name" href={signal.conceptHref} aria-label={`查看${signal.name}历史趋势`}>{signal.name}<span aria-hidden="true"> ↗</span></a>
+    <span class="home-reading-value"><small>{valueLabel}</small> <strong>{signal.latest.toFixed(signal.metric === 'rate' && signal.id !== 'unemployment-rate' ? 2 : 1)}</strong><span>{signal.unit === 'index' ? '点' : signal.unit}</span></span>
+  </div>
+  <div class="home-reading-meta">
+    <span class="home-reading-period">{signal.isEvent ? '最近生效 / 操作日：' : ''}<time>{signal.observationPeriod}</time></span>
+    <span class="home-reading-change">{signal.id === 'pmi'
+    ? getPmiReading(signal)
+    : `${signal.changeLabel}：${formatSignalChange(signal)}`}</span>
+  </div>
+  {signal.isEvent && signal.verifiedThrough && <div class="home-reading-period">已核验至 <time>{signal.verifiedThrough}</time></div>}
+</div>

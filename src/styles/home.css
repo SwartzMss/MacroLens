@@ -69,7 +69,7 @@
   background: #e8f1ec;
 }
 
-.home-hero a:focus-visible, .home-section a:focus-visible, .home-section summary:focus-visible {
+.home-hero a:focus-visible, .home-section a:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 4px;
 }
@@ -206,42 +206,52 @@
 
 .home-domain-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  align-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--line);
 }
 
 .home-domain {
-  display: flex;
-  flex-direction: column;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
   min-width: 0;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-top: 3px solid var(--line);
-  border-radius: 4px 4px 12px 12px;
-  background: var(--card);
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
 }
 
-.home-domain[data-state='weakening'], .home-domain[data-state='tightening'] {
-  border-top-color: #a36a1e;
+.home-domain-compact {
+  grid-column: auto;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 20px;
 }
 
-.home-domain[data-state='strengthening'], .home-domain[data-state='easing'] {
-  border-top-color: var(--green);
+.home-domain-compact[data-domain='labor'] {
+  padding-right: 28px;
 }
 
-.home-domain[data-state='mixed'], .home-domain[data-state='divergent'] {
-  border-top-color: var(--blue);
+.home-domain-compact[data-domain='external'] {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.home-domain-compact .home-domain-readings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-domain-compact[data-domain='labor'] .home-domain-readings {
+  grid-template-columns: 1fr;
 }
 
 .home-domain-topline {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
 }
 
 .home-domain-label {
+  margin: 0;
   font: 700 19px/1.3 var(--serif);
 }
 
@@ -270,119 +280,86 @@
 }
 
 .home-domain p {
-  margin: 14px 0;
-  font-size: 14px;
+  margin: 12px 0 0;
+  font-size: 13px;
   line-height: 1.65;
   color: #52635a;
 }
 
-.home-domain-details {
-  margin-top: auto;
-}
-
-.home-domain-details summary {
-  width: fit-content;
-  cursor: pointer;
-  color: var(--green);
-  font-size: 12px;
-  padding: 6px 0;
-}
-
-.home-domain-details ul {
-  padding: 0;
-  list-style: none;
-  font-size: 12px;
-}
-
-.home-domain-details li {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 5px 0;
-  border-top: 1px solid var(--line);
-}
-
-.home-domain-details a {
-  color: var(--green);
-  text-decoration: underline;
-}
-
-.home-domain-details li span {
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.home-signal-grid {
+.home-domain-readings {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 24px 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.home-domain-readings > li {
+  min-width: 0;
+}
+
+.home-reading-heading {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.home-signal-card {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--card);
-}
-
-.home-signal-topline {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 13px;
-}
-
-.home-signal-topline a {
+.home-reading-name {
   color: var(--green);
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.home-signal-topline span, .home-signal-metric {
-  color: var(--muted);
+.home-reading-name span {
   font-size: 12px;
 }
 
-.home-signal-metric {
-  margin-top: 16px;
+.home-reading-name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.home-signal-value {
-  margin-top: 4px;
-  color: var(--green);
-  font: 700 36px/1.25 var(--serif);
+.home-reading-value {
+  color: var(--ink);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-.home-signal-value small {
-  margin-left: 4px;
-  font: 14px var(--sans);
+.home-reading-value strong {
+  font-size: 32px;
+  line-height: 1.3;
 }
 
-.home-signal-change {
+.home-reading-value small, .home-reading-value > span {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.home-reading-value small {
+  color: var(--muted);
+}
+
+.home-reading-meta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 6px;
   margin-top: 10px;
+}
+
+.home-reading-period, .home-reading-change {
   font-size: 12px;
   color: var(--muted);
 }
 
-.home-signal-change strong {
-  color: var(--ink);
-  font-weight: 600;
+.home-reading > .home-reading-period {
+  margin-top: 6px;
 }
 
-.home-signal-detail {
-  margin-top: auto;
-  padding-top: 18px;
-  color: var(--green);
-  font-size: 12px;
-  font-weight: 700;
+.home-reading-change {
+  color: #52635a;
 }
+
 
 .relationship-preview-panel {
   padding: 28px;
@@ -522,11 +499,15 @@
 }
 
 @media (max-width: 1040px) {
+  .home-domain {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .home-domain p {
+    max-width: 620px;
+  }
   .home-hero {
     gap: 28px;
-  }
-  .home-signal-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .learning-path-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -552,6 +533,13 @@
 }
 
 @media (max-width: 760px) {
+  .home-domain-compact {
+    grid-column: 1 / -1;
+  }
+  .home-domain-compact[data-domain='labor'], .home-domain-compact[data-domain='external'] {
+    padding-inline: 0;
+    border-left: 0;
+  }
   .home-hero, .home-section {
     width: calc(100% - 32px);
   }
@@ -614,21 +602,12 @@
     font-size: 24px;
     text-wrap: initial;
   }
-  .home-domain-grid, .learning-path-grid {
+  .learning-path-grid {
     grid-template-columns: 1fr;
   }
-  .home-signal-grid {
+  .home-domain-readings {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .home-signal-card {
-    padding: 14px;
-  }
-  .home-signal-value {
-    font-size: 32px;
-  }
-  .home-signal-grid > :last-child {
-    grid-column: 1 / -1;
+    gap: 24px 20px;
   }
   .relationship-preview-panel {
     padding: 20px;
