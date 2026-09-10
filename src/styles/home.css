@@ -69,7 +69,7 @@
   background: #e8f1ec;
 }
 
-.home-hero a:focus-visible, .home-section a:focus-visible, .home-section summary:focus-visible {
+.home-hero a:focus-visible, .home-section a:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 4px;
 }
@@ -275,18 +275,6 @@
   font-size: 14px;
   line-height: 1.65;
   color: #52635a;
-}
-
-.home-domain-details {
-  margin-top: auto;
-}
-
-.home-domain-details summary {
-  width: fit-content;
-  cursor: pointer;
-  color: var(--green);
-  font-size: 12px;
-  padding: 6px 0;
 }
 
 .home-domain-readings {

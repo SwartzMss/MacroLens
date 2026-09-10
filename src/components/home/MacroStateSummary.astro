@@ -36,10 +36,6 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
       <p>{domain.id === 'policy-financial-conditions'
         ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
         : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
-      <details class="home-domain-details">
-        <summary>判断说明与解读限制</summary>
-        <p>{localizeExplanation(domain.explanation)}</p>
-      </details>
     </article>)}
   </div>
 </section>
