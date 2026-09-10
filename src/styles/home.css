@@ -205,16 +205,42 @@
 }
 
 .home-domain-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-bottom: 1px solid var(--line);
 }
 
 .home-domain {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr);
   gap: 28px;
   min-width: 0;
   padding: 28px 0;
   border-top: 1px solid var(--line);
+}
+
+.home-domain-compact {
+  grid-column: auto;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.home-domain-compact[data-domain='labor'] {
+  padding-right: 28px;
+}
+
+.home-domain-compact[data-domain='external'] {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.home-domain-compact .home-domain-readings {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-domain-compact[data-domain='labor'] .home-domain-readings {
+  grid-template-columns: 1fr;
 }
 
 .home-domain-topline {
@@ -507,6 +533,13 @@
 }
 
 @media (max-width: 760px) {
+  .home-domain-compact {
+    grid-column: 1 / -1;
+  }
+  .home-domain-compact[data-domain='labor'], .home-domain-compact[data-domain='external'] {
+    padding-inline: 0;
+    border-left: 0;
+  }
   .home-hero, .home-section {
     width: calc(100% - 32px);
   }

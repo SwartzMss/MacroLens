@@ -1,9 +1,13 @@
 ---
-import type { MacroSnapshot } from '../../data/macroSnapshot';
+import type { MacroDomainId, MacroSnapshot } from '../../data/macroSnapshot';
 import { homeStateLabels, localizeExplanation, getHomeSynthesis } from '../../data/home';
 import LatestReading from './LatestReading.astro';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
+const domainOrder: MacroDomainId[] = [
+  'growth', 'credit-liquidity', 'prices', 'policy-financial-conditions', 'labor', 'external',
+];
+const domains = [...snapshot.domains].sort((a, b) => domainOrder.indexOf(a.id) - domainOrder.indexOf(b.id));
 ---
 
 <section class="home-section home-state" id="macro-state" aria-labelledby="macro-state-title">
@@ -25,7 +29,7 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
   <p class="home-freshness">数据集最近更新：<time>{snapshot.freshness.latestUpdatedAt}</time> · 各指标观察期不同，具体期间见读数与详情。</p>
 
   <div class="home-domain-grid">
-    {snapshot.domains.map((domain) => <article class="home-domain" data-state={domain.state}>
+    {domains.map((domain) => <article class:list={['home-domain', { 'home-domain-compact': domain.id === 'labor' || domain.id === 'external' }]} data-domain={domain.id} data-state={domain.state}>
       <div class="home-domain-intro">
         <div class="home-domain-topline">
           <h3 class="home-domain-label">{domain.label}</h3>
