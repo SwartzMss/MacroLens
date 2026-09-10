@@ -1,6 +1,7 @@
 ---
 import type { MacroSnapshot } from '../../data/macroSnapshot';
 import { homeStateLabels, localizeExplanation, getHomeSynthesis } from '../../data/home';
+import LatestReading from './LatestReading.astro';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 ---
@@ -8,7 +9,7 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 <section class="home-section home-state" id="macro-state" aria-labelledby="macro-state-title">
   <div class="home-section-heading">
     <div>
-      <div class="eyebrow">01 / 当前宏观状态</div>
+      <div class="eyebrow">01 / 宏观概览</div>
       <h2 id="macro-state-title">现在，经济有哪些信号？</h2>
     </div>
     <a class="home-inline-link" href="/snapshot">查看完整宏观快照 →</a>
@@ -26,16 +27,18 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
   <div class="home-domain-grid">
     {snapshot.domains.map((domain) => <article class="home-domain" data-state={domain.state}>
       <div class="home-domain-topline">
-        <span class="home-domain-label">{domain.label}</span>
+        <h3 class="home-domain-label">{domain.label}</h3>
         <span class="home-state-chip">{homeStateLabels[domain.state]}</span>
       </div>
+      <ul class="home-domain-readings" aria-label={`${domain.label}最新数据`}>
+        {domain.evidence.map(item => <li><LatestReading signal={item} /></li>)}
+      </ul>
       <p>{domain.id === 'policy-financial-conditions'
         ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
         : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
       <details class="home-domain-details">
-        <summary>依据与解读边界</summary>
+        <summary>判断说明与解读限制</summary>
         <p>{localizeExplanation(domain.explanation)}</p>
-        <ul>{domain.evidence.map(item => <li><a href={item.conceptHref}>{item.name}</a><span>{item.observationPeriod}</span></li>)}</ul>
       </details>
     </article>)}
   </div>

@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeHero from '../components/home/HomeHero.astro';
 import MacroStateSummary from '../components/home/MacroStateSummary.astro';
-import NotableSignals from '../components/home/NotableSignals.astro';
 import RelationshipPreview from '../components/home/RelationshipPreview.astro';
 import LearningPaths from '../components/home/LearningPaths.astro';
 import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals, learningPaths } from '../data/home';
@@ -21,7 +20,6 @@ const nodes = getHomepageRelationNodes();
 >
   <HomeHero signal={signals[0]} relationshipHref="/graph" />
   <MacroStateSummary snapshot={snapshot} />
-  <NotableSignals signals={signals} />
   <RelationshipPreview relations={relations} nodes={nodes} concepts={concepts} />
   <LearningPaths paths={learningPaths} concepts={concepts} />
 </BaseLayout>

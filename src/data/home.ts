@@ -26,8 +26,9 @@ export function formatSignalChange(signal: SnapshotEvidence): string {
   if (signal.change === null) return '暂无可比数据';
   const suffix = signal.unit === '%' || signal.changeUnit === 'percentage-points'
     ? ' 个百分点' : signal.changeUnit === 'points' ? ' 点' : ` ${signal.unit}`;
-  const rounded = Number(signal.change.toFixed(1));
-  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}${suffix}`;
+  const decimals = signal.metric === 'rate' && signal.id !== 'unemployment-rate' ? 2 : 1;
+  const rounded = Number(signal.change.toFixed(decimals));
+  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(decimals)}${suffix}`;
 }
 
 export function getPmiReading(signal: SnapshotEvidence): string {
