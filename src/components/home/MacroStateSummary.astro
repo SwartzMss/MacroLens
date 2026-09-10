@@ -26,16 +26,18 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 
   <div class="home-domain-grid">
     {snapshot.domains.map((domain) => <article class="home-domain" data-state={domain.state}>
-      <div class="home-domain-topline">
-        <h3 class="home-domain-label">{domain.label}</h3>
-        <span class="home-state-chip">{homeStateLabels[domain.state]}</span>
+      <div class="home-domain-intro">
+        <div class="home-domain-topline">
+          <h3 class="home-domain-label">{domain.label}</h3>
+          <span class="home-state-chip">{homeStateLabels[domain.state]}</span>
+        </div>
+        <p>{domain.id === 'policy-financial-conditions'
+          ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
+          : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
       </div>
       <ul class="home-domain-readings" aria-label={`${domain.label}最新数据`}>
         {domain.evidence.map(item => <li><LatestReading signal={item} /></li>)}
       </ul>
-      <p>{domain.id === 'policy-financial-conditions'
-        ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
-        : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
     </article>)}
   </div>
 </section>
