@@ -1,0 +1,198 @@
+{
+  "unit": "万亿元",
+  "note": "2024-01至2025-10取自央行货币供应量表，亿元除以10000；后续取自项目已保存的央行月报余额。独立于同比数据，不由同比反推。",
+  "sources": [
+    {
+      "title": "中国人民银行货币供应量表（2024）",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111416484293445.pdf",
+      "sourceDate": "2025-01-14",
+      "coverage": "2024-01 to 2024-12"
+    },
+    {
+      "title": "中国人民银行货币供应量表（2025）",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535682666.pdf",
+      "sourceDate": "2025-11-19",
+      "coverage": "2025-01 to 2025-10"
+    },
+    {
+      "title": "中国人民银行：2025年11月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2025121217132789688/index.html",
+      "sourceDate": "2025-12-12",
+      "coverage": "2025-11 to 2025-11"
+    },
+    {
+      "title": "中国人民银行：2025年金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026011515015720511/index.html",
+      "sourceDate": "2026-01-15",
+      "coverage": "2025-12 to 2025-12"
+    },
+    {
+      "title": "中国人民银行：2026年1月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026021317031040775/index.html",
+      "sourceDate": "2026-02-13",
+      "coverage": "2026-01 to 2026-01"
+    },
+    {
+      "title": "中国人民银行：2026年2月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026031317020260950/index.html",
+      "sourceDate": "2026-03-13",
+      "coverage": "2026-02 to 2026-02"
+    },
+    {
+      "title": "中国人民银行：2026年一季度金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026041317011944771/index.html",
+      "sourceDate": "2026-04-13",
+      "coverage": "2026-03 to 2026-03"
+    },
+    {
+      "title": "中国人民银行：2026年4月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026051417030520490/index.html",
+      "sourceDate": "2026-05-14",
+      "coverage": "2026-04 to 2026-04"
+    },
+    {
+      "title": "中国人民银行：2026年5月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026061217051611931/index.html",
+      "sourceDate": "2026-06-12",
+      "coverage": "2026-05 to 2026-05"
+    },
+    {
+      "title": "中国人民银行：2026年上半年金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026071515025183948/index.html",
+      "sourceDate": "2026-07-15",
+      "coverage": "2026-06 to 2026-06"
+    },
+    {
+      "title": "中国人民银行：2026年7月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416320925645/index.html",
+      "sourceDate": "2026-08-14",
+      "coverage": "2026-07 to 2026-07"
+    }
+  ],
+  "data": [
+    {
+      "date": "2024-01",
+      "value": 297.62502
+    },
+    {
+      "date": "2024-02",
+      "value": 299.557297
+    },
+    {
+      "date": "2024-03",
+      "value": 304.795216
+    },
+    {
+      "date": "2024-04",
+      "value": 301.194198
+    },
+    {
+      "date": "2024-05",
+      "value": 301.850673
+    },
+    {
+      "date": "2024-06",
+      "value": 305.016154
+    },
+    {
+      "date": "2024-07",
+      "value": 303.306078
+    },
+    {
+      "date": "2024-08",
+      "value": 305.046127
+    },
+    {
+      "date": "2024-09",
+      "value": 309.479824
+    },
+    {
+      "date": "2024-10",
+      "value": 309.709201
+    },
+    {
+      "date": "2024-11",
+      "value": 311.958727
+    },
+    {
+      "date": "2024-12",
+      "value": 313.53223
+    },
+    {
+      "date": "2025-01",
+      "value": 318.524718
+    },
+    {
+      "date": "2025-02",
+      "value": 320.517324
+    },
+    {
+      "date": "2025-03",
+      "value": 326.055457
+    },
+    {
+      "date": "2025-04",
+      "value": 325.173932
+    },
+    {
+      "date": "2025-05",
+      "value": 325.783811
+    },
+    {
+      "date": "2025-06",
+      "value": 330.286817
+    },
+    {
+      "date": "2025-07",
+      "value": 329.942906
+    },
+    {
+      "date": "2025-08",
+      "value": 331.983144
+    },
+    {
+      "date": "2025-09",
+      "value": 335.377103
+    },
+    {
+      "date": "2025-10",
+      "value": 335.131231
+    },
+    {
+      "date": "2025-11",
+      "value": 336.99
+    },
+    {
+      "date": "2025-12",
+      "value": 340.29
+    },
+    {
+      "date": "2026-01",
+      "value": 347.19
+    },
+    {
+      "date": "2026-02",
+      "value": 349.22
+    },
+    {
+      "date": "2026-03",
+      "value": 353.86
+    },
+    {
+      "date": "2026-04",
+      "value": 353.04
+    },
+    {
+      "date": "2026-05",
+      "value": 353.67
+    },
+    {
+      "date": "2026-06",
+      "value": 356.71
+    },
+    {
+      "date": "2026-07",
+      "value": 355.51
+    }
+  ]
+}
