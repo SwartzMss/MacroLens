@@ -1,0 +1,16 @@
+---
+interface Props {
+  sections: { id: string; label: string }[];
+  headings: { slug: string; text: string }[];
+  detailId: string;
+}
+const { sections, headings, detailId } = Astro.props;
+---
+<ul class="detail-toc-list">
+  {sections.map(section => <li>
+    <a href={`#${section.id}`}>{section.label}</a>
+    {section.id === detailId && headings.length > 0 && <ul class="detail-toc-children">
+      {headings.map(heading => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}
+    </ul>}
+  </li>)}
+</ul>

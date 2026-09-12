@@ -10,6 +10,7 @@ import RelatedConcepts from '../../components/RelatedConcepts.astro';
 import PrerequisiteConcepts from '../../components/PrerequisiteConcepts.astro';
 import PageFeedback from '../../components/PageFeedback.astro';
 import ConceptKnowledgeOverview from '../../components/ConceptKnowledgeOverview.astro';
+import ConceptTableOfContents from '../../components/ConceptTableOfContents.astro';
 import { buildConceptCatalog } from '../../data/conceptCatalog';
 import { buildConceptKnowledge } from '../../data/conceptKnowledge';
 import { topicRegistry } from '../../data/topics';
@@ -66,13 +67,12 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
         <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
       </div>
     </header>
-    <nav class="detail-jumps" aria-label="本页区块" data-detail-navigation>
+    <nav class="detail-mobile-navigation" aria-label="本页目录" data-detail-navigation>
       <div class="shell detail-jump-inner">
-        <div class="detail-jump-links">{sectionLinks.map(link => <a href={`#${link.id}`}>{link.label}</a>)}</div>
-        {articleHeadings.length > 0 && <details class="detail-mobile-toc">
+        <details class="detail-mobile-toc">
           <summary>目录</summary>
-          <div class="detail-toc-menu">{articleHeadings.map(heading => <a href={`#${heading.slug}`}>{heading.text}</a>)}</div>
-        </details>}
+          <div class="detail-toc-menu"><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} /></div>
+        </details>
       </div>
     </nav>
     <div class="shell concept-layout detail-layout">
@@ -96,9 +96,8 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
       </article>
       <aside class="side-nav detail-side-nav">
         <nav aria-label="完整页内目录" data-detail-navigation>
-          <b>本页内容</b>
-          {sectionLinks.map(link => <a href={`#${link.id}`}>{link.label}</a>)}
-          {articleHeadings.length > 0 && <div class="detail-chapters"><b>正文目录</b>{articleHeadings.map(heading => <a href={`#${heading.slug}`}>{heading.text}</a>)}</div>}
+          <b>本页目录</b>
+          <ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} />
         </nav>
       </aside>
     </div>

@@ -19,7 +19,7 @@ for (const item of readdirSync(directory, { withFileTypes: true })) {
     assert.ok(html.indexOf('data-chart=') < detailPosition, `${item.name}: chart must precede article`);
     assert.ok(ids.has(`${item.name}-sources`));
   }
-  assert.match(html, /aria-label="本页区块"/);
+  assert.match(html, /aria-label="本页目录"/);
   assert.match(html, /class="detail-mobile-toc"/);
   checked++;
 }
