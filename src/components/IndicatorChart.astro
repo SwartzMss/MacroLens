@@ -1,11 +1,26 @@
 ---
 import type { IndicatorDataset } from '../domain/indicatorDataset';
+import m0Balance from '../../data/chart-overlays/m0-balance.json';
+import m1Balance from '../../data/chart-overlays/m1-balance.json';
+import m2Balance from '../../data/chart-overlays/m2-balance.json';
 const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${indicator.id}`;
 const unitLabel = indicator.unit === 'index' ? '点' : indicator.unit;
-const series = indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];
+const balance = ({ m0: m0Balance, m1: m1Balance, m2: m2Balance } as Record<string, typeof m0Balance>)[indicator.id];
+const dualAxis = Boolean(balance);
+const chartTitle = dualAxis ? `${indicator.id.toUpperCase()} 余额与同比增速` : indicator.chartTitle;
+const series = dualAxis ? [
+  { id: 'balance', label: '余额', unit: '万亿元', yAxisIndex: 0, data: balance.data },
+  { id: 'yoy', label: '同比增速', unit: '%', yAxisIndex: 1, data: indicator.data },
+] : indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];
 ---
-<div class="viz-card"><div class="viz-head"><h3>{indicator.chartTitle}</h3><span class="tag">{indicator.label} · {unitLabel}</span></div><div class="chart" id={id} data-chart={JSON.stringify({series,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${indicator.chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div></div>
+<div class="viz-card"><div class="viz-head"><h3>{chartTitle}</h3>{!dualAxis && <span class="tag">{indicator.label} · {unitLabel}</span>}</div><div class="chart" id={id} data-chart={JSON.stringify({series,dualAxis,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div>
+  {dualAxis && <p class="dual-axis-note"><a href={`#${indicator.id}-sources`}>数据来源与口径</a></p>}
+</div>
+<style>
+  .dual-axis-note { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .dual-axis-note a { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
+</style>
 <script>
   import * as echarts from 'echarts';
   import { buildIndicatorChartOption, type IndicatorChartConfig } from '../data/indicatorChartOption';

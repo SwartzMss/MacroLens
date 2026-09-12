@@ -2,7 +2,8 @@ import type { EChartsOption } from 'echarts';
 import type { IndicatorSeries } from '../domain/indicatorDataset';
 
 export type IndicatorChartConfig = {
-  series: IndicatorSeries[];
+  series: (IndicatorSeries & { unit?: string; yAxisIndex?: number })[];
+  dualAxis?: boolean;
   unit: string;
   chartType?: string;
   verifiedThrough?: string;
@@ -19,13 +20,16 @@ export function buildIndicatorChartOption(config: IndicatorChartConfig): ECharts
   return {
     useUTC: true,
     animationDuration: 700,
-    tooltip: { trigger: 'axis' },
+    tooltip: { trigger: 'axis', confine: true, renderMode: config.dualAxis ? 'richText' : 'html' },
     legend: series.length > 1 ? { top: 0 } : undefined,
-    grid: { left: 44, right: 20, top: series.length > 1 ? 38 : 28, bottom: 38 },
+    grid: { left: 44, right: config.dualAxis ? 44 : 20, top: config.dualAxis ? 58 : series.length > 1 ? 38 : 28, bottom: 38 },
     xAxis: step
       ? { type: 'time', min: timestamp(dates[0]), max: timestamp(config.verifiedThrough ?? dates.at(-1)!), axisLabel: { formatter: '{yyyy}-{MM}-{dd}', hideOverlap: true } }
       : { type: 'category', data: dates, axisLine: { lineStyle: { color: '#b9c2ba' } } },
-    yAxis: { type: 'value', name: config.unit === 'index' ? '点' : config.unit, splitLine: { lineStyle: { color: '#e7e8e1' } } },
+    yAxis: config.dualAxis ? [
+      { type: 'value', name: '万亿元', min: 0, position: 'left', axisLabel: { color: colors[0] }, nameTextStyle: { color: colors[0] }, splitLine: { lineStyle: { color: '#e7e8e1' } } },
+      { type: 'value', name: '%', position: 'right', axisLabel: { color: colors[1] }, nameTextStyle: { color: colors[1] }, splitLine: { show: false } },
+    ] : { type: 'value', name: config.unit === 'index' ? '点' : config.unit, splitLine: { lineStyle: { color: '#e7e8e1' } } },
     series: series.map((item, index) => {
       const values = new Map(item.data.map(({ date, value }) => [date, value]));
       const last = item.data.at(-1)!;
@@ -36,10 +40,12 @@ export function buildIndicatorChartOption(config: IndicatorChartConfig): ECharts
         : [];
       return {
         name: item.label, type: 'line',
+        yAxisIndex: item.yAxisIndex ?? 0,
+        tooltip: item.unit ? { valueFormatter: value => `${Number(value).toFixed(item.unit === '%' ? 1 : 2)} ${item.unit}` } : undefined,
         data: step ? [...eventData, ...terminal] : dates.map(date => values.get(date) ?? null),
-        step: step ? 'end' : false, smooth: step ? false : .25,
+        step: step ? 'end' : false, smooth: step || config.dualAxis ? false : .25,
         symbolSize: 7,
-        lineStyle: { width: 3, color: colors[index % colors.length] },
+        lineStyle: { width: 3, color: colors[index % colors.length], type: config.dualAxis && index === 1 ? 'dashed' : 'solid' },
         itemStyle: { color: colors[index % colors.length] },
         areaStyle: series.length === 1 ? { color: 'rgba(13,107,80,.09)' } : undefined,
         markLine: index === 0 && config.referenceValue !== undefined ? {
