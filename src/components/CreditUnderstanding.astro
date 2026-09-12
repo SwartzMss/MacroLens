@@ -1,0 +1,51 @@
+<section class="credit-entry" id="credit-start" aria-labelledby="credit-start-title">
+  <header>
+    <span class="entry-label">一句话理解</span>
+    <h2 id="credit-start-title">今天先用资金，未来按约偿还</h2>
+    <p>信用让居民和企业不用等攒够钱，就能先买房、消费或投入生产。银行贷款是其中一种形式，借到的钱需要按约定偿还本息。</p>
+    <p class="entry-scope">本页从人民币贷款看信贷；广义信用还包括债券等融资关系。</p>
+  </header>
+  <div class="entry-example">
+    <h3>一个简单例子：贷款买房</h3>
+    <div class="example-grid">
+      <p><strong>今天</strong>你用首付款加银行贷款支付房款，卖方收到钱，你获得住房。</p>
+      <p><strong>未来</strong>你按约定分期还本付息，通常依靠未来收入承担这笔支出。</p>
+    </div>
+    <p>贷款把购买力提前，也把还款责任带到未来。收入变化时，还款压力也会变化。</p>
+  </div>
+  <section class="entry-transmission" aria-labelledby="credit-path-title">
+    <h3 id="credit-path-title">信贷如何影响经济？</h3>
+    <ol class="credit-path">
+      <li><strong>融资条件改善</strong><span>利率、审批等条件变化</span></li>
+      <li><strong>贷款被实际使用</strong><span>有人愿借，银行愿贷</span></li>
+      <li><strong>消费或投资增加</strong><span>资金用于新增支出</span></li>
+      <li><strong>经济活动可能增强</strong><span>订单、生产与就业响应</span></li>
+    </ol>
+    <p>这条路径需要需求和还款能力支持。借新还旧未必带来新增支出；缺乏回报的项目或资产投机，也可能累积风险。</p>
+  </section>
+  <nav class="entry-links" aria-label="信贷观察入口">
+    <a href="#credit-data">看贷款数据 ↓</a>
+    <a href="/concepts/social-financing">社融：看融资范围 →</a>
+    <a href="/concepts/m2">M2：看货币总量 →</a>
+  </nav>
+</section>
+<style>
+  .credit-entry{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:24px;margin-bottom:28px}
+  .entry-label{color:var(--green);font-size:12px;font-weight:700}
+  .credit-entry h2{font:700 28px/1.4 var(--serif);margin:8px 0 12px}
+  .credit-entry h3{font-size:17px;margin:0 0 14px}
+  .credit-entry p{font-size:15px;line-height:1.8;margin:10px 0}
+  .credit-entry .entry-scope{font-size:13px;color:var(--muted)}
+  .entry-example,.entry-transmission{border-top:1px solid var(--line);margin-top:20px;padding-top:20px}
+  .example-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .example-grid p{background:#f0eee5;border-radius:10px;padding:14px;margin:0}
+  .example-grid strong{display:block;color:var(--green);margin-bottom:6px}
+  .credit-path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;list-style:none;padding:0;margin:0}
+  .credit-path li{position:relative;background:#e8f1ec;border-radius:10px;padding:12px;margin:0;min-width:0}
+  .credit-path li+li::before{content:'→';position:absolute;left:-19px;top:16px;color:var(--green)}
+  .credit-path strong{display:block;font-size:14px;color:var(--green)}
+  .credit-path span{display:block;font-size:12px;line-height:1.6;color:var(--muted);margin-top:6px}
+  .entry-links{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:18px}
+  .entry-links a{color:var(--green);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+  @media(max-width:760px){.credit-entry{padding:18px}.credit-entry h2{font-size:24px}.example-grid,.credit-path{grid-template-columns:1fr}.credit-path{gap:24px}.credit-path li+li::before{content:'↓';left:18px;top:-24px}}
+</style>

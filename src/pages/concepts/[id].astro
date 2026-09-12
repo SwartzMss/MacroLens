@@ -11,6 +11,7 @@ import PrerequisiteConcepts from '../../components/PrerequisiteConcepts.astro';
 import PageFeedback from '../../components/PageFeedback.astro';
 import ConceptKnowledgeOverview from '../../components/ConceptKnowledgeOverview.astro';
 import ConceptTableOfContents from '../../components/ConceptTableOfContents.astro';
+import CreditUnderstanding from '../../components/CreditUnderstanding.astro';
 import { buildConceptCatalog } from '../../data/conceptCatalog';
 import { buildConceptKnowledge } from '../../data/conceptKnowledge';
 import { topicRegistry } from '../../data/topics';
@@ -49,6 +50,7 @@ const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length >
 const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
 const sectionLinks = [
   { id: `${entry.data.id}-overview`, label: '概览' },
+  ...(entry.data.id === 'credit' ? [{ id: 'credit-start', label: '先理解' }] : []),
   ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
   ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解' }] : []),
   { id: `${entry.data.id}-detail`, label: '详解' },
@@ -77,6 +79,7 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
     </nav>
     <div class="shell concept-layout detail-layout">
       <article class="prose detail-article" data-pagefind-body>
+        {entry.data.id === 'credit' && <CreditUnderstanding />}
         {indicator && <section class="detail-data" id={`${entry.data.id}-data`} aria-label="最新数据与趋势">
           <IndicatorReading indicator={indicator} />
           <IndicatorChart indicator={indicator} />
