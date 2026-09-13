@@ -16,6 +16,7 @@ for (const item of readdirSync(directory, { withFileTypes: true })) {
   const entryPosition = html.indexOf(`id="${item.name}-start"`);
   const knowledgePosition = html.indexOf(`id="${item.name}-knowledge"`);
   assert.ok(detailPosition >= 0, `${item.name}: missing article details`);
+  assert.ok(!html.includes('<span>证据与来源</span>'), `${item.name}: relationship evidence must not be duplicated in overview`);
   assert.ok(entryPosition >= 0 && entryPosition < detailPosition, `${item.name}: understanding entry must precede article`);
   assert.equal([...html.matchAll(new RegExp(`id="${item.name}-start"`, 'g'))].length, 1, `${item.name}: duplicate understanding entry`);
   if (knowledgePosition >= 0) assert.ok(detailPosition < knowledgePosition, `${item.name}: relationship overview must follow article`);

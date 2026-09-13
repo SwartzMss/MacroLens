@@ -49,7 +49,7 @@ const knowledge = buildConceptKnowledge({
   relatedIds: entry.data.related,
   concepts: allConcepts,
 });
-const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length > 0 || knowledge.limitations.length > 0 || knowledge.evidence.length > 0;
+const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length > 0 || knowledge.limitations.length > 0;
 const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
 const isMonetaryPolicy = entry.data.id === 'monetary-policy';
 const hasCustomEntry = entry.data.id === 'credit' || isMonetaryPolicy;

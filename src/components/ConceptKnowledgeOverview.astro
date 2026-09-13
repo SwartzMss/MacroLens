@@ -70,14 +70,10 @@ const relationLabel = (type: RelationType, relation: string | undefined) => (
     </ol>
   </section>}
 
-  {(knowledge.limitations.length > 0 || knowledge.evidence.length > 0) && <div class="knowledge-context-grid">
+  {knowledge.limitations.length > 0 && <div class="knowledge-context-grid">
     {knowledge.limitations.length > 0 && <details class="knowledge-disclosure">
       <summary><span>局限与解读边界</span><small>{knowledge.limitations.length} 条</small></summary>
       <ul>{knowledge.limitations.map((limitation) => <li>{limitation}</li>)}</ul>
-    </details>}
-    {knowledge.evidence.length > 0 && <details class="knowledge-disclosure">
-      <summary><span>证据与来源</span><small>{knowledge.evidence.length} 条</small></summary>
-      <ul>{knowledge.evidence.map((item) => <li><a href={item.url} target="_blank" rel="noreferrer">{item.title} ↗</a></li>)}</ul>
     </details>}
   </div>}
 </section>
