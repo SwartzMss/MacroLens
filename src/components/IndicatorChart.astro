@@ -6,6 +6,7 @@ import m2Balance from '../../data/chart-overlays/m2-balance.json';
 const { indicator } = Astro.props as { indicator: IndicatorDataset };
 const id = `chart-${indicator.id}`;
 const unitLabel = indicator.unit === 'index' ? '点' : indicator.unit;
+const amountLabel = indicator.id === 'social-financing' ? '社融存量' : '贷款余额';
 const balance = ({ m0: m0Balance, m1: m1Balance, m2: m2Balance } as Record<string, typeof m0Balance>)[indicator.id];
 const dualAxis = Boolean(balance);
 const chartTitle = dualAxis ? `${indicator.id.toUpperCase()} 余额与同比增速` : indicator.chartTitle;
@@ -18,9 +19,9 @@ const series = dualAxis ? [
   {(dualAxis || indicator.balance) && <p class="dual-axis-note"><a href={`#${indicator.id}-sources`}>数据来源与口径</a></p>}
   {indicator.balance && <>
     <details>
-      <summary>查看贷款余额与同比明细</summary>
+      <summary>查看{amountLabel}与同比明细</summary>
       <table>
-        <thead><tr><th scope="col">月份</th><th scope="col">余额（{indicator.balance.unit}）</th><th scope="col">同比增速（%）</th></tr></thead>
+        <thead><tr><th scope="col">月份</th><th scope="col">{amountLabel}（{indicator.balance.unit}）</th><th scope="col">同比增速（%）</th></tr></thead>
         <tbody>{[...indicator.balance.data].reverse().map(item => <tr><th scope="row">{item.date}</th><td>{item.value.toFixed(2)}</td><td>{indicator.data.find(point => point.date === item.date)?.value.toFixed(1) ?? '待补充'}</td></tr>)}</tbody>
       </table>
     </details>
