@@ -1,12 +1,13 @@
 ---
 id: financial-account
 name: 金融账户
+intro: "金融账户记录居民与非居民之间涉及金融资产和负债的交易。它与 BPM6 中规模通常较小的资本账户不同，不能把二者混为一项。"
 subtitle: 记录居民与非居民金融资产和负债交易，读正负号前必须确认列示方法
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [balance-of-payments, current-account, cross-border-capital-flows, foreign-exchange-reserves]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [balance-of-payments]
 prerequisites: [balance-of-payments]
 featured: false
 ---
-
-> 金融账户记录居民与非居民之间涉及金融资产和负债的交易。它与 BPM6 中规模通常较小的资本账户不同，不能把二者混为一项。
 
 ## 五类功能分类
 

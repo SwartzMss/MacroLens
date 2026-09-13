@@ -48,7 +48,7 @@ test('housing pages have stable metadata and no charts', () => {
     const parsed = parse(document);
     for (const [key, value] of Object.entries(expected)) assert.deepEqual(parsed[key], value, `${id} ${key} mismatch`);
     assert.equal(parsed.country, 'CN');
-    assert.equal(parsed.updatedAt, '2026-08-31');
+    assert.equal(parsed.updatedAt, '2026-09-13');
     assert.equal(Object.hasOwn(parsed, 'chart'), false);
     for (const related of expected.related) assert.ok(ids.has(`${related}.md`) || abstractIds.has(related), `${id} related ${related} missing`);
   }

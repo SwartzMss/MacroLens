@@ -1,12 +1,13 @@
 ---
 id: interbank-rate
 name: 银行间资金利率（DR007 / R007）
+intro: "银行间资金利率是金融机构在货币市场融入或融出短期资金的市场价格。DR007、R007 与央行7天期逆回购操作利率互相关联，但不是同一类利率。"
 subtitle: 市场成交形成的短期资金价格，不等于央行政策操作利率
 country: CN
 category: markets
 source: 中国人民银行与全国银行间同业拆借中心
 definition: { source: CFETS 质押式回购指标口径, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [policy-rate, omo, lpr, credit]
 graph: macro
 order: 1
@@ -15,8 +16,6 @@ topics: [monetary-transmission,market-rates]
 prerequisites: [policy-rate]
 featured: false
 ---
-
-> 银行间资金利率是金融机构在货币市场融入或融出短期资金的市场价格。DR007、R007 与央行7天期逆回购操作利率互相关联，但不是同一类利率。
 
 ## 政策操作利率与市场成交利率
 

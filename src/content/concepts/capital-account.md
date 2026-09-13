@@ -1,12 +1,13 @@
 ---
 id: capital-account
 name: 资本账户
+intro: "国际收支里的资本账户记录资本转移、非生产非金融资产买卖等特定交易；日常说的跨境买股票、债券，主要属于另一个金融账户。"
 subtitle: BPM6 中记录资本转移与非生产非金融资产交易的独立账户
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: IMF BPM6 与 SAFE 国际收支说明, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [balance-of-payments, financial-account]
 graph: macro
 order: 9

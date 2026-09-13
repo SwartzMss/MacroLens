@@ -1,12 +1,13 @@
 ---
 id: balance-of-payments
 name: 国际收支
+intro: "国际收支像一份对外交易账本，记录一段时间里本经济体与外部之间的买卖、收入往来和投融资。它按居民与非居民划分，不能只看国籍。"
 subtitle: 记录居民与非居民在某一期间经济交易的统计报表，不是外部资产负债存量表
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [current-account, financial-account, cross-border-capital-flows, foreign-exchange-reserves]
 graph: macro
 order: 1

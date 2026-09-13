@@ -1,12 +1,13 @@
 ---
 id: local-government-special-bonds
 name: 地方政府专项债
+intro: "地方政府专项债为有一定收益的公益性项目筹资，并有相应的还本付息资金安排。债券发行后，还要看资金是否使用、项目是否推进。"
 subtitle: 对应有一定收益公益性项目并以政府性基金收入或专项收入偿还的政府债券
 country: CN
 category: fiscal
 source: 财政部地方政府债务管理资料
 definition: { source: 财政部、全国人民代表大会, asOf: '2026-09' }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [local-government-debt, local-government-finance, government-debt, fiscal-expenditure]
 graph: macro
 order: 8

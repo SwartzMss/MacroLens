@@ -1,12 +1,13 @@
 ---
 id: mortgage
 name: 个人住房贷款 / 按揭
+intro: "个人住房贷款是以住房抵押等方式发放的家庭住房融资。阅读时要把个人住房贷款利率、存量余额、新增贷款和偿还额分开，它们分别反映价格、存量和流量。"
 subtitle: 区分房贷定价、存量余额、新增投放与偿还，不能用 LPR 或住户贷款总量替代
 country: CN
 category: housing
 source: 中国人民银行
 definition: { source: 中国人民银行个人住房贷款与贷款市场报价利率统计, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [property-sales, house-price-index, lpr, credit]
 graph: macro
 order: 4
@@ -15,8 +16,6 @@ topics: [credit-financing,housing-market]
 prerequisites: []
 featured: false
 ---
-
-> 个人住房贷款是以住房抵押等方式发放的家庭住房融资。阅读时要把个人住房贷款利率、存量余额、新增贷款和偿还额分开，它们分别反映价格、存量和流量。
 
 ## 房贷利率不是 LPR 本身
 

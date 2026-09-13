@@ -1,11 +1,12 @@
 ---
 id: gdp-deflator
 name: GDP 平减指数
+intro: "GDP 平减指数帮助分辨产出金额变大，有多少与价格变化有关。它观察国内生产的最终产品和服务，与居民日常购物篮的统计范围不同。"
 subtitle: 名义GDP与实际GDP之比，反映国内生产最终产品与服务的综合价格变化，不是CPI
 country: CN
 category: inflation
 source: 国家统计局国民经济核算
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 definition: { source: 国家统计局, asOf: 2025-02 }
 related: [gdp, cpi, ppi]
 graph: macro

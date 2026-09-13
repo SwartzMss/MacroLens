@@ -1,12 +1,13 @@
 ---
 id: employment
 name: 就业
+intro: "就业描述在特定时点或调查参考周处于就业状态的人口存量。它回答“有多少人被认定为就业”，不直接回答本月净新增了多少岗位。"
 subtitle: 处于就业状态的人口存量，不等于某一期间新增的就业岗位或人员
 country: CN
 category: labor
 source: 国家统计局
 definition: { source: 国家统计局劳动力调查制度, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [unemployment-rate, youth-unemployment, labor-force-participation, wages, gdp]
 graph: macro
 order: 1
@@ -15,8 +16,6 @@ topics: [economic-activity,labor-market]
 prerequisites: []
 featured: false
 ---
-
-> 就业描述在特定时点或调查参考周处于就业状态的人口存量。它回答“有多少人被认定为就业”，不直接回答本月净新增了多少岗位。
 
 ## 统计上的就业状态
 

@@ -1,12 +1,13 @@
 ---
 id: ppi
 name: 工业生产者出厂价格指数（PPI）
+intro: "中国通常所说的 PPI，是工业生产者出厂价格指数，反映工业企业产品第一次出售时价格水平的总体变动。"
 subtitle: 工业产品第一次出售时的价格变化，位于消费价格上游
 country: CN
 category: inflation
 source: 国家统计局工业生产者价格月度发布与编制方法
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [cpi, core-cpi, pmi]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [prices-inflation]
 prerequisites: []
 featured: false
 ---
-
-> 中国通常所说的 PPI，是工业生产者出厂价格指数，反映工业企业产品第一次出售时价格水平的总体变动。
 
 ## 出厂价格与购进价格不要混淆
 

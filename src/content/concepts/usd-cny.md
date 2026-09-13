@@ -1,12 +1,13 @@
 ---
 id: usd-cny
 name: 人民币兑美元（USD/CNY）
+intro: "本页 USD/CNY 指境内人民币对美元汇率，按 1 USD = x CNY 报价。数值上升表示人民币兑美元贬值，数值下降表示人民币兑美元升值。"
 subtitle: 境内人民币对美元价格，默认按每美元对应多少人民币报价
 country: CN
 category: exchange
 source: 中国人民银行与中国外汇交易中心
 definition: { source: 中国人民银行、中国外汇交易中心, asOf: '2026' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, rmb-exchange-rate-regime, cfets-rmb-index, foreign-exchange-reserves]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [exchange-rates]
 prerequisites: [exchange-rate]
 featured: false
 ---
-
-> 本页 USD/CNY 指境内人民币对美元汇率，按 `1 USD = x CNY` 报价。数值上升表示人民币兑美元贬值，数值下降表示人民币兑美元升值。
 
 ## 先读懂报价
 

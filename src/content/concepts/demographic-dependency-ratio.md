@@ -1,12 +1,13 @@
 ---
 id: demographic-dependency-ratio
 name: 人口抚养比
+intro: "人口抚养比是描述年龄结构的比率，不是财政支出、家庭实际负担或劳动生产率的直接测量。"
 subtitle: 以劳动年龄人口为参照描述儿童与老年人口结构的比率
 country: CN
 category: labor
 source: 国家统计局与世界银行人口指标
 definition: { source: NBS population statistics and World Bank demographic indicators, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [working-age-population, labor-force-participation, employment]
 graph: macro
 order: 7
@@ -15,8 +16,6 @@ topics: [structural-growth,labor-market]
 prerequisites: [working-age-population]
 featured: false
 ---
-
-> 人口抚养比是描述年龄结构的比率，不是财政支出、家庭实际负担或劳动生产率的直接测量。
 
 ## 常见定义
 

@@ -1,12 +1,13 @@
 ---
 id: fiscal-deficit
 name: 财政赤字
+intro: "财政赤字反映特定预算范围内需要通过融资等方式弥补的缺口。预算安排与实际执行要分开，也不能把任意两项收支简单相减就叫官方赤字。"
 subtitle: 区分预算安排、执行收支差额与分析者构造的广义财政口径
 country: CN
 category: fiscal
 source: 全国人民代表大会预算报告
 definition: { source: 全国人民代表大会、财政部, asOf: '2026' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [fiscal-policy, fiscal-revenue, fiscal-expenditure, government-debt]
 graph: macro
 order: 4

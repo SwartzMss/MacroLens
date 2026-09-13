@@ -1,12 +1,13 @@
 ---
 id: local-government-debt
 name: 地方政府债务
+intro: "地方政府债务是依法纳入预算和限额管理、由地方政府承担偿还责任的债务。它是特定法律和统计口径下的政府债务，不等于地方范围内所有公共部门或企业的负债。"
 subtitle: 地方政府依法承担的债务存量，受债务限额和预算管理约束
 country: CN
 category: fiscal
 source: 财政部与全国人民代表大会预算报告
 definition: { source: 财政部、全国人民代表大会, asOf: '2026-09' }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [local-government-finance, government-debt, fiscal-deficit, local-government-special-bonds, lgfv, local-fiscal-space]
 graph: macro
 order: 7
@@ -15,8 +16,6 @@ topics: [local-government-finance]
 prerequisites: [local-government-finance]
 featured: false
 ---
-
-> 地方政府债务是依法纳入预算和限额管理、由地方政府承担偿还责任的债务。它是特定法律和统计口径下的政府债务，不等于地方范围内所有公共部门或企业的负债。
 
 ## 一般债务与专项债务
 

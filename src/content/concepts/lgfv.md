@@ -1,12 +1,13 @@
 ---
 id: lgfv
 name: 地方政府融资平台（LGFV / 城投平台）
+intro: "城投平台是与地方政府有关、承担融资和建设运营等业务的企业。它与地方财政联系密切，但企业欠的钱不能自动算成政府法定债务。"
 subtitle: 具有独立法人资格的地方国有企业融资主体，不等于地方政府法定债务
 country: CN
 category: fiscal
 source: 国家发展改革委与国务院地方政府融资平台管理文件
 definition: { source: 国家发展改革委、国务院, asOf: '2026-09' }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [local-government-finance, local-government-debt, social-financing, credit, market-financing, local-fiscal-and-investment-conditions]
 graph: macro
 order: 10

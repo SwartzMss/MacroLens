@@ -13,6 +13,7 @@ import ConceptKnowledgeOverview from '../../components/ConceptKnowledgeOverview.
 import ConceptTableOfContents from '../../components/ConceptTableOfContents.astro';
 import CreditUnderstanding from '../../components/CreditUnderstanding.astro';
 import MonetaryPolicyUnderstanding from '../../components/MonetaryPolicyUnderstanding.astro';
+import ConceptUnderstanding from '../../components/ConceptUnderstanding.astro';
 import { buildConceptCatalog } from '../../data/conceptCatalog';
 import { buildConceptKnowledge } from '../../data/conceptKnowledge';
 import { topicRegistry } from '../../data/topics';
@@ -51,14 +52,14 @@ const knowledge = buildConceptKnowledge({
 const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length > 0 || knowledge.limitations.length > 0 || knowledge.evidence.length > 0;
 const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
 const isMonetaryPolicy = entry.data.id === 'monetary-policy';
+const hasCustomEntry = entry.data.id === 'credit' || isMonetaryPolicy;
+const hasEntry = hasCustomEntry || Boolean(entry.data.intro);
 const sectionLinks = [
   { id: `${entry.data.id}-overview`, label: '概览' },
-  ...(entry.data.id === 'credit' ? [{ id: 'credit-start', label: '先理解' }] : []),
-  ...(isMonetaryPolicy ? [{ id: 'monetary-policy-start', label: '先理解' }] : []),
+  ...(hasEntry ? [{ id: `${entry.data.id}-start`, label: '先理解' }] : []),
   ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
-  ...(hasKnowledge && !isMonetaryPolicy ? [{ id: `${entry.data.id}-knowledge`, label: '理解' }] : []),
   { id: `${entry.data.id}-detail`, label: '详解' },
-  ...(hasKnowledge && isMonetaryPolicy ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
+  ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
   ...(presentation ? [{ id: `${entry.data.id}-sources`, label: '来源' }] : []),
   ...(hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
 ];
@@ -86,17 +87,17 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
       <article class="prose detail-article" data-pagefind-body>
         {entry.data.id === 'credit' && <CreditUnderstanding />}
         {isMonetaryPolicy && <MonetaryPolicyUnderstanding />}
+        {!hasCustomEntry && entry.data.intro && <ConceptUnderstanding conceptId={entry.data.id} intro={entry.data.intro} />}
         {indicator && <section class="detail-data" id={`${entry.data.id}-data`} aria-label="最新数据与趋势">
           <IndicatorReading indicator={indicator} />
           <IndicatorChart indicator={indicator} />
         </section>}
         <PrerequisiteConcepts concepts={prerequisites} />
-        {hasKnowledge && !isMonetaryPolicy && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
         <details class="concept-long-form" id={`${entry.data.id}-detail`} open>
           <summary>详细说明与统计边界</summary>
           <div class="concept-long-form-content"><Content /></div>
         </details>
-        {hasKnowledge && isMonetaryPolicy && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
+        {hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
         {presentation && <section id={`${entry.data.id}-sources`} aria-label="数据口径与来源"><IndicatorMetadata presentation={presentation} /></section>}
         <PageFeedback pageId={entry.data.id} />
         {hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">

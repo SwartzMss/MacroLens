@@ -1,12 +1,13 @@
 ---
 id: income-expectations
 name: 收入预期
+intro: "收入预期是家庭对未来一段时间收入、就业或购买力的前瞻判断。它不是已经实现的收入，也不是一条不保证落空的官方预测。"
 subtitle: 家庭对未来收入的前瞻判断，必须注明对象、期限、问题形式和不确定性
 country: CN
 category: growth
 source: 中国人民银行与国家统计局
 definition: { source: household income expectation surveys and income statistics, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [disposable-income, household-consumption, wages, employment]
 graph: macro
 order: 12
@@ -15,8 +16,6 @@ topics: [household-sector,labor-market,economic-activity]
 prerequisites: [disposable-income]
 featured: false
 ---
-
-> 收入预期是家庭对未来一段时间收入、就业或购买力的前瞻判断。它不是已经实现的收入，也不是一条不保证落空的官方预测。
 
 ## 预期的统计边界
 

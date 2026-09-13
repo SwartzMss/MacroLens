@@ -1,12 +1,13 @@
 ---
 id: inventory-cycle
 name: 库存周期
+intro: "库存周期是企业面对需求、价格和生产变化时调整库存的分析框架，不是一条官方综合指数，也不是固定时钟。"
 subtitle: 企业库存存量、变化与需求生产调整形成的条件性周期叙事
 country: CN
 category: growth
 source: 国家统计局
 definition: { source: 国家统计局工业企业财务与国民经济核算口径, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [industrial-production, industrial-profits, pmi, gdp]
 graph: macro
 order: 7
@@ -15,8 +16,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: false
 ---
-
-> 库存周期是企业面对需求、价格和生产变化时调整库存的分析框架，不是一条官方综合指数，也不是固定时钟。
 
 ## 先分清存量、增速与流量
 

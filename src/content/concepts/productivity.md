@@ -1,12 +1,13 @@
 ---
 id: productivity
 name: 劳动生产率
+intro: "劳动生产率是单位劳动投入对应的产出。先区分生产率水平与生产率增速，再确认产出和劳动投入的统计口径。"
 subtitle: 单位劳动投入对应的实际产出，必须区分水平、增速和投入口径
 country: CN
 category: growth
 source: 国家统计局与 OECD 生产率方法
 definition: { source: NBS national accounts and OECD productivity methodology, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [gdp, total-factor-productivity, employment, labor-force-participation]
 graph: macro
 order: 7
@@ -15,8 +16,6 @@ topics: [structural-growth,economic-activity]
 prerequisites: [gdp]
 featured: false
 ---
-
-> 劳动生产率是单位劳动投入对应的产出。先区分生产率水平与生产率增速，再确认产出和劳动投入的统计口径。
 
 ## 水平与增速
 

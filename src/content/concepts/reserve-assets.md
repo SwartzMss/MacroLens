@@ -1,12 +1,13 @@
 ---
 id: reserve-assets
 name: 官方储备资产
+intro: "官方储备资产是货币当局掌握、可用于对外支付等需要的资产，包括外汇储备等项目。企业和居民的海外资产不因此自动算进来。"
 subtitle: 货币当局可支配并可用于外部支付与市场操作的外部资产类别
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 官方储备资产与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [international-investment-position, foreign-exchange-reserves, balance-of-payments]
 graph: macro
 order: 8

@@ -1,12 +1,13 @@
 ---
 id: cross-border-capital-flows
 name: 跨境资本流动
+intro: "跨境资金往来可以来自投资、借贷等不同活动。读到“资金流入或流出”，先问统计的是哪一种往来，不能把不同数据直接相加。"
 subtitle: 对多类跨境金融交易的分析性总称，不是一条统一口径的官方指标
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [financial-account, balance-of-payments, current-account, exchange-rate, foreign-exchange-reserves]
 graph: macro
 order: 4

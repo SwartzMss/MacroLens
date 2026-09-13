@@ -1,12 +1,13 @@
 ---
 id: disposable-income
 name: 居民人均可支配收入
+intro: "居民人均可支配收入是住户调查汇总得到的、平均到每位居民的可用于消费和储蓄的收入指标。它不是某一位劳动者的工资，也不是所有家庭收入简单相加后忽略人口变化的总量。"
 subtitle: 住户调查中的人均可支配收入，连接劳动所得、经营财产转移收入与购买力
 country: CN
 category: growth
 source: 国家统计局住户调查与国民经济核算
 definition: { source: 国家统计局住户收支与生活状况调查, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [wages, employment, household-consumption, household-saving-rate, cpi]
 graph: macro
 order: 11
@@ -15,8 +16,6 @@ topics: [household-sector,labor-market,economic-activity]
 prerequisites: [wages]
 featured: false
 ---
-
-> 居民人均可支配收入是住户调查汇总得到的、平均到每位居民的可用于消费和储蓄的收入指标。它不是某一位劳动者的工资，也不是所有家庭收入简单相加后忽略人口变化的总量。
 
 ## 收入从哪里来
 

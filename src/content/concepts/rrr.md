@@ -1,12 +1,13 @@
 ---
 id: rrr
 name: 存款准备金率与降准
+intro: "降准可以简单理解为：降低银行必须按规定存放在央行的准备金比例，让银行有更多资金安排空间。 它先改变银行的资金条件，再可能影响贷款和经济活动。"
 subtitle: 降低银行法定准备金比例，让银行有更多资金安排空间
 country: CN
 category: policy
 source: 中国人民银行准备金政策与货币政策执行报告
 definition: { source: 中国人民银行, asOf: 2025-Q1 }
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 related: [monetary-policy, credit, m2, social-financing]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [monetary-transmission]
 prerequisites: [monetary-policy]
 featured: false
 ---
-
-> **降准可以简单理解为：降低银行必须按规定存放在央行的准备金比例，让银行有更多资金安排空间。** 它先改变银行的资金条件，再可能影响贷款和经济活动。
 
 ## 一个简单例子：比例降低意味着什么？
 

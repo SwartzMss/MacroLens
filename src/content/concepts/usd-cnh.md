@@ -1,12 +1,13 @@
 ---
 id: usd-cnh
 name: 离岸人民币（USD/CNH）
+intro: "USD/CNH 是离岸人民币市场的报价：1 美元对应多少离岸人民币；CNH 不是另一种货币。"
 subtitle: 香港等离岸市场交易的人民币兑美元价格，与境内 USD/CNY 相互关联但口径不同
 country: CN
 category: exchange
 source: 中国人民银行、中国外汇交易中心与香港金融管理局
 definition: { source: RMB internationalisation and offshore-market descriptions, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [usd-cny, exchange-rate, rmb-exchange-rate-regime, interest-rate-parity]
 graph: macro
 order: 8
@@ -15,8 +16,6 @@ topics: [exchange-rates]
 prerequisites: [exchange-rate]
 featured: false
 ---
-
-> USD/CNH 是离岸人民币市场的报价：1 美元对应多少离岸人民币；CNH 不是另一种货币。
 
 ## CNY 与 CNH
 

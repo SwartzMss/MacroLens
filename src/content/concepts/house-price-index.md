@@ -1,12 +1,13 @@
 ---
 id: house-price-index
 name: 房价指数 / 70城住宅价格指数
+intro: "房价指数帮助看同一统计范围里的住房价格涨了还是跌了。这里看 70 个大中城市的新房和二手房变化，不能当成全国房屋的平均售价。"
 subtitle: 70个大中城市新建与二手住宅价格的官方指数，不是全国交易价格平均数
 country: CN
 category: housing
 source: 国家统计局城市司
 definition: { source: 国家统计局70个大中城市住宅销售价格调查, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [property-sales, real-estate-investment, mortgage]
 graph: macro
 order: 3

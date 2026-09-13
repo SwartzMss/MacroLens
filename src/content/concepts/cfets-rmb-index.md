@@ -1,12 +1,13 @@
 ---
 id: cfets-rmb-index
 name: CFETS 人民币汇率指数
+intro: "CFETS 人民币汇率指数汇总人民币相对一篮子货币的变化，用于观察多边价值。指数点位不是“每美元多少人民币”。"
 subtitle: 衡量人民币相对一篮子货币价值的多边指数，不是另一个 USD/CNY
 country: CN
 category: exchange
 source: 中国外汇交易中心
 definition: { source: 中国外汇交易中心, asOf: 2026-01 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, usd-cny, rmb-exchange-rate-regime, foreign-exchange-reserves]
 graph: macro
 order: 4
@@ -15,8 +16,6 @@ topics: [exchange-rates]
 prerequisites: []
 featured: false
 ---
-
-> CFETS 人民币汇率指数汇总人民币相对一篮子货币的变化，用于观察多边价值。指数点位不是“每美元多少人民币”。
 
 ## 它衡量什么
 

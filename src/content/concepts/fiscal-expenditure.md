@@ -1,12 +1,13 @@
 ---
 id: fiscal-expenditure
 name: 财政支出
+intro: "本页“财政支出”主要指全国一般公共预算支出。它记录预算执行中的支出流量，但不能把每一元支出都机械理解为新增宏观刺激。"
 subtitle: 本页以全国一般公共预算支出为核心，理解预算资金的执行与用途
 country: CN
 category: fiscal
 source: 中华人民共和国财政部国库司
 definition: { source: 财政部, asOf: '2025' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [fiscal-policy, fiscal-revenue, fiscal-deficit, government-debt, gdp]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [fiscal-policy]
 prerequisites: []
 featured: false
 ---
-
-> 本页“财政支出”主要指全国一般公共预算支出。它记录预算执行中的支出流量，但不能把每一元支出都机械理解为新增宏观刺激。
 
 ## 它测量什么
 

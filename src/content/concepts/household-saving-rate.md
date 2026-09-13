@@ -1,12 +1,13 @@
 ---
 id: household-saving-rate
 name: 居民储蓄率
+intro: "居民储蓄率描述一定时期内住户可支配收入中没有用于最终消费的部分。它是流量概念的比例，不是银行账户余额，也不是家庭财富的直接估计。"
 subtitle: 可支配收入中未用于消费的储蓄流量比例，不等于住户存款余额变化
 country: CN
 category: growth
 source: 国家统计局国民经济核算与 OECD
 definition: { source: household saving in national accounts, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [disposable-income, household-consumption, m2, real-interest-rate]
 graph: macro
 order: 14
@@ -15,8 +16,6 @@ topics: [household-sector,economic-activity,market-rates]
 prerequisites: [disposable-income,household-consumption]
 featured: false
 ---
-
-> 居民储蓄率描述一定时期内住户可支配收入中没有用于最终消费的部分。它是流量概念的比例，不是银行账户余额，也不是家庭财富的直接估计。
 
 ## 基本计算
 

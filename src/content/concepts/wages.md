@@ -1,12 +1,13 @@
 ---
 id: wages
 name: 工资与劳动报酬
+intro: "“工资上涨”可能指不同人群的平均工资、某位劳动者的工资、工资总额或经价格调整后的购买力变化。先确认统计对象和价格口径，再解释增长。"
 subtitle: 衡量劳动所得时必须区分平均与中位、名义与实际以及统计覆盖范围
 country: CN
 category: labor
 source: 国家统计局
 definition: { source: 国家统计局单位就业人员工资统计制度, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [employment, unemployment-rate, labor-force-participation, cpi, retail-sales]
 graph: macro
 order: 5
@@ -15,8 +16,6 @@ topics: [prices-inflation,economic-activity,labor-market]
 prerequisites: []
 featured: false
 ---
-
-> “工资上涨”可能指不同人群的平均工资、某位劳动者的工资、工资总额或经价格调整后的购买力变化。先确认统计对象和价格口径，再解释增长。
 
 ## 平均数不等于典型劳动者
 

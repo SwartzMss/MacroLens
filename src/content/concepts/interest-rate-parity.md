@@ -1,12 +1,13 @@
 ---
 id: interest-rate-parity
 name: 利率平价（CIP / UIP）
+intro: "把钱换成另一种货币后，回报既受利息影响，也受汇率影响。利率平价研究两者的联系，并区分是否提前锁定换回来的汇率。"
 subtitle: 连接利率、即期汇率与远期汇率的两类跨货币定价关系
 country: CN
 category: exchange
 source: 国际清算银行与国际货币基金组织
 definition: { source: BIS cross-currency pricing methodology, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, usd-cny, usd-cnh, carry-trade]
 graph: macro
 order: 7

@@ -1,12 +1,13 @@
 ---
 id: external-debt
 name: 外债
+intro: "外债是居民对非居民承担的未来支付本金或利息的债务性负债。它是毛额概念，不能直接等同于政府债务、外币债务或净外部头寸。"
 subtitle: 居民对非居民承担的债务性负债总额，需按部门与期限阅读
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 全口径外债与 IMF 外债统计, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [international-investment-position, external-liabilities, government-debt, net-foreign-assets]
 graph: macro
 order: 7
@@ -15,8 +16,6 @@ topics: [external-balance-sheets]
 prerequisites: [international-investment-position]
 featured: false
 ---
-
-> 外债是居民对非居民承担的未来支付本金或利息的债务性负债。它是毛额概念，不能直接等同于政府债务、外币债务或净外部头寸。
 
 ## 覆盖与分解
 

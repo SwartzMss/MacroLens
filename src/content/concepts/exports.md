@@ -1,12 +1,13 @@
 ---
 id: exports
 name: 出口
+intro: "出口帮助看对外卖出了多少货物或服务。出口金额增加，可能是卖得更多，也可能是价格更高；海关货物数据与国际收支数据的范围不同。"
 subtitle: 货物或服务向境外流出的贸易概念，必须先区分海关统计与国际收支口径
 country: CN
 category: external
 source: 海关总署、国家外汇管理局与国际货币基金组织
 definition: { source: 海关统计、SAFE 与 IMF BPM6, asOf: 2026-09 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [imports, trade-balance, trade-volume-and-price, exchange-rate, current-account]
 graph: macro
 chart: exports

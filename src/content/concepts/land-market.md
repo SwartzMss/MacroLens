@@ -1,12 +1,13 @@
 ---
 id: land-market
 name: 土地市场与土地出让收入
+intro: "土地市场同时包含土地供应、成交和财政收支等不同流量。土地成交价款、土地出让收入和房地产开发投资并不是同一个指标。"
 subtitle: 分开土地成交、土地出让收入、房地产投资与政府预算口径
 country: CN
 category: housing
 source: 财政部与自然资源部
 definition: { source: 财政部政府性基金预算与自然资源土地出让口径, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [real-estate-investment, property-sales, fiscal-revenue, fiscal-conditions]
 graph: macro
 order: 5
@@ -15,8 +16,6 @@ topics: [fiscal-policy,housing-market]
 prerequisites: []
 featured: false
 ---
-
-> 土地市场同时包含土地供应、成交和财政收支等不同流量。土地成交价款、土地出让收入和房地产开发投资并不是同一个指标。
 
 ## 交易价值与出让收入
 

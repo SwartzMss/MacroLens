@@ -1,12 +1,13 @@
 ---
 id: industrial-profits
 name: 规模以上工业企业利润
+intro: "工业企业赚了多少钱，要把收入、成本和利润一起看。这里统计的是达到规定规模的工业企业，不能代表所有企业的经营情况。"
 subtitle: 观察规上工业企业累计利润、收入与利润率，必须保持可比口径
 country: CN
 category: growth
 source: 国家统计局
 definition: { source: 国家统计局工业企业财务状况统计, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [industrial-production, inventory-cycle, capacity-utilization, ppi]
 graph: macro
 order: 9

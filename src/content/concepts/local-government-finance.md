@@ -1,12 +1,13 @@
 ---
 id: local-government-finance
 name: 地方财政
+intro: "地方财政是地方政府履行公共服务、投资和治理职能所使用的预算与融资安排。它不是一个单独的收入指标，也不能把所有与地方有关的企业融资都算作政府财政。"
 subtitle: 区分地方一般公共预算、政府性基金预算、土地出让收入与地方融资安排
 country: CN
 category: fiscal
 source: 财政部与全国人民代表大会预算报告
 definition: { source: 财政部、全国人民代表大会, asOf: '2026-09' }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [fiscal-policy, fiscal-revenue, fiscal-expenditure, government-debt, land-transfer-revenue, lgfv, fiscal-conditions]
 graph: macro
 order: 6
@@ -15,8 +16,6 @@ topics: [local-government-finance]
 prerequisites: [fiscal-policy]
 featured: false
 ---
-
-> 地方财政是地方政府履行公共服务、投资和治理职能所使用的预算与融资安排。它不是一个单独的收入指标，也不能把所有与地方有关的企业融资都算作政府财政。
 
 ## 两类重要预算
 

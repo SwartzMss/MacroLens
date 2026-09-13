@@ -1,12 +1,13 @@
 ---
 id: pmi
 name: 采购经理指数（PMI）
+intro: "PMI 可以简单理解为：每月问一批企业，最近的订单、生产等情况比上个月怎样，再把回答汇总成一个信号。 它帮助我们较早了解经营活动的方向。"
 subtitle: 通过企业月度调查，观察订单和生产的变化方向
 country: CN
 category: growth
 source: 国家统计局服务业调查中心、中国物流与采购联合会 PMI 月度发布
 definition: { source: 国家统计局服务业调查中心, asOf: 2025-10 }
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 related: [cpi, ppi, credit, social-financing]
 chart: pmi
 graph: macro
@@ -16,8 +17,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: false
 ---
-
-> **PMI 可以简单理解为：每月问一批企业，最近的订单、生产等情况比上个月怎样，再把回答汇总成一个信号。** 它帮助我们较早了解经营活动的方向。
 
 ## 一个简单例子：订单多了还是少了？
 

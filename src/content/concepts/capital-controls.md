@@ -1,12 +1,13 @@
 ---
 id: capital-controls
 name: 资本流动管理
+intro: "资本流动管理不是一条“开放或关闭”的开关，而是对不同主体、工具、期限和方向施加的规则光谱。"
 subtitle: 影响跨境资本进入、退出与币种转换的规则和工具集合
 country: CN
 category: external
 source: 中国人民银行、国家外汇管理局与国际货币基金组织
 definition: { source: IMF Institutional View 与中国跨境资本管理框架, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [cross-border-capital-flows, balance-of-payments, exchange-rate-formation, impossible-trinity]
 graph: macro
 order: 11
@@ -15,8 +16,6 @@ topics: [exchange-rates,balance-of-payments]
 prerequisites: []
 featured: false
 ---
-
-> 资本流动管理不是一条“开放或关闭”的开关，而是对不同主体、工具、期限和方向施加的规则光谱。
 
 ## 管理对象
 

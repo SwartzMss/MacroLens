@@ -1,12 +1,13 @@
 ---
 id: potential-output
 name: 潜在产出与潜在增长
+intro: "潜在产出帮助估计经济在一定条件下能够持续生产多少。它不能直接测量，不同模型可能得出不同结果，也会随新资料修订。"
 subtitle: 在约束和模型下估计的可持续产出能力，不是直接发布的 GDP 序列
 country: CN
 category: growth
 source: 国际货币基金组织与国家统计局
 definition: { source: IMF potential-output methodology and NBS GDP, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [gdp, productivity, total-factor-productivity, output-gap, labor-supply]
 graph: macro
 order: 9

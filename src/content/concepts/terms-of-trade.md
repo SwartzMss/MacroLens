@@ -1,12 +1,13 @@
 ---
 id: terms-of-trade
 name: 贸易条件
+intro: "贸易条件是出口价格相对于进口价格的相对价格指标。它描述同样一单位出口能够交换多少进口，不是某个货币的兑换价格，也不是出口减进口得到的贸易差额。"
 subtitle: 出口价格相对进口价格的比值或指数，不是汇率或贸易差额
 country: CN
 category: external
 source: 国家外汇管理局、国际货币基金组织与世界贸易组织
 definition: { source: IMF BPM6 与 WTO trade methodology, asOf: 2026-09 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [trade-volume-and-price, exports, imports, trade-balance, exchange-rate]
 graph: macro
 order: 10
@@ -15,8 +16,6 @@ topics: [balance-of-payments]
 prerequisites: [trade-volume-and-price]
 featured: false
 ---
-
-> 贸易条件是出口价格相对于进口价格的相对价格指标。它描述同样一单位出口能够交换多少进口，不是某个货币的兑换价格，也不是出口减进口得到的贸易差额。
 
 ## 基本定义
 

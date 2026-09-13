@@ -1,12 +1,13 @@
 ---
 id: omo
 name: 公开市场操作（OMO）
+intro: "公开市场操作是央行通过与合格交易对手交易，调节银行体系资金条件的一类操作。看投放了多少时，也要看同期有多少到期收回。"
 subtitle: 央行通过公开市场交易管理银行体系流动性并传递政策利率信号
 country: CN
 category: policy
 source: 中国人民银行公开市场业务公告与货币政策执行报告
 definition: { source: 中国人民银行, asOf: 2025-Q1 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [monetary-policy, policy-rate, lpr, credit]
 graph: macro
 order: 4

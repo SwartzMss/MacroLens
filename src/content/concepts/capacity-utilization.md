@@ -1,12 +1,13 @@
 ---
 id: capacity-utilization
 name: 工业产能利用率
+intro: "工业产能利用率衡量报告期内工业实际产出相对既定条件下生产能力的使用程度，是调查指标，不等于全经济产出缺口。"
 subtitle: 规模以上工业实际产出相对可持续生产能力的季度调查指标
 country: CN
 category: growth
 source: 国家统计局
 definition: { source: 国家统计局工业产能利用率调查, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [industrial-production, output-gap, industrial-profits, ppi]
 graph: macro
 order: 8
@@ -15,8 +16,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: false
 ---
-
-> 工业产能利用率衡量报告期内工业实际产出相对既定条件下生产能力的使用程度，是调查指标，不等于全经济产出缺口。
 
 ## 官方口径
 
