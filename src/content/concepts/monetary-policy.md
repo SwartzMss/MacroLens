@@ -51,7 +51,10 @@ featured: false
 - 一次 OMO 净投放不等于永久转向宽松。
 - 政策意图与最终传导结果可能存在时滞和损耗。
 
-## 来源
+<details>
+<summary>正文参考来源</summary>
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/5587716/2025022618190099812.pdf)
 - [中国人民银行：建设现代中央银行制度 更好服务中国式现代化](https://xining.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212553168670/index.html)
+
+</details>
