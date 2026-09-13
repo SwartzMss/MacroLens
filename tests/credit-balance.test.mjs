@@ -19,6 +19,8 @@ test('credit tooltip joins balance by month and distinguishes unavailable histor
   assert.equal(credit.balance.data.length, 31);
   assert.equal(option.yAxis.length, 2);
   assert.equal(option.yAxis[1].name, '余额（万亿元）');
+  assert.equal(option.yAxis[1].position, 'left');
+  assert.equal(option.yAxis[0].position, 'right');
   assert.equal(option.series[1].yAxisIndex, 1);
   assert.equal(option.series[1].data.at(-1), 282.29);
   assert.equal(option.series[1].data[0], 242.504789);

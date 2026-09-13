@@ -34,13 +34,13 @@ export function buildIndicatorChartOption(config: IndicatorChartConfig): ECharts
       },
     } : {}) },
     legend: series.length > 1 || config.balance ? { top: 0 } : undefined,
-    grid: { left: 44, right: config.balance ? 64 : config.dualAxis ? 44 : 20, top: config.balance ? 64 : config.dualAxis ? 58 : series.length > 1 ? 38 : 28, bottom: 38 },
+    grid: { left: config.balance ? 64 : 44, right: config.balance || config.dualAxis ? 44 : 20, top: config.balance ? 64 : config.dualAxis ? 58 : series.length > 1 ? 38 : 28, bottom: 38 },
     xAxis: step
       ? { type: 'time', min: timestamp(dates[0]), max: timestamp(config.verifiedThrough ?? dates.at(-1)!), axisLabel: { formatter: '{yyyy}-{MM}-{dd}', hideOverlap: true } }
       : { type: 'category', data: dates, axisLine: { lineStyle: { color: '#b9c2ba' } } },
     yAxis: config.balance ? [
-      { type: 'value', name: `同比（${config.unit}）`, position: 'left', splitLine: { lineStyle: { color: '#e7e8e1' } } },
-      { type: 'value', name: `余额（${config.balance.unit}）`, position: 'right', scale: true, splitLine: { show: false } },
+      { type: 'value', name: `同比（${config.unit}）`, position: 'right', splitLine: { lineStyle: { color: '#e7e8e1' } } },
+      { type: 'value', name: `余额（${config.balance.unit}）`, position: 'left', scale: true, splitLine: { show: false } },
     ] : config.dualAxis ? [
       { type: 'value', name: '万亿元', min: 0, position: 'left', axisLabel: { color: colors[0] }, nameTextStyle: { color: colors[0] }, splitLine: { lineStyle: { color: '#e7e8e1' } } },
       { type: 'value', name: '%', position: 'right', axisLabel: { color: colors[1] }, nameTextStyle: { color: colors[1] }, splitLine: { show: false } },
