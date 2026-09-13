@@ -14,13 +14,24 @@ const series = dualAxis ? [
   { id: 'yoy', label: '同比增速', unit: '%', yAxisIndex: 1, data: indicator.data },
 ] : indicator.series ?? [{ id: 'default', label: indicator.label, data: indicator.data }];
 ---
-<div class="viz-card"><div class="viz-head"><h3>{chartTitle}</h3>{!dualAxis && <span class="tag">{indicator.label} · {unitLabel}</span>}</div><div class="chart" id={id} data-chart={JSON.stringify({series,dualAxis,unit:indicator.unit,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div>
+<div class="viz-card"><div class="viz-head"><h3>{chartTitle}</h3>{!dualAxis && <span class="tag">{indicator.label} · {unitLabel}</span>}</div><div class="chart" id={id} data-chart={JSON.stringify({series,dualAxis,unit:indicator.unit,balance:indicator.balance,chartType:indicator.chartType,verifiedThrough:indicator.verifiedThrough,referenceValue:indicator.referenceValue,referenceLabel:indicator.referenceLabel})} role="img" aria-label={`${chartTitle}${indicator.chartType === 'step' ? '阶梯图' : '折线图'}`}></div>
   {dualAxis && <p class="dual-axis-note"><a href={`#${indicator.id}-sources`}>数据来源与口径</a></p>}
+  {indicator.balance && <>
+    <p>绿线为同比增速（左轴，%），橙线为贷款余额（右轴，{indicator.balance.unit}）。两轴刻度不同，请分别读数。余额金额已收录 {indicator.balance.data[0]?.date} 至 {indicator.balance.data.at(-1)?.date}。{indicator.data.some(point => !indicator.balance!.data.some(item => item.date === point.date)) && '缺失月份待补充。'}金额取自央行信贷收支表及金融统计数据报告，统一折算为万亿元，显示两位小数。</p>
+    <details>
+      <summary>查看贷款余额与同比明细</summary>
+      <table>
+        <thead><tr><th scope="col">月份</th><th scope="col">余额（{indicator.balance.unit}）</th><th scope="col">同比增速（%）</th></tr></thead>
+        <tbody>{[...indicator.balance.data].reverse().map(item => <tr><th scope="row">{item.date}</th><td>{item.value.toFixed(2)}</td><td>{indicator.data.find(point => point.date === item.date)?.value.toFixed(1) ?? '待补充'}</td></tr>)}</tbody>
+      </table>
+    </details>
+  </>}
 </div>
 <style>
   .dual-axis-note { margin: 4px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
   .dual-axis-note a { color: var(--green); text-decoration: underline; text-underline-offset: 3px; }
 </style>
+
 <script>
   import * as echarts from 'echarts';
   import { buildIndicatorChartOption, type IndicatorChartConfig } from '../data/indicatorChartOption';
