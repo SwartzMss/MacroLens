@@ -40,6 +40,7 @@ const prerequisites = entry.data.prerequisites.map(id => catalog.byId.get(id)).f
 const conceptsByStableId = new Map(allConcepts.map(concept => [concept.data.id, concept]));
 const relatedConcepts = entry.data.related.map(id => conceptsByStableId.get(id)).filter(Boolean);
 const knowledge = buildConceptKnowledge({
+  displayedSourceUrls: presentation?.sources.map(source => source.url) ?? [],
   graphId: entry.data.graph,
   conceptId: entry.data.id,
   summary: entry.data.subtitle,
