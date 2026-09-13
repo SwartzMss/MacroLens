@@ -35,6 +35,7 @@ export type ConceptKnowledge = {
 };
 
 type BuildConceptKnowledgeOptions = {
+  displayedSourceUrls?: readonly string[];
   graphId?: string;
   conceptId: string;
   summary: string;
@@ -77,6 +78,7 @@ function longestChain(
 }
 
 export function buildConceptKnowledge({
+  displayedSourceUrls = [],
   graphId,
   conceptId,
   summary,
@@ -125,10 +127,11 @@ export function buildConceptKnowledge({
     explainableRelations.flatMap((relation) => relation.limitations),
     (limitation) => limitation,
   ).slice(0, 6);
+  const displayedSources = new Set(displayedSourceUrls);
   const evidence = unique(
     explainableRelations.flatMap((relation) => relation.evidence),
     (item) => item.url,
-  ).slice(0, 6);
+  ).filter(item => !displayedSources.has(item.url)).slice(0, 6);
 
   return {
     summary,

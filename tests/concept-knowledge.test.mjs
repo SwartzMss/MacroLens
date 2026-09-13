@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildConceptKnowledge } from '../src/data/conceptKnowledge.ts';
 import { getRelationData } from '../src/data/graphRegistry.ts';
+import { getIndicatorData } from '../src/data/indicatorRegistry.ts';
 
 const concepts = [
   { data: { id: 'monetary-policy', name: '货币政策', subtitle: '中央银行的政策框架' } },
@@ -10,6 +11,29 @@ const concepts = [
   { data: { id: 'credit', name: '人民币贷款 / 信贷', subtitle: '信贷读数', chart: 'credit' } },
   { data: { id: 'm2', name: 'M2', subtitle: '广义货币', chart: 'm2' } },
 ];
+
+test('omits fully duplicated evidence while preserving underlying relationship citations', () => {
+  const options = { graphId: 'macro', conceptId: 'social-financing', summary: '', relatedIds: [], concepts };
+  const before = buildConceptKnowledge(options);
+  assert.ok(before.evidence.length > 0);
+  const after = buildConceptKnowledge({ ...options,
+    displayedSourceUrls: getIndicatorData('social-financing').sources.map(source => source.url),
+  });
+  assert.deepEqual(after.evidence, []);
+  assert.deepEqual(after.chain, before.chain);
+  assert.deepEqual(after.limitations, before.limitations);
+  assert.deepEqual(buildConceptKnowledge(options).evidence, before.evidence);
+});
+
+test('keeps additional evidence when only some sources appear in the data section', () => {
+  const options = { graphId: 'macro', conceptId: 'credit', summary: '', relatedIds: [], concepts };
+  const before = buildConceptKnowledge(options);
+  const sources = getIndicatorData('credit').sources.map(source => source.url);
+  const after = buildConceptKnowledge({ ...options, displayedSourceUrls: sources });
+  assert.ok(after.evidence.length > 0 && after.evidence.length < before.evidence.length);
+  assert.deepEqual(after.evidence, before.evidence.filter(item => !sources.includes(item.url)));
+  assert.deepEqual(buildConceptKnowledge({ ...options, displayedSourceUrls: [] }).evidence, before.evidence);
+});
 
 test('concept knowledge view reuses graph relations for indicators and transmission chain', () => {
   const knowledge = buildConceptKnowledge({
