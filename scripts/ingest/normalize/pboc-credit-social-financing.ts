@@ -61,6 +61,18 @@ export function normalizePBOCFinancialDataset(
     sources,
     data,
   };
+  if (id === 'credit') {
+    const balances = rawReports.map(report => {
+      if (typeof report.creditBalance !== 'number' || !Number.isFinite(report.creditBalance) || report.creditBalance <= 0) {
+        throw new IngestionContractError(`Missing positive credit balance for ${report.publication.month}`);
+      }
+      return { date: report.publication.month, value: report.creditBalance };
+    });
+    normalized.balance = {
+      label: '人民币贷款余额', unit: '万亿元',
+      data: mergeObservations(existing.balance?.data ?? [], balances, 'PBOC credit balance'),
+    };
+  }
   validatePBOCFinancialDataset(normalized, id);
   return normalized;
 }

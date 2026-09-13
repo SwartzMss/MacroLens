@@ -103,6 +103,9 @@ test('parses the exact broad RMB-loan balance YoY and social-financing stock YoY
   const credit = parsePBOCCreditReport(moneyPublication, creditHtml);
   const social = parsePBOCSocialFinancingReport(socialPublication, socialHtml);
   assert.equal(credit.values.credit, 6.4);
+  assert.equal(credit.creditBalance, 271);
+  assert.equal(parsePBOCCreditReport(moneyPublication, creditHtml.replace('271万亿元', '2710000亿元')).creditBalance, 271);
+  assert.throws(() => parsePBOCCreditReport(moneyPublication, creditHtml.replace('271万亿元', '待定万亿元')), /balance/);
   assert.equal(social.values['social-financing'], 8.5);
   assert.equal(credit.methodologyFingerprints.credit, PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS.credit);
   assert.equal(social.methodologyFingerprints['social-financing'], PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS['social-financing']);
@@ -137,6 +140,8 @@ test('normalizes both datasets with continuity, official provenance, and overlap
   const credit = normalizePBOCFinancialDataset([creditRaw], creditExisting, 'credit');
   const social = normalizePBOCFinancialDataset([socialRaw], socialExisting, 'social-financing');
   assert.deepEqual(credit.data.at(-1), { date: '2025-11', value: 6.4 });
+  assert.deepEqual(credit.balance.data.at(-1), { date: '2025-11', value: 271 });
+  assert.throws(() => normalizePBOCFinancialDataset([{ ...creditRaw, creditBalance: 272 }], credit, 'credit'), HistoricalMismatchError);
   assert.deepEqual(social.data.at(-1), { date: '2025-11', value: 8.5 });
   assert.equal(credit.sources.some(({ role, coverage }) => role === 'methodology' && coverage === '2023-01 to 2023-12'), true);
   assert.doesNotThrow(() => validatePBOCFinancialDataset(credit, 'credit'));

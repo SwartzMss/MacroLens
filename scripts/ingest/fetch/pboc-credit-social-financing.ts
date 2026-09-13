@@ -66,8 +66,15 @@ export function parsePBOCCreditReport(
     throw new MethodologyMismatchError('PBOC credit scope marker is missing or changed');
   }
   const methodologyFingerprint = validatedFingerprint('credit', canonical);
+  const balances = CREDIT_MARKERS.flatMap(marker => [...canonical.matchAll(
+    new RegExp(`${marker}(?:为|是)?([0-9]+(?:\\.[0-9]+)?)(万亿元|亿元)`, 'g'),
+  )]);
+  if (balances.length !== 1) throw new IngestionContractError('Missing or duplicate credit balance amount');
+  const creditBalance = Number(balances[0][1]) / (balances[0][2] === '亿元' ? 10000 : 1);
+  if (!Number.isFinite(creditBalance) || creditBalance <= 0) throw new IngestionContractError('Invalid credit balance amount');
   return {
     publication,
+    creditBalance,
     values: { credit: parseSignedGrowth(canonical, CREDIT_MARKERS, '') },
     methodologyFingerprints: { ...PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS, credit: methodologyFingerprint },
   };

@@ -64,6 +64,7 @@ export type IndicatorDataset = {
   referenceLabel?: string;
   data: Observation[];
   series?: IndicatorSeries[];
+  balance?: { label: string; unit: string; data: Observation[] };
 };
 
 export type IndicatorDatasetValidationIssue = {
@@ -231,6 +232,16 @@ export function validateIndicatorDataset(input: unknown): IndicatorDataset {
     }
   }
   validateObservationArray(input.data, ['data'], issues);
+  if (input.balance !== undefined) {
+    if (!isRecord(input.balance)) {
+      issues.push({ path: ['balance'], message: 'must be an object' });
+    } else {
+      for (const field of ['label', 'unit']) {
+        if (!isNonEmptyString(input.balance[field])) issues.push({ path: ['balance', field], message: 'must be a non-empty string' });
+      }
+      validateObservationArray(input.balance.data, ['balance', 'data'], issues);
+    }
+  }
   if (input.series !== undefined) {
     if (!Array.isArray(input.series)) {
       issues.push({ path: ['series'], message: 'must be an array' });
