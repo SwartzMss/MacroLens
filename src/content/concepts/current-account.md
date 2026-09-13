@@ -1,12 +1,13 @@
 ---
 id: current-account
 name: 经常账户
+intro: "经常账户是国际收支的一部分，由货物和服务、初次收入、二次收入组成。它不是“出口减进口”的完整同义词。"
 subtitle: 汇总货物和服务、初次收入与二次收入的跨境交易流量
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [balance-of-payments, financial-account, cross-border-capital-flows, exchange-rate]
 graph: macro
 order: 2
@@ -15,8 +16,6 @@ topics: [balance-of-payments]
 prerequisites: [balance-of-payments]
 featured: false
 ---
-
-> 经常账户是国际收支的一部分，由货物和服务、初次收入、二次收入组成。它不是“出口减进口”的完整同义词。
 
 ## 三个组成部分
 

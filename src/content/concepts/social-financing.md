@@ -1,6 +1,7 @@
 ---
 id: social-financing
 name: 社会融资规模
+intro: "社融可以简单理解为：把实体经济通过贷款、债券、股票等金融渠道获得的融资放在一起看。 它比只看银行贷款更全面。"
 subtitle: 贷款之外还有债券和股票融资，一起看实体经济如何获得资金
 country: CN
 category: credit
@@ -9,7 +10,7 @@ chart: social-financing
 definition:
   source: 中国人民银行
   asOf: 2025-08
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 related: [credit, m2, lpr]
 graph: macro
 order: 5
@@ -18,8 +19,6 @@ topics: [credit-financing]
 prerequisites: [credit]
 featured: true
 ---
-
-> **社融可以简单理解为：把实体经济通过贷款、债券、股票等金融渠道获得的融资放在一起看。** 它比只看银行贷款更全面。
 
 ## 一个简单例子：企业扩建的钱从哪里来？
 

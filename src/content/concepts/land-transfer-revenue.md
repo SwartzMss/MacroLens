@@ -1,12 +1,13 @@
 ---
 id: land-transfer-revenue
 name: 国有土地使用权出让收入
+intro: "国有土地使用权出让收入是政府按规定收取并核算的土地出让财政收入，属于政府性基金预算收入。它与土地成交价款、土地交易额、房地产开发投资和税收收入不是同一个统计对象。"
 subtitle: 列入政府性基金预算的土地出让财政收入，不等于土地成交价款或土地交易额
 country: CN
 category: fiscal
 source: 财政部政府性基金预算资料
 definition: { source: 财政部, asOf: '2026-09' }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [local-government-finance, land-market, fiscal-revenue, local-government-debt]
 graph: macro
 order: 9
@@ -15,8 +16,6 @@ topics: [local-government-finance]
 prerequisites: [local-government-finance]
 featured: false
 ---
-
-> 国有土地使用权出让收入是政府按规定收取并核算的土地出让财政收入，属于政府性基金预算收入。它与土地成交价款、土地交易额、房地产开发投资和税收收入不是同一个统计对象。
 
 ## 预算归属
 

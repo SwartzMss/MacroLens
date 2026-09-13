@@ -1,12 +1,13 @@
 ---
 id: policy-rate
 name: 政策利率
+intro: "政策利率是央行引导市场利率的一个起点。它可以影响银行资金成本，再传到贷款定价，但不是你贷款合同上直接采用的最终利率。"
 subtitle: 央行传递利率调控信号的基准，不是 LPR 或每笔贷款的成交利率
 country: CN
 category: policy
 source: 中国人民银行货币政策执行报告
 definition: { source: 中国人民银行, asOf: 2025-Q1 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [monetary-policy, lpr, omo, credit]
 graph: macro
 chart: policy-rate

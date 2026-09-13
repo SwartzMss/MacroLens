@@ -1,12 +1,13 @@
 ---
 id: real-interest-rate
 name: 实际利率
+intro: "实际利率试图衡量利息收入或融资成本扣除物价变化后的购买力回报。必须说明名义利率、通胀指标、期限以及使用预期还是实现通胀。"
 subtitle: 剔除通胀后的利率概念，必须说明预期或实现通胀及匹配期限
 country: CN
 category: markets
 source: 中国人民银行与国际货币基金组织
 definition: { source: Fisher relation and official monetary-policy usage, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [government-bond-yield, yield-curve, policy-rate, cpi]
 graph: macro
 order: 4
@@ -15,8 +16,6 @@ topics: [prices-inflation,monetary-transmission,market-rates]
 prerequisites: [cpi]
 featured: false
 ---
-
-> 实际利率试图衡量利息收入或融资成本扣除物价变化后的购买力回报。必须说明名义利率、通胀指标、期限以及使用预期还是实现通胀。
 
 ## 费雪关系与常用近似
 

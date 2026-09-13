@@ -1,12 +1,13 @@
 ---
 id: yield-curve
 name: 收益率曲线
+intro: "收益率曲线描述同一币种、相近信用和其他条件下，不同期限与收益率之间的关系，也称利率期限结构。比较前必须先确认债券品种和曲线类型。"
 subtitle: 把可比债券的期限与收益率连接起来，曲线形态不是单一经济预测
 country: CN
 category: markets
 source: 中央国债登记结算有限责任公司
 definition: { source: 中债收益率曲线编制说明, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [government-bond-yield, real-interest-rate, credit-spread, policy-rate]
 graph: macro
 order: 3
@@ -15,8 +16,6 @@ topics: [market-rates]
 prerequisites: []
 featured: false
 ---
-
-> 收益率曲线描述同一币种、相近信用和其他条件下，不同期限与收益率之间的关系，也称利率期限结构。比较前必须先确认债券品种和曲线类型。
 
 ## 三种常见曲线
 

@@ -1,11 +1,12 @@
 ---
 id: inflation-expectations
 name: 通胀预期
+intro: "通胀预期是家庭、企业、专业预测者或金融市场对未来价格增长的判断；它可能影响今天的定价和决策，但它本身不是已经发生的通胀，也不是一条保证实现的预测。"
 subtitle: 对未来价格增长的前瞻性判断，不是可以直接观测到的单一事实
 country: CN
 category: inflation
 source: 中国人民银行与国际货币基金组织
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 definition: { source: 中国人民银行与国际货币基金组织, asOf: 2026-08 }
 related: [cpi, core-cpi, real-interest-rate, phillips-curve]
 graph: macro
@@ -15,8 +16,6 @@ topics: [prices-inflation]
 prerequisites: [cpi]
 featured: false
 ---
-
-> 通胀预期是家庭、企业、专业预测者或金融市场对未来价格增长的判断；它可能影响今天的定价和决策，但它本身不是已经发生的通胀，也不是一条保证实现的预测。
 
 ## 预期是什么、不是什么
 

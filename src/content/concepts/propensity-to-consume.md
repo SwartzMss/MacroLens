@@ -1,12 +1,13 @@
 ---
 id: propensity-to-consume
 name: 消费倾向
+intro: "消费倾向是把消费与可支配收入联系起来的比例或边际响应。它回答“收入中有多少用于消费”或“收入变化一单位时消费如何变化”，不是消费水平本身。"
 subtitle: 消费相对于可支配收入的比例或增量响应，不是消费水平本身
 country: CN
 category: growth
 source: 国家统计局与宏观经济学定义
 definition: { source: household consumption and disposable income concepts, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [household-consumption, disposable-income, household-saving-rate, income-expectations]
 graph: macro
 order: 15
@@ -15,8 +16,6 @@ topics: [household-sector,economic-activity]
 prerequisites: [household-consumption]
 featured: false
 ---
-
-> 消费倾向是把消费与可支配收入联系起来的比例或边际响应。它回答“收入中有多少用于消费”或“收入变化一单位时消费如何变化”，不是消费水平本身。
 
 ## 平均与边际
 

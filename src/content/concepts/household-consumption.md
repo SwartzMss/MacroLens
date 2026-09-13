@@ -1,12 +1,13 @@
 ---
 id: household-consumption
 name: 居民消费支出
+intro: "居民消费支出是常住住户为直接满足生活需要而消费货物和服务的支出。居民人均消费支出是把住户调查中的消费支出平均到居民后的指标，不能和某个商贸流量或单个家庭支出混为一谈。"
 subtitle: 住户消费货物与服务的支出指标，不能与社会消费品零售总额互换
 country: CN
 category: growth
 source: 国家统计局住户调查与国民经济核算
 definition: { source: 国家统计局居民收支调查与国民经济核算, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [disposable-income, income-expectations, retail-sales, cpi, gdp]
 graph: macro
 order: 13
@@ -15,8 +16,6 @@ topics: [household-sector,economic-activity]
 prerequisites: [disposable-income,income-expectations]
 featured: false
 ---
-
-> 居民消费支出是常住住户为直接满足生活需要而消费货物和服务的支出。居民人均消费支出是把住户调查中的消费支出平均到居民后的指标，不能和某个商贸流量或单个家庭支出混为一谈。
 
 ## 住户调查与国民账户
 

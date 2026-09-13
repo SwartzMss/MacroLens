@@ -1,11 +1,12 @@
 ---
 id: phillips-curve
 name: 菲利普斯曲线
+intro: "菲利普斯曲线用来研究就业、需求的松紧与通胀之间的联系。经济更忙时价格压力可能增加，但供给冲击和预期会改变这种关系。"
 subtitle: 通胀与经济松弛之间的经验关系，不是固定不变的自然规律
 country: CN
 category: inflation
 source: 经济学文献与国际货币基金组织
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 definition: { source: 国际货币基金组织, asOf: 2026-08 }
 related: [cpi, core-cpi, inflation-expectations, output-gap, unemployment-rate]
 graph: macro

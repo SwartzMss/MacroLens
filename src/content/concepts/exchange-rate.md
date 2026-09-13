@@ -1,12 +1,13 @@
 ---
 id: exchange-rate
 name: 汇率
+intro: "汇率是一种货币用另一种货币表示的价格。讨论“升值”或“贬值”前，必须先说清货币对和报价方向。"
 subtitle: 两种货币之间的相对价格，方向判断必须先看报价约定
 country: CN
 category: exchange
 source: 中国人民银行与中国外汇交易中心
 definition: { source: 中国人民银行、中国外汇交易中心, asOf: '2026' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [rmb-exchange-rate-regime, usd-cny, cfets-rmb-index, foreign-exchange-reserves, cpi]
 graph: macro
 order: 1
@@ -15,8 +16,6 @@ topics: [exchange-rates,balance-of-payments]
 prerequisites: []
 featured: false
 ---
-
-> 汇率是一种货币用另一种货币表示的价格。讨论“升值”或“贬值”前，必须先说清货币对和报价方向。
 
 ## 基础货币与报价货币
 

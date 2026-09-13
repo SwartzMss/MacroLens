@@ -1,12 +1,13 @@
 ---
 id: working-age-population
 name: 劳动年龄人口
+intro: "劳动年龄人口是按年龄范围定义的人口分母，不等于劳动力，也不等于就业人口。"
 subtitle: 按年龄范围定义的劳动力统计分母，不等于劳动力或就业人口
 country: CN
 category: labor
 source: 国家统计局与国际劳工组织
 definition: { source: NBS labor statistics and ILOSTAT labor-force definitions, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [labor-force-participation, employment, demographic-dependency-ratio, labor-supply]
 graph: macro
 order: 6
@@ -15,8 +16,6 @@ topics: [structural-growth,labor-market]
 prerequisites: []
 featured: false
 ---
-
-> 劳动年龄人口是按年龄范围定义的人口分母，不等于劳动力，也不等于就业人口。
 
 ## 年龄分母与劳动力
 

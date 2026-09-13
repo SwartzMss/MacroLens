@@ -1,12 +1,13 @@
 ---
 id: trade-balance
 name: 贸易差额
+intro: "在相同范围和时期内，出口减进口就是贸易差额。出口更多叫顺差，进口更多叫逆差；读数前要分清只算货物，还是还包括服务。"
 subtitle: 在明确货物、服务及统计口径后计算的出口减进口差额，不等同经常账户余额
 country: CN
 category: external
 source: 海关总署、国家外汇管理局与国际货币基金组织
 definition: { source: 海关统计、SAFE 与 IMF BPM6, asOf: 2026-09 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [exports, imports, current-account, trade-volume-and-price]
 graph: macro
 order: 8

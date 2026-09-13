@@ -1,11 +1,12 @@
 ---
 id: price-transmission
 name: 价格传导
+intro: "价格传导描述冲击如何从上游投入、汇率或需求变化，经过企业成本和市场定价行为，逐步影响下游商品与服务价格；它有方向但没有固定比例和固定速度。"
 subtitle: 上游成本与其他冲击经过时间和市场结构传递到下游价格的过程
 country: CN
 category: inflation
 source: 国家统计局价格统计与宏观经济学文献
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 definition: { source: 国家统计局与国际货币基金组织, asOf: 2026-08 }
 related: [ppi, cpi, core-cpi, exchange-rate, wages]
 graph: macro
@@ -15,8 +16,6 @@ topics: [prices-inflation]
 prerequisites: [cpi, ppi]
 featured: false
 ---
-
-> 价格传导描述冲击如何从**上游**投入、汇率或需求变化，经过企业成本和市场定价行为，逐步影响**下游**商品与服务价格；它有方向但没有固定比例和固定速度。
 
 ## 从上游到下游的链条
 

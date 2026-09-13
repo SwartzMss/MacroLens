@@ -1,12 +1,13 @@
 ---
 id: output-gap
 name: 产出缺口
+intro: "产出缺口描述实际产出相对潜在产出的偏离，用于判断经济闲置或需求压力；潜在产出无法直接观测，所以它始终是模型估计，不是另一套 GDP 统计。"
 subtitle: 实际产出相对潜在产出的估计偏离，不是直接观测的官方 GDP 指标
 country: CN
 category: growth
 source: 国际货币基金组织与国家统计局
 definition: { source: IMF output-gap methodology and NBS GDP, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [gdp, potential-output, capacity-utilization, unemployment-rate, cpi]
 graph: macro
 order: 6
@@ -15,8 +16,6 @@ topics: [economic-activity,structural-growth]
 prerequisites: [potential-output]
 featured: false
 ---
-
-> 产出缺口描述实际产出相对潜在产出的偏离，用于判断经济闲置或需求压力；潜在产出无法直接观测，所以它始终是模型估计，不是另一套 GDP 统计。
 
 ## 定义与符号
 

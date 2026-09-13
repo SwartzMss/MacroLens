@@ -1,12 +1,13 @@
 ---
 id: government-debt
 name: 政府债务
+intro: "政府债务余额是某个时点尚未偿还的债务存量。新发行、偿还本金和利息支出都是期间流量，不能与债务余额混用。"
 subtitle: 政府尚未偿还的债务存量，不等于某一时期的新发行或财政赤字
 country: CN
 category: fiscal
 source: 财政部与全国人民代表大会预算报告
 definition: { source: 财政部、全国人民代表大会, asOf: '2025' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [fiscal-policy, fiscal-deficit, fiscal-revenue, fiscal-expenditure, social-financing]
 graph: macro
 order: 5
@@ -15,8 +16,6 @@ topics: [fiscal-policy]
 prerequisites: []
 featured: false
 ---
-
-> 政府债务余额是某个时点尚未偿还的债务存量。新发行、偿还本金和利息支出都是期间流量，不能与债务余额混用。
 
 ## 中国官方显性政府债务
 

@@ -1,12 +1,13 @@
 ---
 id: core-cpi
 name: 核心 CPI
+intro: "中国月度价格发布中常见的核心 CPI，指扣除食品和能源价格后的居民消费价格指数，用来降低高波动项目对总体趋势的遮蔽。"
 subtitle: 扣除食品和能源后，观察更稳定的消费价格压力
 country: CN
 category: inflation
 source: 国家统计局居民消费价格月度发布
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [cpi, ppi, pmi]
 graph: macro
 order: 2
@@ -15,8 +16,6 @@ topics: [prices-inflation]
 prerequisites: [cpi]
 featured: false
 ---
-
-> 中国月度价格发布中常见的核心 CPI，指扣除食品和能源价格后的居民消费价格指数，用来降低高波动项目对总体趋势的遮蔽。
 
 ## 为什么要扣除食品和能源
 

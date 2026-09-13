@@ -38,7 +38,7 @@ test('external stock pages use external category, stable order, and no charts', 
     assert.equal(parsed.category, 'external');
     assert.equal(parsed.graph, 'macro');
     assert.equal(parsed.order, meta.order);
-    assert.equal(parsed.updatedAt, '2026-08-31');
+    assert.equal(parsed.updatedAt, '2026-09-13');
     assert.equal(Object.hasOwn(parsed, 'chart'), false);
     for (const related of meta.related) assert.ok(files.has(`${related}.md`) || ['external-liabilities'].includes(related), `${id} related ${related} missing`);
   }

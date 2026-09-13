@@ -1,12 +1,13 @@
 ---
 id: imports
 name: 进口
+intro: "进口帮助看从外部买入了多少货物或服务。花的钱更多，可能是买得更多，也可能只是涨价；先确认报道用的是哪种统计范围。"
 subtitle: 货物或服务自境外流入的贸易概念，必须先区分海关统计与国际收支口径
 country: CN
 category: external
 source: 海关总署、国家外汇管理局与国际货币基金组织
 definition: { source: 海关统计、SAFE 与 IMF BPM6, asOf: 2026-09 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [exports, trade-balance, trade-volume-and-price, exchange-rate, current-account]
 graph: macro
 chart: imports

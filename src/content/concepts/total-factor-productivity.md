@@ -1,12 +1,13 @@
 ---
 id: total-factor-productivity
 name: 全要素生产率（TFP）
+intro: "投入更多人力和设备之外，产出为什么还会变化？全要素生产率尝试估计这部分，但结果依赖模型和数据，不能直接当成技术进步的精确读数。"
 subtitle: 在生产函数和投入假设下估计的效率残差，不是直接观测的技术数量
 country: CN
 category: growth
 source: OECD 与国际货币基金组织生产率方法
 definition: { source: OECD productivity and IMF growth-accounting methodology, asOf: 2026-08 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [productivity, potential-output, gdp]
 graph: macro
 order: 8

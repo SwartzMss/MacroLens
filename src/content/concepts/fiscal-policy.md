@@ -1,12 +1,13 @@
 ---
 id: fiscal-policy
 name: 财政政策
+intro: "政府通过税费、公共支出和转移支付等安排，影响公共服务、收入分配和经济活动。它既包括收多少钱，也包括钱怎么花、何时花。"
 subtitle: 政府通过收入、支出、转移支付与融资安排履行公共职能并影响经济运行
 country: CN
 category: fiscal
 source: 中华人民共和国预算法与财政部预算报告
 definition: { source: 全国人民代表大会、财政部, asOf: '2026' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [fiscal-revenue, fiscal-expenditure, fiscal-deficit, government-debt, monetary-policy, gdp]
 graph: macro
 order: 1

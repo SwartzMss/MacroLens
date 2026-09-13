@@ -1,12 +1,13 @@
 ---
 id: industrial-production
 name: 规模以上工业增加值
+intro: "规模以上工业增加值衡量统计范围内工业企业生产活动新增价值的变化，不代表整个工业部门，更不代表整个经济。"
 subtitle: 观察规模以上工业企业生产活动最终成果的月度实际增速
 country: CN
 category: growth
 source: 国家统计局工业生产月度发布
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [pmi, ppi, gdp, fixed-asset-investment]
 chart: industrial-production
 graph: macro
@@ -16,8 +17,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: false
 ---
-
-> 规模以上工业增加值衡量统计范围内工业企业生产活动新增价值的变化，不代表整个工业部门，更不代表整个经济。
 
 ## “规模以上”是什么
 

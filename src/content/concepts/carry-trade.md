@@ -1,12 +1,13 @@
 ---
 id: carry-trade
 name: 套息交易
+intro: "套息交易的基本结构是借入低息货币、投资高收益资产，但正利差不是免费的确定回报。"
 subtitle: 借入低息货币并投资高收益资产的跨货币头寸，收益取决于利差与汇率等风险
 country: CN
 category: exchange
 source: 国际清算银行与国际货币基金组织
 definition: { source: BIS international banking and carry-trade analysis, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [interest-rate-parity, exchange-rate, cross-border-capital-flows, usd-cnh]
 graph: macro
 order: 9
@@ -15,8 +16,6 @@ topics: [exchange-rates,balance-of-payments]
 prerequisites: [interest-rate-parity]
 featured: false
 ---
-
-> 套息交易的基本结构是借入低息货币、投资高收益资产，但正利差不是免费的确定回报。
 
 ## 头寸结构
 

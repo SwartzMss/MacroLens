@@ -1,12 +1,13 @@
 ---
 id: fixed-asset-investment
 name: 固定资产投资（不含农户）
+intro: "建厂房、修设施、购置设备等投入，可以用固定资产投资来观察。本页图表看年初至当期累计增长多少，不是单独这个月增长多少。"
 subtitle: 以累计同比观察建设和购置固定资产活动，不能当作单月投资增速
 country: CN
 category: growth
 source: 国家统计局投资统计月度发布
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [gdp, industrial-production, credit, social-financing]
 chart: fixed-asset-investment
 graph: macro

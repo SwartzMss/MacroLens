@@ -1,12 +1,13 @@
 ---
 id: fiscal-revenue
 name: 财政收入
+intro: "本页“财政收入”主要指全国一般公共预算收入。这是重要的官方统计口径，但不等于全部政府收入，也不等于政府当期可支配的所有资金。"
 subtitle: 本页以全国一般公共预算收入为核心，观察政府依法取得的预算资金
 country: CN
 category: fiscal
 source: 中华人民共和国财政部国库司
 definition: { source: 财政部, asOf: '2025' }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [fiscal-policy, fiscal-expenditure, fiscal-deficit, government-debt]
 graph: macro
 order: 2
@@ -15,8 +16,6 @@ topics: [fiscal-policy]
 prerequisites: []
 featured: false
 ---
-
-> 本页“财政收入”主要指全国一般公共预算收入。这是重要的官方统计口径，但不等于全部政府收入，也不等于政府当期可支配的所有资金。
 
 ## 一般公共预算收入是什么
 

@@ -1,12 +1,13 @@
 ---
 id: trade-volume-and-price
 name: 贸易数量与价格拆分
+intro: "贸易金额是价格和数量共同作用的名义结果。要判断外贸增长究竟来自卖得更多、价格更高，还是商品结构变化，必须把金额、数量和价格指数放在各自口径中阅读。"
 subtitle: 把进出口金额变化拆解为数量和价格变化的分析框架
 country: CN
 category: external
 source: 国家统计局、国家外汇管理局与国际货币基金组织
 definition: { source: 国民经济核算、SAFE 与 IMF BPM6, asOf: 2026-09 }
-updatedAt: 2026-09-02
+updatedAt: 2026-09-13
 related: [exports, imports, trade-balance, terms-of-trade, current-account]
 graph: macro
 order: 9
@@ -15,8 +16,6 @@ topics: [balance-of-payments]
 prerequisites: [exports, imports]
 featured: false
 ---
-
-> 贸易金额是价格和数量共同作用的名义结果。要判断外贸增长究竟来自卖得更多、价格更高，还是商品结构变化，必须把金额、数量和价格指数放在各自口径中阅读。
 
 ## 三个维度
 

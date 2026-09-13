@@ -1,12 +1,13 @@
 ---
 id: rmb-exchange-rate-regime
 name: 人民币汇率形成机制
+intro: "人民币实行以市场供求为基础、参考一篮子货币进行调节、有管理的浮动汇率制度。它既不是机械盯住美元，也不是没有制度边界的完全自由浮动。"
 subtitle: 以市场供求为基础、参考一篮子货币进行调节的有管理浮动框架
 country: CN
 category: exchange
 source: 中国人民银行
 definition: { source: 中国人民银行, asOf: 2025-Q4 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, usd-cny, cfets-rmb-index, foreign-exchange-reserves, monetary-policy]
 graph: macro
 order: 2
@@ -15,8 +16,6 @@ topics: [exchange-rates]
 prerequisites: []
 featured: false
 ---
-
-> 人民币实行以市场供求为基础、参考一篮子货币进行调节、有管理的浮动汇率制度。它既不是机械盯住美元，也不是没有制度边界的完全自由浮动。
 
 ## 制度框架与每日方向
 

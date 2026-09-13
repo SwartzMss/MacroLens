@@ -1,12 +1,13 @@
 ---
 id: government-bond-yield
 name: 国债收益率
+intro: "买国债的价格和未来收到的利息、本金，共同决定收益率。同一笔未来现金流，买入价格越高，对应收益率越低。"
 subtitle: 由债券价格和现金流共同决定的市场贴现率，不是票面利率或债券价格
 country: CN
 category: markets
 source: 财政部与中央国债登记结算有限责任公司
 definition: { source: 财政部-中国国债收益率曲线编制说明, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [yield-curve, real-interest-rate, credit-spread, government-debt]
 graph: macro
 order: 2

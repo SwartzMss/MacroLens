@@ -1,0 +1,14 @@
+---
+interface Props { conceptId: string; intro: string }
+const { conceptId, intro } = Astro.props;
+---
+<section class="concept-entry" id={`${conceptId}-start`} aria-labelledby={`${conceptId}-start-title`}>
+  <h2 id={`${conceptId}-start-title`}>先理解</h2>
+  <p>{intro}</p>
+</section>
+<style>
+  .concept-entry{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:20px 24px;margin-bottom:28px}
+  .concept-entry h2{color:var(--green);font-size:14px;line-height:1.5;margin:0 0 10px}
+  .concept-entry p{font-size:16px;line-height:1.8;margin:0}
+  @media(max-width:760px){.concept-entry{padding:18px}}
+</style>

@@ -1,12 +1,13 @@
 ---
 id: retail-sales
 name: 社会消费品零售总额
+intro: "社零帮助观察商品零售和餐饮卖了多少钱。它是了解消费的一扇窗口，但没有涵盖居民的全部服务消费，也不只统计居民购买。"
 subtitle: 商品零售与餐饮收入的市场规模指标，不等同于居民消费总支出
 country: CN
 category: growth
 source: 国家统计局贸易外经统计月度发布
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-08-30
+updatedAt: 2026-09-13
 related: [gdp, cpi, core-cpi, credit]
 chart: retail-sales
 graph: macro

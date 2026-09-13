@@ -1,12 +1,13 @@
 ---
 id: net-foreign-assets
 name: 对外净资产 / 净国际投资头寸
+intro: "对外净资产 = 对外金融资产减去对外负债。在 IIP 语境下，这个净额就是净国际投资头寸（net IIP）：正值为净资产，负值为净负债。"
 subtitle: 对外金融资产减去对外负债的净头寸视角，不是国民财富总量
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 国际投资头寸与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [international-investment-position, external-liabilities, balance-of-payments]
 graph: macro
 order: 10
@@ -15,8 +16,6 @@ topics: [external-balance-sheets]
 prerequisites: [international-investment-position]
 featured: false
 ---
-
-> 对外净资产 = 对外金融资产减去对外负债。在 IIP 语境下，这个净额就是净国际投资头寸（net IIP）：正值为净资产，负值为净负债。
 
 ## 它从哪里来
 

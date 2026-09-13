@@ -1,12 +1,13 @@
 ---
 id: labor-force-participation
 name: 劳动参与率
+intro: "劳动参与率衡量劳动年龄人口中有工作或正在积极求职并能够工作的人所占比重。劳动力 = 就业人口 + 失业人口。"
 subtitle: 劳动力占劳动年龄人口的比重，连接就业、失业与退出劳动力市场
 country: CN
 category: labor
 source: 国家统计局与国际劳工组织
 definition: { source: 国家统计局劳动力调查制度与 ILOSTAT, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [employment, unemployment-rate, youth-unemployment, wages]
 graph: macro
 order: 4
@@ -15,8 +16,6 @@ topics: [labor-market]
 prerequisites: []
 featured: false
 ---
-
-> 劳动参与率衡量劳动年龄人口中有工作或正在积极求职并能够工作的人所占比重。劳动力 = 就业人口 + 失业人口。
 
 ## 分子和分母
 

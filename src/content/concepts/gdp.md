@@ -1,12 +1,13 @@
 ---
 id: gdp
 name: 国内生产总值（GDP）
+intro: "GDP 可以简单理解为：一段时间里，一个经济体新生产了多少商品和服务。 它帮助看经济规模和增长，统计时会避免把同一份价值重复相加。"
 subtitle: 一段时间里生产了多少商品和服务，经济增长得多快
 country: CN
 category: growth
 source: 国家统计局国民经济核算
 definition: { source: 国家统计局, asOf: 2025-Q3 }
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 related: [pmi, industrial-production, retail-sales, fixed-asset-investment, cpi]
 chart: gdp
 graph: macro
@@ -16,8 +17,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: true
 ---
-
-> **GDP 可以简单理解为：一段时间里，一个经济体新生产了多少商品和服务。** 它帮助看经济规模和增长，统计时会避免把同一份价值重复相加。
 
 ## 一个简单例子：面包的价值怎么算？
 

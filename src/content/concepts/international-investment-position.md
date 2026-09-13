@@ -1,12 +1,13 @@
 ---
 id: international-investment-position
 name: 国际投资头寸
+intro: "国际投资头寸（IIP）是居民在某一时点持有的对外金融资产和对外负债存量，回答“期末持有什么”，不是一段期间发生了多少交易。"
 subtitle: 居民对外金融资产与负债在某一时点的存量表
 country: CN
 category: external
 source: 国家外汇管理局与国际货币基金组织
 definition: { source: SAFE 与 IMF BPM6, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [balance-of-payments, external-debt, reserve-assets, net-foreign-assets]
 graph: macro
 order: 6
@@ -15,8 +16,6 @@ topics: [balance-of-payments,external-balance-sheets]
 prerequisites: [balance-of-payments]
 featured: false
 ---
-
-> 国际投资头寸（IIP）是居民在某一时点持有的对外金融资产和对外负债存量，回答“期末持有什么”，不是一段期间发生了多少交易。
 
 ## 存量与流量
 

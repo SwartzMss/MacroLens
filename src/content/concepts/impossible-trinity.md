@@ -1,12 +1,13 @@
 ---
 id: impossible-trinity
 name: 不可能三角
+intro: "不可能三角是分析框架，不是要求经济体只能选择三个角中的两个的机械规则。"
 subtitle: 货币政策自主性、汇率稳定与资本流动自由之间的开放经济权衡
 country: CN
 category: exchange
 source: 国际货币基金组织与中国人民银行
 definition: { source: IMF open-economy policy framework, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [capital-controls, rmb-exchange-rate-regime, exchange-rate-formation, interest-rate-parity]
 graph: macro
 order: 6
@@ -15,8 +16,6 @@ topics: [exchange-rates]
 prerequisites: []
 featured: false
 ---
-
-> 不可能三角是分析框架，不是要求经济体只能选择三个角中的两个的机械规则。
 
 ## 三个维度
 

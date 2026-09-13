@@ -1,12 +1,13 @@
 ---
 id: youth-unemployment
 name: 青年失业率 / 分年龄组失业率
+intro: "青年失业率看的是参加劳动市场的青年中，有多少人失业。它不是所有青年中没工作的人所占比例，比较时还要核对年龄和在校学生范围。"
 subtitle: 观察不同年龄劳动力的失业状况，必须先确认年龄分组和在校生口径
 country: CN
 category: labor
 source: 国家统计局
 definition: { source: 国家统计局分年龄组调查失业率说明, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [unemployment-rate, employment, labor-force-participation, wages]
 graph: macro
 order: 3

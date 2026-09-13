@@ -1,12 +1,13 @@
 ---
 id: foreign-exchange-reserves
 name: 外汇储备
+intro: "外汇储备是官方储备资产中的外币资产存量，通常按月末时点公布。余额变化不是单纯的资金流量，更不能直接一对一等同于汇率干预。"
 subtitle: 官方持有的外币储备资产存量，月度变化同时包含交易与估值影响
 country: CN
 category: exchange
 source: 国家外汇管理局
 definition: { source: 国家外汇管理局, asOf: 2026-07 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, rmb-exchange-rate-regime, usd-cny, cfets-rmb-index, monetary-policy]
 graph: macro
 order: 5
@@ -15,8 +16,6 @@ topics: [exchange-rates,external-balance-sheets]
 prerequisites: []
 featured: false
 ---
-
-> 外汇储备是官方储备资产中的外币资产存量，通常按月末时点公布。余额变化不是单纯的资金流量，更不能直接一对一等同于汇率干预。
 
 ## 存量与月度变化
 

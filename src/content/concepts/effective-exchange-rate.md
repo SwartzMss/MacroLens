@@ -1,12 +1,13 @@
 ---
 id: effective-exchange-rate
 name: 有效汇率（NEER / REER）
+intro: "有效汇率把一种货币与多个贸易伙伴的货币放在一起比较；实际有效汇率还考虑物价差异，帮助观察变化是否仅仅来自汇率。"
 subtitle: 汇总本币相对一篮子货币变化的多边指数，并可进一步纳入相对价格
 country: CN
 category: external
 source: 国际清算银行与中国外汇交易中心
 definition: { source: BIS effective exchange rates methodology, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [exchange-rate, usd-cny, cfets-rmb-index, current-account]
 graph: macro
 order: 5

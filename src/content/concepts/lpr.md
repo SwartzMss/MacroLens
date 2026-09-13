@@ -1,6 +1,7 @@
 ---
 id: lpr
 name: 贷款市场报价利率（LPR）
+intro: "LPR 可以简单理解为：银行给贷款定价时使用的一把参考尺。 你的实际贷款利率，还要看合同约定的加减点和调整时间。"
 subtitle: 贷款定价的参考尺，实际利率还要看合同约定
 country: CN
 category: credit
@@ -9,7 +10,7 @@ definition:
   source: 中国人民银行
   effectiveFrom: 2019-08
   asOf: 2026-08
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 chart: lpr
 related: [policy-rate, monetary-policy, credit]
 graph: macro
@@ -19,8 +20,6 @@ topics: [credit-financing,monetary-transmission,market-rates]
 prerequisites: [policy-rate]
 featured: false
 ---
-
-> **LPR 可以简单理解为：银行给贷款定价时使用的一把参考尺。** 你的实际贷款利率，还要看合同约定的加减点和调整时间。
 
 ## 一个简单例子：参考利率不是成交利率
 

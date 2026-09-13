@@ -1,12 +1,13 @@
 ---
 id: credit-spread
 name: 信用利差
+intro: "信用利差是信用债收益率相对明确基准收益率的差额。没有基准曲线、期限和债券范围，就没有可复现的“信用利差”。"
 subtitle: 信用债收益率相对可比基准的差额，不只反映违约风险
 country: CN
 category: markets
 source: 中央国债登记结算有限责任公司
 definition: { source: 中债收益率曲线与估值方法, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [government-bond-yield, yield-curve, real-interest-rate, credit]
 graph: macro
 order: 5
@@ -15,8 +16,6 @@ topics: [credit-financing,market-rates]
 prerequisites: []
 featured: false
 ---
-
-> 信用利差是信用债收益率相对明确基准收益率的差额。没有基准曲线、期限和债券范围，就没有可复现的“信用利差”。
 
 ## 基本计算
 

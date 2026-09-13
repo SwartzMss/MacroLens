@@ -1,12 +1,13 @@
 ---
 id: property-sales
 name: 商品房销售
+intro: "商品房销售是交易流量；面积、金额和价格是不同统计量。国家统计局的商品房销售面积是房地产开发企业出售新建商品房的合同总面积，不是所有住房交易的面积。"
 subtitle: 分开阅读新建商品房销售面积、销售额和合同口径，不能混入二手房交易
 country: CN
 category: housing
 source: 国家统计局房地产统计
 definition: { source: 国家统计局商品房销售统计, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [real-estate-investment, house-price-index, mortgage, economic-activity]
 graph: macro
 order: 2
@@ -15,8 +16,6 @@ topics: [housing-market]
 prerequisites: []
 featured: false
 ---
-
-> 商品房销售是交易流量；面积、金额和价格是不同统计量。国家统计局的商品房销售面积是房地产开发企业出售新建商品房的合同总面积，不是所有住房交易的面积。
 
 ## 面积、金额与隐含均价
 

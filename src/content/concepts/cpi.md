@@ -1,12 +1,13 @@
 ---
 id: cpi
 name: 居民消费价格指数（CPI）
+intro: "CPI 可以简单理解为：居民日常购买的商品和服务，整体变贵了还是变便宜了。 它把吃饭、衣着、交通等消费放进一个有不同权重的“购物篮”。"
 subtitle: 日常购买的商品和服务，整体变贵了还是变便宜了
 country: CN
 category: inflation
 source: 国家统计局居民消费价格月度发布与价格统计方法
 definition: { source: 国家统计局, asOf: 2025-10 }
-updatedAt: 2026-09-12
+updatedAt: 2026-09-13
 related: [core-cpi, ppi, pmi, m2]
 graph: macro
 order: 1
@@ -15,8 +16,6 @@ topics: [prices-inflation]
 prerequisites: []
 featured: false
 ---
-
-> **CPI 可以简单理解为：居民日常购买的商品和服务，整体变贵了还是变便宜了。** 它把吃饭、衣着、交通等消费放进一个有不同权重的“购物篮”。
 
 ## 一个简单例子：菜价涨了，为什么 CPI 涨得不多？
 

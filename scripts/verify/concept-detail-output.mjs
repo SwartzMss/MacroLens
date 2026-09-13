@@ -13,8 +13,14 @@ for (const item of readdirSync(directory, { withFileTypes: true })) {
   for (const id of links) assert.ok(ids.has(id), `${item.name}: missing anchor ${id}`);
   const dataPosition = html.indexOf(`id="${item.name}-data"`);
   const detailPosition = html.indexOf(`id="${item.name}-detail"`);
+  const entryPosition = html.indexOf(`id="${item.name}-start"`);
+  const knowledgePosition = html.indexOf(`id="${item.name}-knowledge"`);
   assert.ok(detailPosition >= 0, `${item.name}: missing article details`);
+  assert.ok(entryPosition >= 0 && entryPosition < detailPosition, `${item.name}: understanding entry must precede article`);
+  assert.equal([...html.matchAll(new RegExp(`id="${item.name}-start"`, 'g'))].length, 1, `${item.name}: duplicate understanding entry`);
+  if (knowledgePosition >= 0) assert.ok(detailPosition < knowledgePosition, `${item.name}: relationship overview must follow article`);
   if (dataPosition >= 0) {
+    assert.ok(entryPosition < dataPosition, `${item.name}: understanding entry must precede data`);
     assert.ok(dataPosition < detailPosition, `${item.name}: data must precede article`);
     assert.ok(html.indexOf('data-chart=') < detailPosition, `${item.name}: chart must precede article`);
     assert.ok(ids.has(`${item.name}-sources`));

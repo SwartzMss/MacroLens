@@ -1,12 +1,13 @@
 ---
 id: leading-indicators
 name: 领先指标
+intro: "“领先”是一项指标相对明确预测目标、领先期和历史样本呈现的经验角色，不是永远领先所有经济活动的固定属性。"
 subtitle: 相对特定经济活动和预测期具有经验领先性的信号角色，不是一条通用序列
 country: CN
 category: growth
 source: 国家统计局与中国人民银行
 definition: { source: 官方指标方法与条件性领先关系, asOf: 2026-08 }
-updatedAt: 2026-08-31
+updatedAt: 2026-09-13
 related: [pmi, credit, social-financing, yield-curve, industrial-production]
 graph: macro
 order: 10
@@ -15,8 +16,6 @@ topics: [economic-activity]
 prerequisites: []
 featured: false
 ---
-
-> “领先”是一项指标相对明确预测目标、领先期和历史样本呈现的经验角色，不是永远领先所有经济活动的固定属性。
 
 ## 常见信号
 
