@@ -42,7 +42,10 @@ featured: false
 - 把住户调查收入与国民经济核算收入不加说明地混用。
 - 只看名义收入，不看实际收入、人口和城乡结构。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：什么是居民人均可支配收入](https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903384.html)
 - [国家统计局：居民人均可支配收入的基础数据来源](https://www.stats.gov.cn/zs/tjws/zytjzbqs/jmrj/202501/t20250121_1958392.html)
+
+</details>

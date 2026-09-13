@@ -43,7 +43,10 @@ featured: false
 - 把招聘职位增加直接当成已经实现的就业增加。
 - 看到“一小时”门槛就把所有就业理解为充分、稳定就业。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：调查失业率统计方法科学规范](https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896011.html)
 - [国家统计局：人口和就业统计常见问题](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902273.html)
+
+</details>

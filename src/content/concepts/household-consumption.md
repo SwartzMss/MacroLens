@@ -38,7 +38,10 @@ featured: false
 - 把名义支出增速当成实际消费数量增速。
 - 把人均指标推广为所有家庭的共同变化。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：五、国民经济核算（16）](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902278.html)
 - [国家统计局：2025年居民收入和消费支出情况](https://www.stats.gov.cn/sj/zxfb/202601/t20260119_1962321.html)
+
+</details>

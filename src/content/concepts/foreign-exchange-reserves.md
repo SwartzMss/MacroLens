@@ -52,8 +52,11 @@ SAFE 提供清晰的官方月度序列，未来适合以“月末存量、十亿
 - 把月度变化额当作月末储备水平。
 - 认为储备和基础货币必须一比一同步变化。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家外汇管理局：官方储备资产](https://www.safe.gov.cn/safe/gfcbzc/)
 - [国家外汇管理局：国家外汇储备规模时间序列](https://www.safe.gov.cn/safe/gjwhcbgm/index.html)
 - [国家外汇管理局：2026年7月末外汇储备规模数据](https://www.safe.gov.cn/safe/2026/0806/27770.html)
+
+</details>

@@ -48,8 +48,11 @@ CNY 通常指境内人民币市场报价，CNH 通常指离岸人民币市场报
 - 认为央行决定每一笔市场成交价。
 - 用一天的升贬值反推制度发生改变。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人民银行：建设现代中央银行制度 更好服务中国式现代化](https://xining.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212553168670/index.html)
 - [中国人民银行：《银行间外汇市场管理规定》](https://www.pbc.gov.cn/zhengwugongkai/attachDir/2025/12/2025122910541412031.pdf)
 - [中国外汇交易中心：人民币汇率中间价发布说明](https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?contentId=384571&mode=open&priority=0)
+
+</details>

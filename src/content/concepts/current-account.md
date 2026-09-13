@@ -45,8 +45,11 @@ featured: false
 - 认为货物顺差必然形成同等规模的经常账户顺差。
 - 认为经常账户顺差必然导致货币升值。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家外汇管理局：国际收支平衡表编制原则与指标说明](https://www.safe.gov.cn/safe/2015/1230/6080.html)
 - [国家外汇管理局：中国国际收支平衡表](https://www.safe.gov.cn/safe/zggjszphb/index.html)
 - [IMF BPM6：Goods and Services、Primary Income、Secondary Income](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

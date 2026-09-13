@@ -43,8 +43,11 @@ featured: false
 - 把调查失业率和登记失业率直接拼成一条时间序列。
 - 认为失业率没有上升就代表就业质量没有恶化。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：调查失业率统计方法科学规范](https://www.stats.gov.cn/sj/sjjd/202302/t20230202_1896011.html)
 - [国家统计局：什么是调查失业率](https://www.stats.gov.cn/zs/tjws/zytjzbqs/tcsyl/202409/t20240910_1956360.html)
 - [国家统计局：调查失业率的计算方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/tcsyl/202411/t20241115_1957491.html)
+
+</details>

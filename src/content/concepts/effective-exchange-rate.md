@@ -59,8 +59,11 @@ BIS 提供语义清晰的人民币 NEER 与 REER 序列，但接入前需要把�
 - 把指数点位差直接称为百分点或货币升贬值幅度。
 - 认为 REER 上升必然造成出口同比例下降。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [BIS Data Portal：Effective exchange rates](https://data.bis.org/topics/EER)
 - [BIS：About exchange rate statistics](https://www.bis.org/statistics/dataportal/exr.htm)
 - [中国外汇交易中心：人民币汇率指数算法说明 v1.4](https://www.chinamoney.com.cn/chinese/zxpl/20211231/2276204.html)
+
+</details>

@@ -48,7 +48,10 @@ featured: false
 - 用支出增速直接预测 GDP 增速。
 - 忽略中央、地方和转移支付之间的执行链条。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [财政部：《2025年财政收支情况》](https://gks.mof.gov.cn/tongjishuju/202601/t20260130_3982923.htm)
 - [财政部：《关于2025年中央和地方预算执行情况与2026年中央和地方预算草案的报告》](https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202603/t20260316_3985331.htm)
+
+</details>

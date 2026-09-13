@@ -36,7 +36,10 @@ featured: false
 - 忽略年龄边界变化后直接比较不同来源的序列。
 - 看到劳动年龄人口增加就断言就业和 GDP 必然增加。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：人口和就业统计常见问题](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902273.html)
 - [ILOSTAT：Labour force participation rate](https://rshiny.ilo.org/dataexplorer18/?lang=en&id=EAP_2WAP_SEX_AGE_RT_A)
+
+</details>

@@ -40,7 +40,10 @@ featured: false
 - 把地方政府债券发行额当作当期财政收入或当期支出。
 - 把 LGFV 企业债务自动计入地方政府法定债务。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人大网：《中华人民共和国预算法》](https://www.npc.gov.cn/rdxwzx/xwzx2026/xwzx2026019/202601/t20260116_451162.html)
 - [财政部：《2025年财政收支情况》](https://gks.mof.gov.cn/tongjishuju/202601/t20260130_3982923.htm)
+
+</details>

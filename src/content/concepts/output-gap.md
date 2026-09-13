@@ -39,7 +39,10 @@ featured: false
 - 正缺口提示需求压力的可能性，不自动证明通胀或经济过热。
 - 修订后的历史估计不能当成决策当时已经掌握的信息。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - IMF，Output Gaps：https://www.imf.org/external/Pubs/FT/fandd/basics/pdf/jahan_output.pdf
 - 国家统计局，数据发布：https://www.stats.gov.cn/sj/zxfb/
+
+</details>

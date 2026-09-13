@@ -31,7 +31,10 @@ PMI新订单是企业回答改善、持平或恶化后汇总的扩散指数，�
 
 本站解释各官方序列及条件性关系，不创建自制综合领先指标。不同指标不能在没有标准化、权重依据和实时数据检验时拼成一个看似精确的总分。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家统计局，采购经理指数方法：https://www.stats.gov.cn/zs/tjws/zytjzbqs/cgzlzs/202501/t20250121_1958396.html
 - 中国人民银行，调查统计司：https://www.pbc.gov.cn/diaochatongjisi/116219/index.html
+
+</details>

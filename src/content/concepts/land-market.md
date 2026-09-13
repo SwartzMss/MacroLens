@@ -33,7 +33,10 @@ featured: false
 
 可分别看供地面积、成交宗数、成交价款、溢价率和出让收入。城市土地政策、地块位置、规划条件、企业拿地能力和地方财政安排会影响这些指标，单月竞拍结果不代表全国房地产景气。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 财政部：《2025年财政收支情况》 https://gks.mof.gov.cn/tongjishuju/202601/t20260130_3982923.htm
 - 财政部：政府性基金预算科目说明 https://yss.mof.gov.cn/xiazaizhongxin/202510/P020251022648527813584.pdf
+
+</details>

@@ -54,7 +54,10 @@ featured: false
 - 忽略久期、流动性和嵌入期权差异。
 - 比较不同曲线提供者的数据，却不记录编制方法。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国债券信息网：国债及其他债券收益率曲线](https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/more?locale=cn_ZH)
 - [中国债券信息网：中债收益率曲线编制说明](https://indices.chinabond.com.cn/cbweb-mn/int/int_yield_syl_doc)
+
+</details>

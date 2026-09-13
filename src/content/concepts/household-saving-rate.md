@@ -45,7 +45,10 @@ featured: false
 - 把银行存款增加全部归因于当期收入未消费。
 - 不区分调查口径与国民经济核算口径。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：五、国民经济核算（16）](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902278.html)
 - [OECD：Household savings forecast](https://www.oecd.org/en/data/indicators/household-savings-forecast.html)
+
+</details>

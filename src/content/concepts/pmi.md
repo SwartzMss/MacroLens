@@ -67,9 +67,12 @@ PMI 观察企业回答的分布，GDP、工业增加值等则衡量实际产出�
 
 非制造业商务活动指数和综合 PMI 产出指数是其他序列，应分别阅读。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：什么是采购经理指数（PMI）](https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903972.html)
 - [国家统计局：采购经理指数编制方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/cgzlzs/202501/t20250121_1958396.html)
 
 图表的具体来源、范围和临界值说明见本页“来源”。
+
+</details>

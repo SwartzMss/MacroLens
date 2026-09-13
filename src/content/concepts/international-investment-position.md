@@ -29,7 +29,10 @@ featured: false
 
 对外金融资产包括直接投资、证券投资、其他投资和储备资产等；对外负债是非居民对本经济体居民的金融债权。资产减负债形成净国际投资头寸，正值表示净资产，负值表示净负债。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家外汇管理局：公布2025年末我国国际投资头寸表 https://www.safe.gov.cn/safe/2026/0327/27298.html
 - IMF：BPM6 https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm
+
+</details>

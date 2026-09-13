@@ -31,7 +31,10 @@ featured: false
 
 资本账户是国际收支的组成部分，和经常账户、金融账户并列。SAFE 的某些汇总标题可能写“资本与金融账户”，阅读时仍应按 BPM6 分拆两个独立账户。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - IMF：BPM6 https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm
 - 国家外汇管理局：国际收支平衡表编制原则与指标说明 https://www.safe.gov.cn/safe/2015/1230/6080.html
+
+</details>

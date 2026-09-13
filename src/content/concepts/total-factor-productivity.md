@@ -38,7 +38,10 @@ TFP 变动还可能吸收产能利用率、规模报酬、资源重新配置、�
 - 忽略生产函数、资本存量和劳动质量假设就比较 TFP 水平。
 - 把 TFP 上升写成某一项技术必然导致的结果。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [OECD：Productivity](https://www.oecd.org/en/topics/productivity.html)
 - [国际货币基金组织：Output Gaps](https://www.imf.org/external/Pubs/FT/fandd/basics/pdf/jahan_output.pdf)
+
+</details>

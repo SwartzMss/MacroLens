@@ -67,7 +67,10 @@ CPI 的正式统计对象是居民购买的一篮子消费品和服务价格的�
 
 它不覆盖所有资产价格，也不是全经济价格指标。PPI 观察工业生产端价格；GDP 平减指数观察国内生产的最终产品与服务价格，两者范围都与 CPI 不同。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：居民消费价格指数（CPI）是如何编制的](https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903757.html)
 - [国家统计局：什么是权数](https://www.stats.gov.cn/zs/tjws/tjbk/202301/t20230101_1912959.html)
+
+</details>

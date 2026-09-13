@@ -29,7 +29,10 @@ featured: false
 
 对外净资产只覆盖对外金融头寸，不包括国内住房、土地、基础设施、人力资本等国内资产，也不等于完整的国家资产负债表。因此它不是直接衡量国民财富的指标。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家外汇管理局：公布2025年末我国国际投资头寸表 https://www.safe.gov.cn/safe/2026/0327/27298.html
 - IMF：BPM6 https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm
+
+</details>

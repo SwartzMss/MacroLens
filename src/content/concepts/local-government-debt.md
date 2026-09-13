@@ -45,8 +45,11 @@ featured: false
 - 把一般债券和专项债券的偿债来源混为一谈。
 - 把 LGFV 企业债务称为地方政府法定债务。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [财政部：2025年和2026年地方政府一般债务余额情况表](https://yss.mof.gov.cn/2026zyczys/202603/t20260324_3986005.htm)
 - [财政部：地方政府债务问题答记者问](https://yss.mof.gov.cn/zhuantilanmu/zfzw/201611/t20161122_2463933.htm)
 - [中国人大网：关于2025年中央和地方预算执行情况与2026年中央和地方预算草案的报告](https://www.npc.gov.cn/npc/c2/c30834/202603/t20260316_453265.html)
+
+</details>

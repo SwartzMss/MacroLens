@@ -29,7 +29,10 @@ featured: false
 
 应区分现货、远期和掉期价格，说明是否套期保值、融资期限、资产信用风险和交易成本。宏观层面的资本流动数据还需要确认统计边界，不能把一种策略概念当成官方单列指标。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际清算银行：Carry trades and exchange rates](https://www.bis.org/publ/work550.htm)
 - [国际货币基金组织：全球金融稳定与资本流动](https://www.imf.org/en/Publications/GFSR)
+
+</details>

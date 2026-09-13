@@ -50,7 +50,10 @@ featured: false
 - 把债券收益率差当成纯粹的市场通胀预测，忽略流动性和风险溢价。
 - 只看预期均值，不看分歧、期限、尾部风险和是否已经反映在合同或价格中。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人民银行：城镇储户问卷调查报告](https://www.pbc.gov.cn/diaochatongjisi/fileDir/resource/cms/2025/03/2025032117142239782.pdf)
 - [国际货币基金组织：Are Household Inflation Expectations De-anchoring?](https://www.imf.org/en/news/articles/2022/05/17/sp05172022-are-household-inflation-expectations-deanchoring)
+
+</details>
