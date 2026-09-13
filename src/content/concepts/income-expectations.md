@@ -38,6 +38,9 @@ featured: false
 - 不注明调查期限、样本和问题形式就比较不同期数。
 - 把收入预期改善解释为消费一定增加。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人民银行：城镇储户问卷调查报告](https://www.pbc.gov.cn/diaochatongjisi/fileDir/resource/cms/2025/03/2025032117142239782.pdf)
+
+</details>

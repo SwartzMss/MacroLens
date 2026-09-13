@@ -29,7 +29,10 @@ USD/CNH 与 USD/CNY 受共同的美元和人民币因素影响，但资金流动
 
 记录序列时应明确是 CNH 还是 CNY、即期还是中间价、观察时区和收盘定义。将两者并列比较可以观察市场分割和联动，但不能把 CNH 当成独立货币或用一个市场的报价替代另一个市场的官方口径。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [香港金融管理局：人民币业务概览](https://www.hkma.gov.hk/eng/key-functions/international-financial-centre/rmb-business/)
 - [中国外汇交易中心：人民币外汇市场](https://www.chinamoney.com.cn/english/)
+
+</details>

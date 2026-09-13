@@ -31,7 +31,10 @@ featured: false
 
 利用率上升可能来自需求改善、供给退出或临时扰动；高位可能支持投资和价格，也可能只是特定行业约束。它不自动等于经济过热，更不能覆盖服务业与全部小微工业企业。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家统计局，工业产能利用率统计指标解释：https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903791.html
 - 国家统计局，2024年四季度全国工业产能利用率：https://www.stats.gov.cn/sj/zxfb/202501/t20250117_1958324.html
+
+</details>

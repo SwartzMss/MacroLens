@@ -50,7 +50,10 @@ featured: false
 - 用事后修订的产出缺口评价当时已经可见的经济松弛。
 - 认为菲利普斯曲线给出“失业率与通胀之间永远存在的精确交换关系”。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际货币基金组织：Managing Expectations: Inflation and Monetary Policy](https://www.elibrary.imf.org/display/book/9798400235801/CH002.xml)
 - [国际货币基金组织：Flattening of the Phillips Curve: Implications for Monetary Policy](https://www.elibrary.imf.org/view/journals/001/2007/076/article-A001-en.xml)
+
+</details>

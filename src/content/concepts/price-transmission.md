@@ -48,7 +48,10 @@ featured: false
 - 看到上游价格上涨就预测终端价格必然同步上涨。
 - 忽略汇率、进口份额和服务价格在不同经济阶段的作用。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际货币基金组织：Pass-Through of Imported Input Prices to Domestic Producer Prices](https://www.imf.org/-/media/websites/imf/imported-full-text-pdf/external/pubs/ft/wp/2016/_wp1623.pdf)
 - [欧洲中央银行：The impact of oil price shocks on euro area inflation](https://www.ecb.europa.eu/press/economic-bulletin/html/eb201607.en.html)
+
+</details>

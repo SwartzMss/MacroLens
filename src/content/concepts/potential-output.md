@@ -37,7 +37,10 @@ featured: false
 
 短期需求不足、库存调整或金融条件变化可能造成周期性走弱；生产率、人口结构和劳动供给趋势变化则可能带来结构性放缓。两者可以同时存在，区分时要结合更长样本、投入指标和估计模型，而不是把所有实际增速下降都归为潜在增长下降。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际货币基金组织：Output Gaps](https://www.imf.org/external/Pubs/FT/fandd/basics/pdf/jahan_output.pdf)
 - [国家统计局：数据发布](https://www.stats.gov.cn/sj/zxfb/)
+
+</details>

@@ -33,7 +33,10 @@ featured: false
 
 销售改善可能影响开发企业资金和开工安排，但传导受库存、融资、土地和预期约束。销售额上升也可能主要来自价格或结构变化，不能机械推出实际建设同步回升。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家统计局：《商品房销售面积和待售面积如何统计》 https://www.stats.gov.cn/zs/tjws/tjzb/202301/t20230101_1903764.html
 - 国家统计局：《2025年全国房地产市场基本情况》 https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962324.html
+
+</details>

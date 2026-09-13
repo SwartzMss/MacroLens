@@ -51,8 +51,11 @@ featured: false
 - 忽略 FOB、CIF、运保费和 BOP 调整带来的可比性问题。
 - 认为贸易条件变化能够机械推出出口数量、增长或福利变化。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [IMF：Compiling and Using Export and Import Price Indices](https://www.elibrary.imf.org/view/journals/001/2002/230/article-A001-en.xml)
 - [IMF：Balance of Payments and International Investment Position Manual, Sixth Edition](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
 - [WTO：Merchandise trade methodology](https://www.wto.org/english/res_e/statis_e/daily_update_e/merch_methodology_e.pdf)
+
+</details>

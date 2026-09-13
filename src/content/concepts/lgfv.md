@@ -42,8 +42,11 @@ LGFV 年度发债额、贷款新增额和偿还额是期间流量；企业债务
 - 把市场估算的隐性债务称为官方地方政府债务余额。
 - 把 LGFV 融资流量与地方政府债务存量直接相加。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家发展改革委：关于进一步规范地方政府投融资平台公司发行债券行为有关问题的通知](https://zfxxgk.ndrc.gov.cn/web/iteminfo.jsp?id=1232)
 - [国务院：关于加强地方政府融资平台公司管理有关问题的通知](https://www.gov.cn/zhengce/content/2010-06/13/content_1942.htm)
 - [财政部：地方政府债务问题答记者问](https://yss.mof.gov.cn/zhuantilanmu/zfzw/201611/t20161122_2463933.htm)
+
+</details>

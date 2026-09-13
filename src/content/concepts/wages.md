@@ -44,8 +44,11 @@ featured: false
 - 把单位就业人员工资推广为全部就业人口的收入。
 - 把工资、劳动报酬和居民可支配收入当作同一概念。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：单位就业人员平均工资的计算方法](https://www.stats.gov.cn/zs/tjws/zytjzbqs/dwjyry/202411/t20241128_1957598.html)
 - [国家统计局：中国统计年鉴2025——就业和工资统计指标解释](https://www.stats.gov.cn/sj/ndsj/2025/html/zbe04.pdf)
 - [国家统计局：人口和就业统计常见问题](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902273.html)
+
+</details>

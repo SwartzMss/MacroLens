@@ -46,7 +46,10 @@ featured: false
 - 把曲线倒挂写成衰退必然发生。
 - 把拟合曲线点当作某只债券的最后成交。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国债券信息网：中债收益率曲线编制说明](https://indices.chinabond.com.cn/cbweb-mn/int/int_yield_syl_doc)
 - [财政部-中国国债收益率曲线编制说明](https://indices.chinabond.com.cn/cbweb-czb-web/czb/bzcxsmDown?locale=)
+
+</details>

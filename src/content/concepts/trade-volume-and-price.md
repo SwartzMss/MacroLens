@@ -51,8 +51,11 @@ featured: false
 - 用单月未季调金额变化判断实际贸易趋势。
 - 把价格数量拆分后的结果直接等同贸易条件或贸易差额。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局](https://www.stats.gov.cn/)
 - [国家外汇管理局：国际收支平衡表编制原则与指标说明](https://www.safe.gov.cn/safe/2015/1230/6080.html)
 - [IMF：Balance of Payments and International Investment Position Manual, Sixth Edition](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

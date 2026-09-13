@@ -55,9 +55,12 @@ featured: false
 - 把差额的扩大直接解释为出口数量增加。
 - 忽略月度季节性、基数效应、估价差异和后续修订。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中华人民共和国海关总署](https://www.customs.gov.cn/)
 - [国家外汇管理局：汇知识｜数据口径差异：国际收支货物贸易与海关进出口](https://www.safe.gov.cn/beijing/2023/1103/2249.html)
 - [国家外汇管理局](https://www.safe.gov.cn/)
 - [IMF：Balance of Payments and International Investment Position Manual, Sixth Edition](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

@@ -50,6 +50,9 @@ featured: false
 - 不注明名义、实际、人均或总量口径。
 - 把样本期比率当作不变的行为规律。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：五、国民经济核算（16）](https://www.stats.gov.cn/hd/cjwtjd/202302/t20230207_1902278.html)
+
+</details>

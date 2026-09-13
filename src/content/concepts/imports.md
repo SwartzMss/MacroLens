@@ -52,9 +52,12 @@ featured: false
 - 把进口增长等同于国内最终消费增长，把进口下降等同于需求全面收缩。
 - 不检查月度季节性、集中报关和基数效应。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中华人民共和国海关总署](https://www.customs.gov.cn/)
 - [国家外汇管理局：汇知识｜数据口径差异：国际收支货物贸易与海关进出口](https://www.safe.gov.cn/beijing/2023/1103/2249.html)
 - [国家外汇管理局](https://www.safe.gov.cn/)
 - [IMF：Balance of Payments and International Investment Position Manual, Sixth Edition](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

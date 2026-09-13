@@ -49,8 +49,11 @@ IMF 框架以净获得金融资产和净发生负债组织金融账户：BPM6 �
 - 把交易流量当作外部资产头寸的全部变化。
 - 把直接投资与证券市场资金流混为同一类。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家外汇管理局：国际收支平衡表编制原则与指标说明](https://www.safe.gov.cn/safe/2015/1230/6080.html)
 - [国家外汇管理局：中国国际收支平衡表](https://www.safe.gov.cn/safe/zggjszphb/index.html)
 - [IMF BPM6：Chapter 8, Financial Account](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

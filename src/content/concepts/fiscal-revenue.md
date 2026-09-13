@@ -48,7 +48,10 @@ featured: false
 - 把收入增长直接视为财政政策收紧。
 - 只看总额，不看税收、非税、中央和地方结构。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [财政部：《2025年财政收支情况》](https://gks.mof.gov.cn/tongjishuju/202601/t20260130_3982923.htm)
 - [中国人大网：《中华人民共和国预算法》](https://www.npc.gov.cn/rdxwzx/xwzx2026/xwzx2026019/202601/t20260116_451162.html)
+
+</details>

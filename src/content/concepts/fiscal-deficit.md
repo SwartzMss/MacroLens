@@ -50,7 +50,10 @@ featured: false
 - 把分析者的“广义赤字”标成官方统计。
 - 认为赤字扩大必然导致同幅度通胀或增长。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人大网：《关于2025年中央和地方预算执行情况与2026年中央和地方预算草案的报告》](https://www.npc.gov.cn/npc/c2/c30834/202603/t20260316_453265.html)
 - [中国人大网：《中华人民共和国预算法》](https://www.npc.gov.cn/rdxwzx/xwzx2026/xwzx2026019/202601/t20260116_451162.html)
+
+</details>

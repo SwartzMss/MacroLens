@@ -39,7 +39,10 @@ featured: false
 
 价格指数描述价格变动，商品房销售面积和销售额描述交易流量。销售额除以面积形成的隐含均价会受结构变化影响，不能替代同质价格指数。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家统计局：《2025年12月份70个大中城市商品住宅销售价格变动情况》 https://www.stats.gov.cn/sj/zxfbhjd/202601/t20260119_1962319.html
 - 国家统计局：《2026年1月份70个大中城市商品住宅销售价格变动情况》 https://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202602/t20260213_1962617.html
+
+</details>

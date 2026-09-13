@@ -33,7 +33,10 @@ featured: false
 
 供应冲击、行业结构、融资约束、预期和统计口径都能改变企业行为。补库存不必然带来景气上行，去库存也不必然表示最终需求恶化，阶段划分会随数据修订而变化。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家统计局，第一次全国经济普查主要指标解释：https://www.stats.gov.cn/sj/pcsj/jjpc/1jp/html/indicator2.htm
 - 国家统计局，2025年全国规模以上工业企业利润：https://www.stats.gov.cn/sj/zxfb/202601/t20260127_1962382.html
+
+</details>

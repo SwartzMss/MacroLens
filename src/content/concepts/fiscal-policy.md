@@ -46,7 +46,10 @@ featured: false
 - 赤字扩大不自动意味着通胀上升，传导受供需条件和融资方式影响。
 - “积极财政”不能仅由单月收支差额判断。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人大网：《中华人民共和国预算法》](https://www.npc.gov.cn/rdxwzx/xwzx2026/xwzx2026019/202601/t20260116_451162.html)
 - [财政部：《关于2025年中央和地方预算执行情况与2026年中央和地方预算草案的报告》](https://www.mof.gov.cn/zhengwuxinxi/caizhengxinwen/202603/t20260316_3985331.htm)
+
+</details>

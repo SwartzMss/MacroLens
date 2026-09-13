@@ -29,7 +29,10 @@ featured: false
 
 不可能三角适合用来解释政策权衡，不适合用来预测某个单一汇率点位。评估一项政策时，应分别记录汇率目标的稳定程度、资本流动的实际可达程度和国内利率工具的自主性，避免把“更稳定”写成“完全固定”，或把“有管理”写成“没有浮动”。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际货币基金组织：The impossible trinity](https://www.imf.org/external/pubs/ft/fandd/2015/06/people.htm)
 - [中国人民银行：人民币汇率形成机制](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/)
+
+</details>

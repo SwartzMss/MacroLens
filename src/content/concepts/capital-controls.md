@@ -29,8 +29,11 @@ featured: false
 
 资本流动管理会改变跨境资本流动的成本、速度和构成，也可能影响汇率形成，但不能仅凭某个月净流量判断政策放松或收紧。分析时应同时确认国际收支、结售汇、涉外收付款等数据的统计边界，以及居民与非居民视角。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际货币基金组织：资本流动管理的机构性观点](https://www.imf.org/en/Topics/Capital-Flows)
 - [国家外汇管理局：《资本项目外汇业务指引（2024年版）》](https://www.safe.gov.cn/safe/2024/0412/24226.html)
 - [中国人民银行：跨境人民币业务](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/)
+
+</details>

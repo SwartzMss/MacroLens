@@ -56,7 +56,10 @@ USD/CNY：7.10 → 7.30
 - 把名义汇率和实际有效汇率混成一条序列。
 - 认为远期汇率就是未来即期汇率预测。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国人民银行：《2024年第四季度中国货币政策执行报告》](https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/2025092212554550369/index.html)
 - [中国外汇交易中心：人民币汇率中间价发布说明](https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?contentId=384571&mode=open&priority=0)
+
+</details>

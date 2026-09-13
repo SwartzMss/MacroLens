@@ -36,7 +36,10 @@ featured: false
 - 把老年人口增加直接等同于劳动力减少。
 - 把人口抚养比上升解释为 GDP 必然下降。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：数据发布](https://www.stats.gov.cn/sj/zxfb/)
 - [世界银行：Age dependency ratio](https://data.worldbank.org/indicator/SP.POP.DPND)
+
+</details>

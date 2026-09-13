@@ -48,7 +48,10 @@ featured: false
 - 混淆债券发行额、发行收益率和二级市场收益率。
 - 忽略剩余期限和曲线提供者。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [财政部-中国国债收益率曲线编制说明](https://indices.chinabond.com.cn/cbweb-czb-web/czb/bzcxsmDown?locale=)
 - [中国债券信息网：国债及其他债券收益率曲线](https://yield.chinabond.com.cn/cbweb-pbc-web/pbc/more?locale=cn_ZH)
+
+</details>

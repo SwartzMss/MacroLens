@@ -79,8 +79,11 @@ featured: true
 
 住户贷款可分为短期和中长期，分别常与消费经营、住房等活动相关；企（事）业单位贷款也可观察短期、中长期和票据融资。相同的贷款增量，如果主要来自企业中长期项目、居民按揭或短期票据，其经济含义完全不同。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 中国人民银行：金融统计数据报告及《中国货币政策执行报告》中的人民币贷款结构表，具体数据来源见本页“来源”。
 - [中国人民银行：社会融资规模增量统计定义](https://www.pbc.gov.cn/diaochatongjisi/116219/116225/523c260b344c4f1390664430295064a9/index.html)
 - [英格兰银行：现代经济中的货币创造](https://www.bankofengland.co.uk/quarterly-bulletin/2014/q1/money-creation-in-the-modern-economy)（解释银行贷款与存款的机制，不作为中国统计口径依据）
+
+</details>

@@ -55,9 +55,12 @@ SAFE 的国际收支金融账户按居民与非居民及权责发生制框架记
 - 把居民增加境外资产与非居民减少境内负债视为同一种行为。
 - 从资本流向直接推出股市、汇率或储备的确定结果。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家外汇管理局：中国国际收支平衡表](https://www.safe.gov.cn/safe/zggjszphb/index.html)
 - [国家外汇管理局：银行代客涉外收付款数据](https://www.safe.gov.cn/safe/2018/0419/8806.html)
 - [国家外汇管理局：国际收支平衡表编制原则与指标说明](https://www.safe.gov.cn/safe/2015/1230/6080.html)
 - [IMF BPM6：Financial Account](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

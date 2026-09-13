@@ -45,7 +45,10 @@ CNY 是境内市场惯例，CNH 是离岸市场惯例。两者都表达人民币
 
 必须在中间价、境内即期收盘或其他明确观察中选择一种，标注 `CNY per USD`、频率、观察时点和来源。不得混入 CNH，也不得把中间价称为市场收盘价。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国外汇交易中心：人民币汇率中间价发布说明](https://www.chinamoney.com.cn/dqs/cm-s-notice-query/fileDownLoad.do?contentId=384571&mode=open&priority=0)
 - [中国人民银行：《银行间外汇市场管理规定》](https://www.pbc.gov.cn/zhengwugongkai/attachDir/2025/12/2025122910541412031.pdf)
+
+</details>

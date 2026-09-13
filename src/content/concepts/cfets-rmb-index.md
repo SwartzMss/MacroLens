@@ -44,7 +44,10 @@ USD/CNY 只比较人民币与美元，CFETS 指数同时考虑多种货币。美
 - 忽略篮子权重和方法版本调整。
 - 把指数点位变化直接称为同幅度百分比升贬值。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [中国外汇交易中心：《人民币汇率指数算法说明 v1.4》](https://www.chinamoney.com.cn/chinese/zxpl/20211231/2276204.html)
 - [中国外汇交易中心：《关于调整 CFETS 人民币汇率指数、BIS 货币篮子人民币汇率指数货币篮子和权重的公告》（2025 年 12 月 31 日发布，2026 年 1 月 1 日生效）](https://www.chinamoney.com.cn/dqs/rest/cm-s-security/dealPath?cp=zxpl&path=Jnw5ofpjlbE%253DuZ9TuHgZHBAAf1R6YB58X8wnHcWN2ZBANiGVmKdotTDJ5IU%252Bv28k9LapeMkbRGOz%252F4w98v7X5aDxKqu7zVqQiA%253D%253D&sign=Q%2Fd8solfMh3GOoMI5WmGUaZA1ukiCpO5sMwap9ByMZnt4tsJZeSkX6Wq1v3lRrKsnQLcWdAPun00%0ALsYa5AtcTZpCs2CvuKf8xTKL5JKkAphGIIEbpsADAhjeg2dCZIBVMUOFd2LaiLvRLJLML9AfJTc%2F%0AI44XV2MvFkyyEBuTLsA%3D%0A&ut=gmHKE0%2BS3B%2FcwRC50Qngm7yln6mNRiJ7IRJhsVCyeP%2Bmp6iyzd0CK832DOfWGQywHXoUpkWU1NQ5%0A2589GVb9C4jHBMITPiOOCUIiiH4LNq4B7ZeE1tjKxOKY0tEINxjcxScKYzlRA7q64xxZRdlv%2Fgn9%0AtXmWUecDvNUPbgRRu6M%3D%0A)
+
+</details>

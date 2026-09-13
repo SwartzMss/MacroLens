@@ -31,7 +31,10 @@ featured: false
 
 只有由货币当局控制且实际存在、可动用的外部资产才符合储备资产概念。企业、居民或其他公共机构持有的海外资产，不会仅因属于国家广义资产就自动成为官方储备资产。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - 国家外汇管理局：官方储备资产（2025年） https://www.safe.gov.cn/safe/2025/0206/25745.html
 - IMF：BPM6 https://data.imf.org/-/media/iData/External-Storage/Documents/73FBCD5B6CDE4D289C60B9B0CAA40622/en/2-bpm6.pdf
+
+</details>

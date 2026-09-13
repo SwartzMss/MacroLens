@@ -38,7 +38,10 @@ featured: false
 - 用名义产出计算后直接解释为实际效率变化。
 - 把劳动生产率上升解读为每个劳动者工资必然同比例上升。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家统计局：数据发布](https://www.stats.gov.cn/sj/zxfb/)
 - [OECD：Productivity](https://www.oecd.org/en/topics/productivity.html)
+
+</details>

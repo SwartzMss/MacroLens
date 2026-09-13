@@ -51,8 +51,11 @@ BPM6 用“净获得金融资产”和“净发生负债”描述金融账户两
 - 把统计上的账面平衡理解为经济上不存在外部失衡。
 - 不检查来源符号就把金融账户正负值翻译成流入或流出。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国家外汇管理局：国际收支平衡表编制原则与指标说明](https://www.safe.gov.cn/safe/2015/1230/6080.html)
 - [国家外汇管理局：中国国际收支平衡表](https://www.safe.gov.cn/safe/zggjszphb/index.html)
 - [IMF：Balance of Payments and International Investment Position Manual, Sixth Edition](https://www.imf.org/external/pubs/ft/bop/2007/bopman6.htm)
+
+</details>

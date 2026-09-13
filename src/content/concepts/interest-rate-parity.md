@@ -31,7 +31,10 @@ Uncovered interest parity（UIP）不使用远期合约锁定汇率，而是把�
 
 先确认利率和汇率的期限、报价方向、是否有远期或掉期套期保值，再区分 CIP 的无套利定价与 UIP 的预期关系。跨市场比较还要说明资金成本、抵押品、交易时点和基差口径。
 
-## 来源
+<details id="来源">
+<summary>正文参考来源</summary>
 
 - [国际清算银行：Covered interest parity lost](https://www.bis.org/publ/qtrpdf/r_qt1809e.htm)
 - [国际货币基金组织：Uncovered Interest Parity](https://www.imf.org/en/publications/wp/issues/2016/12/31/uncovered-interest-parity-19096)
+
+</details>
