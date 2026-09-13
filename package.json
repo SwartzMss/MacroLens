@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "test": "node --import tsx --test tests/*.test.mjs",
-    "test:output": "node scripts/verify/metadata-visibility-output.mjs && node scripts/verify/concept-detail-output.mjs",
+    "test:output": "node scripts/verify/metadata-visibility-output.mjs && node scripts/verify/concept-detail-output.mjs && node scripts/verify/markdown-output.mjs",
     "ingest:pmi": "node --import tsx scripts/ingest/cli.ts",
     "ingest:pboc-money-supply": "node --import tsx scripts/ingest/money-supply-cli.ts",
     "ingest:pboc-financial": "node --import tsx scripts/ingest/pboc-financial-cli.ts",
