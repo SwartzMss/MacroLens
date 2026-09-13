@@ -95,8 +95,13 @@ export function parsePBOCSocialFinancingReport(
     throw new MethodologyMismatchError('PBOC social-financing stock marker is missing or changed');
   }
   const methodologyFingerprint = validatedFingerprint('social-financing', canonical);
+  const stocks = [...canonical.matchAll(/社会融资规模存量(?:为|是)([0-9]+(?:\.[0-9]+)?)(万亿元|亿元)/g)];
+  if (stocks.length !== 1) throw new IngestionContractError('Missing or duplicate social-financing stock amount');
+  const socialFinancingStock = Number(stocks[0][1]) / (stocks[0][2] === '亿元' ? 10000 : 1);
+  if (!Number.isFinite(socialFinancingStock) || socialFinancingStock <= 0) throw new IngestionContractError('Invalid social-financing stock amount');
   return {
     publication,
+    socialFinancingStock,
     values: { 'social-financing': parseSignedGrowth(canonical, [SOCIAL_FINANCING_MARKER], '(?:为|是)[^同比]*?') },
     methodologyFingerprints: { ...PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS, 'social-financing': methodologyFingerprint },
   };

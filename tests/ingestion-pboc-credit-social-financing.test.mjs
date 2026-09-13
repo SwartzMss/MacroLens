@@ -107,6 +107,11 @@ test('parses the exact broad RMB-loan balance YoY and social-financing stock YoY
   assert.equal(parsePBOCCreditReport(moneyPublication, creditHtml.replace('271万亿元', '2710000亿元')).creditBalance, 271);
   assert.throws(() => parsePBOCCreditReport(moneyPublication, creditHtml.replace('271万亿元', '待定万亿元')), /balance/);
   assert.equal(social.values['social-financing'], 8.5);
+  assert.equal(social.socialFinancingStock, 440.07);
+  assert.equal(parsePBOCSocialFinancingReport(socialPublication, socialHtml.replace('440.07万亿元', '4400700亿元')).socialFinancingStock, 440.07);
+  for (const invalid of ['待定万亿元', '0万亿元', '-1万亿元', '440.07美元']) {
+    assert.throws(() => parsePBOCSocialFinancingReport(socialPublication, socialHtml.replace('440.07万亿元', invalid)), /stock|amount/);
+  }
   assert.equal(credit.methodologyFingerprints.credit, PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS.credit);
   assert.equal(social.methodologyFingerprints['social-financing'], PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS['social-financing']);
 });
@@ -143,6 +148,8 @@ test('normalizes both datasets with continuity, official provenance, and overlap
   assert.deepEqual(credit.balance.data.at(-1), { date: '2025-11', value: 271 });
   assert.throws(() => normalizePBOCFinancialDataset([{ ...creditRaw, creditBalance: 272 }], credit, 'credit'), HistoricalMismatchError);
   assert.deepEqual(social.data.at(-1), { date: '2025-11', value: 8.5 });
+  assert.deepEqual(social.balance.data.at(-1), { date: '2025-11', value: 440.07 });
+  assert.throws(() => normalizePBOCFinancialDataset([{ ...socialRaw, socialFinancingStock: 441 }], social, 'social-financing'), HistoricalMismatchError);
   assert.equal(credit.sources.some(({ role, coverage }) => role === 'methodology' && coverage === '2023-01 to 2023-12'), true);
   assert.doesNotThrow(() => validatePBOCFinancialDataset(credit, 'credit'));
   assert.doesNotThrow(() => validatePBOCFinancialDataset(social, 'social-financing'));

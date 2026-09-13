@@ -40,7 +40,7 @@ export function buildIndicatorChartOption(config: IndicatorChartConfig): ECharts
       : { type: 'category', data: dates, axisLine: { lineStyle: { color: '#b9c2ba' } } },
     yAxis: config.balance ? [
       { type: 'value', name: `同比（${config.unit}）`, position: 'right', splitLine: { lineStyle: { color: '#e7e8e1' } } },
-      { type: 'value', name: `余额（${config.balance.unit}）`, position: 'left', scale: true, splitLine: { show: false } },
+      { type: 'value', name: `${config.balance.label.includes('存量') ? '存量' : '余额'}（${config.balance.unit}）`, position: 'left', scale: true, splitLine: { show: false } },
     ] : config.dualAxis ? [
       { type: 'value', name: '万亿元', min: 0, position: 'left', axisLabel: { color: colors[0] }, nameTextStyle: { color: colors[0] }, splitLine: { lineStyle: { color: '#e7e8e1' } } },
       { type: 'value', name: '%', position: 'right', axisLabel: { color: colors[1] }, nameTextStyle: { color: colors[1] }, splitLine: { show: false } },

@@ -11,16 +11,16 @@ export function validatePBOCFinancialDataset(dataset: IndicatorDataset, id: PBOC
   if (dataset.metric !== 'yoy') throw new IngestionContractError(`PBOC financial metric must be yoy, got ${dataset.metric}`);
   if (dataset.calculation !== 'published') throw new IngestionContractError(`PBOC financial calculation must be published, got ${dataset.calculation}`);
   if (dataset.source !== 'PBOC') throw new IngestionContractError(`PBOC financial source must be PBOC, got ${dataset.source}`);
-  if (id === 'credit') {
-    if (dataset.balance) {
-      if (dataset.balance.unit !== '万亿元') throw new IngestionContractError('Credit balance unit must be 万亿元');
-      validateMonthlyObservations(dataset.balance.data, 'Credit balance');
-      for (const observation of dataset.balance.data) {
-        if (observation.value <= 0 || !dataset.data.some(item => item.date === observation.date)) {
-          throw new IngestionContractError(`Invalid credit balance observation: ${observation.date}`);
-        }
+  if (dataset.balance) {
+    if (dataset.balance.unit !== '万亿元') throw new IngestionContractError('PBOC balance unit must be 万亿元');
+    validateMonthlyObservations(dataset.balance.data, `PBOC ${id} balance`);
+    for (const observation of dataset.balance.data) {
+      if (observation.value <= 0 || !dataset.data.some(item => item.date === observation.date)) {
+        throw new IngestionContractError(`Invalid ${id} balance observation: ${observation.date}`);
       }
     }
+  }
+  if (id === 'credit') {
     if (dataset.calculationEffectiveFrom !== '2025-12') {
       throw new MethodologyMismatchError('PBOC credit calculation must declare the published boundary from 2025-12');
     }

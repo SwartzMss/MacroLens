@@ -117,6 +117,7 @@ export type RawPBOCFinancialPublication = {
   publication: MoneySupplyPublication;
   values: Partial<PBOCFinancialValues>;
   creditBalance?: number;
+  socialFinancingStock?: number;
   methodologyFingerprints: typeof PBOC_FINANCIAL_METHODOLOGY_FINGERPRINTS;
 };
 
