@@ -40,17 +40,23 @@ function renderProgress() {
       link.textContent = completed.length === path.steps.length ? '查看路线回顾 →' : `继续：${step.title} →`;
     });
   }
-  const recent = publishedLearningPaths.filter(item => progress.paths[item.id])
-    .sort((a, b) => progress.paths[b.id].visitedAt - progress.paths[a.id].visitedAt)[0];
-  document.querySelectorAll<HTMLElement>('[data-continue-learning]').forEach(panel => {
-    panel.hidden = !recent;
-    if (!recent) return;
-    const saved = progress.paths[recent.id];
-    const step = resumeStep(recent, saved);
-    const link = panel.querySelector<HTMLAnchorElement>('a')!;
-    link.href = learningStepHref(recent.id, step.id);
-    link.textContent = `${recent.title} · ${step.title} →`;
-    panel.querySelector<HTMLElement>('[data-continue-progress]')!.textContent = `已读 ${saved.completedStepIds.length} / ${recent.steps.length} 步`;
+  document.querySelectorAll<HTMLElement>('[data-learning-card]').forEach(card => {
+    const route = publishedLearningPaths.find(item => item.id === card.dataset.learningCard);
+    if (!route) return;
+    const saved = progress.paths[route.id];
+    const link = card.querySelector<HTMLAnchorElement>('[data-card-resume]')!;
+    const label = card.querySelector<HTMLElement>('[data-card-progress]')!;
+    label.hidden = !saved;
+    if (!saved) {
+      link.href = '/learn/' + route.id + '/';
+      link.textContent = '查看路线与学习目标 →';
+      label.textContent = '';
+      return;
+    }
+    const step = resumeStep(route, saved);
+    link.href = learningStepHref(route.id, step.id);
+    link.textContent = saved.completedStepIds.length === route.steps.length ? '查看路线回顾 →' : `继续：${step.title} →`;
+    label.textContent = `已读 ${saved.completedStepIds.length} / ${route.steps.length} 步`;
   });
 }
 

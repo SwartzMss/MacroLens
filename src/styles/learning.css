@@ -7,14 +7,13 @@
 .learning-card h2 { font: 700 26px/1.4 var(--serif); margin: 12px 0; }
 .learning-card p { color: var(--muted); margin: 0 0 14px; }
 .learning-card .learning-card-basis { font-size: 13px; }
-.learning-card .learning-text-link { margin-top: auto; }
+.learning-card-actions { margin-top: auto; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; }
+.learning-card-progress { font-size: 13px; color: var(--muted); }
+.learning-card-progress[hidden] { display: none; }
 .learning-card-featured { margin-bottom: 28px; background: #e8f1ec; }
 .learning-card-featured h2 { font-size: 30px; }
 .learning-text-link { color: var(--green); font-weight: 700; }
 .learning-section-title { font: 700 26px/1.4 var(--serif); margin: 32px 0 16px; }
-.learning-continue { background: #e8f1ec; padding: 18px 22px; border: 1px solid #bfd6c9; border-radius: 12px; margin-bottom: 24px; }
-.learning-continue a { display: block; font-weight: 700; color: var(--green); }
-.learning-continue p { margin: 4px 0; }
 .learning-support { display: flex; flex-wrap: wrap; gap: 14px 28px; margin-top: 32px; color: var(--green); }
 .learning-button { display: inline-flex; align-items: center; justify-content: center; padding: 11px 18px; border-radius: 9px; background: var(--green); color: white; font-weight: 700; line-height: 1.5; }
 .learning-button:hover { background: #09563f; }

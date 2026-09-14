@@ -1,4 +1,5 @@
 ---
+import LearningRuntime from '../learning/LearningRuntime.astro';
 import LearningCard from '../learning/LearningCard.astro';
 import type { LearningPath } from '../../data/learningPaths';
 import '../../styles/learning.css';
@@ -8,6 +9,7 @@ const { paths } = Astro.props as { paths: LearningPath[] };
   <div class="home-section-heading"><div><div class="eyebrow">03 / 从这里开始</div><h2 id="learning-paths-title">从一条路线开始</h2></div><a class="home-inline-link" href="/learn/">进入学习中心 →</a></div>
   <div class="home-learning-cards">{paths.map(path => <LearningCard path={path} />)}</div>
 </section>
+<LearningRuntime />
 <style>
   .home-learning-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
   @media(max-width:560px) { .home-learning-cards { grid-template-columns:minmax(0,1fr); } }
