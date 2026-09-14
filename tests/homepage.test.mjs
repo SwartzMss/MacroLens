@@ -37,7 +37,7 @@ test('homepage learning paths link only to existing concepts', () => {
   for (const path of learningPaths) {
     assert.ok(path.title.trim());
     assert.ok(path.steps.length >= 2);
-    for (const step of path.steps) assert.ok(conceptIds.has(step.id), `${path.title}/${step.id}`);
+    for (const step of path.steps.filter(step => step.kind === 'concept')) assert.ok(conceptIds.has(step.conceptId), `${path.title}/${step.id}`);
   }
 });
 

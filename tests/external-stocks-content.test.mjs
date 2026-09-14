@@ -18,7 +18,7 @@ function page(id) {
   return readFileSync(path, 'utf8');
 }
 function frontmatter(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'frontmatter missing');
   return Object.fromEntries(match[1].split('\n').map(line => {
     const colon = line.indexOf(':');
@@ -38,7 +38,8 @@ test('external stock pages use external category, stable order, and no charts', 
     assert.equal(parsed.category, 'external');
     assert.equal(parsed.graph, 'macro');
     assert.equal(parsed.order, meta.order);
-    assert.equal(parsed.updatedAt, '2026-09-13');
+    assert.match(parsed.updatedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(new Date(parsed.updatedAt).toISOString().slice(0, 10), parsed.updatedAt);
     assert.equal(Object.hasOwn(parsed, 'chart'), false);
     for (const related of meta.related) assert.ok(files.has(`${related}.md`) || ['external-liabilities'].includes(related), `${id} related ${related} missing`);
   }

@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { buildConceptCatalog, type ConceptEntry } from '../../data/conceptCatalog';
 import { topicRegistry, type Topic } from '../../data/topics';
 import { getCategory } from '../../data/categories';
+import { publishedLearningPaths, learningPathHref } from '../../data/learningPaths';
 import '../../styles/catalog-header.css';
 
 export async function getStaticPaths() {
@@ -14,10 +15,13 @@ export async function getStaticPaths() {
 
 const { topic, concepts } = Astro.props as { topic: Topic; concepts: ConceptEntry[] };
 const conceptNames = new Map((await getCollection('concepts')).map(concept => [concept.data.id, concept.data.name]));
+const learningRoutes = publishedLearningPaths.filter(path => path.topicIds.includes(topic.id));
 ---
 <BaseLayout title={`${topic.label}｜主题地图｜MacroLens`} description={topic.description}>
   <header class="index-head"><div class="shell"><nav class="breadcrumbs" aria-label="面包屑"><a href="/">首页</a> / <a href="/topics">主题</a> / <span aria-current="page">{topic.label}</span></nav><div class="eyebrow">{getCategory(topic.category).label}</div><h1>{topic.label}</h1><p class="lead">{topic.description}</p><div class="index-summary"><b>{concepts.length} 个概念</b> · 按概念顺序浏览</div></div></header>
-  <div class="shell topic-detail"><div class="topic-concept-grid">
+  <div class="shell topic-detail">
+    {learningRoutes.length > 0 && <section class="topic-learning"><h2>按路线学习这个主题</h2>{learningRoutes.map(path => <a href={learningPathHref(path.id)}>{path.title} →</a>)}</section>}
+    <div class="topic-concept-grid">
     {concepts.map((concept, index) => <a class="topic-concept-card" href={`/concepts/${concept.data.id}`}>
       <div class="topic-concept-number">{String(index + 1).padStart(2, '0')}</div>
       <div><div class="topic-card-meta"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span></div><h2>{concept.data.name}</h2><p>{concept.data.subtitle}</p>{concept.data.prerequisites.length > 0 && <p class="prerequisite-hint">建议先理解：{concept.data.prerequisites.map(id => conceptNames.get(id) ?? id).join('、')}</p>}</div>
@@ -26,6 +30,7 @@ const conceptNames = new Map((await getCollection('concepts')).map(concept => [c
   </div></div>
 </BaseLayout>
 <style>
+.topic-learning{padding:18px 0 28px}.topic-learning h2{font-size:20px;margin-top:0}.topic-learning a{display:block;color:var(--green);padding:6px 0}
 .breadcrumbs{margin-bottom:16px;font-size:12px;line-height:1.6}
 .topic-concept-card:focus-visible{outline:3px solid var(--green);outline-offset:3px}
 .topic-concept-card p.prerequisite-hint{display:block;background:transparent;padding:0;margin-top:10px;color:var(--muted);font-size:12px;line-height:1.6}

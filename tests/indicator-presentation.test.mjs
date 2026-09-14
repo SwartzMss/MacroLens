@@ -19,7 +19,7 @@ test('indicator metadata presents calculation method changes at their effective 
 
 test('indicator detail provides structured user-facing metadata', () => {
   const source = fs.readFileSync(path.join(root, 'src', 'components', 'IndicatorMetadata.astro'), 'utf8');
-  const page = fs.readFileSync(path.join(root, 'src', 'pages', 'concepts', '[id].astro'), 'utf8');
+  const page = fs.readFileSync(path.join(root, 'src', 'components', 'ConceptReader.astro'), 'utf8');
 
   for (const label of ['如何阅读', '指标定义', '统计频率', '变化口径', '数据来源', '数据更新', '覆盖期间']) {
     assert.match(source, new RegExp(label));

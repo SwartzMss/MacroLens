@@ -20,7 +20,7 @@ function documentFor(id) {
 }
 
 function frontmatter(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'concept must have frontmatter');
   const result = {};
   for (const line of match[1].split('\n')) {
@@ -39,7 +39,7 @@ for (const [id, spec] of Object.entries(specs)) {
     assert.equal(Number(metadata.order), spec.order);
     assert.match(metadata.source ?? '', /\S/);
     assert.match(metadata.related ?? '', /^\[/);
-    assert.doesNotMatch(document.match(/^---\n([\s\S]*?)\n---/)[1], /^chart:/m);
+    assert.doesNotMatch(document.match(/^---\r?\n([\s\S]*?)\r?\n---/)[1], /^chart:/m);
     for (const term of spec.terms) assert.ok(document.includes(term), `${id} must explain ${term}`);
     for (const url of spec.urls ?? []) assert.ok(document.includes(url), `${id} must cite ${url}`);
   });

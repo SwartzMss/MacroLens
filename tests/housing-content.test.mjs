@@ -14,7 +14,7 @@ const metadata = {
 };
 
 function parse(document) {
-  const match = document.match(/^---\n([\s\S]*?)\n---/);
+  const match = document.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert.ok(match, 'concept must have frontmatter');
   const result = {};
   for (const line of match[1].split('\n')) {

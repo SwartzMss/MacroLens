@@ -225,7 +225,8 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(page, /适用条件|局限|证据来源/);
   assert.match(page, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
-  assert.match(nav, /<a href=["']\/graph["']>宏观关系<\/a>/);
+  assert.match(nav, /<a href=["']\/learn["']>学习<\/a>/);
+  assert.match(readSource(`${root}src/pages/learn/index.astro`), /href=["']\/graph["']/);
   assert.match(home, /href=["']\/graph["']/);
 });
 
@@ -236,7 +237,7 @@ test('makes the relationship map discoverable from the homepage', () => {
 });
 
 test('concept pages reuse canonical relationship metadata', () => {
-  const conceptPage = readSource(`${root}src/pages/concepts/[id].astro`);
+  const conceptPage = readSource(`${root}src/components/ConceptReader.astro`);
   const cards = readSource(relationshipCards);
   assert.match(conceptPage, /getConceptRelations\(entry\.data\.graph, entry\.data\.id\)/);
   assert.match(conceptPage, /<RelationshipCards conceptId=\{entry\.data\.id\}/);

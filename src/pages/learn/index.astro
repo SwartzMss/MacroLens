@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LearningCard from '../../components/learning/LearningCard.astro';
+import LearningRuntime from '../../components/learning/LearningRuntime.astro';
+import { learningPaths, publishedLearningPaths, validateLearningPaths } from '../../data/learningPaths';
+import '../../styles/learning.css';
+validateLearningPaths(learningPaths, await getCollection('concepts'));
+const [foundation, ...specialists] = publishedLearningPaths;
+---
+<BaseLayout title="学习｜MacroLens" description="从入门主线或一个专题开始，按顺序理解宏观经济。">
+  <header class="learning-head"><div class="shell"><div class="eyebrow">学习</div><h1>按一条路线理解宏观经济</h1><p class="lead">知道从哪里开始，也知道下一篇为什么值得读。</p></div></header>
+  <div class="shell learning-body" data-pagefind-body>
+    <LearningCard path={foundation} featured />
+    <h2 class="learning-section-title">从一个问题深入</h2>
+    <div class="learning-card-grid">{specialists.map(path => <LearningCard path={path} />)}</div>
+    <div class="learning-support"><a href="/concepts">查一个名词，去概念库 →</a><a href="/graph">查联系与证据，浏览宏观关系 →</a></div>
+    <p class="learning-local-note">阅读进度保存在本机浏览器。可以随时跳读、复习，不需要登录。</p>
+  </div>
+  <LearningRuntime />
+</BaseLayout>
