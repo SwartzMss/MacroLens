@@ -1,5 +1,4 @@
 .search-wrap { max-width: 740px; margin: 44px auto 80px; }
-.search-wrap > .eyebrow,
 .search-wrap > h1,
 .search-wrap > p { text-align: center; }
 .search-wrap h1 { font: 800 clamp(32px, 4vw, 48px)/1.2 var(--serif); margin: 12px 0 16px; }
