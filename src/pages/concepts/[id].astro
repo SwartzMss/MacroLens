@@ -57,8 +57,8 @@ const hasEntry = hasCustomEntry || Boolean(entry.data.intro);
 const sectionLinks = [
   { id: `${entry.data.id}-overview`, label: '概览' },
   ...(hasEntry ? [{ id: `${entry.data.id}-start`, label: '先理解' }] : []),
-  ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
   { id: `${entry.data.id}-detail`, label: '详解' },
+  ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
   ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
   ...(presentation ? [{ id: `${entry.data.id}-sources`, label: '来源' }] : []),
   ...(hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
@@ -88,15 +88,15 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
         {entry.data.id === 'credit' && <CreditUnderstanding />}
         {isMonetaryPolicy && <MonetaryPolicyUnderstanding />}
         {!hasCustomEntry && entry.data.intro && <ConceptUnderstanding conceptId={entry.data.id} intro={entry.data.intro} />}
-        {indicator && <section class="detail-data" id={`${entry.data.id}-data`} aria-label="最新数据与趋势">
-          <IndicatorReading indicator={indicator} />
-          <IndicatorChart indicator={indicator} />
-        </section>}
         <PrerequisiteConcepts concepts={prerequisites} />
         <details class="concept-long-form" id={`${entry.data.id}-detail`} open>
           <summary>详细说明与统计边界</summary>
           <div class="concept-long-form-content"><Content /></div>
         </details>
+        {indicator && <section class="detail-data" id={`${entry.data.id}-data`} aria-label="最新数据与趋势">
+          <IndicatorReading indicator={indicator} />
+          <IndicatorChart indicator={indicator} />
+        </section>}
         {hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
         {presentation && <section id={`${entry.data.id}-sources`} aria-label="数据口径与来源"><IndicatorMetadata presentation={presentation} /></section>}
         <PageFeedback pageId={entry.data.id} />
