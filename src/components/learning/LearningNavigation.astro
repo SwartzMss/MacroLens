@@ -1,0 +1,19 @@
+---
+import { learningStepHref, type LearningPath } from '../../data/learningPaths';
+const { path, currentStepId } = Astro.props as { path: LearningPath; currentStepId?: string };
+---
+<nav class="learning-route-nav" aria-label="路线步骤" data-pagefind-ignore>
+  {path.chapters.map((chapter, chapterIndex) => <details class="learning-chapter" open={currentStepId ? chapter.stepIds.includes(currentStepId) : path.steps.length <= 8 || chapterIndex === 0}>
+    <summary>{chapterIndex + 1}. {chapter.title}<small>{chapter.stepIds.length} 步</small></summary>
+    <ol>
+      {chapter.stepIds.map(id => {
+        const index = path.steps.findIndex(step => step.id === id);
+        const step = path.steps[index];
+        return <li><a href={learningStepHref(path.id, id)} aria-current={id === currentStepId ? 'step' : undefined}>
+          <span class="learning-step-number">{index + 1}</span>
+          <span>{step.title}<small data-step-status={id}>{id === currentStepId ? '当前' : '未读'}</small></span>
+        </a></li>;
+      })}
+    </ol>
+  </details>)}
+</nav>

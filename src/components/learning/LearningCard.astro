@@ -1,0 +1,11 @@
+---
+import { learningPathHref, type LearningPath } from '../../data/learningPaths';
+const { path, featured = false } = Astro.props as { path: LearningPath; featured?: boolean };
+---
+<article class:list={['learning-card', { 'learning-card-featured': featured }]}>
+  <div class="eyebrow">{featured ? '从这里开始' : path.id === 'macro-foundations' ? '入门主线' : '专题学习'} · {path.steps.length} 步</div>
+  <h2><a href={learningPathHref(path.id)}>{path.title}</a></h2>
+  <p>{path.description}</p>
+  <p class="learning-card-basis">{path.assumedConceptIds.length ? '建议先了解货币层次；路线内可随时补基础。' : '可从第一步开始，进阶内容会保留提示。'}</p>
+  <a class="learning-text-link" href={learningPathHref(path.id)}>查看路线与学习目标 →</a>
+</article>

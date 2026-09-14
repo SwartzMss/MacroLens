@@ -6,7 +6,6 @@ import { topicIds, topicRegistry } from '../src/data/topics.ts';
 import { learningPaths } from '../src/data/home.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const topicsIndex = `${root}src/pages/topics/index.astro`;
 const topicDetail = `${root}src/pages/topics/[id].astro`;
 const prerequisiteComponent = `${root}src/components/PrerequisiteConcepts.astro`;
 const conceptsIndex = `${root}src/pages/concepts/index.astro`;
@@ -41,7 +40,9 @@ test('topic registry has stable unique IDs and complete topic metadata', () => {
 });
 
 test('topic pages and prerequisite component exist as static route sources', () => {
-  assert.equal(existsSync(topicsIndex), true, 'topic index route is missing');
+  const config = readFileSync(`${root}astro.config.mjs`, 'utf8');
+  assert.match(config, /['"]\/topics['"]:\s*['"]\/learn\/['"]/);
+  assert.equal(existsSync(`${root}src/pages/learn/index.astro`), true, 'learning index route is missing');
   assert.equal(existsSync(topicDetail), true, 'topic detail route is missing');
   assert.equal(existsSync(prerequisiteComponent), true, 'prerequisite component is missing');
 

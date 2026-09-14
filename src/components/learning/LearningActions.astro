@@ -1,0 +1,19 @@
+---
+import { learningPathHref, learningStepHref, type LearningPath } from '../../data/learningPaths';
+const { path, stepId } = Astro.props as { path: LearningPath; stepId: string };
+const index = path.steps.findIndex(step => step.id === stepId);
+const step = path.steps[index];
+const previous = path.steps[index - 1];
+const next = path.steps[index + 1];
+---
+<section class="learning-actions" aria-label="继续学习" data-pagefind-ignore data-no-learning-context>
+  <p class="learning-progress-text" data-route-progress>第 {index + 1} / {path.steps.length} 步</p>
+  {next ? <><h2>接下来：{next.title}</h2>{step.nextReason && <p>{step.nextReason}</p>}</> : <><h2>回顾之后，你想继续了解什么？</h2><p>可以返回目录复习，也可以到学习中心选择另一条路线。</p></>}
+  <div class="learning-read-control" data-learning-controls hidden><button type="button" data-toggle-read aria-pressed="false">标为已读</button><span>只记录阅读，不代表已经掌握。</span></div>
+  <p class="learning-save-status" data-save-status role="status" aria-live="polite"></p>
+  <div class="learning-action-links">
+    {previous && <a href={learningStepHref(path.id, previous.id)}>← 上一步：{previous.title}</a>}
+    {next ? <div class="learning-next-group"><a class="learning-button" data-read-next href={learningStepHref(path.id, next.id)} hidden>已读，继续下一步 →</a><a class="learning-button" data-next-link href={learningStepHref(path.id, next.id)}>下一步：{next.title} →</a></div> : <a class="learning-button" href={learningPathHref(path.id)}>返回路线目录 →</a>}
+  </div>
+  {!next && <a class="learning-text-link" href="/learn/">选择其他学习路线 →</a>}
+</section>

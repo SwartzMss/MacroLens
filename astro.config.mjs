@@ -18,5 +18,6 @@ if (configuredSite) {
 export default defineConfig({
   site,
   output: 'static',
-  integrations: site ? [sitemap()] : [],
+  redirects: { '/topics': '/learn/' },
+  integrations: site ? [sitemap({ filter: (page) => !/^\/learn\/[^/]+\/[^/]+\/?$/.test(new URL(page).pathname) })] : [],
 });

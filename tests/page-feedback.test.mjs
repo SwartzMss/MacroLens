@@ -7,7 +7,7 @@ import { VISITOR_COOKIE } from '../functions/visitor.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const feedbackComponent = `${root}src/components/PageFeedback.astro`;
-const conceptPage = `${root}src/pages/concepts/[id].astro`;
+const conceptPage = `${root}src/components/ConceptReader.astro`;
 const migration = `${root}migrations/0001_page_feedback.sql`;
 const apiSource = `${root}functions/api/feedback.ts`;
 
