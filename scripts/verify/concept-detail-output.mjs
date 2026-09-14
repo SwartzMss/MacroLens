@@ -22,8 +22,14 @@ for (const item of readdirSync(directory, { withFileTypes: true })) {
   if (knowledgePosition >= 0) assert.ok(detailPosition < knowledgePosition, `${item.name}: relationship overview must follow article`);
   if (dataPosition >= 0) {
     assert.ok(entryPosition < dataPosition, `${item.name}: understanding entry must precede data`);
-    assert.ok(dataPosition < detailPosition, `${item.name}: data must precede article`);
-    assert.ok(html.indexOf('data-chart=') < detailPosition, `${item.name}: chart must precede article`);
+    assert.ok(detailPosition < dataPosition, `${item.name}: article must precede data`);
+    assert.ok(detailPosition < html.indexOf('data-chart='), `${item.name}: article must precede chart`);
+    if (knowledgePosition >= 0) assert.ok(dataPosition < knowledgePosition, `${item.name}: data must precede relationship overview`);
+    for (const navigation of html.matchAll(/<nav\b[^>]*data-detail-navigation[^>]*>([\s\S]*?)<\/nav>/g)) {
+      const detailLink = navigation[1].indexOf(`href="#${item.name}-detail"`);
+      const dataLink = navigation[1].indexOf(`href="#${item.name}-data"`);
+      assert.ok(detailLink >= 0 && detailLink < dataLink, `${item.name}: navigation must list article before data`);
+    }
     assert.ok(ids.has(`${item.name}-sources`));
   }
   assert.match(html, /aria-label="本页目录"/);
