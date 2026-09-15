@@ -295,16 +295,25 @@ function publicationCoverageFromTitle(title: string, id: RealEconomyDatasetId, s
   }
   const match = canonicalTitle.match(/^(\d{4})年(\d{1,2})(?:-(\d{1,2}))?月份/)
     ?? (id === 'unemployment-rate'
-      ? canonicalTitle.match(/^(\d{1,2})-(\d{1,2})月份/)
+      ? canonicalTitle.match(/^(\d{1,2})(?:-(\d{1,2}))?月份/)
       : null);
   if (!match) fail(`NBS publication title has no period: ${title}`);
   const hasExplicitYear = match[1].length === 4;
-  const year = hasExplicitYear ? match[1] : sourceDate.slice(0, 4);
+  let year = hasExplicitYear ? match[1] : sourceDate.slice(0, 4);
   const startMonth = Number(hasExplicitYear ? match[2] : match[1]);
-  const endMonth = Number(hasExplicitYear ? (match[3] ?? match[2]) : match[2]);
+  const endMonth = Number(hasExplicitYear ? (match[3] ?? match[2]) : (match[2] ?? match[1]));
   if (!/^\d{4}$/.test(year)) fail(`NBS publication title has no inferable year: ${title}`);
   if (!Number.isInteger(startMonth) || startMonth < 1 || startMonth > 12 || !Number.isInteger(endMonth) || endMonth < startMonth || endMonth > 12) {
     fail(`NBS publication title has invalid period: ${title}`);
+  }
+  if (!hasExplicitYear) {
+    // Yearless monthly headlines refer to the month preceding publication.
+    // Reject ambiguous/stale titles rather than assigning the publication year blindly.
+    if (!validIsoDate(sourceDate)) fail(`NBS publication has no valid date for yearless title: ${title}`);
+    const releaseMonth = Number(sourceDate.slice(5, 7));
+    const expectedMonth = releaseMonth === 1 ? 12 : releaseMonth - 1;
+    if (endMonth !== expectedMonth) fail(`NBS yearless title period does not match publication date: ${title}`);
+    year = String(Number(sourceDate.slice(0, 4)) - (releaseMonth === 1 ? 1 : 0));
   }
   const period = id === 'unemployment-rate'
     ? `${year}-${String(endMonth).padStart(2, '0')}`

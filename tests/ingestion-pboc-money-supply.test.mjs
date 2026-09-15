@@ -26,7 +26,7 @@ const rawReports = publications.map((publication) => parsePBOCMoneySupplyReport(
 ));
 const existing = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', 'm1.json'), 'utf8'));
 const existingWithFingerprint = {
-  ...existing,
+  ...datasetBeforeFixtureReports(existing),
   methodologyFingerprint: MONEY_SUPPLY_METHODOLOGY_FINGERPRINTS.m1,
 };
 

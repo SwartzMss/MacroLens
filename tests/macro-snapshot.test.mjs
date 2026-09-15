@@ -27,6 +27,10 @@ const makeMacroIndicators = (overrides = {}) => {
     const override = overrides[id] ?? {};
     return [id, {
       ...base[id],
+      // Synthetic policy events must not inherit a moving live verification date.
+      ...(id === 'policy-rate' && override.data
+        ? { verifiedThrough: override.data.at(-1)?.date }
+        : {}),
       ...override,
       ...(override.data ? { data: override.data } : {}),
       ...(override.series ? { series: override.series } : {}),
@@ -65,8 +69,8 @@ test('normalizes single-series, LPR, and policy-rate evidence with timing contex
   assert.deepEqual(lpr.map(item => item.id), ['lpr:1y', 'lpr:5y-plus']);
   assert.ok(lpr.every(item => item.seriesId));
   assert.equal(policy[0].isEvent, true);
-  assert.equal(policy[0].observationPeriod, '2025-05-08');
-  assert.equal(policy[0].verifiedThrough, '2026-09-07');
+  assert.equal(policy[0].observationPeriod, indicators['policy-rate'].data.at(-1).date);
+  assert.equal(policy[0].verifiedThrough, indicators['policy-rate'].verifiedThrough);
 });
 
 test('growth keeps positive levels and weakening momentum separate', () => {

@@ -11,18 +11,20 @@ test('credit tooltip joins balance by month and distinguishes unavailable histor
     unit: credit.unit, balance: credit.balance,
   });
   const latest = option.tooltip.formatter([{ dataIndex: credit.data.length - 1 }]);
-  assert.match(latest, /2026-07/);
-  assert.match(latest, /282\.29 万亿元/);
-  assert.match(latest, /5\.1%/);
+  assert.ok(latest.includes(credit.data.at(-1).date));
+  assert.ok(latest.includes(`${credit.balance.data.at(-1).value.toFixed(2)} 万亿元`));
+  assert.ok(latest.includes(`${credit.data.at(-1).value.toFixed(1)}%`));
+  const july = credit.data.findIndex(({ date }) => date === '2026-07');
+  assert.match(option.tooltip.formatter([{ dataIndex: july }]), /282\.29 万亿元/);
   assert.match(option.tooltip.formatter([{ dataIndex: 0 }]), /人民币贷款余额：242.50 万亿元/);
   assert.deepEqual(credit.balance.data.map(item => item.date), credit.data.map(item => item.date));
-  assert.equal(credit.balance.data.length, 31);
+  assert.ok(credit.balance.data.length >= 31);
   assert.equal(option.yAxis.length, 2);
   assert.equal(option.yAxis[1].name, '余额（万亿元）');
   assert.equal(option.yAxis[1].position, 'left');
   assert.equal(option.yAxis[0].position, 'right');
   assert.equal(option.series[1].yAxisIndex, 1);
-  assert.equal(option.series[1].data.at(-1), 282.29);
+  assert.deepEqual(option.series[1].data, credit.balance.data.map(({ value }) => value));
   assert.equal(option.series[1].data[0], 242.504789);
   assert.equal(option.series[1].connectNulls, false);
   const partial = buildIndicatorChartOption({

@@ -34,6 +34,9 @@ jobs:
       - name: Fetch and validate PBOC money supply
         run: npm run ingest:pboc-money-supply -- --target-dir data/indicators
 
+      - name: Fetch and validate PBOC money supply balances
+        run: npm run ingest:pboc-money-balances -- --target-dir data/chart-overlays
+
       - name: Fetch and validate PBOC credit and social financing
         run: npm run ingest:pboc-financial -- --target-dir data/indicators
 
@@ -52,6 +55,13 @@ jobs:
       - name: Fetch and validate official GACC customs trade
         run: npm run ingest:customs-trade -- --target-dir data/indicators
 
+      - name: Validate updated datasets and pages
+        run: |
+          npm test
+          npm run check
+          npm run build
+          npm run test:output
+
       - name: Open macro data update pull request
         uses: peter-evans/create-pull-request@v8
         with:
@@ -61,6 +71,9 @@ jobs:
             data/indicators/m0.json
             data/indicators/m1.json
             data/indicators/m2.json
+            data/chart-overlays/m0-balance.json
+            data/chart-overlays/m1-balance.json
+            data/chart-overlays/m2-balance.json
             data/indicators/credit.json
             data/indicators/social-financing.json
             data/indicators/lpr.json
@@ -84,4 +97,7 @@ jobs:
 
             The ingestion adapters validate official publication structures,
             check historical overlaps and methodology, and update only changed
-            indicator datasets.
+            indicator datasets and money-supply balance charts.
+
+            Before opening this PR, the workflow ran npm test, npm run check,
+            npm run build, and npm run test:output against the updated files.

@@ -192,10 +192,11 @@ test('checked-in Customs history is aligned, sourced, and leaves January 2026 ex
   for (const id of ['exports', 'imports']) {
     const checkedIn = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
     assert.doesNotThrow(() => validateCustomsTradeDataset(checkedIn, id));
-    assert.deepEqual(checkedIn.data.map(({ date }) => date), expectedDates);
-    assert.deepEqual(checkedIn.data.map(({ value }) => value), expectedValues[id]);
+    assert.deepEqual(checkedIn.data.slice(0, expectedDates.length).map(({ date }) => date), expectedDates);
+    assert.deepEqual(checkedIn.data.slice(0, expectedDates.length).map(({ value }) => value), expectedValues[id]);
     assert.equal(checkedIn.data.some(({ date }) => date === '2026-01'), false);
-    assert.equal(checkedIn.sources.length, expectedDates.length);
+    // The validator checks continuity and source coverage for every appended month.
+    assert.ok(checkedIn.data.length >= expectedDates.length);
     assert.ok(checkedIn.sources.every(({ url }) => /^https:\/\/(?:[a-z0-9-]+\.)*customs\.gov\.cn\//.test(url)));
   }
 });
@@ -249,7 +250,8 @@ test('registers both indicators, attaches concept charts, and schedules the GACC
     const indicator = getIndicatorData(id);
     assert.equal(indicator.id, id);
     assert.equal(indicator.source, 'GACC');
-    assert.equal(indicator.data.at(-1).date, '2026-07');
+    const checkedIn = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
+    assert.deepEqual(indicator.data, checkedIn.data);
     const concept = fs.readFileSync(path.join(here, '..', 'src', 'content', 'concepts', `${id}.md`), 'utf8');
     assert.match(concept, new RegExp(`^chart: ${id}$`, 'm'));
   }
