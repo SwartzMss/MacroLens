@@ -57,9 +57,9 @@ const sectionLinks = [
   ...(hasEntry ? [{ id: `${entry.data.id}-start`, label: '先理解' }] : []),
   { id: `${entry.data.id}-detail`, label: '详解' },
   ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
-  ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
+  ...(!learningPath && hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
   ...(presentation ? [{ id: `${entry.data.id}-sources`, label: '来源' }] : []),
-  ...(hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
+  ...(!learningPath && hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
 ];
 const articleHeadings = headings.filter(heading => heading.depth === 2);
 ---
@@ -98,12 +98,12 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
           <IndicatorReading indicator={indicator} />
           <IndicatorChart indicator={indicator} />
         </section>}
-        {hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
+        {!learningPath && hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
         {presentation && <section id={`${entry.data.id}-sources`} aria-label="数据口径与来源"><IndicatorMetadata presentation={presentation} /></section>}
         {learningPath && learningStep && <LearningActions path={learningPath} stepId={learningStep.id} />}
         {!learningPath && publishedLearningPaths.some(path => path.steps.some(step => step.conceptId === entry.data.id)) && <section class="learning-related-paths" data-no-learning-context data-pagefind-ignore><h2>在路线中学习</h2>{publishedLearningPaths.filter(path => path.steps.some(step => step.conceptId === entry.data.id)).map(path => <a href={learningPathHref(path.id)}>{path.title} →</a>)}</section>}
         <PageFeedback pageId={entry.data.id} />
-        {hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">
+        {!learningPath && hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">
           <RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} />
           <RelatedConcepts concepts={relatedConcepts} />
         </section>}

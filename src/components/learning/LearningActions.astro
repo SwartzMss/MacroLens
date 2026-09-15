@@ -15,5 +15,6 @@ const next = path.steps[index + 1];
     {previous && <a href={learningStepHref(path.id, previous.id)}>← 上一步：{previous.title}</a>}
     {next ? <div class="learning-next-group"><a class="learning-button" data-read-next href={learningStepHref(path.id, next.id)} hidden>已读，继续下一步 →</a><a class="learning-button" data-next-link href={learningStepHref(path.id, next.id)}>下一步：{next.title} →</a></div> : <a class="learning-button" href={learningPathHref(path.id)}>返回路线目录 →</a>}
   </div>
+  {step.kind === 'concept' && step.conceptId && <p><a class="learning-text-link" href={`/concepts/${step.conceptId}/`}>查看完整概念 →</a></p>}
   {!next && <a class="learning-text-link" href="/learn/">选择其他学习路线 →</a>}
 </section>

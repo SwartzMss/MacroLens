@@ -27,6 +27,12 @@ for (const path of publishedLearningPaths) {
       const data = `id="${step.conceptId}-data"`;
       assert.equal(html.includes(data), canonical.includes(data));
       assert.equal(html.includes(`id="${step.conceptId}-sources"`), canonical.includes(`id="${step.conceptId}-sources"`));
+      assert.ok(!html.includes(`id="${step.conceptId}-knowledge"`), `learning page exposes knowledge overview: ${step.id}`);
+      assert.ok(!html.includes(`id="${step.conceptId}-connections"`), `learning page exposes exploration: ${step.id}`);
+      const actions = html.match(/<section class="learning-actions"[\s\S]*?<\/section>/)?.[0];
+      assert.ok(actions?.includes(`href="/concepts/${step.conceptId}/"`), `missing full concept entry: ${step.id}`);
+      assert.match(actions, /查看完整概念/);
+      assert.match(actions, /data-no-learning-context/);
       assert.ok(html.indexOf('class="learning-actions"') < html.indexOf('data-page-feedback'));
       if (process.env.PUBLIC_SITE_URL) assert.ok(html.includes(`rel="canonical" href="${new URL(`/concepts/${step.conceptId}/`, process.env.PUBLIC_SITE_URL)}"`));
     }
