@@ -87,10 +87,3 @@
   .learning-context-line { font-size: 12px; }
   .learning-reader .detail-jump-inner { width: calc(100% - 40px); }
 }
-.learning-core-relation, .learning-concept-link { margin: 28px 0; padding: 20px; border: 1px solid var(--line); border-radius: 12px; }
-.learning-core-relation h2, .learning-concept-link h2 { margin-top: 0; font-size: 22px; }
-.learning-relation-pair { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
-.learning-relation-pair span, .learning-relation-timing { color: var(--muted); font-size: 14px; }
-.learning-core-relation summary { cursor: pointer; color: var(--green); }
-.learning-core-relation h3 { font-size: 16px; }
-.learning-concept-link p { color: var(--muted); }
