@@ -387,11 +387,13 @@ test('checked-in price datasets are complete monthly official series', () => {
     const checkedIn = JSON.parse(fs.readFileSync(path.join(here, '..', 'data', 'indicators', `${id}.json`), 'utf8'));
     validatePriceDataset(checkedIn, id);
     assert.equal(checkedIn.data[0].date, '2026-01');
-    assert.equal(checkedIn.data.at(-1).date, '2026-07');
-    assert.equal(checkedIn.data.length, 7);
+    // Preserve the baseline; validatePriceDataset checks the full growing series.
+    assert.deepEqual(checkedIn.data.slice(0, 7).map(({ date }) => date),
+      ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07']);
     assert.ok(checkedIn.sources.every((source) => source.url.includes('stats.gov.cn')));
     if (id === 'cpi' || id === 'core-cpi') {
-      assert.equal(checkedIn.sources.at(-1).url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html');
+      const july = checkedIn.sources.find((source) => source.coverage === '2026-07 to 2026-07');
+      assert.equal(july.url, 'https://www.stats.gov.cn/sj/zxfbhjd/202608/t20260809_1965008.html');
       const april = checkedIn.sources.find((source) => source.coverage === '2026-04 to 2026-04');
       assert.deepEqual(
         { url: april.url, sourceDate: april.sourceDate },

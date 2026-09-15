@@ -355,6 +355,23 @@ test('fails clearly after exhausting the bounded publication page scan', async (
   ]);
 });
 
+test('maps yearless unemployment releases only to the month before publication', () => {
+  for (const [title, sourceDate, month] of [
+    ['8月份国民经济运行平稳、发展向新向优', '2026-09-15', '2026-08'],
+    ['1—7月份国民经济保持总体平稳', '2026-08-17', '2026-07'],
+    ['12月份国民经济运行情况', '2027-01-19', '2026-12'],
+  ]) {
+    const publication = discoverLatestRealEconomyPublication(
+      `<a href="/sj/zxfb/report.html">${title}</a> ${sourceDate}`, 'unemployment-rate');
+    assert.equal(publication.coverage, `${month} to ${month}`);
+  }
+  for (const title of ['9月份国民经济运行情况', '13月份国民经济运行情况']) {
+    assert.throws(() => discoverLatestRealEconomyPublication(
+      `<a href="/sj/zxfb/report.html">${title}</a> 2026-09-15`, 'unemployment-rate'),
+    IngestionContractError);
+  }
+});
+
 test('maps official retail half-year titles to June publication coverage', () => {
   const publication = discoverLatestRealEconomyPublication(
     '<a href="/sj/zxfb/202607/t20260715_1964144.html">2026年上半年社会消费品零售总额增长5.4%</a> 2026-07-15',

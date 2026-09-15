@@ -13,7 +13,12 @@ for (const id of ['m0', 'm1', 'm2']) {
     assert.equal(balance.unit, '万亿元');
     for (const row of balance.data) {
       assert.ok(Number.isFinite(row.value) && row.value > 0);
-      if (row.date < '2025-11') continue;
+      assert.ok(balance.sources.some(source => {
+        const [start, end] = source.coverage.split(' to ');
+        return start <= row.date && row.date <= end && source.url.startsWith('https://www.pbc.gov.cn/');
+      }), `Missing official source for ${id} ${row.date}`);
+      // Saved report fixtures certify this historical window; later live records retain source checks above.
+      if (row.date < '2025-11' || row.date > '2026-07') continue;
       const report = readFileSync(new URL(`fixtures/pboc/report-${row.date}.html`, import.meta.url), 'utf8');
       const match = report.match(new RegExp(`[（(]${id.toUpperCase()}[）)]余额([\\d.]+)万亿元`));
       assert.equal(row.value, Number(match[1]));

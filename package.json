@@ -9,6 +9,7 @@
     "test:output": "node scripts/verify/metadata-visibility-output.mjs && node scripts/verify/concept-detail-output.mjs && node scripts/verify/markdown-output.mjs && node --import tsx scripts/verify/learning-output.mjs",
     "ingest:pmi": "node --import tsx scripts/ingest/cli.ts",
     "ingest:pboc-money-supply": "node --import tsx scripts/ingest/money-supply-cli.ts",
+    "ingest:pboc-money-balances": "node --import tsx scripts/ingest/money-supply-balance-cli.ts",
     "ingest:pboc-financial": "node --import tsx scripts/ingest/pboc-financial-cli.ts",
     "ingest:nbs-real-economy": "node --import tsx scripts/ingest/real-economy-cli.ts",
     "ingest:nbs-prices": "node --import tsx scripts/ingest/price-cli.ts",

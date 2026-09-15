@@ -203,15 +203,15 @@ test('registers both datasets, charts both concept pages, and tracks both workfl
 test('checked-in financial datasets use the official integrated report values and provenance', () => {
   const credit = getIndicatorData('credit');
   const social = getIndicatorData('social-financing');
-  assert.deepEqual(credit.data.at(-1), { date: '2026-07', value: 5.1 });
-  assert.deepEqual(social.data.at(-1), { date: '2026-07', value: 7.4 });
+  assert.deepEqual(credit.data.find(({ date }) => date === '2026-07'), { date: '2026-07', value: 5.1 });
+  assert.deepEqual(social.data.find(({ date }) => date === '2026-07'), { date: '2026-07', value: 7.4 });
   assert.equal(credit.data.find(({ date }) => date === '2024-04')?.value, 9.6);
   assert.equal(credit.calculation, 'published');
   assert.equal(credit.calculationEffectiveFrom, '2025-12');
   assert.equal(credit.methodologyFingerprint, 'pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy');
   assert.equal(credit.sources.some(({ coverage, url }) => coverage === '2023-01 to 2023-12' && url.includes('2025111817163388840')), true);
   assert.equal(social.data.find(({ date }) => date === '2024-01')?.value, 9.5);
-  assert.match(credit.sources.at(-1).url, /2026081416320925645/);
+  assert.ok(credit.sources.some(({ url }) => url.includes('2026081416320925645')));
   assert.equal(social.sources.at(-1).url, credit.sources.at(-1).url);
   assert.equal(social.sources.some(({ url }) => url.includes('16000000004')), false);
 });
