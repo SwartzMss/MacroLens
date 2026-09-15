@@ -1,0 +1,23 @@
+---
+import type { KnowledgeChainStep } from '../../data/conceptKnowledge';
+import { isExplainableRelation, type ExplainableRelationType } from '../../data/graphRegistry';
+const { conceptId, step } = Astro.props as { conceptId: string; step?: KnowledgeChainStep };
+const relation = step && isExplainableRelation(step.relation) ? step.relation : undefined;
+const labels: Record<ExplainableRelationType, string> = {
+  transmission: '传导环节', leading_factor: '领先因素', leading_indicator: '领先指标',
+  synchronous_indicator: '同步指标', lagging_indicator: '滞后指标',
+};
+---
+{step && relation && <section class="learning-core-relation" id={`${conceptId}-knowledge`} aria-labelledby={`${conceptId}-knowledge-title`}>
+  <h2 id={`${conceptId}-knowledge-title`}>理解与联系</h2>
+  <p class="learning-relation-pair"><strong>{step.source.label}</strong><span>{labels[relation.relation]} →</span><strong>{step.target.label}</strong></p>
+  <p>{relation.explanation}</p>
+  <p class="learning-relation-timing">传导或观察时滞：{relation.lag}</p>
+  <details>
+    <summary>适用条件与解读边界</summary>
+    <h3>适用条件</h3>
+    <ul>{relation.applicability.map(item => <li>{item}</li>)}</ul>
+    <h3>解读边界</h3>
+    <ul>{relation.limitations.map(item => <li>{item}</li>)}</ul>
+  </details>
+</section>}

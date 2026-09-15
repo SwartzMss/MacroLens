@@ -1,3 +1,6 @@
+---
+const { showExploration = true } = Astro.props as { showExploration?: boolean };
+---
 <section class="credit-entry" id="credit-start" aria-labelledby="credit-start-title">
   <header>
     <span class="entry-label">一句话理解</span>
@@ -23,11 +26,11 @@
     </ol>
     <p>这条路径需要需求和还款能力支持。借新还旧未必带来新增支出；缺乏回报的项目或资产投机，也可能累积风险。</p>
   </section>
-  <nav class="entry-links" aria-label="信贷观察入口">
+  {showExploration && <nav class="entry-links" aria-label="信贷观察入口">
     <a href="#credit-data">看贷款数据 ↓</a>
     <a href="/concepts/social-financing">社融：看融资范围 →</a>
     <a href="/concepts/m2">M2：看货币总量 →</a>
-  </nav>
+  </nav>}
 </section>
 <style>
   .credit-entry{border:1px solid var(--line);border-radius:16px;background:var(--card);padding:24px;margin-bottom:28px}
