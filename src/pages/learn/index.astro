@@ -8,11 +8,37 @@ import '../../styles/learning.css';
 validateLearningPaths(learningPaths, await getCollection('concepts'));
 const [foundation, ...specialists] = publishedLearningPaths;
 ---
-<BaseLayout title="学习｜MacroLens" description="从入门主线或一个专题开始，按顺序理解宏观经济。">
-  <header class="learning-head"><div class="shell"><div class="eyebrow">学习</div><h1>按一条路线理解宏观经济</h1><p class="lead">知道从哪里开始，也知道下一篇为什么值得读。</p></div></header>
+<BaseLayout title="学习｜MacroLens" description="从一条面向初学者的宏观经济旅程开始，再按问题进入专题学习。">
+  <header class="learning-head"><div class="shell"><div class="eyebrow">学习 · 宏观学习系统</div><h1>从这里开始，建立宏观经济的整体框架</h1><p class="lead">先理解经济系统怎样运转，再进入具体概念和专题。每一步都会说明为什么接着读下一步。</p></div></header>
   <div class="shell learning-body" data-pagefind-body>
+    <section class="learning-journey-intro" data-learning-journey-intro aria-labelledby="learning-journey-intro-title">
+      <div>
+        <div class="eyebrow">推荐学习路径</div>
+        <h2 id="learning-journey-intro-title">从个人概念走到经济系统</h2>
+        <p>MacroLens 不只是查一个名词的知识库，也提供一条可以跟着走的宏观学习旅程。你可以先完成入门主线，建立产出、货币、信用、利率、价格、政策和周期之间的基本联系，再按兴趣进入专题。</p>
+      </div>
+      <div class="learning-journey-intro-action">
+        <a class="learning-button" href={`/learn/${foundation.id}/${foundation.steps[0].id}/`}>开始入门旅程 →</a>
+        <p class="learning-local-note">{foundation.chapters.length} 个阶段 · {foundation.steps.length} 步（含路线回顾）</p>
+      </div>
+    </section>
+
+    <section class="learning-journey" data-learning-recommended-order aria-labelledby="learning-journey-title">
+      <div class="learning-journey-heading">
+        <div><div class="eyebrow">入门主线</div><h2 id="learning-journey-title">推荐顺序</h2></div>
+        <a class="learning-text-link" href={`/learn/${foundation.id}/`}>查看完整路线与目标 →</a>
+      </div>
+      <ol class="learning-journey-list">
+        {foundation.chapters.map((chapter, index) => <li>
+          <span class="learning-journey-number">{index + 1}</span>
+          <span><strong>{chapter.title}</strong><small>{chapter.stepIds.length} 个阅读步骤</small></span>
+        </li>)}
+      </ol>
+    </section>
+
     <LearningCard path={foundation} featured />
-    <h2 class="learning-section-title">从一个问题深入</h2>
+    <h2 class="learning-section-title">专题深入</h2>
+    <p class="learning-section-lead">已经有一个具体问题，或想沿某个方向继续？这些路线可以随时跳读，不会改变入门主线的进度。</p>
     <div class="learning-card-grid">{specialists.map(path => <LearningCard path={path} />)}</div>
     <div class="learning-support"><a href="/concepts">查一个名词，去概念库 →</a><a href="/graph">查联系与证据，浏览宏观关系 →</a></div>
     <p class="learning-local-note">阅读进度保存在本机浏览器。可以随时跳读、复习，不需要登录。</p>
