@@ -102,5 +102,9 @@ jobs:
             check historical overlaps and methodology, and update only changed
             indicator datasets and money-supply balance charts.
 
+            Monthly NBS real-economy data was checked against the latest discovered
+            publication periods. Missing adjacent periods are filled only from
+            verified official releases; unresolved gaps stop the workflow.
+
             Before opening this PR, the workflow ran npm test, npm run check,
             npm run build, and npm run test:output against the updated files.

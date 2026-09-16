@@ -80,14 +80,19 @@ export async function runRealEconomy(args: string[] = process.argv.slice(2)): Pr
     ? undefined
     : await fetchNbsRealEconomyPublications();
   const candidates = new Map<RealEconomyDatasetId, IndicatorDataset>();
+  const summary = ['### NBS real-economy coverage', '', '| Indicator | Latest release period | Data period |', '| --- | --- | --- |'];
   for (const id of IDS) {
     const raw = await loadRawSeries(id, options, publications?.[id]);
     candidates.set(id, normalizeRealEconomyDataset(raw, existing.get(id)!, id));
+    summary.push(`| ${id} | ${raw.publication.coverage} | ${candidates.get(id)!.data.at(-1)!.date} |`);
   }
   for (const id of IDS) {
     const target = path.join(options.targetDir, id + '.json');
     const result = writeIndicatorDataset(target, candidates.get(id)!);
     console.log(id + ': ' + candidates.get(id)!.data.at(-1)?.date + ' Changed: ' + result.changed);
+  }
+  if (publications && process.env.GITHUB_STEP_SUMMARY) {
+    await fs.appendFile(process.env.GITHUB_STEP_SUMMARY, summary.join('\n') + '\n');
   }
 }
 

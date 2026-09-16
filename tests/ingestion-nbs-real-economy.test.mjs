@@ -403,18 +403,35 @@ test('maps unemployment Jan-Feb joint releases to the ending month and parses th
   ]);
 });
 
+// These structured fixtures end in April 2025. Their live release metadata must
+// describe April too; a later release without its values is now rejected.
+function structuredFixtureRelease(id) {
+  if (id === 'unemployment-rate') return { publication: fixture(id).publication, html: '全国城镇调查失业率（%）' };
+  const titles = {
+    'industrial-production': '2025年4月份规模以上工业增加值增长6.1%',
+    'retail-sales': '2025年1—4月份社会消费品零售总额增长5.1%',
+    'fixed-asset-investment': '2025年1—4月份全国固定资产投资基本情况',
+  };
+  const bodies = {
+    'industrial-production': '4月份，规模以上工业增加值同比实际增长6.1%（扣除价格因素）。',
+    'retail-sales': '4月份，社会消费品零售总额100亿元，同比增长5.1%。名义增速。',
+    'fixed-asset-investment': '1—4月份，全国固定资产投资（不含农户）100亿元，同比增长4.0%（累计增长按可比口径计算）。',
+  };
+  const period = id === 'fixed-asset-investment' ? '2025-01–04' : '2025-04';
+  return { publication: { title: titles[id], url: 'https://www.stats.gov.cn/sj/zxfb/202505/test.html', sourceDate: '2025-05-19', coverage: `${period} to ${period}` }, html: `<h1>${titles[id]}</h1><p>${bodies[id]}</p>` };
+}
+
 test('routes real-economy live requests through the shared text fetch boundary', async () => {
   const calls = [];
   const gdpPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'gdp-quarterly.json'), 'utf8'));
-  const fixedAssetPayload = fixture('fixed-asset-investment');
   const structuredPayload = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8')).responses['fixed-asset-investment'];
   const gdpPublication = { ...gdpPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202607/t20260716_1964142.html' };
-  const fixedAssetPublication = { ...fixedAssetPayload.publication, url: 'https://www.stats.gov.cn/sj/zxfb/202608/t20260817_1965057.html' };
+  const fixedAssetPublication = structuredFixtureRelease('fixed-asset-investment').publication;
   const fetcher = async (url) => {
     calls.push(url);
     if (url === nbsPublicationIndex) return publicationIndexFixture();
     if (url === gdpPublication.url) return gdpFixture();
-    if (url === fixedAssetPublication.url) return '固定资产投资（不含农户）累计增长按可比口径计算';
+    if (url === fixedAssetPublication.url) return structuredFixtureRelease('fixed-asset-investment').html;
     if (url === 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData') return JSON.stringify(structuredPayload);
     throw new Error(`unexpected URL: ${url}`);
   };
@@ -440,20 +457,14 @@ test('routes real-economy live requests through the shared text fetch boundary',
 test('retrieves all five National Data series through the official structured endpoint', async () => {
   const structuredFixture = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8'));
   const endpoint = 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData';
-  const methodology = {
-    'industrial-production': '规模以上工业增加值同比增长按不变价格计算',
-    'retail-sales': '社会消费品零售总额同比增长按现价计算',
-    'fixed-asset-investment': '固定资产投资（不含农户）累计增长按可比口径计算',
-    'unemployment-rate': '全国城镇调查失业率（%）',
-  };
   const calls = [];
   for (const id of ['industrial-production', 'retail-sales', 'fixed-asset-investment', 'unemployment-rate']) {
     const fixturePayload = structuredFixture.responses[id];
     const publication = JSON.parse(JSON.stringify(fixture(id)));
-    publication.publication.coverage = id === 'unemployment-rate' ? '2026-07 to 2026-07' : '';
+    publication.publication = structuredFixtureRelease(id).publication;
     const fetcher = async (url, options) => {
       calls.push({ id, url, options });
-      if (url === publication.publication.url) return methodology[id];
+      if (url === publication.publication.url) return structuredFixtureRelease(id).html;
       if (url === endpoint) return JSON.stringify(fixturePayload);
       throw new Error(`unexpected URL: ${url}`);
     };
@@ -548,13 +559,13 @@ test('rejects a structured response when one selected indicator has no valid val
 
 test('persists structured request provenance from actual data coverage, not run time', async () => {
   const structuredFixture = JSON.parse(fs.readFileSync(path.join(here, 'fixtures', 'nbs', 'real-economy', 'national-data-structured.json'), 'utf8'));
-  const payload = fixture('industrial-production');
+  const payload = structuredFixtureRelease('industrial-production');
   const endpoint = 'https://data.stats.gov.cn/dg/website/publicrelease/web/external/stream/esData';
   const run = (runAt) => fetchNbsRealEconomySeries(
     payload.publication,
     REAL_ECONOMY_CONTRACTS['industrial-production'],
     async (url) => url === payload.publication.url
-      ? '规模以上工业增加值同比增长按不变价格计算'
+      ? payload.html
       : JSON.stringify(structuredFixture.responses['industrial-production']),
     runAt,
   );
