@@ -868,3 +868,50 @@ test('wires NBS real-economy ingestion into the reviewable scheduled workflow', 
   }
   assert.match(workflow, /create-pull-request/);
 });
+
+const augustUnemploymentPublication = {
+  title: '8月份国民经济运行平稳、发展向新向优',
+  url: 'https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965307.html',
+  sourceDate: '2026-09-15', coverage: '2026-08 to 2026-08',
+};
+// Official release excerpt; the cumulative and city figures must not be selected.
+const augustUnemploymentHtml = `<h1>${augustUnemploymentPublication.title}</h1><p>1—8月份，全国城镇调查失业率平均值为5.2%，与上年同期持平。8月份，全国城镇调查失业率为5.3%，比上月上升0.1个百分点。31个大城市城镇调查失业率为5.3%。</p>`;
+const parseAugustUnemployment = (html = augustUnemploymentHtml, payload = fixture('unemployment-rate')) =>
+  parseNbsRealEconomyResponse(payload, augustUnemploymentPublication, REAL_ECONOMY_CONTRACTS['unemployment-rate'], html);
+
+test('supplements only the adjacent missing unemployment month with release provenance', () => {
+  const raw = parseAugustUnemployment();
+  assert.deepEqual(raw.observations.at(-1), { date: '2026-08', value: 5.3 });
+  assert.equal(raw.dataSources[0].coverage, '2026-05 to 2026-07');
+  assert.equal(raw.dataSources[1].url, augustUnemploymentPublication.url);
+  assert.equal(raw.dataSources[1].coverage, '2026-08 to 2026-08');
+  assert.equal(raw.dataSources[1].role, 'data');
+  const normalized = normalizeRealEconomyDataset(raw, existingFor('unemployment-rate'), 'unemployment-rate');
+  assert.deepEqual(normalized.data.at(-1), { date: '2026-08', value: 5.3 });
+  assert.deepEqual(normalizeRealEconomyDataset(raw, normalized, 'unemployment-rate'), normalized);
+});
+
+test('rejects missing, wrong-month, non-national, average, conflicting and discontinuous release values', () => {
+  for (const html of [
+    '',
+    augustUnemploymentHtml.replace('8月份，全国城镇调查失业率为', '7月份，全国城镇调查失业率为'),
+    augustUnemploymentHtml.replace('8月份，全国城镇调查失业率为', '8月份，31个大城市城镇调查失业率为'),
+    augustUnemploymentHtml.replace('失业率为5.3%', '失业率平均值为5.3%'),
+    augustUnemploymentHtml + '。8月份，全国城镇调查失业率为5.4%。',
+    augustUnemploymentHtml.replace(augustUnemploymentPublication.title, '别的发布稿'),
+  ]) assert.throws(() => parseAugustUnemployment(html), IngestionContractError);
+  const payload = fixture('unemployment-rate');
+  payload.returndata.datanodes.pop();
+  assert.throws(() => parseAugustUnemployment(augustUnemploymentHtml, payload), /match publication month/);
+});
+
+test('cross-checks release values when the structured unemployment series catches up', () => {
+  const payload = fixture('unemployment-rate');
+  const august = structuredClone(payload.returndata.datanodes.at(-1));
+  Object.assign(august.wds.find(wd => wd.wdcode === 'sj'), { valuecode: '202608', value: '2026年8月' });
+  august.data.data = '5.3';
+  payload.returndata.datanodes.push(august);
+  assert.equal(parseAugustUnemployment(augustUnemploymentHtml, payload).dataSources.length, 1);
+  august.data.data = '5.4';
+  assert.throws(() => parseAugustUnemployment(augustUnemploymentHtml, payload), /conflict/);
+});
