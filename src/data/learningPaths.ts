@@ -30,8 +30,8 @@ const recap = (questions: ReviewQuestion[]): LearningStep => ({ id: 'recap', kin
 
 export const learningPaths: LearningPath[] = [
   {
-    id: 'macro-foundations', title: '从零开始的宏观经济旅程', status: 'published', revision: 2,
-    description: '沿着八个问题，从经济活动、钱与信用走到利率、价格、政策、周期与对外联系，先建立宏观经济的整体框架。',
+    id: 'macro-foundations', title: '从零开始的宏观经济旅程', status: 'published', revision: 3,
+    description: '沿着八个问题，从经济活动、钱与信用走到利率、价格、就业收入与周期，先建立宏观经济的整体框架。',
     topicIds: ['economic-activity', 'prices-inflation', 'household-sector', 'money-supply', 'monetary-transmission'],
     outcomes: ['用产出、货币、信用、利率、价格、收入和周期建立一张宏观经济地图。', '理解政策信号传到融资、需求和生活时需要哪些条件，避免把相关描述当成必然因果。', '阅读宏观新闻时，先找到它在这条旅程中的位置，再核对统计口径、单位和时间范围。'],
     assumedConceptIds: [], extensionConceptIds: ['fiscal-policy', 'fiscal-expenditure', 'government-debt', 'fiscal-revenue', 'fiscal-deficit', 'household-consumption'],
@@ -41,7 +41,7 @@ export const learningPaths: LearningPath[] = [
       { title: '信用如何创造', stepIds: ['credit'] },
       { title: '利率与货币政策', stepIds: ['monetary-policy', 'policy-rate', 'lpr'] },
       { title: '什么是通胀', stepIds: ['cpi', 'ppi'] },
-      { title: '政策如何影响经济', stepIds: ['employment', 'unemployment-rate', 'wages', 'disposable-income'] },
+      { title: '经济如何影响就业与收入', stepIds: ['employment', 'unemployment-rate', 'wages', 'disposable-income'] },
       { title: '经济为什么会有周期', stepIds: ['pmi', 'inventory-cycle'] },
       { title: '把各部分联系起来', stepIds: ['recap'] },
     ],
