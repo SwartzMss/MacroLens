@@ -7,6 +7,10 @@ const read = path => readFileSync(new URL(path, dist), 'utf8');
 const body = html => html.match(/<div class="concept-long-form-content">([\s\S]*?)<\/div>\s*<\/details>/)?.[1];
 const ids = html => [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 let checked = 0;
+const learningIndex = read('learn/index.html');
+assert.match(learningIndex, /data-content-boundary/);
+assert.match(learningIndex, /回答“它是什么？”/);
+assert.match(learningIndex, /回答“它如何运作？”/);
 for (const path of publishedLearningPaths) {
   const overview = read(`learn/${path.id}/index.html`);
   assert.match(overview, /data-pagefind-body/);
@@ -21,6 +25,8 @@ for (const path of publishedLearningPaths) {
     const next = path.steps[index + 1];
     if (next) assert.ok(html.includes(`href="/learn/${path.id}/${next.id}/"`));
     if (step.kind === 'concept') {
+      assert.match(html, /data-content-layer="learning"/);
+      assert.match(html, /回答“它如何运作？”/);
       const canonical = read(`concepts/${step.conceptId}/index.html`);
       assert.ok(body(html), `missing content: ${step.id}`);
       assert.equal(body(html), body(canonical), `learning content diverges: ${step.id}`);

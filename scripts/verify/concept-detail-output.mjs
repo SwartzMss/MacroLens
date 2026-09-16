@@ -8,6 +8,8 @@ let checked = 0;
 for (const item of readdirSync(directory, { withFileTypes: true })) {
   if (!item.isDirectory()) continue;
   const html = readFileSync(join(directory, item.name, 'index.html'), 'utf8');
+  assert.match(html, /data-content-layer="concept"/);
+  assert.match(html, /回答“它是什么？”/);
   const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]));
   const links = [...html.matchAll(/href="#([^"]+)"/g)].map(match => decodeURIComponent(match[1]));
   for (const id of links) assert.ok(ids.has(id), `${item.name}: missing anchor ${id}`);

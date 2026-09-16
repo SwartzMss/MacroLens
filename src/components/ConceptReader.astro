@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { publishedLearningPaths, learningPathHref, type LearningPath, type LearningStep } from '../data/learningPaths';
+import { publishedLearningPaths, learningPathHref, learningStepHref, type LearningPath, type LearningStep } from '../data/learningPaths';
 import LearningNavigation from './learning/LearningNavigation.astro';
 import LearningActions from './learning/LearningActions.astro';
 import LearningRuntime from './learning/LearningRuntime.astro';
@@ -22,6 +22,7 @@ import ConceptTableOfContents from '../components/ConceptTableOfContents.astro';
 import CreditUnderstanding from '../components/CreditUnderstanding.astro';
 import MonetaryPolicyUnderstanding from '../components/MonetaryPolicyUnderstanding.astro';
 import ConceptUnderstanding from '../components/ConceptUnderstanding.astro';
+import ContentLayerGuide from '../components/ContentLayerGuide.astro';
 import { buildConceptCatalog } from '../data/conceptCatalog';
 import { buildConceptKnowledge } from '../data/conceptKnowledge';
 import { topicRegistry } from '../data/topics';
@@ -53,6 +54,9 @@ const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
 const isMonetaryPolicy = entry.data.id === 'monetary-policy';
 const hasCustomEntry = entry.data.id === 'credit' || isMonetaryPolicy;
 const hasEntry = hasCustomEntry || Boolean(entry.data.intro);
+const learningRoute = publishedLearningPaths
+  .map(path => ({ path, step: path.steps.find(step => step.conceptId === entry.data.id) }))
+  .find(item => item.step);
 const sectionLinks = [
   { id: `${entry.data.id}-overview`, label: '概览' },
   ...(hasEntry ? [{ id: `${entry.data.id}-start`, label: '先理解' }] : []),
@@ -75,6 +79,11 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
         <p class="lead">{entry.data.subtitle}</p>
         {learningStep?.focus && <p class="learning-focus">本步关注：{learningStep.focus}</p>}
         <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
+        <ContentLayerGuide
+          mode={learningPath ? 'learning' : 'concept'}
+          learningHref={learningRoute?.step ? learningStepHref(learningRoute.path.id, learningRoute.step.id) : '/learn/'}
+          conceptHref={`/concepts/${entry.data.id}/`}
+        />
       </div>
     </header>
     <nav class="detail-mobile-navigation" aria-label="本页目录" data-detail-navigation>

@@ -1,0 +1,30 @@
+---
+type Props = {
+  mode: 'concept' | 'learning';
+  learningHref?: string;
+  conceptHref?: string;
+};
+
+const { mode, learningHref = '/learn/', conceptHref } = Astro.props as Props;
+const isConcept = mode === 'concept';
+---
+
+<aside class:list={['content-layer-guide', isConcept ? 'is-concept' : 'is-learning']} data-content-layer={mode} aria-label={isConcept ? '概念页定位' : '学习步骤定位'}>
+  <div class="content-layer-guide-copy">
+    <span class="content-layer-guide-label">{isConcept ? '概念页' : '学习步骤'}</span>
+    <strong>{isConcept ? '回答“它是什么？”' : '回答“它如何运作？”'}</strong>
+    <p>{isConcept ? '适合查定义、统计口径、数据和关系证据。' : '按问题和顺序把概念连接起来，再回到概念页核对定义和口径。'}</p>
+  </div>
+  {isConcept ? <a href={learningHref}>{learningHref === '/learn/' ? '进入学习路线 →' : '按路线理解它如何运作 →'}</a> : conceptHref && <a href={conceptHref} data-no-learning-context>查看概念定义和统计口径 →</a>}
+</aside>
+
+<style>
+  .content-layer-guide{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:20px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#f2f6f3}
+  .content-layer-guide-copy{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:10px;min-width:0}
+  .content-layer-guide-label{grid-column:1;color:var(--green);font-size:12px;font-weight:800;white-space:nowrap}
+  .content-layer-guide strong{grid-column:2;font-size:14px}
+  .content-layer-guide p{grid-column:2;margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.6}
+  .content-layer-guide>a{flex:0 0 auto;color:var(--green);font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+  .content-layer-guide>a:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+  @media(max-width:760px){.content-layer-guide{align-items:flex-start;flex-direction:column;gap:10px}.content-layer-guide-copy{grid-template-columns:auto;row-gap:3px}.content-layer-guide-label,.content-layer-guide strong,.content-layer-guide p{grid-column:1}.content-layer-guide strong{font-size:15px}.content-layer-guide p{margin-top:0}}
+</style>
