@@ -73,8 +73,15 @@
 .learning-related-paths a { display: block; padding: 5px 0; color: var(--green); }
 .learning-review-question { border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin: 16px 0; }
 .learning-review-question summary { cursor: pointer; font-weight: 700; }
+.learning-review-stage { display: block; margin-bottom: 6px; color: var(--green); font-size: 13px; font-weight: 800; letter-spacing: .02em; }
 .learning-review-question a { color: var(--green); text-decoration: underline; }
 .learning-review-links { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.learning-review-observation { padding: 12px 14px; background: #f2f6f3; border-radius: 9px; }
+.learning-cycle-graph { margin: 34px 0; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: #f2f6f3; }
+.learning-cycle-graph h2 { margin: 8px 0 10px; font: 700 24px/1.4 var(--serif); }
+.learning-cycle-graph p { color: var(--muted); }
+.learning-cycle-graph-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.learning-cycle-graph-links a:not(.learning-button) { color: var(--green); font-weight: 700; }
 .learning-mobile-label { color: var(--green); font-size: 13px; }
 .learning-mobile-menu { margin-left: 0 !important; width: 100%; }
 .learning-mobile-menu > summary { white-space: normal; }

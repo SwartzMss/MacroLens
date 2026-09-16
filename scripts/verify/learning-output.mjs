@@ -35,6 +35,13 @@ for (const path of publishedLearningPaths) {
       assert.match(actions, /data-no-learning-context/);
       assert.ok(html.indexOf('class="learning-actions"') < html.indexOf('data-page-feedback'));
       if (process.env.PUBLIC_SITE_URL) assert.ok(html.includes(`rel="canonical" href="${new URL(`/concepts/${step.conceptId}/`, process.env.PUBLIC_SITE_URL)}"`));
+    } else if (path.id === 'macro-foundations' && step.id === 'recap') {
+      assert.match(html, /经济周期：把各部分串起来/);
+      assert.match(html, /假设场景/);
+      assert.match(html, /打开宏观关系浏览器/);
+      for (const id of ['gdp', 'cpi', 'ppi', 'credit', 'policy-rate', 'monetary-policy', 'employment']) {
+        assert.ok(html.includes(`/concepts/${id}/#${id}-connections`), `missing relationship link: ${id}`);
+      }
     }
     checked++;
   }

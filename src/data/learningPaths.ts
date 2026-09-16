@@ -1,7 +1,13 @@
 import type { ConceptEntry } from './conceptCatalog';
 import { topicIds } from './topics';
 
-export type ReviewQuestion = { question: string; explanation: string; conceptIds: string[] };
+export type ReviewQuestion = {
+  stage?: string;
+  question: string;
+  explanation: string;
+  observation?: string;
+  conceptIds: string[];
+};
 export type LearningStep = {
   id: string;
   kind: 'concept' | 'recap';
@@ -9,6 +15,8 @@ export type LearningStep = {
   conceptId?: string;
   focus?: string;
   nextReason?: string;
+  recapHeading?: string;
+  recapIntro?: string;
   questions?: ReviewQuestion[];
 };
 export type LearningPath = {
@@ -26,7 +34,9 @@ export type LearningPath = {
 };
 const read = (id: string, title: string, focus: string, nextReason: string): LearningStep =>
   ({ id, kind: 'concept', conceptId: id, title, focus, nextReason });
-const recap = (questions: ReviewQuestion[]): LearningStep => ({ id: 'recap', kind: 'recap', title: '路线回顾', questions });
+const recap = (questions: ReviewQuestion[], options: Pick<LearningStep, 'recapHeading' | 'recapIntro'> = {}): LearningStep => ({
+  id: 'recap', kind: 'recap', title: '路线回顾', questions, ...options,
+});
 
 export const learningPaths: LearningPath[] = [
   {
@@ -64,10 +74,59 @@ export const learningPaths: LearningPath[] = [
       read('pmi', 'PMI', '分清景气方向与实际产出的增长速度；PMI 是调查信号，不是官方综合周期指数。', '再看企业如何根据需求、价格和生产变化调整库存。'),
       read('inventory-cycle', '库存周期', '库存周期是分析框架，不是一条官方综合指数，也不是固定时钟。', '最后回顾这些指标各自回答的问题，并把它们放回同一张宏观地图。'),
       recap([
-        { question: 'GDP、PMI、CPI 可以互相替代吗？', explanation: 'GDP 观察产出，PMI 描述调查中的景气变化，CPI 观察居民消费价格。先分清指标含义、单位和期间，再比较变化。', conceptIds: ['gdp', 'pmi', 'cpi'] },
-        { question: '降息是否意味着贷款一定增加？', explanation: '政策利率、贷款报价和实际信用变化之间需要时间与条件；银行约束、借款需求和还款能力都影响结果。', conceptIds: ['monetary-policy', 'lpr', 'credit'] },
-        { question: '读一个宏观数字时，先问什么？', explanation: '先问统计对象、单位、时间范围以及它是余额、增速还是期间增量。不同口径的数字不能直接替换。', conceptIds: ['m2', 'credit', 'government-debt', 'exports'] },
-      ]),
+        {
+          stage: '1 · 需求回升',
+          question: '假设居民消费和企业投资开始回升，最早可以从哪里看到线索？',
+          explanation: '这是一个假设起点。零售数据能观察部分消费活动，PMI 是企业调查信号，GDP 则从国民经济核算角度汇总一个时期的最终产出；三者覆盖范围和发布时间不同，不能互相替代。',
+          observation: '先看社会消费品零售总额和 PMI 的变化，再在季度数据发布后核对 GDP。',
+          conceptIds: ['retail-sales', 'pmi', 'gdp'],
+        },
+        {
+          stage: '2 · 企业扩张与就业',
+          question: '需求如果持续，企业为什么可能扩大生产并增加就业？',
+          explanation: '当企业判断订单和销售能够持续时，可能增加生产、补充库存或招聘；但产出和就业的反应会受到行业结构、生产率、库存位置和用工安排影响，未必同时、同幅发生。',
+          observation: '把 GDP、PMI 和就业放在一起看，留意调查信号、实际产出和劳动力市场数据的时点差异。',
+          conceptIds: ['gdp', 'pmi', 'employment', 'inventory-cycle'],
+        },
+        {
+          stage: '3 · 信贷进入扩张',
+          question: '企业和居民活动变活跃后，信贷为什么可能跟着变化？',
+          explanation: '更强的融资需求和银行愿意放贷，可能共同推高新增信贷；政策利率和 LPR 变化可能影响融资成本，但银行资本与风险约束、借款人的还款能力和实际需求仍决定信用是否扩张。',
+          observation: '观察融资成本、信贷需求和银行信贷条件如何共同影响信用变化，并为传导预留数周到数月的时间。',
+          conceptIds: ['monetary-policy', 'policy-rate', 'lpr', 'credit'],
+        },
+        {
+          stage: '4 · 价格压力',
+          question: '扩张阶段为什么可能出现 CPI 或 PPI 的价格压力？',
+          explanation: '需求增加、原材料成本变化和供给能力约束都可能推高部分价格。PPI 观察生产者环节，CPI 观察居民消费篮子，生产端变化传到消费端还要经过成本占比、竞争、需求和合约等条件。',
+          observation: '同时看 PPI 和 CPI 的范围、同比或环比口径，以及它们之间可能存在的时滞。',
+          conceptIds: ['ppi', 'cpi'],
+        },
+        {
+          stage: '5 · 货币政策如何应对价格压力',
+          question: '价格压力上升时，货币政策会怎样评估是否调整利率？',
+          explanation: '价格压力是政策评估的输入之一，决策还要结合经济活动、通胀预期、就业和金融条件。政策利率调整可能是收紧融资条件的一个信号，但不代表所有贷款合同会立即等幅变化。',
+          observation: '区分货币政策目标、政策利率动作和实际贷款利率，检查 LPR 报价与重定价时间。',
+          conceptIds: ['monetary-policy', 'policy-rate', 'lpr'],
+        },
+        {
+          stage: '6 · 活动与就业放缓',
+          question: '融资条件收紧后，经济活动如何可能传回产出和就业？',
+          explanation: '融资成本上升或信用供给收紧，可能让部分居民和企业推迟支出与投资，随后生产、库存和招聘计划出现变化；影响通常有时滞，也会因行业、借款人和政策配套不同而不同。',
+          observation: '比较 PMI 的较早信号、GDP 的季度产出和就业数据，避免用单一指标判断整个经济阶段。',
+          conceptIds: ['policy-rate', 'credit', 'pmi', 'gdp', 'employment'],
+        },
+        {
+          stage: '7 · 条件变化与可能宽松',
+          question: '经济放缓后，为什么政策方向可能重新转向宽松？',
+          explanation: '如果价格压力减弱，而产出、信用或就业走弱，政策制定者可能重新评估融资条件；宽松信号能改变部分资金价格和预期，但经济恢复仍取决于需求、银行供给、借款人信心和其他约束。',
+          observation: '把政策动作与后续的资金价格、信用、产出和就业变化分开记录，并标注政策到结果的时滞。',
+          conceptIds: ['monetary-policy', 'policy-rate', 'credit', 'gdp', 'employment'],
+        },
+      ], {
+        recapHeading: '经济周期：把各部分串起来',
+        recapIntro: '下面用一个假设场景，把需求、产出、就业、信贷、价格、利率和货币政策放进同一条观察线索。现实中的顺序、力度和时滞会因供给冲击、外部需求、财政安排与预期变化而不同，这里用来练习如何连接指标，不代表每次都会完整走完一轮。',
+      }),
     ],
   },
   {

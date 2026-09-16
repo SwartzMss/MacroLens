@@ -35,6 +35,17 @@ test('published routes resolve real concepts, recap evidence and prerequisite or
   assert.ok(chapter('经济为什么会有周期').stepIds.includes('pmi'));
   assert.ok(chapter('经济为什么会有周期').stepIds.includes('inventory-cycle'));
   assert.equal(foundation.chapters.at(-1).stepIds.at(-1), 'recap');
+  const cycle = foundation.steps.at(-1);
+  assert.equal(cycle.id, 'recap');
+  assert.equal(cycle.recapHeading, '经济周期：把各部分串起来');
+  assert.match(cycle.recapIntro, /假设场景/);
+  assert.deepEqual(cycle.questions.map(question => question.stage), [
+    '1 · 需求回升', '2 · 企业扩张与就业', '3 · 信贷进入扩张', '4 · 价格压力',
+    '5 · 货币政策如何应对价格压力', '6 · 活动与就业放缓', '7 · 条件变化与可能宽松',
+  ]);
+  assert.ok(cycle.questions.every(question => question.observation));
+  const cycleConceptIds = new Set(cycle.questions.flatMap(question => question.conceptIds));
+  for (const id of ['gdp', 'cpi', 'ppi', 'credit', 'policy-rate', 'monetary-policy', 'employment']) assert.ok(cycleConceptIds.has(id));
   assert.ok(foundation.extensionConceptIds.includes('fiscal-policy'));
   assert.ok(!foundation.steps.some(step => ['fiscal-policy', 'fiscal-expenditure', 'government-debt', 'exchange-rate', 'exports', 'imports'].includes(step.id)));
   assert.deepEqual(openEconomy.topicIds, ['exchange-rates', 'balance-of-payments']);
