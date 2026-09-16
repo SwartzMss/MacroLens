@@ -56,6 +56,15 @@ test('topic pages and prerequisite component exist as static route sources', () 
   assert.match(prerequisiteSource, /\/concepts\//);
 });
 
+test('learning entry explains the beginner journey and specialist route relationship', () => {
+  const learningIndex = readFileSync(`${root}src/pages/learn/index.astro`, 'utf8');
+  assert.match(learningIndex, /data-learning-journey-intro/);
+  assert.match(learningIndex, /learning-recommended-order/);
+  assert.match(learningIndex, /推荐顺序/);
+  assert.match(learningIndex, /专题深入/);
+  assert.match(learningIndex, /从个人概念走到经济系统/);
+});
+
 test('concept links in the catalog remain stable concept routes', () => {
   const conceptIds = new Set(readdirSync(`${root}src/content/concepts`)
     .filter((name) => name.endsWith('.md'))

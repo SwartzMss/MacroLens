@@ -13,11 +13,32 @@ const concepts = readdirSync(dir).filter(name => name.endsWith('.md')).map(name 
 });
 const money = publishedLearningPaths.find(path => path.id === 'money-credit');
 const policy = publishedLearningPaths.find(path => path.id === 'monetary-transmission');
+const foundation = publishedLearningPaths.find(path => path.id === 'macro-foundations');
+const openEconomy = publishedLearningPaths.find(path => path.id === 'open-economy');
 
 test('published routes resolve real concepts, recap evidence and prerequisite order', () => {
   assert.doesNotThrow(() => validateLearningPaths(learningPaths, concepts));
-  assert.equal(publishedLearningPaths.length, 4);
-  assert.equal(publishedLearningPaths[0].steps.length, 23);
+  assert.equal(publishedLearningPaths.length, 5);
+  assert.equal(publishedLearningPaths[0].id, 'macro-foundations');
+  assert.equal(publishedLearningPaths[0].steps.length, 18);
+  assert.deepEqual(foundation.chapters.map(chapter => chapter.title), [
+    '经济是什么', '钱与货币体系', '信用如何创造', '利率与货币政策',
+    '什么是通胀', '经济如何影响就业与收入', '经济为什么会有周期', '把各部分联系起来',
+  ]);
+  const chapter = title => foundation.chapters.find(item => item.title === title);
+  assert.ok(chapter('经济是什么').stepIds.includes('gdp'));
+  assert.ok(chapter('钱与货币体系').stepIds.includes('m2'));
+  assert.ok(chapter('信用如何创造').stepIds.includes('credit'));
+  assert.ok(chapter('利率与货币政策').stepIds.includes('monetary-policy'));
+  assert.ok(chapter('什么是通胀').stepIds.includes('cpi'));
+  assert.ok(chapter('经济如何影响就业与收入').stepIds.includes('employment'));
+  assert.ok(chapter('经济为什么会有周期').stepIds.includes('pmi'));
+  assert.ok(chapter('经济为什么会有周期').stepIds.includes('inventory-cycle'));
+  assert.equal(foundation.chapters.at(-1).stepIds.at(-1), 'recap');
+  assert.ok(foundation.extensionConceptIds.includes('fiscal-policy'));
+  assert.ok(!foundation.steps.some(step => ['fiscal-policy', 'fiscal-expenditure', 'government-debt', 'exchange-rate', 'exports', 'imports'].includes(step.id)));
+  assert.deepEqual(openEconomy.topicIds, ['exchange-rates', 'balance-of-payments']);
+  assert.deepEqual(openEconomy.steps.map(step => step.id), ['exchange-rate', 'exports', 'imports', 'recap']);
   assert.equal(policy.steps.at(-1).kind, 'recap');
 });
 
