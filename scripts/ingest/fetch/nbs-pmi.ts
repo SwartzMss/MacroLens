@@ -1,3 +1,4 @@
+import { fetchText } from '../fetch-text.ts';
 import { IngestionContractError, MethodologyMismatchError, PMI_METHODOLOGY_FINGERPRINT } from '../types.ts';
 import type { Observation, PmiPublication, RawPmiPublication } from '../types.ts';
 
@@ -68,7 +69,7 @@ export function validatePmiMethodology(html: string): string {
   return PMI_METHODOLOGY_FINGERPRINT;
 }
 
-export function discoverLatestPmiPublication(indexHtml: string): PmiPublication {
+function discoverPmiPublicationCandidates(indexHtml: string): PmiPublication[] {
   const candidates: PmiPublication[] = [];
   const anchorPattern = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
 
@@ -87,10 +88,33 @@ export function discoverLatestPmiPublication(indexHtml: string): PmiPublication 
     candidates.push({ title, url, sourceDate: dateMatch[1] });
   }
 
+  return candidates;
+}
+
+export function discoverLatestPmiPublication(indexHtml: string): PmiPublication {
+  const candidates = discoverPmiPublicationCandidates(indexHtml);
   if (candidates.length === 0) {
     throw new IngestionContractError(`No NBS publication matching ${PUBLICATION_TITLE}`);
   }
   return candidates.sort((left, right) => right.sourceDate.localeCompare(left.sourceDate))[0];
+}
+
+// NBS lists releases newest first; monthly releases can move off the first page.
+export async function fetchLatestPmiPublication(
+  fetcher: (url: string) => Promise<string> = fetchText,
+  maxPages = 5,
+): Promise<PmiPublication> {
+  if (!Number.isInteger(maxPages) || maxPages < 1) {
+    throw new IngestionContractError('NBS publication index page limit must be a positive integer');
+  }
+  for (let page = 0; page < maxPages; page += 1) {
+    const url = page === 0 ? NBS_PUBLICATION_INDEX : `${NBS_PUBLICATION_INDEX}index_${page}.html`;
+    const candidates = discoverPmiPublicationCandidates(await fetcher(url));
+    if (candidates.length > 0) {
+      return candidates.sort((left, right) => right.sourceDate.localeCompare(left.sourceDate))[0];
+    }
+  }
+  throw new IngestionContractError(`No NBS publication matching ${PUBLICATION_TITLE} after scanning ${maxPages} pages`);
 }
 
 export function parsePmiPublication(publication: PmiPublication, html: string): RawPmiPublication {

@@ -5,6 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
   discoverLatestPmiPublication,
+  fetchLatestPmiPublication,
   parsePmiPublication,
 } from '../scripts/ingest/fetch/nbs-pmi.ts';
 import { normalizePmiDataset } from '../scripts/ingest/normalize/pmi.ts';
@@ -321,3 +322,42 @@ async function captureOutput(callback) {
     console.log = originalLog;
   }
 }
+
+
+test('PMI discovery scans older index pages and stops when a publication is found', async () => {
+  const urls = [];
+  const publication = await fetchLatestPmiPublication(async (url) => {
+    urls.push(url);
+    return urls.length === 1 ? '<p>Other releases</p>' : fixture('publication-index.html');
+  });
+  assert.equal(publication.sourceDate, '2026-08-31');
+  assert.deepEqual(urls, [
+    'https://www.stats.gov.cn/sj/zxfbhjd/',
+    'https://www.stats.gov.cn/sj/zxfbhjd/index_1.html',
+  ]);
+});
+
+test('PMI discovery bounds missing-publication searches', async () => {
+  let calls = 0;
+  await assert.rejects(fetchLatestPmiPublication(async () => {
+    calls += 1;
+    return '<p>No PMI release</p>';
+  }, 2), /after scanning 2 pages/);
+  assert.equal(calls, 2);
+  await assert.rejects(fetchLatestPmiPublication(async () => '', 0), /positive integer/);
+});
+
+test('PMI discovery does not hide network or publication contract failures', async () => {
+  let calls = 0;
+  await assert.rejects(fetchLatestPmiPublication(async () => {
+    calls += 1;
+    throw new Error('Network unavailable');
+  }), /Network unavailable/);
+  assert.equal(calls, 1);
+  await assert.rejects(fetchLatestPmiPublication(async () =>
+    '<a href="https://example.com/release">中国采购经理指数运行情况</a>2026-08-31'
+  ), /not hosted/);
+  await assert.rejects(fetchLatestPmiPublication(async () =>
+    '<a href="./release">中国采购经理指数运行情况</a>'
+  ), /date missing/);
+});

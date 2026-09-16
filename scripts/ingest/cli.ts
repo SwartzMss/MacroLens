@@ -1,13 +1,11 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { fetchText } from './fetch-text.ts';
-import { discoverLatestPmiPublication, parsePmiPublication } from './fetch/nbs-pmi.ts';
+import { discoverLatestPmiPublication, fetchLatestPmiPublication, parsePmiPublication } from './fetch/nbs-pmi.ts';
 import { normalizePmiDataset } from './normalize/pmi.ts';
 import { validateIndicatorDataset } from './validate/dataset.ts';
 import { writeIndicatorDataset } from './write/indicator.ts';
 import type { PmiPublication } from './types.ts';
-
-const NBS_PUBLICATION_INDEX = 'https://www.stats.gov.cn/sj/zxfbhjd/';
 
 type CliOptions = {
   fixtureIndex?: string;
@@ -39,8 +37,7 @@ async function loadPublication(options: CliOptions): Promise<{ publication: PmiP
     const publication = discoverLatestPmiPublication(indexHtml);
     return { publication, html };
   }
-  const indexHtml = await fetchText(NBS_PUBLICATION_INDEX);
-  const publication = discoverLatestPmiPublication(indexHtml);
+  const publication = await fetchLatestPmiPublication();
   return { publication, html: await fetchText(publication.url) };
 }
 
