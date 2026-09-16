@@ -558,6 +558,25 @@ export function compactRealEconomyCoverage(
   return ranges.join('; ');
 }
 
+function unemploymentReleaseValue(publication: NbsRealEconomyPublication, html: string): number | undefined {
+  if (!html) return undefined;
+  const text = canonical(textOf(html));
+  // Only an explicit single-month national rate is eligible. Never use averages
+  // or subgroup rates. Repeated desktop/mobile copies must agree.
+  const month = Number(publication.coverage.slice(5, 7));
+  const pattern = new RegExp(`(?:^|[。！？；])${month}月份?，全国城镇调查失业率为(\\d+(?:\\.\\d+)?)%`, 'g');
+  const values = [...text.matchAll(pattern)].map(match => Number(match[1]));
+  if (values.length === 0) return undefined;
+  if (new URL(publication.url).origin !== NBS_ORIGIN
+    || !text.includes(canonical(publication.title))
+    || publicationCoverageFromTitle(publication.title, 'unemployment-rate', publication.sourceDate) !== publication.coverage) {
+    fail('Unemployment release identity or period mismatch');
+  }
+  if (new Set(values).size !== 1) fail('Unemployment release values conflict');
+  validateRealEconomyObservations([{ date: publication.coverage.slice(0, 7), value: values[0] }], 'unemployment-rate', { requireYearStart: false });
+  return values[0];
+}
+
 export function parseNbsRealEconomyResponse(
   payload: unknown,
   publication: NbsRealEconomyPublication,
@@ -621,11 +640,25 @@ export function parseNbsRealEconomyResponse(
   const first = observations[0];
   const last = observations.at(-1);
   if (!first || !last) fail('NBS response contains no observations');
+  let supplementalSource: IndicatorSource | undefined;
   if (contract.id === 'unemployment-rate') {
     const publicationMonth = publication.coverage.match(/^(\d{4}-(?:0[1-9]|1[0-2])) to \1$/)?.[1];
     if (!publicationMonth) fail('NBS unemployment publication must cover one exact month');
-    if (last.date !== publicationMonth) {
-      fail(`NBS unemployment data does not match publication month: ${last.date} != ${publicationMonth}`);
+    const releaseValue = unemploymentReleaseValue(publication, officialMethodologyText);
+    if (last.date === publicationMonth) {
+      if (releaseValue !== undefined && releaseValue !== last.value) fail('NBS unemployment API and release values conflict');
+    } else {
+      const nextMonth = new Date(`${last.date}-01T00:00:00Z`);
+      nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1);
+      if (nextMonth.toISOString().slice(0, 7) !== publicationMonth || releaseValue === undefined) {
+        fail(`NBS unemployment data does not match publication month: ${last.date} != ${publicationMonth}`);
+      }
+      observations.push({ date: publicationMonth, value: releaseValue });
+      validateRealEconomyObservations(observations, contract.id, { requireYearStart: false });
+      supplementalSource = {
+        title: `国家统计局：${publication.title}`, url: publication.url,
+        sourceDate: publication.sourceDate, coverage: publication.coverage, role: 'data',
+      };
     }
   }
   const dataSources: IndicatorSource[] = [...sourcePeriods.entries()].map(([code, periods]) => ({
@@ -636,6 +669,7 @@ export function parseNbsRealEconomyResponse(
     role: 'data',
     request: requests[code],
   }));
+  if (supplementalSource) dataSources.push(supplementalSource);
   return {
     publication,
     id: contract.id,
