@@ -66,6 +66,12 @@
       "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416320925645/index.html",
       "sourceDate": "2026-08-14",
       "coverage": "2026-07 to 2026-07"
+    },
+    {
+      "title": "中国人民银行：2026年8月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026091417020862747/index.html",
+      "sourceDate": "2026-09-14",
+      "coverage": "2026-08 to 2026-08"
     }
   ],
   "data": [
@@ -192,6 +198,10 @@
     {
       "date": "2026-07",
       "value": 14.82
+    },
+    {
+      "date": "2026-08",
+      "value": 14.83
     }
   ],
   "unit": "万亿元"

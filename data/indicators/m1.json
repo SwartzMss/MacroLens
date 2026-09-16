@@ -71,9 +71,15 @@
       "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416320925645/index.html",
       "sourceDate": "2026-08-14",
       "coverage": "2026-07 to 2026-07"
+    },
+    {
+      "title": "中国人民银行：2026年8月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026091417020862747/index.html",
+      "sourceDate": "2026-09-14",
+      "coverage": "2026-08 to 2026-08"
     }
   ],
-  "updatedAt": "2026-08-14",
+  "updatedAt": "2026-09-14",
   "comparabilityNote": "2024 年数据采用中国人民银行按 2025 年 1 月启用的新 M1 统计口径回溯后的可比数据；序列为央行直接公布值。",
   "data": [
     {
@@ -199,6 +205,10 @@
     {
       "date": "2026-07",
       "value": 4
+    },
+    {
+      "date": "2026-08",
+      "value": 4.1
     }
   ]
 }

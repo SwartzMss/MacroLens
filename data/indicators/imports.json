@@ -10,7 +10,7 @@
   "definitionAsOf": "2026-08",
   "source": "GACC",
   "calculation": "published",
-  "updatedAt": "2026-08-10",
+  "updatedAt": "2026-09-09",
   "comparabilityNote": "这是海关总署按人民币计价发布的全国货物贸易进口金额月度同比增速，采用海关货物贸易统计口径，不是国际收支货物或服务进口，也不是美元口径、累计同比、进口数量或价格指数。本次历史回溯从档案中首个可可靠识别的官方单月表2025年5月开始；2026年1—2月官方联合发布没有可用于单独识别1月的月度值，因此不把累计值拆成1月，2026年1月保留为空档并由2026年2月单月表接续。若官方发布口径、币种或估价发生变化，应停止自动拼接并更新方法指纹。",
   "methodologyFingerprint": "gacc-customs-goods-trade|rmb-value|monthly-published-yoy|national-total",
   "sources": [
@@ -111,6 +111,13 @@
       "sourceDate": "2026-08-10",
       "coverage": "2026-07 to 2026-07",
       "role": "data"
+    },
+    {
+      "title": "海关总署：(1) China's Total Export & Import Values, Aug 2026(in CNY)",
+      "url": "https://english.customs.gov.cn/Statics/074ff4d3-434a-474e-bbfa-4342d0a97c88.html",
+      "sourceDate": "2026-09-09",
+      "coverage": "2026-08 to 2026-08",
+      "role": "data"
     }
   ],
   "data": [
@@ -169,6 +176,10 @@
     {
       "date": "2026-07",
       "value": 21.2
+    },
+    {
+      "date": "2026-08",
+      "value": 21.7
     }
   ]
 }

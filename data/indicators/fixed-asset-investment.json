@@ -10,7 +10,7 @@
   "source": "NBS",
   "calculation": "published",
   "methodologyFingerprint": "nbs-fixed-asset-investment|excluding-rural-households|cumulative-yoy",
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-09-15",
   "comparabilityNote": "每个点均为年初至标示月份的累计同比，不是当月同比。国家统计局从1—2月开始发布，图中不补造1月值；2025年增速按统计制度改革、五经普和执法检查后的可比口径计算。",
   "sources": [
     {
@@ -31,6 +31,13 @@
       "sourceDate": "2026-08-17",
       "coverage": "2026-01–07 to 2026-01–07",
       "role": "methodology"
+    },
+    {
+      "title": "国家统计局：2026年1—8月份全国固定资产投资基本情况",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965309.html",
+      "sourceDate": "2026-09-15",
+      "coverage": "2026-01–08 to 2026-01–08",
+      "role": "data"
     }
   ],
   "data": [
@@ -717,6 +724,10 @@
     {
       "date": "2026-01–07",
       "value": -6.7
+    },
+    {
+      "date": "2026-01–08",
+      "value": -7.2
     }
   ]
 }

@@ -78,9 +78,15 @@
       "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416320925645/index.html",
       "sourceDate": "2026-08-14",
       "coverage": "2026-07 to 2026-07"
+    },
+    {
+      "title": "中国人民银行：2026年8月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026091417020862747/index.html",
+      "sourceDate": "2026-09-14",
+      "coverage": "2026-08 to 2026-08"
     }
   ],
-  "updatedAt": "2026-08-14",
+  "updatedAt": "2026-09-14",
   "comparabilityNote": "2025-10 及之前同比增速由央行月末余额按（本期余额 ÷ 上年同期余额 − 1）计算并四舍五入至一位小数；自 2025-11 起直接采用央行发布的同比增速。",
   "data": [
     {
@@ -206,6 +212,10 @@
     {
       "date": "2026-07",
       "value": 7.7
+    },
+    {
+      "date": "2026-08",
+      "value": 7.5
     }
   ]
 }
