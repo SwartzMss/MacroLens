@@ -1,7 +1,7 @@
-import { getShanghaiDate, normalizeConceptPath } from './visitor.ts';
+import { getShanghaiDate } from './visitor.ts';
 
 export type VisitorStats = { available: true; total: number; today: number };
-export type PageStat = { path: string; total: number; today?: number };
+export type PageStat = { pageId: string; total: number; today?: number };
 
 export function visitorStatsQueries(today = getShanghaiDate()): { total: string; today: string } {
   const safeDate = today.replaceAll("'", "''");
@@ -22,10 +22,10 @@ export function parseVisitorCount(payload: unknown, field: 'total' | 'today'): n
 
 export function pageStatsQueries(today = getShanghaiDate()): { total: string; today: string } {
   const safeDate = today.replaceAll("'", "''");
-  const scope = "FROM macrolens_visitors WHERE blob3 LIKE '/concepts/%'";
+  const scope = "FROM macrolens_visitors WHERE blob4 LIKE 'learn:%'";
   return {
-    total: `SELECT blob3 AS path, COUNT(DISTINCT blob1) AS total ${scope} GROUP BY blob3 ORDER BY total DESC`,
-    today: `SELECT blob3 AS path, COUNT(DISTINCT blob1) AS today ${scope} AND blob2 = '${safeDate}' GROUP BY blob3 ORDER BY today DESC`,
+    total: `SELECT blob4 AS page_id, COUNT(DISTINCT blob1) AS total ${scope} GROUP BY blob4 ORDER BY total DESC`,
+    today: `SELECT blob4 AS page_id, COUNT(DISTINCT blob1) AS today ${scope} AND blob2 = '${safeDate}' GROUP BY blob4 ORDER BY today DESC`,
   };
 }
 
@@ -37,21 +37,22 @@ export function parsePageStats(payload: unknown, field: 'total' | 'today'): Page
   const seen = new Set<string>();
   for (const row of rows) {
     if (!row || typeof row !== 'object') return null;
-    const path = normalizeConceptPath((row as Record<string, unknown>).path);
+    const pageId = (row as Record<string, unknown>).page_id;
     const rawCount = (row as Record<string, unknown>)[field];
     const count = typeof rawCount === 'number' ? rawCount : Number(rawCount);
-    if (!path || !Number.isSafeInteger(count) || count < 0 || seen.has(path)) return null;
-    seen.add(path);
-    pages.push(field === 'total' ? { path, total: count } : { path, total: 0, today: count });
+    if (typeof pageId !== 'string' || !/^learn:[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pageId)
+      || !Number.isSafeInteger(count) || count < 0 || seen.has(pageId)) return null;
+    seen.add(pageId);
+    pages.push(field === 'total' ? { pageId, total: count } : { pageId, total: 0, today: count });
   }
   return pages;
 }
 
 export function combinePageStats(total: PageStat[], today: PageStat[]): PageStat[] {
-  const todayByPath = new Map(today.map((page) => [page.path, page.today ?? 0]));
+  const todayByPage = new Map(today.map((page) => [page.pageId, page.today ?? 0]));
   return total.map((page) => ({
-    path: page.path,
+    pageId: page.pageId,
     total: page.total,
-    today: todayByPath.get(page.path) ?? 0,
+    today: todayByPage.get(page.pageId) ?? 0,
   }));
 }

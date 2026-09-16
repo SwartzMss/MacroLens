@@ -24,7 +24,8 @@ type Context = {
 };
 
 const MAX_BODY_BYTES = 2048;
-const pageIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const learningArticleIdPattern = /^learn:[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const legacyPageIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const feedbackReasons = new Set<FeedbackReason>([
   'too_complex',
   'missing_example',
@@ -63,7 +64,9 @@ function isSameOrigin(request: Request): boolean {
 }
 
 function parsePageId(value: unknown): string | null {
-  return typeof value === 'string' && value.length <= 100 && pageIdPattern.test(value) ? value : null;
+  // Keep accepting legacy concept IDs so existing D1 rows remain readable; new UI writes learn:<id>.
+  return typeof value === 'string' && value.length <= 100
+    && (learningArticleIdPattern.test(value) || legacyPageIdPattern.test(value)) ? value : null;
 }
 
 async function readBoundedBody(request: Request): Promise<{ body?: string; status?: number }> {

@@ -1,10 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { learningArticles } from '../data/learningArticles';
 import '../styles/stats.css';
 
 const concepts = (await getCollection('concepts'))
   .sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id));
+const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
+const articles = learningArticles
+  .map(article => ({ ...article, concept: conceptsById.get(article.conceptId) }))
+  .filter(article => article.concept)
+  .sort((a, b) => a.concept!.data.order - b.concept!.data.order || a.conceptId.localeCompare(b.conceptId));
 ---
 <BaseLayout
   title="内容统计｜MacroLens"
@@ -33,9 +39,9 @@ const concepts = (await getCollection('concepts'))
         <small>上海时区</small>
       </article>
       <article class="stats-kpi">
-        <span>已有访问概念</span>
+        <span>已有访问文章</span>
         <strong data-tracked-pages>—</strong>
-        <small>有页面 UV 的概念数</small>
+        <small>有学习 UV 的文章数</small>
       </article>
       <article class="stats-kpi">
         <span>页面反馈</span>
@@ -49,8 +55,8 @@ const concepts = (await getCollection('concepts'))
     <section class="stats-panel" aria-labelledby="concept-stats-title">
       <header class="stats-panel-head">
         <div>
-          <h2 id="concept-stats-title">概念表现</h2>
-          <p>默认按累计页面 UV 排序。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
+          <h2 id="concept-stats-title">学习文章表现</h2>
+          <p>同一概念出现在多条学习路线时合并统计。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
         </div>
       </header>
 
@@ -58,7 +64,7 @@ const concepts = (await getCollection('concepts'))
         <table class="stats-table">
           <thead>
             <tr>
-              <th scope="col">概念</th>
+              <th scope="col">学习文章</th>
               <th scope="col">累计 UV</th>
               <th scope="col">今日 UV</th>
               <th scope="col">反馈数</th>
@@ -67,16 +73,15 @@ const concepts = (await getCollection('concepts'))
             </tr>
           </thead>
           <tbody data-stats-body>
-            {concepts.map(concept => (
+            {articles.map(article => (
               <tr
-                data-page-id={concept.data.id}
-                data-path={`/concepts/${concept.data.id}`}
+                data-page-id={article.pageId}
                 data-total-uv="0"
                 data-feedback-count="0"
               >
                 <td class="stats-concept">
-                  <a href={`/concepts/${concept.data.id}`}>{concept.data.name}</a>
-                  <small>{concept.data.id}</small>
+                  <a href={`${article.paths[0]}/`}>{article.concept!.data.name}</a>
+                  <small>{article.conceptId}</small>
                 </td>
                 <td data-total-uv>—</td>
                 <td data-today-uv>—</td>
@@ -89,7 +94,7 @@ const concepts = (await getCollection('concepts'))
         </table>
       </div>
 
-      <p class="stats-note">页面 UV 是“每个页面分别去重”的访问人数；同一个访客访问多个概念，会在多个页面各计 1，因此不要把各页面 UV 相加当成全站访客数。</p>
+      <p class="stats-note">学习文章 UV 按文章 ID 和访客去重。同一概念出现在多条学习路线时，一个访客只计 1 次；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
     </section>
   </section>
 
@@ -152,8 +157,8 @@ const concepts = (await getCollection('concepts'))
         const pageStats = new Map<string, { total: number; today: number }>();
         if (pagePayload?.available === true && Array.isArray(pagePayload.pages)) {
           for (const page of pagePayload.pages) {
-            if (page && typeof page.path === 'string' && Number.isFinite(page.total) && Number.isFinite(page.today)) {
-              pageStats.set(page.path, { total: page.total, today: page.today });
+            if (page && typeof page.pageId === 'string' && Number.isFinite(page.total) && Number.isFinite(page.today)) {
+              pageStats.set(page.pageId, { total: page.total, today: page.today });
             }
           }
         } else {
@@ -180,8 +185,7 @@ const concepts = (await getCollection('concepts'))
 
         for (const row of rows()) {
           const pageId = row.dataset.pageId ?? '';
-          const path = row.dataset.path ?? '';
-          const traffic = pageStats.get(path);
+          const traffic = pageStats.get(pageId);
           const feedback = feedbackStats.get(pageId);
           const totalUv = traffic?.total ?? 0;
           const todayUv = traffic?.today ?? 0;
