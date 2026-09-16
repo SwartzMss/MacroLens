@@ -8,6 +8,15 @@
 .learning-journey-intro-action { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
 .learning-journey-intro-action .learning-local-note { margin: 0; }
 .learning-journey { padding: 24px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: 16px; }
+.learning-layer-boundary { display: grid; grid-template-columns: minmax(210px,.55fr) minmax(0,1fr); gap: 24px; align-items: stretch; padding: 24px; margin-bottom: 28px; border: 1px solid var(--line); border-radius: 16px; background: #fbfaf5; }
+.learning-layer-boundary-heading h2 { font: 700 25px/1.4 var(--serif); margin: 10px 0; }
+.learning-layer-boundary-heading p { margin: 0; color: var(--muted); line-height: 1.7; }
+.learning-layer-boundary-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.learning-layer-card { display: flex; flex-direction: column; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+.content-layer-card-label { color: var(--green); font-size: 12px; font-weight: 800; }
+.learning-layer-card h3 { margin: 8px 0; font: 700 20px/1.4 var(--serif); }
+.learning-layer-card p { flex: 1; margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.learning-layer-card a { color: var(--green); font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .learning-journey-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; margin-bottom: 18px; }
 .learning-journey-heading h2 { font: 700 26px/1.4 var(--serif); margin: 10px 0 0; }
 .learning-journey-list { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; counter-reset: journey; }
@@ -94,6 +103,7 @@
   .learning-reader .detail-layout { grid-template-columns: minmax(0,1fr); }
   .learning-card-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .learning-journey-intro { grid-template-columns: minmax(0,1fr); }
+  .learning-layer-boundary { grid-template-columns: minmax(0,1fr); }
   .learning-journey-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .learning-path-summary { grid-template-columns: minmax(0,1fr); gap: 28px; }
   .learning-mobile-menu .detail-toc-menu a { padding: 9px; }
@@ -105,8 +115,10 @@
   .learning-card-grid { grid-template-columns: minmax(0,1fr); }
   .learning-card { padding: 20px; }
   .learning-journey-intro, .learning-journey { padding: 20px; }
+  .learning-layer-boundary { padding: 20px; }
   .learning-journey-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
   .learning-journey-list { grid-template-columns: minmax(0,1fr); }
+  .learning-layer-boundary-grid { grid-template-columns: minmax(0,1fr); }
   .learning-card h2, .learning-card-featured h2 { font-size: 24px; }
   .learning-action-links { align-items: stretch; flex-direction: column; }
   .learning-next-group { align-items: stretch; flex-direction: column; }
