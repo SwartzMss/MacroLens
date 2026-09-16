@@ -59,7 +59,14 @@ export function normalizeRealEconomyDataset(
     coverage: raw.publication.coverage,
     role: 'methodology',
   };
-  const incomingSources = [...raw.dataSources, ...(methodologySource ? [methodologySource] : [])];
+  // A new release does not republish unchanged historical API observations.
+  // Preserve the recorded publication date for the same data source and coverage.
+  const dataSources = raw.dataSources.map(source => {
+    const previous = existing.sources.find(candidate => candidate.role !== 'methodology'
+      && candidate.url === source.url && candidate.coverage === source.coverage);
+    return previous ? { ...source, sourceDate: previous.sourceDate } : source;
+  });
+  const incomingSources = [...dataSources, ...(methodologySource ? [methodologySource] : [])];
   const incomingUrls = new Set(incomingSources.map((source) => source.url));
   const candidates = [
     ...existing.sources.filter((source) => !incomingUrls.has(source.url)),

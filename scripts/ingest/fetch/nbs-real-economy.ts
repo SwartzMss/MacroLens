@@ -789,6 +789,56 @@ export async function fetchNbsRealEconomyPublications(
   fail(`No NBS publication matching ${missing.join(', ')} after scanning ${maxPages} pages`);
 }
 
+/** Match each live monthly dataset to its latest discovered release before writing. */
+export function completeNbsRealEconomyRelease(raw: RawNbsRealEconomySeries, html: string): RawNbsRealEconomySeries {
+  if (raw.id === 'gdp' || raw.id === 'unemployment-rate') return raw;
+  const { publication, id } = raw;
+  const expectedCoverage = publicationCoverageFromTitle(publication.title, id, publication.sourceDate);
+  const period = expectedCoverage.split(' to ')[0];
+  if (publication.coverage !== expectedCoverage) fail(`NBS ${id} publication period mismatch`);
+  const last = raw.observations.at(-1);
+  if (!last) fail(`NBS ${id} has no observations`);
+  // Accept only an exact-period, exact-scope sentence in the release body.
+  const text = canonical(textOf(html
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<\/(?:p|div|h[1-6])>/gi, '。')));
+  if (new URL(publication.url).origin !== NBS_ORIGIN || !validIsoDate(publication.sourceDate)
+    || !text.includes(canonical(publication.title))) fail(`NBS ${id} release identity is not verified`);
+  const month = Number(period.slice(-2));
+  const combined = period.includes('01–02');
+  const year = period.slice(0, 4);
+  const monthlyPrefix = id === 'fixed-asset-investment' || combined ? `1-${month}月份` : `${month}月份`;
+  const prefix = id === 'fixed-asset-investment' && month === 12
+    ? `(?:(?:${year}年)?${monthlyPrefix}|${year}年|全年)`
+    : `(?:${year}年)?${monthlyPrefix}`;
+  const comparison = id === 'fixed-asset-investment' && month === 12 ? '(?:同比|比上年)' : '同比';
+  const amount = '(?:\\d+(?:\\.\\d+)?亿元，)?';
+  const subject = id === 'industrial-production' ? '规模以上工业增加值'
+    : id === 'retail-sales' ? `社会消费品零售总额${amount}`
+    : `全国固定资产投资（不含农户）${amount}`;
+  const pattern = new RegExp(`(?:^|[。！？；])${prefix}，${subject}${comparison}(?:实际)?(?:(增长|下降)(\\d+(?:\\.\\d+)?)%|(持平))`, 'g');
+  const values = [...text.matchAll(pattern)].map(match => match[3] ? 0 : Number(match[2]) * (match[1] === '下降' ? -1 : 1));
+  const methodology = id === 'industrial-production' ? /扣除价格因素|不变价/.test(text)
+    : id === 'retail-sales' ? /名义|现价/.test(text) : /可比口径/.test(text);
+  if (!methodology || values.length === 0) fail(`NBS ${id} release has no verified value for period ${period}`);
+  if (new Set(values).size !== 1) fail(`NBS ${id} release values conflict`);
+  const observation = { date: period, value: values[0] };
+  validateRealEconomyObservations([observation], id, { requireYearStart: false });
+  if (last.date === period) {
+    if (last.value !== observation.value) fail(`NBS ${id} API and release values conflict`);
+    return raw;
+  }
+  if (nextCoveragePeriod(last.date, id) !== period) {
+    fail(`NBS ${id} data period ${last.date} is not adjacent to release period ${period}`);
+  }
+  const observations = [...raw.observations, observation];
+  validateRealEconomyObservations(observations, id, { requireYearStart: false });
+  return { ...raw, observations, dataSources: [...raw.dataSources, {
+    title: `国家统计局：${publication.title}`, url: publication.url,
+    sourceDate: publication.sourceDate, coverage: expectedCoverage, role: 'data',
+  }] };
+}
+
 export async function fetchNbsRealEconomySeries(
   publication: NbsRealEconomyPublication,
   contract: RealEconomyContract,
@@ -802,14 +852,14 @@ export async function fetchNbsRealEconomySeries(
   ]);
   const adaptedPayload = parseNbsStructuredDataPayload(payload, contract, networkRequest.mapping);
   const persistedRequest = buildStructuredDataRequest(contract, latestStructuredDataMonth(adaptedPayload));
-  return parseNbsRealEconomyResponse(
+  return completeNbsRealEconomyRelease(parseNbsRealEconomyResponse(
     adaptedPayload,
     publication,
     contract,
     officialMethodologyText,
     persistedRequest.dataUrls,
     persistedRequest.requests,
-  );
+  ), officialMethodologyText);
 }
 
 export async function fetchNbsGdpPublication(
