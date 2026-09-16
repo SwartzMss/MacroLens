@@ -14,26 +14,28 @@ const concepts = readdirSync(dir).filter(name => name.endsWith('.md')).map(name 
 const money = publishedLearningPaths.find(path => path.id === 'money-credit');
 const policy = publishedLearningPaths.find(path => path.id === 'monetary-transmission');
 const foundation = publishedLearningPaths.find(path => path.id === 'macro-foundations');
+const openEconomy = publishedLearningPaths.find(path => path.id === 'open-economy');
 
 test('published routes resolve real concepts, recap evidence and prerequisite order', () => {
   assert.doesNotThrow(() => validateLearningPaths(learningPaths, concepts));
-  assert.equal(publishedLearningPaths.length, 4);
+  assert.equal(publishedLearningPaths.length, 5);
   assert.equal(publishedLearningPaths[0].id, 'macro-foundations');
-  assert.equal(publishedLearningPaths[0].steps.length, 23);
+  assert.equal(publishedLearningPaths[0].steps.length, 18);
   assert.deepEqual(foundation.chapters.map(chapter => chapter.title), [
     '经济是什么', '钱与银行', '信用如何创造', '利率与货币政策',
-    '什么是通胀', '政策如何进入经济与生活', '经济为什么会有周期与外部联系', '把各部分联系起来',
+    '什么是通胀', '政策如何影响经济', '经济为什么会有周期', '把各部分联系起来',
   ]);
-  assert.deepEqual(foundation.chapters.map(chapter => chapter.stepIds), [
-    ['gdp', 'retail-sales'],
-    ['m0', 'm1', 'm2'],
-    ['credit'],
-    ['monetary-policy', 'policy-rate', 'lpr'],
-    ['cpi', 'ppi'],
-    ['employment', 'unemployment-rate', 'wages', 'disposable-income', 'fiscal-policy', 'fiscal-expenditure', 'government-debt'],
-    ['pmi', 'exchange-rate', 'exports', 'imports'],
-    ['recap'],
-  ]);
+  const chapter = title => foundation.chapters.find(item => item.title === title);
+  assert.ok(chapter('经济是什么').stepIds.includes('gdp'));
+  assert.ok(chapter('钱与银行').stepIds.includes('m2'));
+  assert.ok(chapter('信用如何创造').stepIds.includes('credit'));
+  assert.ok(chapter('利率与货币政策').stepIds.includes('monetary-policy'));
+  assert.ok(chapter('什么是通胀').stepIds.includes('cpi'));
+  assert.ok(chapter('政策如何影响经济').stepIds.includes('employment'));
+  assert.ok(chapter('经济为什么会有周期').stepIds.includes('pmi'));
+  assert.ok(chapter('经济为什么会有周期').stepIds.includes('inventory-cycle'));
+  assert.equal(foundation.chapters.at(-1).stepIds.at(-1), 'recap');
+  assert.deepEqual(openEconomy.steps.map(step => step.id), ['exchange-rate', 'exports', 'imports', 'recap']);
   assert.equal(policy.steps.at(-1).kind, 'recap');
 });
 

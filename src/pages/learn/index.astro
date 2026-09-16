@@ -15,7 +15,7 @@ const [foundation, ...specialists] = publishedLearningPaths;
       <div>
         <div class="eyebrow">推荐学习路径</div>
         <h2 id="learning-journey-intro-title">从个人概念走到经济系统</h2>
-        <p>MacroLens 不只是查一个名词的知识库，也提供一条可以跟着走的宏观学习旅程。你可以先完成入门主线，建立产出、货币、信用、利率、价格、政策和周期之间的基本联系，再按兴趣进入专题。</p>
+        <p>MacroLens 不只是查一个名词的知识库，也提供一条可以跟着走的宏观学习旅程。你可以先完成入门主线，建立产出、货币、信用、利率、价格和周期之间的基本联系，再按兴趣进入专题。</p>
       </div>
       <div class="learning-journey-intro-action">
         <a class="learning-button" href={`/learn/${foundation.id}/${foundation.steps[0].id}/`}>开始入门旅程 →</a>
@@ -36,7 +36,6 @@ const [foundation, ...specialists] = publishedLearningPaths;
       </ol>
     </section>
 
-    <LearningCard path={foundation} featured />
     <h2 class="learning-section-title">专题深入</h2>
     <p class="learning-section-lead">已经有一个具体问题，或想沿某个方向继续？这些路线可以随时跳读，不会改变入门主线的进度。</p>
     <div class="learning-card-grid">{specialists.map(path => <LearningCard path={path} />)}</div>

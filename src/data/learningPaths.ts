@@ -30,19 +30,19 @@ const recap = (questions: ReviewQuestion[]): LearningStep => ({ id: 'recap', kin
 
 export const learningPaths: LearningPath[] = [
   {
-    id: 'macro-foundations', title: '从零开始的宏观经济旅程', status: 'published', revision: 1,
+    id: 'macro-foundations', title: '从零开始的宏观经济旅程', status: 'published', revision: 2,
     description: '沿着八个问题，从经济活动、钱与信用走到利率、价格、政策、周期与对外联系，先建立宏观经济的整体框架。',
-    topicIds: ['economic-activity', 'prices-inflation', 'household-sector', 'money-supply', 'monetary-transmission', 'fiscal-policy', 'balance-of-payments'],
+    topicIds: ['economic-activity', 'prices-inflation', 'household-sector', 'money-supply', 'monetary-transmission'],
     outcomes: ['用产出、货币、信用、利率、价格、收入和周期建立一张宏观经济地图。', '理解政策信号传到融资、需求和生活时需要哪些条件，避免把相关描述当成必然因果。', '阅读宏观新闻时，先找到它在这条旅程中的位置，再核对统计口径、单位和时间范围。'],
-    assumedConceptIds: [], extensionConceptIds: ['fiscal-revenue', 'fiscal-deficit', 'household-consumption', 'balance-of-payments', 'inventory-cycle'],
+    assumedConceptIds: [], extensionConceptIds: ['fiscal-policy', 'fiscal-expenditure', 'government-debt', 'fiscal-revenue', 'fiscal-deficit', 'household-consumption'],
     chapters: [
       { title: '经济是什么', stepIds: ['gdp', 'retail-sales'] },
       { title: '钱与银行', stepIds: ['m0', 'm1', 'm2'] },
       { title: '信用如何创造', stepIds: ['credit'] },
       { title: '利率与货币政策', stepIds: ['monetary-policy', 'policy-rate', 'lpr'] },
       { title: '什么是通胀', stepIds: ['cpi', 'ppi'] },
-      { title: '政策如何进入经济与生活', stepIds: ['employment', 'unemployment-rate', 'wages', 'disposable-income', 'fiscal-policy', 'fiscal-expenditure', 'government-debt'] },
-      { title: '经济为什么会有周期与外部联系', stepIds: ['pmi', 'exchange-rate', 'exports', 'imports'] },
+      { title: '政策如何影响经济', stepIds: ['employment', 'unemployment-rate', 'wages', 'disposable-income'] },
+      { title: '经济为什么会有周期', stepIds: ['pmi', 'inventory-cycle'] },
       { title: '把各部分联系起来', stepIds: ['recap'] },
     ],
     steps: [
@@ -60,14 +60,9 @@ export const learningPaths: LearningPath[] = [
       read('employment', '就业', '先明确哪些人被统计为就业。', '理解就业后，再看失业率的分母和调查范围。'),
       read('unemployment-rate', '城镇调查失业率', '失业率能回答什么，不能代表哪些人群的全部处境？', '工作之外，还要观察劳动带来的收入。'),
       read('wages', '工资与劳动报酬', '区分工资统计与一个家庭的全部收入。', '再看可支配收入，理解工资之外的收入和扣减。'),
-      read('disposable-income', '居民人均可支配收入', '区分收入来源，以及人均值与自己的收入。', '收入之外，还要看政府收支和财政政策。'),
-      read('fiscal-policy', '财政政策', '政府收支与货币政策是不同的调节方式。', '接着看政府支出记录的范围。'),
-      read('fiscal-expenditure', '财政支出', '看支出时先区分预算口径和统计期间。', '再看债务存量，避免把支出与债务直接混为一谈。'),
-      read('government-debt', '政府债务', '区分债务余额与一段时期的新增融资。', '有了这些基础，再用 PMI 观察经济活动的变化方向。'),
-      read('pmi', 'PMI', '分清景气方向与实际产出的增长速度；PMI 是调查信号，不是官方综合周期指数。', '经济活动会与汇率和跨境交易相互联系，下一步先看汇率。'),
-      read('exchange-rate', '汇率', '先判断报价方向，再理解升值和贬值。', '接着看出口，注意币种和贸易统计口径。'),
-      read('exports', '出口', '出口金额变化不等于出口数量同幅变化。', '再看进口，形成对双向贸易的认识。'),
-      read('imports', '进口', '分别观察进口与出口，避免只看一个方向。', '最后回顾这些指标各自回答的问题。'),
+      read('disposable-income', '居民人均可支配收入', '区分收入来源，以及人均值与自己的收入。', '接下来观察经济活动如何出现扩张、放缓和周期变化。'),
+      read('pmi', 'PMI', '分清景气方向与实际产出的增长速度；PMI 是调查信号，不是官方综合周期指数。', '再看企业如何根据需求、价格和生产变化调整库存。'),
+      read('inventory-cycle', '库存周期', '库存周期是分析框架，不是一条官方综合指数，也不是固定时钟。', '最后回顾这些指标各自回答的问题，并把它们放回同一张宏观地图。'),
       recap([
         { question: 'GDP、PMI、CPI 可以互相替代吗？', explanation: 'GDP 观察产出，PMI 描述调查中的景气变化，CPI 观察居民消费价格。先分清指标含义、单位和期间，再比较变化。', conceptIds: ['gdp', 'pmi', 'cpi'] },
         { question: '降息是否意味着贷款一定增加？', explanation: '政策利率、贷款报价和实际信用变化之间需要时间与条件；银行约束、借款需求和还款能力都影响结果。', conceptIds: ['monetary-policy', 'lpr', 'credit'] },
@@ -126,6 +121,23 @@ export const learningPaths: LearningPath[] = [
       recap([
         { question: 'PPI 上涨，CPI 就一定同比例上涨吗？', explanation: '两者覆盖范围不同，成本传导还取决于需求、竞争、成本占比和企业利润吸收等条件，可能有时滞与损耗。', conceptIds: ['ppi', 'cpi', 'price-transmission'] },
         { question: '核心 CPI 比 CPI 更接近每个人的生活成本吗？', explanation: '核心 CPI 排除食品和能源，提供另一个价格观察角度；它并不代表每个家庭的实际消费组合，也不取代总体 CPI。', conceptIds: ['cpi', 'core-cpi'] },
+      ]),
+    ],
+  },
+  {
+    id: 'open-economy', title: '开放经济入门', status: 'published', revision: 1,
+    description: '从汇率和进出口开始，理解一个经济体如何与外部发生交易，以及不同统计口径怎样连接。',
+    topicIds: ['exchange-rates', 'balance-of-payments'],
+    outcomes: ['理解汇率是货币之间的相对价格，并先确认报价方向。', '区分出口、进口的金额变化与数量、价格变化。', '知道海关贸易统计和国际收支统计回答的问题不同。'],
+    assumedConceptIds: [], extensionConceptIds: ['balance-of-payments', 'effective-exchange-rate', 'trade-balance'],
+    chapters: [{ title: '汇率与跨境交易', stepIds: ['exchange-rate', 'exports', 'imports'] }, { title: '路线回顾', stepIds: ['recap'] }],
+    steps: [
+      read('exchange-rate', '汇率', '先判断报价方向，再理解升值和贬值。', '接着看出口，注意币种和贸易统计口径。'),
+      read('exports', '出口', '出口金额变化不等于出口数量同幅变化。', '再看进口，形成对双向贸易的认识。'),
+      read('imports', '进口', '分别观察进口与出口，避免只看一个方向。', '最后回顾汇率、出口和进口各自回答的问题。'),
+      recap([
+        { question: '本币升值，出口一定下降吗？', explanation: '汇率变化可能影响价格和竞争力，但出口还取决于外部需求、产品结构、合同和传导时滞。不能只凭汇率方向推出出口结果。', conceptIds: ['exchange-rate', 'exports'] },
+        { question: '出口金额上升，说明出口数量也同比例增加吗？', explanation: '出口金额同时受数量和价格影响，还要核对币种、统计范围和比较期间。', conceptIds: ['exports', 'imports'] },
       ]),
     ],
   },
