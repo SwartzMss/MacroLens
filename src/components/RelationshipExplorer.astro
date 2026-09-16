@@ -1,5 +1,5 @@
 ---
-import { getExplainableConceptRelations, macroNodeTypeLabels, macroNodeTypes, type RelationNode } from '../data/graphRegistry';
+import { getConceptRelations, macroNodeTypeLabels, macroNodeTypes, type RelationNode } from '../data/graphRegistry';
 import RelationshipCards from './RelationshipCards.astro';
 
 type ConceptLink = { data: { id: string; name: string } };
@@ -13,13 +13,13 @@ const { nodes, concepts, initialNodeId } = Astro.props as ExplorerProps;
 const conceptsById = new Set(concepts.map((concept) => concept.data.id));
 const initialNode = nodes.find((node) => node.id === initialNodeId) ?? nodes[0];
 if (!initialNode) throw new Error('The relationship explorer must contain an initial node');
-const panels = nodes.map((node) => ({ node, relations: getExplainableConceptRelations('macro', node.id) }));
+const panels = nodes.map((node) => ({ node, relations: getConceptRelations('macro', node.id) }));
 const nodeGroups = macroNodeTypes
   .map((type) => ({ type, nodes: nodes.filter((node) => node.type === type) }))
   .filter((group) => group.nodes.length > 0);
 ---
 
-<section class="explorer-shell" data-explorer>
+<section class="explorer-shell" data-explorer data-explorer-default-node={initialNode.id}>
   <div class="explorer-controls">
     <label for="explorer-node">选择一个节点</label>
     <select id="explorer-node" data-explorer-select>
@@ -45,7 +45,9 @@ const nodeGroups = macroNodeTypes
     const panels = [...root.querySelectorAll<HTMLElement>('[data-explorer-panel]')];
     if (!select || panels.length === 0) return;
 
-    select.addEventListener('change', () => {
+    const selectNode = (nodeId: string, updateUrl = true) => {
+      if (!panels.some((panel) => panel.dataset.nodeId === nodeId)) return;
+      select.value = nodeId;
       const selectedId = select.value;
       for (const panel of panels) {
         const isSelected = panel.dataset.nodeId === selectedId;
@@ -53,6 +55,15 @@ const nodeGroups = macroNodeTypes
         panel.classList.toggle('is-selected', isSelected);
         if (isSelected) panel.querySelector<HTMLElement>('h2')?.focus({ preventScroll: true });
       }
-    });
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('node', selectedId);
+        window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+      }
+    };
+
+    select.addEventListener('change', () => selectNode(select.value));
+    const requestedNode = new URLSearchParams(window.location.search).get('node');
+    if (requestedNode) selectNode(requestedNode, false);
   });
 </script>

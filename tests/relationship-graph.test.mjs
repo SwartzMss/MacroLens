@@ -190,7 +190,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   const nav = readSource(layout);
   const home = `${readSource(homepage)}\n${readSource(homeRelationshipPreview)}`;
 
-  assert.match(page, /getExplainableRelationData/);
+  assert.match(page, /getRelationData/);
   assert.match(page, /RelationshipExplorer/);
   assert.match(component, /data-explorer/);
   assert.match(component, /data-explorer-select/);
@@ -199,7 +199,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(component, /<optgroup/);
   assert.match(component, /node\.type/);
   assert.match(component, /RelationshipCards/);
-  assert.match(component, /getExplainableConceptRelations/);
+  assert.match(component, /getConceptRelations/);
   assert.match(page, /上游|下游|它受什么影响/);
   assert.match(component, /<noscript>/);
   assert.match(component, /图谱概念/);

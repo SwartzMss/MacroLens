@@ -2,20 +2,20 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import RelationshipExplorer from '../components/RelationshipExplorer.astro';
-import { getExplainableRelationData } from '../data/graphRegistry';
+import { getRelationData } from '../data/graphRegistry';
 import '../styles/explorer.css';
 
 const concepts = await getCollection('concepts');
-const { nodes } = getExplainableRelationData('macro');
+const { nodes } = getRelationData('macro');
 ---
 
-<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的关系类型、时间关系、适用条件、局限和证据。">
+<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的关系类型；解释性关系还提供时间关系、适用条件、局限和证据。">
   <div class="shell graph-page">
     <header class="graph-page-head">
       <div class="eyebrow">宏观关系</div>
       <h1>按节点浏览关系</h1>
       <p class="lead">选择一个节点，看看它受什么影响、影响什么，以及与什么相关。</p>
-      <details class="graph-disclaimer"><summary>经验关系不代表确定因果 · 阅读边界</summary><p>关系由 MacroLens 手工维护，不做实时预测，也不提供投资建议。展开关系卡片可查看时间关系、适用条件、局限和证据来源。</p></details>
+      <details class="graph-disclaimer"><summary>经验关系不代表确定因果 · 阅读边界</summary><p>关系由 MacroLens 手工维护，不做实时预测，也不提供投资建议。解释性关系卡片可查看时间关系、适用条件、局限和证据来源；其他关系保留为轻量连接提示。</p></details>
     </header>
     <RelationshipExplorer nodes={nodes} concepts={concepts} initialNodeId="m2" />
   </div>
