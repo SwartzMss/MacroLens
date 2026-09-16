@@ -92,7 +92,7 @@ export const learningPaths: LearningPath[] = [
           stage: '3 · 信贷进入扩张',
           question: '企业和居民活动变活跃后，信贷为什么可能跟着变化？',
           explanation: '更强的融资需求和银行愿意放贷，可能共同推高新增信贷；政策利率和 LPR 变化可能影响融资成本，但银行资本与风险约束、借款人的还款能力和实际需求仍决定信用是否扩张。',
-          observation: '沿着货币政策、政策利率、LPR 到人民币贷款的顺序观察，并为传导预留数周到数月的时间。',
+          observation: '观察融资成本、信贷需求和银行信贷条件如何共同影响信用变化，并为传导预留数周到数月的时间。',
           conceptIds: ['monetary-policy', 'policy-rate', 'lpr', 'credit'],
         },
         {
@@ -103,7 +103,7 @@ export const learningPaths: LearningPath[] = [
           conceptIds: ['ppi', 'cpi'],
         },
         {
-          stage: '5 · 货币政策收紧',
+          stage: '5 · 货币政策如何应对价格压力',
           question: '价格压力上升时，货币政策会怎样评估是否调整利率？',
           explanation: '价格压力是政策评估的输入之一，决策还要结合经济活动、通胀预期、就业和金融条件。政策利率调整可能是收紧融资条件的一个信号，但不代表所有贷款合同会立即等幅变化。',
           observation: '区分货币政策目标、政策利率动作和实际贷款利率，检查 LPR 报价与重定价时间。',

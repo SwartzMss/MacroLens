@@ -41,7 +41,7 @@ test('published routes resolve real concepts, recap evidence and prerequisite or
   assert.match(cycle.recapIntro, /假设场景/);
   assert.deepEqual(cycle.questions.map(question => question.stage), [
     '1 · 需求回升', '2 · 企业扩张与就业', '3 · 信贷进入扩张', '4 · 价格压力',
-    '5 · 货币政策收紧', '6 · 活动与就业放缓', '7 · 条件变化与可能宽松',
+    '5 · 货币政策如何应对价格压力', '6 · 活动与就业放缓', '7 · 条件变化与可能宽松',
   ]);
   assert.ok(cycle.questions.every(question => question.observation));
   const cycleConceptIds = new Set(cycle.questions.flatMap(question => question.conceptIds));
