@@ -4,6 +4,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { onRequest as onVisitorRequest } from '../functions/_middleware.ts';
 import { onRequest as onStatsRequest } from '../functions/api/visitor-stats.ts';
+import { learningArticleIdForPath } from '../functions/visitor.ts';
 
 const visitorComponent = fileURLToPath(new URL('../src/components/VisitorStats.astro', import.meta.url));
 const baseLayout = fileURLToPath(new URL('../src/layouts/BaseLayout.astro', import.meta.url));
@@ -54,6 +55,20 @@ test('reuses an existing valid visitor cookie without setting another one', asyn
   assert.equal(binding.points[0].blobs[0], visitorId);
   assert.equal(binding.points[0].blobs[2], '/concepts/m2');
   assert.equal(response.headers.has('set-cookie'), false);
+});
+
+test('records a stable learning article ID for learning routes', async () => {
+  const binding = analytics();
+  await onVisitorRequest({
+    request: new Request('https://macrolens.example/learn/money-credit/m2/?from=route', {
+      headers: { accept: 'text/html' },
+    }),
+    env: { ANALYTICS: binding },
+    next: async () => htmlResponse(),
+  });
+  assert.equal(learningArticleIdForPath('/learn/money-credit/m2/'), 'learn:m2');
+  assert.equal(binding.points[0].blobs[3], 'learn:m2');
+  assert.equal(binding.points[0].blobs.length, 4);
 });
 
 test('does not write for non-HTML requests or responses', async () => {

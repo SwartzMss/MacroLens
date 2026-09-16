@@ -27,17 +27,17 @@ test('feedback aggregate query exposes only per-page counts', () => {
 
 test('parses aggregate feedback and computes helpful rate', () => {
   assert.deepEqual(parseFeedbackStats({ results: [
-    { page_id: 'gdp', feedback_count: '20', helpful: '15', needs_improvement: '5' },
-    { page_id: 'm1', feedback_count: 3, helpful: 3, needs_improvement: 0 },
+    { page_id: 'learn:gdp', feedback_count: '20', helpful: '15', needs_improvement: '5' },
+    { page_id: 'learn:m1', feedback_count: 3, helpful: 3, needs_improvement: 0 },
   ] }), [
-    { pageId: 'gdp', feedbackCount: 20, helpful: 15, needsImprovement: 5, helpfulRate: 75 },
-    { pageId: 'm1', feedbackCount: 3, helpful: 3, needsImprovement: 0, helpfulRate: 100 },
+    { pageId: 'learn:gdp', feedbackCount: 20, helpful: 15, needsImprovement: 5, helpfulRate: 75 },
+    { pageId: 'learn:m1', feedbackCount: 3, helpful: 3, needsImprovement: 0, helpfulRate: 100 },
   ]);
 });
 
 test('rejects malformed aggregate rows', () => {
-  assert.equal(parseFeedbackStats({ results: [{ page_id: '../bad', feedback_count: 1, helpful: 1, needs_improvement: 0 }] }), null);
-  assert.equal(parseFeedbackStats({ results: [{ page_id: 'gdp', feedback_count: 2, helpful: 2, needs_improvement: 1 }] }), null);
+  assert.equal(parseFeedbackStats({ results: [{ page_id: 'learn:../bad', feedback_count: 1, helpful: 1, needs_improvement: 0 }] }), null);
+  assert.equal(parseFeedbackStats({ results: [{ page_id: 'learn:gdp', feedback_count: 2, helpful: 2, needs_improvement: 1 }] }), null);
   assert.equal(parseFeedbackStats({ results: null }), null);
 });
 
@@ -45,13 +45,13 @@ test('feedback stats endpoint returns aggregate data without visitor IDs', async
   const response = await onFeedbackStatsRequest({
     request: request(),
     env: { FEEDBACK_DB: database([
-      { page_id: 'gdp', feedback_count: 4, helpful: 3, needs_improvement: 1 },
+      { page_id: 'learn:gdp', feedback_count: 4, helpful: 3, needs_improvement: 1 },
     ]) },
   });
   const body = await response.json();
   assert.deepEqual(body, {
     available: true,
-    pages: [{ pageId: 'gdp', feedbackCount: 4, helpful: 3, needsImprovement: 1, helpfulRate: 75 }],
+    pages: [{ pageId: 'learn:gdp', feedbackCount: 4, helpful: 3, needsImprovement: 1, helpfulRate: 75 }],
   });
   assert.equal(response.headers.get('cache-control'), 'public, max-age=60, s-maxage=300');
   assert.doesNotMatch(JSON.stringify(body), /visitor/i);

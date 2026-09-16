@@ -26,7 +26,7 @@ export type FeedbackPageStat = {
   helpfulRate: number;
 };
 
-const pageIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const pageIdPattern = /^(?:learn:)?[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const responseHeaders = { 'Cache-Control': 'public, max-age=60, s-maxage=300' };
 const unavailable = () => Response.json(
   { available: false },

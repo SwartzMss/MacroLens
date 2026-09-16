@@ -56,6 +56,17 @@ export function normalizeConceptPath(pathname: unknown): string | null {
   return /^\/concepts\/[^/]+$/.test(normalized) ? normalized : null;
 }
 
+export function learningArticleIdForPath(pathname: string): string | null {
+  const match = normalizePathname(pathname).match(/^\/learn\/[a-z0-9]+(?:-[a-z0-9]+)*\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  if (!match || match[1] === 'recap') return null;
+  return `learn:${match[1]}`;
+}
+
 export function visitorDataPoint(visitorId: string, shanghaiDate: string, pathname: string) {
-  return { blobs: [visitorId, shanghaiDate, normalizePathname(pathname)], indexes: [VISITOR_INDEX] };
+  const path = normalizePathname(pathname);
+  const articleId = learningArticleIdForPath(path);
+  return {
+    blobs: articleId ? [visitorId, shanghaiDate, path, articleId] : [visitorId, shanghaiDate, path],
+    indexes: [VISITOR_INDEX],
+  };
 }

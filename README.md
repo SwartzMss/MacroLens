@@ -77,13 +77,15 @@ CLOUDFLARE_ACCOUNT_ID -> Pages Function variable
 CLOUDFLARE_API_TOKEN -> Pages Function secret（需要 Account Analytics Read）
 ~~~
 
-系统只统计成功的 HTML `GET` 请求，并使用匿名 `HttpOnly; Secure; SameSite=Lax` cookie 生成 visitor identifier。Analytics Engine 只保存规范化 pathname 用于页面级 unique visitor 聚合；不会采集 IP 地址、user-agent（UA）、referrer、query string 或 fragment，也不使用 D1 保存页面访问明细或用户浏览历史。
+系统只统计成功的 HTML `GET` 请求，并使用匿名 `HttpOnly; Secure; SameSite=Lax` cookie 生成 visitor identifier。Analytics Engine 保存规范化 pathname 和（学习文章请求中的）稳定文章 ID；不会采集 IP 地址、user-agent（UA）、referrer、query string 或 fragment，也不使用 D1 保存页面访问明细或用户浏览历史。
 
-“累计访客”表示 Analytics Engine 保留周期内的累计 unique visitors，不代表永久历史累计；“今日访客”按上海时区日期统计。页面统计 API `/api/page-stats` 只返回 `/concepts/<stable-id>` 的 pathname 和 distinct visitor aggregate counts，不返回 visitor ID。
+“累计访客”表示 Analytics Engine 保留周期内的累计 unique visitors，不代表永久历史累计；“今日访客”按上海时区日期统计。页面统计 API `/api/page-stats` 返回学习文章 ID 和 distinct visitor aggregate counts，不返回 visitor ID。同一概念出现在多条学习路线时，按稳定文章 ID 合并 UV。
 
 ### 页面反馈（可选）
 
-概念页支持匿名的“有帮助 / 需要改进”反馈，使用现有 `macrolens_visitor` HttpOnly cookie 和 Cloudflare D1；未配置时反馈不可用，但不会影响页面访问。D1 迁移文件位于 `migrations/0001_page_feedback.sql`，部署环境需要提供名为 `FEEDBACK_DB` 的 D1 binding。系统不保存 IP、user-agent 或自由文本反馈。
+学习文章页支持匿名的“有帮助 / 需要改进”反馈，使用现有 `macrolens_visitor` HttpOnly cookie 和 Cloudflare D1；概念查询页不显示反馈。未配置时反馈不可用，但不会影响页面访问。D1 迁移文件位于 `migrations/0001_page_feedback.sql`，部署环境需要提供名为 `FEEDBACK_DB` 的 D1 binding。系统不保存 IP、user-agent 或自由文本反馈。历史上写入的概念页 ID 会保留在 D1 中，但新的统计表只展示学习文章反馈。
+
+这次调整不新增或更改 Cloudflare binding，也不需要新的 D1 迁移；合并后按现有 Pages 部署流程发布即可。Analytics Engine 中的学习文章 UV 会从新版本开始积累，旧记录不会回填稳定文章 ID。
 
 仅创建并绑定 D1 不会自动建表。首次部署或新增数据库后，必须对每个实际使用的数据库分别执行迁移；如果 Production 和 Preview 使用不同数据库，两边都要执行：
 
@@ -97,12 +99,12 @@ npx wrangler d1 migrations apply <DATABASE_NAME> --remote
 
 ~~~text
 /stats                 人类可读的内容统计概览（访问 + 页面反馈）
-/api/page-stats        页面级 total / today UV 原始聚合
+/api/page-stats        学习文章 total / today UV 原始聚合
 /api/visitor-stats     全站 total / today visitor 原始聚合
-/api/feedback-stats    页面反馈原始聚合
+/api/feedback-stats    学习文章反馈原始聚合（含历史概念页记录）
 ~~~
 
-`/stats` 会把全站访客、概念页 UV 和 D1 页面反馈合并到同一张表中，用于发现“高访问 + 低有帮助率”的优先优化页面。该页面不加入主导航、使用 `noindex`，并排除在 Pagefind 索引之外；但它不是鉴权边界，知道 URL 的人仍可访问聚合数据。如果以后需要真正的私有后台，应再使用 Cloudflare Access 等方式保护。
+`/stats` 会把全站访客、学习文章 UV 和 D1 学习文章反馈合并到同一张表中，用于发现“高访问 + 低有帮助率”的优先优化文章。同一概念在多条路线出现时只占一行。该页面不加入主导航、使用 `noindex`，并排除在 Pagefind 索引之外；但它不是鉴权边界，知道 URL 的人仍可访问聚合数据。如果以后需要真正的私有后台，应再使用 Cloudflare Access 等方式保护。
 
 页面反馈原始记录保存在 D1 的 `page_feedback` 表中。需要排查单条记录时，可直接查询生产数据库：
 
@@ -110,7 +112,7 @@ npx wrangler d1 migrations apply <DATABASE_NAME> --remote
 npx wrangler d1 execute macrolens_interactions --remote --command "SELECT * FROM page_feedback ORDER BY updated_at DESC;"
 ~~~
 
-统计接口只返回聚合结果，不返回匿名 visitor ID。页面级 UV 从引入 pathname 记录后开始积累，旧的 Analytics Engine 历史记录不会回填页面路径。
+统计接口只返回聚合结果，不返回匿名 visitor ID；概念页旧反馈记录也不会被伪装成学习文章反馈。
 
 站点部署在 Cloudflare Pages origin 根路径，不设置 GitHub Pages 风格的 /MacroLens base。首页、/concepts、/topics、/graph、/search、Pagefind 资源和图表资源均使用根路径。
 
