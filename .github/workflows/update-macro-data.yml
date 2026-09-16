@@ -31,6 +31,9 @@ jobs:
       - name: Fetch and validate NBS PMI
         run: npm run ingest:pmi -- --target data/indicators/pmi.json
 
+      - name: Prepare per-run PBOC download cache
+        run: echo "MACROLENS_PBOC_CACHE_DIR=$(mktemp -d)" >> "$GITHUB_ENV"
+
       - name: Fetch and validate PBOC money supply
         run: npm run ingest:pboc-money-supply -- --target-dir data/indicators
 

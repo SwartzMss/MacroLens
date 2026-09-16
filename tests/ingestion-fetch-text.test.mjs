@@ -205,3 +205,15 @@ test('does not retry an accepted response whose body read fails', async () => {
   );
   assert.equal(attempts, 1);
 });
+
+test('reports aggregate connection addresses and per-attempt elapsed time', async () => {
+  const logs = [];
+  const cause = new AggregateError([Object.assign(new Error('connect timeout'), { code: 'ETIMEDOUT', address: '192.0.2.1', port: 443 })], '');
+  await assert.rejects(fetchText(url, {
+    maxAttempts: 2, sleep: async () => {}, onDiagnostic: message => logs.push(message),
+    fetchImpl: async () => { throw new Error('fetch failed', { cause }); },
+  }), /192\.0\.2\.1/);
+  assert.equal(logs.length, 2);
+  assert.match(logs[0], /attempt 1\/2.*\d+ms/);
+  assert.match(logs[1], /ETIMEDOUT.*192\.0\.2\.1.*443/);
+});

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
-import { fetchText } from './fetch-text.ts';
+import { fetchPbocText as fetchText } from './fetch-pboc-text.ts';
 import { canonicalText, discoverPBOCMoneySupplyPublications, parsePBOCMoneySupplyReport, validIsoDate } from './fetch/pboc-money-supply.ts';
 import { selectPublications } from './money-supply-cli.ts';
 import { coverageCoversDates, validateMonthlyObservations } from './validate/dataset.ts';
