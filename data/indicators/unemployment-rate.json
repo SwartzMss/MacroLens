@@ -10,7 +10,7 @@
   "source": "NBS",
   "calculation": "published",
   "methodologyFingerprint": "nbs-unemployment-rate|national-urban-survey|published-level",
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-09-15",
   "comparabilityNote": "这是国家统计局发布的全国城镇调查失业率水平，分母为城镇劳动力（就业人口与失业人口之和），不是登记失业率、青年失业率或劳动参与率。2018年1月起国家数据提供连续月度读数；如调查制度或发布口径发生变化，需在比较时单独核对官方说明。",
   "sources": [
     {
@@ -31,6 +31,13 @@
       "sourceDate": "2026-08-17",
       "coverage": "2026-07 to 2026-07",
       "role": "methodology"
+    },
+    {
+      "title": "国家统计局：8月份国民经济运行平稳、发展向新向优",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965307.html",
+      "sourceDate": "2026-09-15",
+      "coverage": "2026-08 to 2026-08",
+      "role": "data"
     }
   ],
   "data": [
@@ -445,6 +452,10 @@
     {
       "date": "2026-07",
       "value": 5.2
+    },
+    {
+      "date": "2026-08",
+      "value": 5.3
     }
   ]
 }

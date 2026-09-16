@@ -10,7 +10,7 @@
   "source": "NBS",
   "calculation": "published",
   "methodologyFingerprint": "nbs-industrial-production|above-designated-size|real-yoy",
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-09-15",
   "comparabilityNote": "增速为扣除价格因素的实际同比。国家统计局将1—2月合并发布，图中明确保留合并期，不虚构1月或2月单月同比；规上企业范围变化时按可比口径计算。",
   "sources": [
     {
@@ -43,6 +43,13 @@
       "sourceDate": "2026-08-17",
       "coverage": "2026-07 to 2026-07",
       "role": "methodology"
+    },
+    {
+      "title": "国家统计局：2026年8月份规模以上工业增加值增长5.2%",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965308.html",
+      "sourceDate": "2026-09-15",
+      "coverage": "2026-08 to 2026-08",
+      "role": "data"
     }
   ],
   "data": [
@@ -729,6 +736,10 @@
     {
       "date": "2026-07",
       "value": 4.5
+    },
+    {
+      "date": "2026-08",
+      "value": 5.2
     }
   ]
 }

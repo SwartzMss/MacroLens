@@ -11,7 +11,7 @@
   "source": "PBOC",
   "calculation": "published",
   "calculationEffectiveFrom": "2025-12",
-  "updatedAt": "2026-08-14",
+  "updatedAt": "2026-09-14",
   "comparabilityNote": "2025-11 及以前同比增速由中国人民银行月末各项贷款余额按（本期余额 ÷ 上年同期余额 − 1）计算并四舍五入至一位小数；自 2025-12 起直接采用金融统计数据报告公布的同比增速。本序列不替代社会融资规模中的对实体经济发放的人民币贷款；口径或统计范围变化时应分段比较。",
   "methodologyFingerprint": "pboc-credit|financial-institutions-rmb-loans|month-end-balance-yoy",
   "sources": [
@@ -81,6 +81,12 @@
       "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026081416320925645/index.html",
       "sourceDate": "2026-08-14",
       "coverage": "2026-07 to 2026-07"
+    },
+    {
+      "title": "中国人民银行：2026年8月金融统计数据报告",
+      "url": "https://www.pbc.gov.cn/diaochatongjisi/116219/116225/2026091417020862747/index.html",
+      "sourceDate": "2026-09-14",
+      "coverage": "2026-08 to 2026-08"
     }
   ],
   "data": [
@@ -207,6 +213,10 @@
     {
       "date": "2026-07",
       "value": 5.1
+    },
+    {
+      "date": "2026-08",
+      "value": 4.9
     }
   ],
   "balance": {
@@ -336,6 +346,10 @@
       {
         "date": "2026-07",
         "value": 282.29
+      },
+      {
+        "date": "2026-08",
+        "value": 282.35
       }
     ]
   }

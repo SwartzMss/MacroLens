@@ -10,7 +10,7 @@
   "source": "NBS",
   "calculation": "published",
   "methodologyFingerprint": "nbs-retail-sales|total-retail-sales|nominal-yoy",
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-09-15",
   "comparabilityNote": "本序列是未扣除价格因素的名义同比。1—2月为合并发布值，不是2月单月值；2025年增速按第五次全国经济普查修订后的可比口径计算。",
   "sources": [
     {
@@ -43,6 +43,13 @@
       "sourceDate": "2026-08-17",
       "coverage": "2026-07 to 2026-07",
       "role": "methodology"
+    },
+    {
+      "title": "国家统计局：2026年1—8月份社会消费品零售总额增长1.1%",
+      "url": "https://www.stats.gov.cn/sj/zxfb/202609/t20260915_1965311.html",
+      "sourceDate": "2026-09-15",
+      "coverage": "2026-08 to 2026-08",
+      "role": "data"
     }
   ],
   "data": [
@@ -729,6 +736,10 @@
     {
       "date": "2026-07",
       "value": 0.6
+    },
+    {
+      "date": "2026-08",
+      "value": 0.4
     }
   ]
 }
