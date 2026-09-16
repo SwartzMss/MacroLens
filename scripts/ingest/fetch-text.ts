@@ -17,6 +17,7 @@ export type FetchTextOptions = {
   method?: string;
   headers?: Record<string, string>;
   body?: BodyInit | null;
+  onDiagnostic?: (message: string) => void;
 };
 
 export class FetchTextError extends Error {
@@ -53,20 +54,20 @@ function delayFor(attempt: number, base: number, maximum: number): number {
 function describeCause(cause: unknown): string {
   const messages: string[] = [];
   const seen = new Set<unknown>();
-  let current = cause;
-
-  while (current !== undefined && current !== null && !seen.has(current)) {
+  function visit(current: unknown): void {
+    if (current === undefined || current === null || seen.has(current)) return;
     seen.add(current);
     if (current instanceof Error) {
-      const errorWithCode = current as Error & { code?: unknown };
-      const code = errorWithCode.code === undefined ? '' : ` [${String(errorWithCode.code)}]`;
-      messages.push(`${current.message}${code}`);
-      current = current.cause;
+      const details = current as Error & { code?: unknown; address?: unknown; port?: unknown };
+      const fields = [details.code, details.address, details.port].filter(value => value !== undefined);
+      messages.push(`${current.message}${fields.length ? ` [${fields.join(' ')}]` : ''}`);
+      if (current instanceof AggregateError) current.errors.forEach(visit);
+      visit(current.cause);
     } else {
       messages.push(String(current));
-      break;
     }
   }
+  visit(cause);
 
   return messages.join(' <- ');
 }
@@ -98,6 +99,8 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
   let firstCause: unknown;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const started = Date.now();
+    const diagnose = (detail: string) => options.onDiagnostic?.(`Fetch ${url} attempt ${attempt}/${maxAttempts} elapsed ${Date.now() - started}ms: ${detail}`);
     const controller = new AbortController();
     let timedOut = false;
     const timeout = setTimeout(() => {
@@ -115,6 +118,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
           signal: controller.signal,
         });
       } catch (cause) {
+        diagnose(describeCause(cause));
         firstCause ??= cause;
         if (attempt < maxAttempts) {
           await sleep(delayFor(attempt, backoffMs, maxBackoffMs));
@@ -127,6 +131,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
       }
 
       if (!response.ok) {
+        diagnose(`HTTP ${response.status}`);
         const error = new FetchTextError(
           messageForFailure(url, attempt, response.status, false, firstCause),
           { url, attempts: attempt, status: response.status, cause: firstCause, firstCause },
@@ -141,6 +146,7 @@ export async function fetchText(url: string, options: FetchTextOptions = {}): Pr
       try {
         return await response.text();
       } catch (cause) {
+        diagnose(describeCause(cause));
         throw new FetchTextError(
           messageForFailure(url, attempt, undefined, false, cause),
           { url, attempts: attempt, cause, firstCause },
