@@ -1,0 +1,61 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageFeedback from '../../../components/PageFeedback.astro';
+import CourseRuntime from '../../../components/learning/CourseRuntime.astro';
+import { courseOutline, courseLessonHref } from '../../../data/courseOutline';
+import '../../../styles/course.css';
+export async function getStaticPaths() {
+  const lessons = await getCollection('lessons');
+  return courseOutline.filter(item => item.published).map(item => {
+    const lesson = lessons.find(entry => entry.id === item.id);
+    if (!lesson) throw new Error(`Missing published lesson: ${item.id}`);
+    return { params: { lessonId: item.id }, props: { lesson } };
+  });
+}
+const { lesson } = Astro.props;
+const { Content, headings } = await render(lesson);
+const index = courseOutline.findIndex(item => item.id === lesson.id);
+const previous = courseOutline[index - 1];
+const next = courseOutline[index + 1];
+const sections = headings.filter(item => item.depth === 2);
+---
+<BaseLayout title={`${lesson.data.title}｜学习经济｜MacroLens`} description={lesson.data.description}>
+  <div class="course-shell" data-course-lesson={lesson.id} data-pagefind-body>
+    <header>
+      <a href="/learn/">← 入门主线</a>
+      <p class="course-kicker">第 {index + 1} 章 · 约 {lesson.data.minutes} 分钟</p>
+      <h1>{lesson.data.title}</h1>
+      <p class="course-lead">{lesson.data.description}</p>
+    </header>
+    <details class="course-mobile-toc">
+      <summary>这一章我们聊什么</summary>
+      <nav aria-label="本章目录（手机）">
+        {sections.map(item => <a href={`#${item.slug}`}>{item.text}</a>)}
+      </nav>
+    </details>
+    <div class="course-layout">
+      <article class="course-body">
+        <Content />
+        <section class="course-actions" aria-label="阅读进度">
+          <button class="course-start" type="button" data-course-complete hidden>我读完这一章了</button>
+          <p class="course-note" data-course-status aria-live="polite">开启 JavaScript 后可以保存阅读进度。</p>
+          {previous?.published && <a href={courseLessonHref(previous.id)}>← 上一章：{previous.title}</a>}
+          {next && <div class="course-next">
+            <strong>接下来：{next.title}</strong>
+            {next.published
+              ? <a href={courseLessonHref(next.id)}>继续下一章 →</a>
+              : <p class="course-note">这一章正在编写，完成后会在入门主线开放。</p>}
+          </div>}
+          <a href="/learn/">返回主线，查看完整大纲 →</a>
+        </section>
+        <PageFeedback pageId={`learn:course-${lesson.id}`} />
+      </article>
+      <nav class="course-toc" aria-label="本章目录">
+        <strong>这一章我们聊什么</strong>
+        {sections.map(item => <a href={`#${item.slug}`}>{item.text}</a>)}
+      </nav>
+    </div>
+  </div>
+  <CourseRuntime />
+</BaseLayout>

@@ -1,44 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import LearningNavigation from '../../../components/learning/LearningNavigation.astro';
-import LearningRuntime from '../../../components/learning/LearningRuntime.astro';
-import LearningGraphBridge from '../../../components/learning/LearningGraphBridge.astro';
-import { publishedLearningPaths, validateLearningPaths, learningStepHref, type LearningPath } from '../../../data/learningPaths';
-import '../../../styles/learning.css';
-export async function getStaticPaths() {
-  validateLearningPaths(publishedLearningPaths, await getCollection('concepts'));
-  return publishedLearningPaths.map(path => ({ params: { pathId: path.id }, props: { path } }));
-}
-const { path } = Astro.props as { path: LearningPath };
-const concepts = await getCollection('concepts');
-const name = (id: string) => concepts.find(concept => concept.data.id === id)!.data.name;
-const routeConceptIds = path.steps.filter(step => step.kind === 'concept').map(step => step.conceptId).filter((id): id is string => Boolean(id));
+import { publishedLearningPaths } from '../../../data/learningPaths';
+import '../../../styles/course.css';
+export function getStaticPaths() { return publishedLearningPaths.map(path => ({ params: { pathId: path.id } })); }
 ---
-<BaseLayout title={`${path.title}｜学习路线｜MacroLens`} description={path.description}>
-  <div data-learning-path={path.id}>
-    <header class="learning-head"><div class="shell"><div class="eyebrow"><a href="/learn/">学习</a> / 学习路线</div><h1>{path.title}</h1><p class="lead">{path.description}</p></div></header>
-    <div class="shell learning-body" data-pagefind-body>
-      <div class="learning-path-summary">
-        <section><h2>读完能回答什么？</h2><ul>{path.outcomes.map(outcome => <li>{outcome}</li>)}</ul>
-          <p class="learning-progress-text" data-route-progress>{path.steps.length} 步，含路线回顾</p>
-          <a class="learning-button" data-path-start href={learningStepHref(path.id, path.steps[0].id)}>开始第一步：{path.steps[0].title} →</a>
-          <p class="learning-local-note">可直接选择任何一步。已读状态只保存在本机。</p>
-          {path.assumedConceptIds.length > 0 && <div class="learning-basis"><h2>建议先了解</h2><p>{path.assumedConceptIds.map((id, index) => <>{index > 0 && '、'}<a href={`/concepts/${id}/`}>{name(id)}</a></>)}。不熟悉也可以在阅读过程中补基础，再返回原步骤。</p><a href="/learn/money-credit/">先从钱与银行信用开始 →</a></div>}
-        </section>
-        <section><h2>路线目录</h2><LearningNavigation path={path} /></section>
-      </div>
-      <LearningGraphBridge
-        graphId="macro"
-        concepts={concepts}
-        focusConceptIds={routeConceptIds}
-        eyebrow="路线与关系"
-        title="把这条路线放进关系图"
-        description="路线中的概念如果在图谱中已有关系，会在这里显示线索。打开关系浏览器，可查看关系类型；已补充解释的关系还会显示时间、适用条件与证据。"
-      />
-      {path.extensionConceptIds.length > 0 && <section class="learning-basis"><h2>延伸阅读</h2><p>不计入核心进度；进入文章后可查看建议先理解的概念。</p><ul class="learning-extension-links">{path.extensionConceptIds.map(id => <li><a href={`/concepts/${id}/`}>{name(id)} →</a></li>)}</ul></section>}
-      <div class="learning-support"><a href="/learn/">所有学习路线 →</a><a href="/graph">浏览宏观关系与证据 →</a></div>
-    </div>
-  </div>
-  <LearningRuntime />
+<BaseLayout title="学习内容已调整｜MacroLens" description="新的独立课程已开放，旧概念导读不再作为学习课程。" noindex>
+  <div class="course-shell" data-learning-migration><p class="course-kicker">学习内容已调整</p><h1>我们重新编写了学习课程</h1><p class="course-lead">你打开的是旧版概念导读的地址。新版课程从生活中的问题讲起，有自己的正文和阅读顺序。</p><p>旧阅读记录不会换算成新课程的完成进度。你可以从第一章重新开始，也可以先看看课程大纲。</p><a class="course-start" href="/learn/">查看新的学习主线 →</a></div>
 </BaseLayout>

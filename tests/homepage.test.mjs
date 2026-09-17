@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { buildMacroSnapshot } from '../src/data/macroSnapshot.ts';
 import { getRelationData } from '../src/data/graphRegistry.ts';
-import { getHomepageRelationshipPreview, getNotableSignals, learningPaths, formatSignalChange, getPmiReading, getHomeSynthesis, localizeExplanation } from '../src/data/home.ts';
+import { getHomepageRelationshipPreview, getNotableSignals, formatSignalChange, getPmiReading, getHomeSynthesis, localizeExplanation } from '../src/data/home.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const conceptsDirectory = `${root}src/content/concepts`;
 const homeDirectory = `${root}src/components/home`;
 const componentNames = ['HomeHero', 'MacroStateSummary', 'LatestReading', 'RelationshipPreview', 'LearningPaths'];
 const homepagePath = `${root}src/pages/index.astro`;
@@ -32,13 +31,10 @@ test('homepage relationship preview resolves canonical graph edges', () => {
   }
 });
 
-test('homepage learning paths link only to existing concepts', () => {
-  const conceptIds = new Set(readdirSync(conceptsDirectory).map((name) => name.replace(/\.md$/, '')));
-  for (const path of learningPaths) {
-    assert.ok(path.title.trim());
-    assert.ok(path.steps.length >= 2);
-    for (const step of path.steps.filter(step => step.kind === 'concept')) assert.ok(conceptIds.has(step.conceptId), `${path.title}/${step.id}`);
-  }
+test('homepage learning entry opens an independent course', () => {
+  const source = readFileSync(`${homeDirectory}/LearningPaths.astro`, 'utf8');
+  assert.match(source, /courseLessonHref/);
+  assert.doesNotMatch(source, /LearningCard|conceptId/);
 });
 
 test('homepage components expose the required semantic sections and links', () => {

@@ -226,7 +226,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(page, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.match(nav, /<a href=["']\/learn["']>学习<\/a>/);
-  assert.match(readSource(`${root}src/pages/learn/index.astro`), /href=["']\/graph["']/);
+  assert.doesNotMatch(readSource(`${root}src/pages/learn/index.astro`), /href=["']\/graph["']/);
   assert.match(home, /href=["']\/graph["']/);
 });
 

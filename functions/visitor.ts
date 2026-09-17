@@ -57,6 +57,8 @@ export function normalizeConceptPath(pathname: unknown): string | null {
 }
 
 export function learningArticleIdForPath(pathname: string): string | null {
+  const course = normalizePathname(pathname).match(/^\/learn\/course\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  if (course) return `learn:course-${course[1]}`;
   const match = normalizePathname(pathname).match(/^\/learn\/[a-z0-9]+(?:-[a-z0-9]+)*\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
   if (!match || match[1] === 'recap') return null;
   return `learn:${match[1]}`;

@@ -1,51 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
-import ConceptReader from '../../../components/ConceptReader.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import LearningNavigation from '../../../components/learning/LearningNavigation.astro';
-import LearningActions from '../../../components/learning/LearningActions.astro';
-import LearningRuntime from '../../../components/learning/LearningRuntime.astro';
-import { publishedLearningPaths, validateLearningPaths, learningPathHref, learningStepHref, type LearningPath, type LearningStep } from '../../../data/learningPaths';
-import { getConceptRelations } from '../../../data/graphRegistry';
-import '../../../styles/concept-detail.css';
-import '../../../styles/learning.css';
-export async function getStaticPaths() {
-  validateLearningPaths(publishedLearningPaths, await getCollection('concepts'));
-  return publishedLearningPaths.flatMap(path => path.steps.map(step => ({ params: { pathId: path.id, stepId: step.id }, props: { path, step } })));
-}
-const { path, step } = Astro.props as { path: LearningPath; step: LearningStep };
-const concepts = await getCollection('concepts');
-const entry = concepts.find(concept => concept.data.id === step.conceptId);
-if (step.kind === 'concept' && !entry) throw new Error(`Missing learning concept: ${step.conceptId}`);
-const index = path.steps.findIndex(item => item.id === step.id);
-const conceptName = (id: string) => concepts.find(concept => concept.data.id === id)!.data.name;
-const recapConceptIds = [...new Set(step.questions?.flatMap(question => question.conceptIds) ?? [])];
-const graphConceptIds = recapConceptIds.filter(id => {
-  const concept = concepts.find(item => item.data.id === id);
-  if (!concept) return false;
-  const relations = concept.data.graph ? getConceptRelations(concept.data.graph, id) : [];
-  return relations.length > 0 || concept.data.related.length > 0;
-});
-const readHref = (id: string) => {
-  const target = path.steps.find(item => item.conceptId === id);
-  return target ? learningStepHref(path.id, target.id) : `/concepts/${id}/?learnPath=${path.id}&learnStep=${step.id}`;
-};
+import { publishedLearningPaths } from '../../../data/learningPaths';
+import '../../../styles/course.css';
+export function getStaticPaths() { return publishedLearningPaths.flatMap(path => path.steps.map(step => ({ params: { pathId: path.id, stepId: step.id } }))); }
 ---
-{entry ? <ConceptReader entry={entry} learningPath={path} learningStep={step} /> :
-  <BaseLayout title={`${path.title}：${step.recapHeading ?? '路线回顾'}｜MacroLens`} description={step.recapIntro ?? '回顾这条路线，检查概念之间的联系与边界。'} noindex>
-    <div class="concept-detail-page learning-reader" data-learning-path={path.id} data-learning-step={step.id} data-pagefind-ignore>
-          <header class="detail-header"><div class="shell"><div class="learning-context-line"><a href={learningPathHref(path.id)}>学习 / {path.title}</a><span>第 {index + 1} / {path.steps.length} 步</span></div><h1 class="concept-title">{step.recapHeading ?? '把这条路线串起来'}</h1><p class="lead">{step.recapIntro ?? '先想一想，再展开解释。需要复习时，随时回到对应文章。'}</p></div></header>
-      <nav class="detail-mobile-navigation" aria-label="学习目录"><div class="shell detail-jump-inner"><details class="detail-mobile-toc learning-mobile-menu"><summary>第 {index + 1} / {path.steps.length} 步 · 目录</summary><div class="detail-toc-menu"><LearningNavigation path={path} currentStepId={step.id} /></div></details></div></nav>
-      <div class="shell concept-layout detail-layout">
-        <article class="prose detail-article">
-          {step.questions?.map(question => <details class="learning-review-question"><summary>{question.stage && <span class="learning-review-stage">{question.stage}</span>}{question.question}</summary><p>{question.explanation}</p>{question.observation && <p class="learning-review-observation"><strong>观察：</strong>{question.observation}</p>}<p>回到原文核对解释、边界与来源：</p><div class="learning-review-links">{question.conceptIds.map(id => <a href={readHref(id)}>{conceptName(id)} →</a>)}</div></details>)}
-          {graphConceptIds.length > 0 && <section class="learning-cycle-graph" aria-labelledby="learning-cycle-graph-title" data-no-learning-context><div class="eyebrow">继续探索</div><h2 id="learning-cycle-graph-title">沿着关系脉络继续看</h2><p>下面的入口会打开普通概念页的关系区，或进入关系浏览器，查看关系类型、时间关系、适用条件与证据。</p><div class="learning-cycle-graph-links"><a class="learning-button" href="/graph">打开宏观关系浏览器 →</a>{graphConceptIds.map(id => <a href={`/concepts/${id}/#${id}-connections`}>查看{conceptName(id)}的关系 →</a>)}</div></section>}
-          <LearningActions path={path} stepId={step.id} />
-          <section data-learning-supplement><h2>还可以继续了解</h2><ul>{path.extensionConceptIds.map(id => <li><a href={`/concepts/${id}/`}>{conceptName(id)}</a></li>)}</ul></section>
-        </article>
-        <aside class="side-nav detail-side-nav"><a class="learning-text-link" href={learningPathHref(path.id)}>本路线 · {path.title}</a><LearningNavigation path={path} currentStepId={step.id} /></aside>
-      </div>
-    </div>
-    <LearningRuntime />
-  </BaseLayout>
-}
+<BaseLayout title="学习内容已调整｜MacroLens" description="新的独立课程已开放，旧概念导读不再作为学习课程。" noindex>
+  <div class="course-shell" data-learning-migration><p class="course-kicker">学习内容已调整</p><h1>我们重新编写了学习课程</h1><p class="course-lead">你打开的是旧版概念导读的地址。新版课程从生活中的问题讲起，有自己的正文和阅读顺序。</p><p>旧阅读记录不会换算成新课程的完成进度。你可以从第一章重新开始，也可以先看看课程大纲。</p><a class="course-start" href="/learn/">查看新的学习主线 →</a></div>
+</BaseLayout>

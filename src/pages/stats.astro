@@ -1,16 +1,23 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { courseOutline, courseLessonHref } from '../data/courseOutline';
 import { learningArticles } from '../data/learningArticles';
 import '../styles/stats.css';
 
 const concepts = (await getCollection('concepts'))
   .sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id));
 const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
-const articles = learningArticles
+const legacyArticles = learningArticles
   .map(article => ({ ...article, concept: conceptsById.get(article.conceptId) }))
   .filter(article => article.concept)
   .sort((a, b) => a.concept!.data.order - b.concept!.data.order || a.conceptId.localeCompare(b.conceptId));
+const articles = [
+  ...courseOutline.filter(chapter => chapter.published).map(chapter => ({
+    pageId: `learn:course-${chapter.id}`, title: chapter.title, label: '独立课程', paths: [courseLessonHref(chapter.id).replace(/\/$/, '')],
+  })),
+  ...legacyArticles.map(article => ({ pageId: article.pageId, title: article.concept!.data.name, label: '旧版导读 · 历史记录', paths: article.paths })),
+];
 ---
 <BaseLayout
   title="内容统计｜MacroLens"
@@ -56,7 +63,7 @@ const articles = learningArticles
       <header class="stats-panel-head">
         <div>
           <h2 id="concept-stats-title">学习文章表现</h2>
-          <p>同一概念出现在多条学习路线时合并统计。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
+          <p>新课程与旧版导读分别统计，历史反馈不会算入新课程。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
         </div>
       </header>
 
@@ -80,8 +87,8 @@ const articles = learningArticles
                 data-feedback-count="0"
               >
                 <td class="stats-concept">
-                  <a href={`${article.paths[0]}/`}>{article.concept!.data.name}</a>
-                  <small>{article.conceptId}</small>
+                  <a href={`${article.paths[0]}/`}>{article.title}</a>
+                  <small>{article.label}</small>
                 </td>
                 <td data-total-uv>—</td>
                 <td data-today-uv>—</td>
@@ -94,7 +101,7 @@ const articles = learningArticles
         </table>
       </div>
 
-      <p class="stats-note">学习文章 UV 按文章 ID 和访客去重。同一概念出现在多条学习路线时，一个访客只计 1 次；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
+      <p class="stats-note">学习文章 UV 按文章 ID 和访客去重。旧版导读保留历史记录；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
     </section>
   </section>
 

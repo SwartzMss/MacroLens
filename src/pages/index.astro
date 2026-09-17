@@ -5,7 +5,7 @@ import HomeHero from '../components/home/HomeHero.astro';
 import MacroStateSummary from '../components/home/MacroStateSummary.astro';
 import RelationshipPreview from '../components/home/RelationshipPreview.astro';
 import LearningPaths from '../components/home/LearningPaths.astro';
-import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals, learningPaths } from '../data/home';
+import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals } from '../data/home';
 import { buildMacroSnapshot } from '../data/macroSnapshot';
 import '../styles/home.css';
 const snapshot = buildMacroSnapshot();
@@ -21,5 +21,5 @@ const nodes = getHomepageRelationNodes();
   <HomeHero signal={signals[0]} />
   <MacroStateSummary snapshot={snapshot} />
   <RelationshipPreview relations={relations} nodes={nodes} concepts={concepts} />
-  <LearningPaths paths={learningPaths} concepts={concepts} />
+  <LearningPaths />
 </BaseLayout>

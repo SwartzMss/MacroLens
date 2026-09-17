@@ -19,5 +19,5 @@ export default defineConfig({
   site,
   output: 'static',
   redirects: { '/topics': '/learn/' },
-  integrations: site ? [sitemap({ filter: (page) => !/^\/learn\/[^/]+\/[^/]+\/?$/.test(new URL(page).pathname) })] : [],
+  integrations: site ? [sitemap({ filter: (page) => (!new URL(page).pathname.startsWith('/learn/') || new URL(page).pathname === '/learn/' || new URL(page).pathname.startsWith('/learn/course/')) })] : [],
 });
