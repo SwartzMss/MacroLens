@@ -8,7 +8,7 @@ test('new course never treats legacy reading as completion', () => {
 });
 test('damaged, future and unpublished progress cannot mark courses complete', () => {
   for (const raw of [null, 'broken', 'null', '{}', '{"version":2,"completed":[]}']) assert.deepEqual(parseCourseProgress(raw).completed, []);
-  assert.deepEqual(parseCourseProgress(JSON.stringify({ version: 1, completed: ['connected-economy', 'connected-economy', 'bank-lending', 5, '__proto__'], lastVisited: 'bank-lending' })), { version: 1, completed: ['connected-economy'], lastVisited: null });
+  assert.deepEqual(parseCourseProgress(JSON.stringify({ version: 1, completed: ['connected-economy', 'connected-economy', 'borrowing-cost', 5, '__proto__'], lastVisited: 'borrowing-cost' })), { version: 1, completed: ['connected-economy'], lastVisited: null });
 });
 
 test('new course analytics IDs cannot merge with legacy article feedback', async () => {
@@ -23,7 +23,7 @@ test('completion is explicit and reversible, including when persistence is unava
   assert.deepEqual(initial.completed, []);
   assert.deepEqual(done.completed, ['connected-economy']);
   assert.deepEqual(toggleCourseCompletion(done, 'connected-economy').completed, []);
-  assert.equal(toggleCourseCompletion(initial, 'bank-lending'), initial);
+  assert.equal(toggleCourseCompletion(initial, 'borrowing-cost'), initial);
   assert.equal(saveCourseProgress({ setItem() { throw new Error('disabled'); } }, done), false);
   let saved;
   assert.equal(saveCourseProgress({ setItem(key, raw) { assert.equal(key, courseStorageKey); saved = raw; } }, done), true);
@@ -38,7 +38,7 @@ test('publishing a chapter preserves old progress without marking new content co
   assert.deepEqual(courseResumeTarget(visited), { id: 'money', label: '继续阅读 →' });
   assert.deepEqual(visited.completed, ['connected-economy']);
   const finished = toggleCourseCompletion(visited, 'money');
-  assert.deepEqual(courseResumeTarget(finished), { id: 'money', label: '回顾已学内容 →' });
+  assert.deepEqual(courseResumeTarget(finished), { id: 'bank-lending', label: '继续学习 →' });
   assert.deepEqual(parseCourseProgress(JSON.stringify(finished)), finished);
   assert.deepEqual(toggleCourseCompletion(finished, 'money').completed, ['connected-economy']);
 });
@@ -48,5 +48,5 @@ test('resume handles fresh, out-of-order and cleared progress without entering u
   const jumped = { version: 1, completed: [], lastVisited: 'money' };
   assert.deepEqual(courseResumeTarget(jumped), { id: 'money', label: '继续阅读 →' });
   assert.deepEqual(courseResumeTarget(toggleCourseCompletion(jumped, 'money')), { id: 'connected-economy', label: '继续学习 →' });
-  assert.equal(courseResumeTarget(parseCourseProgress('{"version":1,"completed":[],"lastVisited":"bank-lending"}')).id, 'connected-economy');
+  assert.equal(courseResumeTarget(parseCourseProgress('{"version":1,"completed":[],"lastVisited":"borrowing-cost"}')).id, 'connected-economy');
 });
