@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import CourseRuntime from '../../components/learning/CourseRuntime.astro';
 import { courseOutline, courseLessonHref } from '../../data/courseOutline';
 import '../../styles/course.css';
+const publishedCount = courseOutline.filter(chapter => chapter.published).length;
 ---
 <BaseLayout title="学习经济｜MacroLens" description="从日常生活出发，一步步理解经济怎样运转。无需经济学基础。">
   <div class="course-shell" data-pagefind-body>
@@ -15,7 +16,7 @@ import '../../styles/course.css';
     </header>
     <section aria-labelledby="outline">
       <h2 id="outline">入门主线</h2>
-      <p>按下面的顺序，把问题一个个想明白。目前可以阅读第一章，其余章节正在编写，不计入已开放课程的进度。</p>
+      <p>按下面的顺序，把问题一个个想明白。目前已开放 {publishedCount} 章{publishedCount < courseOutline.length ? '，其余章节正在编写，不计入已开放课程的进度。' : '，可以按自己的节奏学习和回顾。'}</p>
       <ol class="course-outline">
         {courseOutline.map((chapter, index) => <li>
           <span class="course-number">{String(index + 1).padStart(2, '0')}</span>
