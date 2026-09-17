@@ -179,7 +179,7 @@ test('enforces JSON, bounded same-origin writes, and failure-safe D1 responses',
   assert.deepEqual(await responseBody(unavailable), { ok: false });
 });
 
-test('renders feedback only in learning mode', () => {
+test('renders feedback on independent courses, not concept pages', () => {
   const component = readFileSync(feedbackComponent, 'utf8');
   const page = readFileSync(conceptPage, 'utf8');
   const api = readFileSync(apiSource, 'utf8');
@@ -195,9 +195,9 @@ test('renders feedback only in learning mode', () => {
     assert.match(api, new RegExp(reason));
   }
   assert.doesNotMatch(component, /textarea|contenteditable|自由文本/);
-  assert.match(page, /import PageFeedback from .*PageFeedback\.astro/);
-  assert.match(page, /learningPath && <PageFeedback pageId=\{learningArticleId\(entry\.data\.id\)\}/);
-  assert.doesNotMatch(page, /\{!learningPath && <PageFeedback/);
+  assert.doesNotMatch(page, /PageFeedback/);
+  const course = readFileSync(`${root}src/pages/learn/course/[lessonId].astro`, 'utf8');
+  assert.match(course, /PageFeedback pageId=\{`learn:course-/);
   assert.match(api, /parseVisitorCookie/);
   assert.match(api, /FEEDBACK_DB/);
   assert.match(sql, /PRIMARY KEY\s*\(page_id, visitor_id\)/i);

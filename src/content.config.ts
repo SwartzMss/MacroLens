@@ -17,4 +17,9 @@ const concepts = defineCollection({
   })
 });
 
-export const collections = { concepts };
+const lessons = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/lessons' }),
+  schema: z.object({ title: z.string(), description: z.string(), minutes: z.number().positive() }),
+});
+
+export const collections = { concepts, lessons };

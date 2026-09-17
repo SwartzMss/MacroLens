@@ -1,0 +1,39 @@
+<script>
+  import { courseStorageKey, parseCourseProgress, toggleCourseCompletion, saveCourseProgress } from '../../data/courseProgress';
+  import { courseLessonHref } from '../../data/courseOutline';
+  let progress = parseCourseProgress(null);
+  let persistent = true;
+  try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch { persistent = false; }
+  const lesson = document.querySelector<HTMLElement>('[data-course-lesson]')?.dataset.courseLesson;
+  const button = document.querySelector<HTMLButtonElement>('[data-course-complete]');
+  const status = document.querySelector<HTMLElement>('[data-course-status]');
+  function render() {
+    if (button && lesson) {
+      const completed = progress.completed.includes(lesson);
+      button.hidden = false;
+      button.textContent = completed ? '已读完 · 撤销标记' : '我读完这一章了';
+      button.setAttribute('aria-pressed', String(completed));
+    }
+    if (status) status.textContent = persistent ? (progress.completed.length ? `已读完 ${progress.completed.length} 章。进度保存在当前浏览器。` : '进度保存在当前浏览器。') : '浏览器暂时无法保存进度，你仍可以正常阅读。';
+    document.querySelectorAll<HTMLElement>('[data-course-marker]').forEach(item => { item.textContent = progress.completed.includes(item.dataset.courseMarker!) ? '已读完' : '可以开始'; });
+    const resume = document.querySelector<HTMLAnchorElement>('[data-course-resume]');
+    if (resume && progress.lastVisited) { resume.href = courseLessonHref(progress.lastVisited); resume.textContent = progress.completed.includes(progress.lastVisited) ? '重读这一章 →' : '继续阅读 →'; }
+  }
+  function save() {
+    try { persistent = saveCourseProgress(localStorage, progress); } catch { persistent = false; }
+    render();
+  }
+  if (lesson) { progress.lastVisited = lesson; save(); }
+  button?.addEventListener('click', () => {
+    if (!lesson) return;
+    progress = toggleCourseCompletion(progress, lesson);
+    save();
+  });
+  render();
+  function refresh() {
+    try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch { persistent = false; }
+    render();
+  }
+  window.addEventListener('pageshow', event => { if (event.persisted) refresh(); });
+  window.addEventListener('storage', event => { if (event.key === courseStorageKey || event.key === null) refresh(); });
+</script>

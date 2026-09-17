@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { topicIds, topicRegistry } from '../src/data/topics.ts';
-import { learningPaths } from '../src/data/home.ts';
+import { courseOutline } from '../src/data/courseOutline.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const topicDetail = `${root}src/pages/topics/[id].astro`;
@@ -56,13 +56,10 @@ test('topic pages and prerequisite component exist as static route sources', () 
   assert.match(prerequisiteSource, /\/concepts\//);
 });
 
-test('learning entry explains the beginner journey and specialist route relationship', () => {
-  const learningIndex = readFileSync(`${root}src/pages/learn/index.astro`, 'utf8');
-  assert.match(learningIndex, /data-learning-journey-intro/);
-  assert.match(learningIndex, /learning-recommended-order/);
-  assert.match(learningIndex, /推荐顺序/);
-  assert.match(learningIndex, /专题深入/);
-  assert.match(learningIndex, /从个人概念走到经济系统/);
+test('learning entry separates available lessons, the outline and independent exploration', () => {
+  const source = readFileSync(`${root}src/pages/learn/index.astro`, 'utf8');
+  for (const text of ['入门主线', '问题探索', '正在编写', 'chapter.published']) assert.ok(source.includes(text));
+  assert.doesNotMatch(source, /ConceptReader|conceptId|LearningCard/);
 });
 
 test('concept links in the catalog remain stable concept routes', () => {
@@ -77,8 +74,7 @@ test('concept links in the catalog remain stable concept routes', () => {
 test('homepage remains a curated entry point', () => {
   const homepage = readFileSync(`${root}src/pages/index.astro`, 'utf8');
   assert.match(homepage, /LearningPaths/);
-  assert.ok(learningPaths.some((path) => path.steps.some((step) => step.id === 'm1')));
-  assert.ok(learningPaths.some((path) => path.steps.some((step) => step.id === 'm2')));
+  assert.ok(courseOutline.some(chapter => chapter.published));
   assert.doesNotMatch(homepage, /topicRegistry|topics\.map/);
 });
 

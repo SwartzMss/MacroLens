@@ -45,7 +45,7 @@ export const homepageNotableSignalIds = [
 export type HomepageNotableSignalId = typeof homepageNotableSignalIds[number];
 
 export type HomepageNotableSignal = SnapshotEvidence & { id: HomepageNotableSignalId };
-export { publishedLearningPaths as learningPaths } from './learningPaths';
+
 
 const previewRelations = [
   ['central-bank', 'monetary-policy', 'IMPLEMENTS'],

@@ -1,12 +1,5 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { publishedLearningPaths, learningPathHref, learningStepHref, type LearningPath, type LearningStep } from '../data/learningPaths';
-import LearningNavigation from './learning/LearningNavigation.astro';
-import LearningActions from './learning/LearningActions.astro';
-import LearningRuntime from './learning/LearningRuntime.astro';
-import LearningReturn from './learning/LearningReturn.astro';
-import LearningGraphBridge from './learning/LearningGraphBridge.astro';
-import '../styles/learning.css';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import IndicatorChart from '../components/IndicatorChart.astro';
@@ -16,8 +9,6 @@ import IndicatorMetadata from '../components/IndicatorMetadata.astro';
 import RelationshipCards from '../components/RelationshipCards.astro';
 import RelatedConcepts from '../components/RelatedConcepts.astro';
 import PrerequisiteConcepts from '../components/PrerequisiteConcepts.astro';
-import PageFeedback from '../components/PageFeedback.astro';
-import { learningArticleId } from '../data/learningArticles';
 import ConceptKnowledgeOverview from '../components/ConceptKnowledgeOverview.astro';
 import ConceptTableOfContents from '../components/ConceptTableOfContents.astro';
 import CreditUnderstanding from '../components/CreditUnderstanding.astro';
@@ -31,8 +22,8 @@ import { getIndicatorData } from '../data/indicatorRegistry';
 import { getIndicatorPresentation } from '../data/indicatorPresentationAdapter';
 import { getConceptRelations } from '../data/graphRegistry';
 import { getCategory } from '../data/categories';
-const { entry, learningPath, learningStep } = Astro.props as { entry: CollectionEntry<'concepts'>; learningPath?: LearningPath; learningStep?: LearningStep };
-const learningIndex = learningPath?.steps.findIndex(step => step.id === learningStep?.id) ?? -1; const { Content, headings } = await render(entry);
+const { entry } = Astro.props as { entry: CollectionEntry<'concepts'> };
+const { Content, headings } = await render(entry);
 const indicator=entry.data.chart ? getIndicatorData(entry.data.chart) : null;
 const presentation = indicator ? getIndicatorPresentation(indicator, entry.data.subtitle) : null;
 const relations=entry.data.graph ? getConceptRelations(entry.data.graph, entry.data.id) : [];
@@ -55,52 +46,46 @@ const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
 const isMonetaryPolicy = entry.data.id === 'monetary-policy';
 const hasCustomEntry = entry.data.id === 'credit' || isMonetaryPolicy;
 const hasEntry = hasCustomEntry || Boolean(entry.data.intro);
-const learningRoute = publishedLearningPaths
-  .map(path => ({ path, step: path.steps.find(step => step.conceptId === entry.data.id) }))
-  .find(item => item.step);
 const sectionLinks = [
   { id: `${entry.data.id}-overview`, label: '概览' },
   ...(hasEntry ? [{ id: `${entry.data.id}-start`, label: '先理解' }] : []),
   { id: `${entry.data.id}-detail`, label: '详解' },
   ...(indicator ? [{ id: `${entry.data.id}-data`, label: '数据' }] : []),
-  ...(!learningPath && hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
+  ...(hasKnowledge ? [{ id: `${entry.data.id}-knowledge`, label: '理解与联系' }] : []),
   ...(presentation ? [{ id: `${entry.data.id}-sources`, label: '来源' }] : []),
-  ...(!learningPath && hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
+  ...(hasConnections ? [{ id: `${entry.data.id}-connections`, label: '关系' }] : []),
 ];
 const articleHeadings = headings.filter(heading => heading.depth === 2);
 ---
-<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle} noindex={Boolean(learningPath)} canonicalPath={`/concepts/${entry.data.id}/`}>
-  <LearningReturn />
-  <div class:list={["concept-detail-page", { "learning-reader": learningPath }]} data-learning-path={learningPath?.id} data-learning-step={learningStep?.id} data-pagefind-ignore={learningPath ? true : undefined}>
+<BaseLayout title={`${entry.data.name}：${entry.data.subtitle}｜MacroLens`} description={entry.data.subtitle} canonicalPath={`/concepts/${entry.data.id}/`}>
+  <div class="concept-detail-page">
     <header class="page-head detail-header" id={`${entry.data.id}-overview`}>
       <div class="shell">
-        {learningPath && <div class="learning-context-line"><a href={learningPathHref(learningPath.id)}>学习 / {learningPath.title}</a><span>第 {learningIndex + 1} / {learningPath.steps.length} 步 · <a href={`/concepts/${entry.data.id}/`} data-no-learning-context>退出学习模式</a></span></div>}
-        {!learningPath && <div class="breadcrumbs"><a href="/">首页</a> / <a href={`/concepts#${entry.data.category}`}>{categoryLabel}</a> / {entry.data.name}</div>}
+        <div class="breadcrumbs"><a href="/">首页</a> / <a href={`/concepts#${entry.data.category}`}>{categoryLabel}</a> / {entry.data.name}</div>
         <h1 class="concept-title">{entry.data.name}</h1>
         <p class="lead">{entry.data.subtitle}</p>
-        {learningStep?.focus && <p class="learning-focus">本步关注：{learningStep.focus}</p>}
         <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
         <ContentLayerGuide
-          mode={learningPath ? 'learning' : 'concept'}
-          learningHref={learningRoute?.step ? learningStepHref(learningRoute.path.id, learningRoute.step.id) : '/learn/'}
+          mode="concept"
+          learningHref="/learn/"
           conceptHref={`/concepts/${entry.data.id}/`}
         />
       </div>
     </header>
     <nav class="detail-mobile-navigation" aria-label="本页目录" data-detail-navigation>
       <div class="shell detail-jump-inner">
-        <details class:list={["detail-mobile-toc", { "learning-mobile-menu": learningPath }]}>
-          <summary>{learningPath ? `第 ${learningIndex + 1} / ${learningPath.steps.length} 步 · 目录` : "目录"}</summary>
-          <div class="detail-toc-menu">{learningPath ? <><LearningNavigation path={learningPath} currentStepId={learningStep?.id} /><details class="learning-page-toc"><summary>本页目录</summary><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} /></details></> : <ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} />}</div>
+        <details class="detail-mobile-toc">
+          <summary>目录</summary>
+          <div class="detail-toc-menu"><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} /></div>
         </details>
       </div>
     </nav>
     <div class="shell concept-layout detail-layout">
-      <article class="prose detail-article" data-pagefind-body={learningPath ? undefined : true}>
+      <article class="prose detail-article" data-pagefind-body>
         {entry.data.id === 'credit' && <CreditUnderstanding />}
         {isMonetaryPolicy && <MonetaryPolicyUnderstanding />}
         {!hasCustomEntry && entry.data.intro && <ConceptUnderstanding conceptId={entry.data.id} intro={entry.data.intro} />}
-        {learningPath && prerequisites.length > 0 ? <details class="learning-prerequisites"><summary>需要补基础？建议先理解：{prerequisites.map(concept => concept!.data.name).join('、')}</summary><PrerequisiteConcepts concepts={prerequisites} /></details> : <PrerequisiteConcepts concepts={prerequisites} />}
+        <PrerequisiteConcepts concepts={prerequisites} />
         <details class="concept-long-form" id={`${entry.data.id}-detail`} open>
           <summary>详细说明与统计边界</summary>
           <div class="concept-long-form-content"><Content /></div>
@@ -109,24 +94,19 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
           <IndicatorReading indicator={indicator} />
           <IndicatorChart indicator={indicator} />
         </section>}
-        {!learningPath && hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
+        {hasKnowledge && <ConceptKnowledgeOverview conceptId={entry.data.id} knowledge={knowledge} showSummary={false} />}
         {presentation && <section id={`${entry.data.id}-sources`} aria-label="数据口径与来源"><IndicatorMetadata presentation={presentation} /></section>}
-        {learningPath && entry.data.graph && <LearningGraphBridge graphId={entry.data.graph} concepts={allConcepts} focusNodeId={entry.data.id} />}
-        {learningPath && learningStep && <LearningActions path={learningPath} stepId={learningStep.id} />}
-        {!learningPath && publishedLearningPaths.some(path => path.steps.some(step => step.conceptId === entry.data.id)) && <section class="learning-related-paths" data-no-learning-context data-pagefind-ignore><h2>在路线中学习</h2>{publishedLearningPaths.filter(path => path.steps.some(step => step.conceptId === entry.data.id)).map(path => <a href={learningPathHref(path.id)}>{path.title} →</a>)}</section>}
-        {learningPath && <PageFeedback pageId={learningArticleId(entry.data.id)} />}
-        {!learningPath && hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">
+        {hasConnections && <section id={`${entry.data.id}-connections`} aria-label="关系与继续探索">
           <RelationshipCards conceptId={entry.data.id} conceptName={entry.data.name} relations={relations} concepts={allConcepts} />
           <RelatedConcepts concepts={relatedConcepts} />
         </section>}
       </article>
       <aside class="side-nav detail-side-nav">
         <nav aria-label="完整页内目录" data-detail-navigation>
-          {learningPath ? <><a class="learning-text-link" href={learningPathHref(learningPath.id)}>本路线 · {learningPath.title}</a><LearningNavigation path={learningPath} currentStepId={learningStep?.id} /><details class="learning-page-toc"><summary>本页目录</summary><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} /></details></> : <><b>本页目录</b><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} /></>}
+          <b>本页目录</b><ConceptTableOfContents sections={sectionLinks} headings={articleHeadings} detailId={`${entry.data.id}-detail`} />
         </nav>
       </aside>
     </div>
   </div>
-<LearningRuntime />
 </BaseLayout>
 <script>import '../scripts/concept-navigation';</script>
