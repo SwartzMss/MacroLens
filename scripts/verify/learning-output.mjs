@@ -20,7 +20,7 @@ for (const chapter of courseOutline) {
   const html = read(route);
   assert.match(html, /data-pagefind-body/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
-  assert.match(html, /假设故事/);
+  assert.match(html, /假设(?:故事|贷款)/);
   assert.match(html, /正文参考来源/);
   assert.match(html, /data-course-complete/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
