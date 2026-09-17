@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import LearningNavigation from '../../../components/learning/LearningNavigation.astro';
 import LearningRuntime from '../../../components/learning/LearningRuntime.astro';
+import LearningGraphBridge from '../../../components/learning/LearningGraphBridge.astro';
 import { publishedLearningPaths, validateLearningPaths, learningStepHref, type LearningPath } from '../../../data/learningPaths';
 import '../../../styles/learning.css';
 export async function getStaticPaths() {
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 const { path } = Astro.props as { path: LearningPath };
 const concepts = await getCollection('concepts');
 const name = (id: string) => concepts.find(concept => concept.data.id === id)!.data.name;
+const routeConceptIds = path.steps.filter(step => step.kind === 'concept').map(step => step.conceptId).filter((id): id is string => Boolean(id));
 ---
 <BaseLayout title={`${path.title}｜学习路线｜MacroLens`} description={path.description}>
   <div data-learning-path={path.id}>
@@ -26,6 +28,14 @@ const name = (id: string) => concepts.find(concept => concept.data.id === id)!.d
         </section>
         <section><h2>路线目录</h2><LearningNavigation path={path} /></section>
       </div>
+      <LearningGraphBridge
+        graphId="macro"
+        concepts={concepts}
+        focusConceptIds={routeConceptIds}
+        eyebrow="路线与关系"
+        title="把这条路线放进关系图"
+        description="路线中的概念如果在图谱中已有关系，会在这里显示线索。打开关系浏览器，可查看关系类型；已补充解释的关系还会显示时间、适用条件与证据。"
+      />
       {path.extensionConceptIds.length > 0 && <section class="learning-basis"><h2>延伸阅读</h2><p>不计入核心进度；进入文章后可查看建议先理解的概念。</p><ul class="learning-extension-links">{path.extensionConceptIds.map(id => <li><a href={`/concepts/${id}/`}>{name(id)} →</a></li>)}</ul></section>}
       <div class="learning-support"><a href="/learn/">所有学习路线 →</a><a href="/graph">浏览宏观关系与证据 →</a></div>
     </div>

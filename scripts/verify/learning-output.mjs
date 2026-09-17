@@ -1,11 +1,18 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { publishedLearningPaths } from '../../src/data/learningPaths.ts';
+import { getRelationData } from '../../src/data/graphRegistry.ts';
 
 const dist = new URL('../../dist/', import.meta.url);
 const read = path => readFileSync(new URL(path, dist), 'utf8');
 const body = html => html.match(/<div class="concept-long-form-content">([\s\S]*?)<\/div>\s*<\/details>/)?.[1];
 const ids = html => [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+const graphRelations = getRelationData('macro').relations;
+const relationTouches = (id) => graphRelations.filter(relation => relation.source === id || relation.target === id);
+const routeRelationCount = (path) => {
+  const conceptIds = new Set(path.steps.filter(step => step.kind === 'concept').map(step => step.conceptId));
+  return graphRelations.filter(relation => conceptIds.has(relation.source) || conceptIds.has(relation.target)).length;
+};
 let checked = 0;
 const learningIndex = read('learn/index.html');
 assert.match(learningIndex, /data-content-boundary/);
@@ -14,6 +21,10 @@ assert.match(learningIndex, /回答“它如何运作？”/);
 for (const path of publishedLearningPaths) {
   const overview = read(`learn/${path.id}/index.html`);
   assert.match(overview, /data-pagefind-body/);
+  if (routeRelationCount(path) > 0) {
+    assert.match(overview, /data-learning-graph-bridge/);
+    assert.match(overview, /href="\/graph\?node=/);
+  }
   for (const [index, step] of path.steps.entries()) {
     const html = read(`learn/${path.id}/${step.id}/index.html`);
     assert.match(html, /name="robots" content="noindex,nofollow"/);
@@ -27,6 +38,10 @@ for (const path of publishedLearningPaths) {
     if (step.kind === 'concept') {
       assert.match(html, /data-content-layer="learning"/);
       assert.match(html, /回答“它如何运作？”/);
+      if (relationTouches(step.conceptId).length > 0) {
+        assert.match(html, /data-learning-graph-bridge/);
+        assert.match(html, /href="\/graph\?node=/);
+      }
       const canonical = read(`concepts/${step.conceptId}/index.html`);
       assert.ok(body(html), `missing content: ${step.id}`);
       assert.equal(body(html), body(canonical), `learning content diverges: ${step.id}`);
