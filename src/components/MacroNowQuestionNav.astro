@@ -6,10 +6,10 @@ const { current } = Astro.props as { current: MacroNowQuestionId };
 
 <section class="macro-now-question-nav" aria-labelledby="macro-now-question-nav-title">
   <div class="macro-now-question-nav-head">
-    <div class="eyebrow">当前状态</div>
+    <div class="eyebrow">当前宏观</div>
     <h2 id="macro-now-question-nav-title">换个问题继续看</h2>
   </div>
-  <nav aria-label="当前状态问题">
+  <nav aria-label="当前宏观问题">
     {macroNowQuestions.map((question) => <a
       class:list={['macro-now-question-nav-item', question.id === current && 'is-current']}
       href={question.href}

@@ -1,25 +1,19 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeHero from '../components/home/HomeHero.astro';
-import MacroStateSummary from '../components/home/MacroStateSummary.astro';
-import RelationshipPreview from '../components/home/RelationshipPreview.astro';
 import LearningPaths from '../components/home/LearningPaths.astro';
-import { getHomepageRelationNodes, getHomepageRelationshipPreview, getNotableSignals } from '../data/home';
+import MacroStateSummary from '../components/home/MacroStateSummary.astro';
 import { buildMacroSnapshot } from '../data/macroSnapshot';
 import '../styles/home.css';
 const snapshot = buildMacroSnapshot();
-const concepts = await getCollection('concepts');
-const signals = getNotableSignals(snapshot);
-const relations = getHomepageRelationshipPreview();
-const nodes = getHomepageRelationNodes();
 ---
 <BaseLayout
   title="MacroLens｜看懂经济，而不只是看数据"
   description="从数据、关系到传导，建立你的宏观经济认知框架。"
 >
-  <HomeHero signal={signals[0]} />
+  <div class="home-landing">
+    <HomeHero />
+    <LearningPaths />
+  </div>
   <MacroStateSummary snapshot={snapshot} />
-  <RelationshipPreview relations={relations} nodes={nodes} concepts={concepts} />
-  <LearningPaths />
 </BaseLayout>

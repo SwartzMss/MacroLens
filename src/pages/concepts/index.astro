@@ -20,20 +20,28 @@ for (const concept of catalog.concepts) {
 const categoryGroups = [...grouped.entries()]
   .map(([id, items]) => ({ id, ...getCategory(id), items: items.sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id)) }))
   .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id], count: grouped.get(id)?.length ?? 0 }));
+const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id] }));
 const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
-<BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
-  <header class="index-head"><div class="shell"><div class="eyebrow">概念查询</div><h1>找到你想理解的概念</h1><p class="lead">先直接搜索一个概念，也可以按领域、难度和主题浏览。</p><form class="concept-search" action="/search/" method="get" role="search"><label for="concept-search-query">搜索概念</label><div><input id="concept-search-query" name="q" type="search" placeholder="搜索 GDP、M2、CPI、利率、失业率……" autocomplete="off" /><button type="submit">搜索</button></div><p>常查：<a href="/search/?q=GDP">GDP</a><a href="/search/?q=M2">M2</a><a href="/search/?q=CPI">CPI</a><a href="/search/?q=失业率">失业率</a></p></form><div class="index-summary" aria-live="polite" aria-atomic="true"><b data-filter-count>{concepts.length} 个概念</b> · <b data-filter-category-count>{categoryGroups.length} 个领域</b> · <a href="/search/">打开概念全文搜索 →</a></div></div></header>
+<BaseLayout title="知识库｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
+  <header class="index-head concept-library-head">
+    <div class="shell">
+      <div class="eyebrow">知识库</div>
+      <h1>按领域认识宏观概念</h1>
+      <p class="lead">按领域浏览宏观经济概念，进入详情查看定义、数据和统计口径。</p>
+    </div>
+  </header>
   <div class="shell concept-index">
-    <form class="concept-filters" data-concept-filters>
-      <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
-      <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
-      <div class="filter-field filter-topic"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
-    </form>
+    <details class="concept-filter-panel" data-filter-panel>
+      <summary>筛选</summary>
+      <form class="concept-filters" data-concept-filters>
+        <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
+        <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
+        <div class="filter-field filter-topic"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
+      </form>
+    </details>
     <nav class="concept-quick-nav" aria-label="按领域快速浏览">
-      <strong>快速浏览</strong>
-      {categoryOptions.map(option => <a href={`#${option.id}`}>{option.label}<span>{option.count}</span></a>)}
+      <div class="concept-quick-links">{categoryOptions.map(option => <a href={`#${option.id}`}>{option.label}</a>)}</div>
     </nav>
     <div class="filter-empty" data-filter-empty hidden>
       <h2>暂无匹配的概念</h2>
@@ -41,10 +49,10 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
       <button type="button" data-filter-reset>清除筛选</button>
     </div>
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
-      <header><div><h2>{group.label}</h2><p>{group.description}</p></div><span data-category-count>{group.items.length} 个概念</span></header>
+      <header><div><h2>{group.label}</h2><p>{group.description}</p></div></header>
       <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
-        <div><span class="category-chip">{group.label}</span><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
-        <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">阅读概念 →</b>
+        <div class="index-card-tags"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
+        <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">查看定义与数据 →</b>
       </a>)}</div>
     </section>)}
   </div>

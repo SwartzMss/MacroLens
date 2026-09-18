@@ -15,7 +15,6 @@
       button.setAttribute('aria-pressed', String(completed));
     }
     if (status) status.textContent = persistent ? (progress.completed.length ? `已读完 ${progress.completed.length} 章。进度保存在当前浏览器。` : '进度保存在当前浏览器。') : '浏览器暂时无法保存进度，你仍可以正常阅读。';
-    document.querySelectorAll<HTMLElement>('[data-course-marker]').forEach(item => { item.textContent = progress.completed.includes(item.dataset.courseMarker!) ? '已读完' : '可以开始'; });
     const resume = document.querySelector<HTMLAnchorElement>('[data-course-resume]');
     if (resume) {
       const target = courseResumeTarget(progress);

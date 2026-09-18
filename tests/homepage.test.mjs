@@ -8,7 +8,7 @@ import { getHomepageRelationshipPreview, getNotableSignals, formatSignalChange, 
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const homeDirectory = `${root}src/components/home`;
-const componentNames = ['HomeHero', 'MacroStateSummary', 'LatestReading', 'RelationshipPreview', 'LearningPaths'];
+const componentNames = ['HomeHero', 'MacroStateSummary', 'LatestReading', 'LearningPaths'];
 const homepagePath = `${root}src/pages/index.astro`;
 const snapshotPagePath = `${root}src/pages/snapshot.astro`;
 
@@ -41,22 +41,23 @@ test('homepage components expose the required semantic sections and links', () =
   const source = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
   const styles = readFileSync(`${root}src/styles/home.css`, 'utf8');
 
-  for (const id of ['home-hero', 'macro-state', 'relationship-preview', 'learning-paths']) {
+  for (const id of ['home-hero', 'macro-state', 'learning-paths']) {
     assert.match(source, new RegExp(`id=["']${id}["']`));
   }
   assert.match(source, /domain\.state/);
   assert.match(source, /domain\.explanation/);
   assert.match(source, /signal\.conceptHref/);
-  assert.match(source, /relation\.source/);
-  assert.match(source, /relation\.target/);
-  assert.match(source, /\/graph/);
-  assert.match(source, /href="\/concepts\/"/);
-  assert.match(source, /home-hero-entry-note/);
-  assert.match(source, /domainHrefs/);
+  assert.match(source, /featuredDomainIds/);
+  assert.match(source, /getMacroNowQuestionForDomain/);
+  assert.match(source, /home-domain-grid/);
+  assert.match(source, /home-domain-question/);
+  assert.match(source, /home-learning-promo/);
+  assert.doesNotMatch(source, /(?:01|02)\s*\//);
+  assert.doesNotMatch(source, /home-hero-entry-note/);
+  assert.doesNotMatch(source, /MacroLens · 宏观经济观察与学习/);
+  assert.doesNotMatch(source, /home-featured-grid/);
+  assert.doesNotMatch(source, /RelationshipPreview/);
   assert.match(source, /home-domain-detail-link/);
-  for (const href of ['/now/growth/', '/now/credit/', '/now/prices/', '/now/policy/', '/now/labor/', '/now/external/']) {
-    assert.match(source, new RegExp(href.replaceAll('/', '\\/')));
-  }
   assert.match(styles, /:focus-visible/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
 });
@@ -65,16 +66,17 @@ test('homepage is a narrative entry point and full snapshot has its own route', 
   const home = readFileSync(homepagePath, 'utf8');
   const homeComponents = componentNames.map((name) => readFileSync(`${homeDirectory}/${name}.astro`, 'utf8')).join('\n');
   const snapshot = readFileSync(snapshotPagePath, 'utf8');
-  for (const name of ['HomeHero', 'MacroStateSummary', 'RelationshipPreview', 'LearningPaths']) {
+  for (const name of ['HomeHero', 'LearningPaths', 'MacroStateSummary']) {
     assert.match(home, new RegExp(name));
   }
+  assert.match(home, /home-landing/);
   assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths|<NotableSignals/);
   assert.doesNotMatch(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
   assert.match(`${home}\n${homeComponents}`, /href=["']\/now\/["']/);
   assert.match(snapshot, /MacroSnapshot/);
   assert.match(snapshot, /buildMacroSnapshot/);
 
-  const order = ['HomeHero', 'MacroStateSummary', 'RelationshipPreview', 'LearningPaths']
+  const order = ['HomeHero', 'LearningPaths', 'MacroStateSummary']
     .map((name) => home.indexOf(name));
   assert.ok(order.every((index) => index >= 0));
   assert.deepEqual([...order].sort((a, b) => a - b), order);

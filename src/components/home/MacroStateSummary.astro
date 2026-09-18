@@ -1,56 +1,37 @@
 ---
 import type { MacroDomainId, MacroSnapshot } from '../../data/macroSnapshot';
-import { homeStateLabels, localizeExplanation, getHomeSynthesis } from '../../data/home';
+import { homeStateLabels, localizeExplanation } from '../../data/home';
+import { getMacroNowQuestionForDomain } from '../../data/macroNow';
 import LatestReading from './LatestReading.astro';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
-const domainOrder: MacroDomainId[] = [
-  'growth', 'credit-liquidity', 'prices', 'policy-financial-conditions', 'labor', 'external',
-];
-const domainHrefs: Record<MacroDomainId, string> = {
-  growth: '/now/growth/',
-  'credit-liquidity': '/now/credit/',
-  prices: '/now/prices/',
-  'policy-financial-conditions': '/now/policy/',
-  labor: '/now/labor/',
-  external: '/now/external/',
-};
-const domains = [...snapshot.domains].sort((a, b) => domainOrder.indexOf(a.id) - domainOrder.indexOf(b.id));
+const featuredDomainIds: MacroDomainId[] = ['growth', 'credit-liquidity', 'prices'];
+const domains = featuredDomainIds.map(id => snapshot.domains.find(domain => domain.id === id)).filter((domain): domain is NonNullable<typeof domain> => Boolean(domain));
 ---
 
 <section class="home-section home-state" id="macro-state" aria-labelledby="macro-state-title">
   <div class="home-section-heading">
     <div>
-      <div class="eyebrow">01 / 宏观概览</div>
       <h2 id="macro-state-title">现在，经济有哪些信号？</h2>
     </div>
-    <a class="home-inline-link" href="/now/">查看完整当前状态 →</a>
+    <a class="home-inline-link" href="/now/">查看当前宏观 →</a>
   </div>
-
-  <div class="home-synthesis">
-    <div>
-      <div class="eyebrow">综合观察</div>
-      <h3>{snapshot.synthesis.label}</h3>
-    </div>
-    <p>{getHomeSynthesis(snapshot)}</p>
-  </div>
-  <p class="home-freshness">数据集最近更新：<time>{snapshot.freshness.latestUpdatedAt}</time> · 各指标观察期不同，具体期间见读数与详情。</p>
 
   <div class="home-domain-grid">
-    {domains.map((domain) => <article class:list={['home-domain', { 'home-domain-compact': domain.id === 'labor' || domain.id === 'external' }]} data-domain={domain.id} data-state={domain.state}>
+    {domains.map((domain) => { const question = getMacroNowQuestionForDomain(domain.id); return <article class="home-domain" data-domain={domain.id} data-state={domain.state}>
       <div class="home-domain-intro">
         <div class="home-domain-topline">
-          <h3 class="home-domain-label">{domain.label}</h3>
+          <h3 class="home-domain-label">{question.label}</h3>
           <span class="home-state-chip">{homeStateLabels[domain.state]}</span>
         </div>
-        <p>{domain.id === 'policy-financial-conditions'
-          ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
-          : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
-        <a class="home-domain-detail-link" href={domainHrefs[domain.id]}>按问题查看这组数据 →</a>
+        <p class="home-domain-question"><a href={question.href}>{question.question}</a></p>
+        <p>{`${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
+        <a class="home-domain-detail-link" href={question.href}>查看这组数据 →</a>
       </div>
       <ul class="home-domain-readings" aria-label={`${domain.label}最新数据`}>
         {domain.evidence.map(item => <li><LatestReading signal={item} /></li>)}
       </ul>
-    </article>)}
+    </article>; })}
   </div>
+  <p class="home-freshness">数据更新时间：<time>{snapshot.freshness.latestUpdatedAt}</time> · 详细期间和口径见当前宏观。</p>
 </section>

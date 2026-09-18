@@ -20,15 +20,12 @@ const publishedExplorations = explorations.filter(exploration => exploration.pub
       <h2 id="outline">入门主线</h2>
       <p>按下面的顺序，把问题一个个想明白。目前已开放 {publishedCount} 章{publishedCount < courseOutline.length ? '，其余章节正在编写，不计入已开放课程的进度。' : '，可以按自己的节奏学习和回顾。'}</p>
       <ol class="course-outline">
-        {courseOutline.map((chapter, index) => <li>
+        {courseOutline.map((chapter, index) => <li class={chapter.published ? 'is-published' : 'is-unpublished'}>
           <span class="course-number">{String(index + 1).padStart(2, '0')}</span>
           <div>
             <h3>{chapter.published ? <a href={courseLessonHref(chapter.id)}>{chapter.title}</a> : chapter.title}</h3>
             <p>{chapter.summary}</p>
           </div>
-          <span class="course-state" data-course-marker={chapter.published ? chapter.id : undefined}>
-            {chapter.published ? '可以开始' : '正在编写'}
-          </span>
         </li>)}
       </ol>
     </section>
@@ -43,7 +40,6 @@ const publishedExplorations = explorations.filter(exploration => exploration.pub
           <a class="course-explore-link" href={explorationHref(exploration.id)}>开始阅读 →</a>
         </article>)}
       </div>
-      <p class="course-note">后续问题会单独加入这里，不会改变入门主线的顺序或阅读进度。</p>
     </section>
   </div>
   <CourseRuntime />

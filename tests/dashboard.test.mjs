@@ -71,6 +71,8 @@ test('dashboard styles remain responsive while homepage uses a compact signal vi
   assert.match(styles, /dashboard-grid/);
   assert.doesNotMatch(styles, /dashboard-changes/);
   assert.match(styles, /\.indicator-change\.is-negative/);
-  assert.match(page, /NotableSignals/);
+  assert.match(page, /MacroStateSummary/);
+  assert.match(page, /LearningPaths/);
+  assert.doesNotMatch(page, /RelationshipPreview/);
   assert.doesNotMatch(page, /<MacroDashboard|<MacroSnapshot|TransmissionPaths/);
 });

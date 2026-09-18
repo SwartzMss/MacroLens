@@ -59,6 +59,8 @@ test('topic pages and prerequisite component exist as static route sources', () 
 test('learning entry separates available lessons, the outline and independent exploration', () => {
   const source = readFileSync(`${root}src/pages/learn/index.astro`, 'utf8');
   for (const text of ['入门主线', '问题探索', '正在编写', 'chapter.published']) assert.ok(source.includes(text));
+  assert.doesNotMatch(source, /可以开始|data-course-marker/);
+  assert.doesNotMatch(source, /后续问题会单独加入这里/);
   assert.doesNotMatch(source, /ConceptReader|conceptId|LearningCard/);
 });
 
@@ -81,27 +83,36 @@ test('homepage remains a curated entry point', () => {
 test('concept index will expose all three browsing dimensions', () => {
   const source = readFileSync(conceptsIndex, 'utf8');
   const filters = readFileSync(`${root}src/scripts/concept-filters.ts`, 'utf8');
+  assert.match(source, /concept-library-head/);
+  assert.match(source, /<div class="eyebrow">知识库<\/div>/);
+  assert.match(source, /按领域认识宏观概念/);
+  assert.doesNotMatch(source, /(?:01|02|03)\s*\//);
   for (const name of ['category', 'topic', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
   for (const attribute of ['data-category', 'data-topics', 'data-level']) assert.match(source, new RegExp(attribute));
   assert.match(source, /concept-filters/);
   assert.match(source, /concept-quick-nav/);
-  assert.match(source, /level-chip/);
   assert.match(filters, /URLSearchParams/);
   assert.match(filters, /history\.pushState/);
   assert.match(filters, /popstate/);
 });
 
-test('concept search is prominent and scoped to concept pages', () => {
+test('knowledge library and global search stay separate', () => {
   const index = readFileSync(conceptsIndex, 'utf8');
   const search = readFileSync(`${root}src/pages/search.astro`, 'utf8');
   const searchStyles = readFileSync(`${root}src/styles/search.css`, 'utf8');
   const reader = readFileSync(`${root}src/components/ConceptReader.astro`, 'utf8');
 
-  assert.match(index, /class="concept-search"/);
-  assert.match(index, /name="q"/);
-  assert.match(index, /action="\/search\/"/);
-  assert.match(search, /triggerFilters\(\{content:'concept'\}\)/);
+  assert.doesNotMatch(index, /class="concept-search"/);
+  assert.match(index, /concept-filter-panel/);
+  assert.match(index, /index-card-tags/);
+  assert.match(index, /data-category-section/);
+  assert.doesNotMatch(search, /triggerFilters\(\{content:'concept'\}\)/);
   assert.match(search, /triggerSearch\(query\)/);
-  assert.match(searchStyles, /pagefind-ui__filter-panel\s*\{\s*display:\s*none/);
+  assert.match(search, /搜索 MacroLens/);
+  assert.match(search, /例如：M2 为什么不等于通胀/);
+  assert.match(search, /showSubResults:true/);
+  assert.doesNotMatch(search, /返回知识库/);
+  assert.doesNotMatch(search, /只搜索知识库内容/);
+  assert.match(searchStyles, /pagefind-ui__result/);
   assert.match(reader, /data-pagefind-filter="content:concept"/);
 });

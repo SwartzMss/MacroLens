@@ -1,28 +1,13 @@
 ---
-import { getPmiReading, type HomepageNotableSignal } from '../../data/home';
-const { signal } = Astro.props as { signal: HomepageNotableSignal };
 ---
 
 <section class="home-hero" id="home-hero" aria-labelledby="home-hero-title">
   <div class="home-hero-copy">
-    <div class="eyebrow">MacroLens · 宏观经济观察与学习</div>
     <h1 id="home-hero-title">看懂经济，<br /><span>而不只是<span class="home-title-word">看数据。</span></span></h1>
     <p class="lead">从一个指标出发，理解它释放的信号，<br class="home-desktop-break" />再看它与经济的联系。</p>
     <div class="home-hero-actions">
       <a class="home-button home-button-primary" href="/learn/">开始学习</a>
-      <a class="home-button home-button-secondary" href="/now/">看当前宏观状态</a>
-      <a class="home-button home-button-secondary" href="/concepts/">查概念</a>
+      <a class="home-button home-button-secondary" href="/now/">看当前宏观</a>
     </div>
-    <p class="home-hero-entry-note"><strong>学习</strong>按顺序建立认知 · <strong>当前状态</strong>看已发布数据 · <strong>概念查询</strong>核对定义和口径</p>
-    <a class="home-learning-entry" href="#learning-paths">先看看有哪些学习路线 →</a>
   </div>
-
-  <aside class="home-hero-map" aria-labelledby="home-observation-title">
-    <div class="home-observation-top"><span class="eyebrow">从一个信号开始</span><time>{signal.observationPeriod}</time></div>
-    <h2 id="home-observation-title">{signal.name}</h2>
-    <div class="home-observation-value">{signal.latest.toFixed(1)}<span>指数</span></div>
-    <p class="home-observation-reading">{getPmiReading(signal)}</p>
-    <p>读数的变化与所处位置，是理解景气的两个角度。</p>
-    <a class="home-inline-link" href={signal.conceptHref}>了解 PMI 与荣枯线 →</a>
-  </aside>
 </section>

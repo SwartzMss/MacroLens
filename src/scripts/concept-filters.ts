@@ -1,10 +1,9 @@
 const form = document.querySelector<HTMLFormElement>('[data-concept-filters]');
 const cards = [...document.querySelectorAll<HTMLElement>('[data-concept-card]')];
 const sections = [...document.querySelectorAll<HTMLElement>('[data-category-section]')];
-const count = document.querySelector<HTMLElement>('[data-filter-count]');
-const categoryCount = document.querySelector<HTMLElement>('[data-filter-category-count]');
 const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
 const filterNames = ['category', 'level', 'topic'] as const;
+const filterPanel = document.querySelector<HTMLDetailsElement>('[data-filter-panel]');
 
 function selected(name: string) {
   return form?.elements.namedItem(name) as HTMLSelectElement | null;
@@ -17,6 +16,7 @@ function readUrl() {
     const value = params.get(name);
     if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
   }
+  if (filterPanel && filterNames.some((name) => params.get(name) && params.get(name) !== 'all')) filterPanel.open = true;
 }
 
 function writeUrl() {
@@ -44,16 +44,10 @@ function apply({ syncUrl = false } = {}) {
     card.hidden = !matches;
     if (matches) visible += 1;
   }
-  let visibleCategories = 0;
   for (const section of sections) {
     const matches = section.querySelectorAll('[data-concept-card]:not([hidden])').length;
     section.hidden = matches === 0;
-    if (matches) visibleCategories += 1;
-    const sectionCount = section.querySelector<HTMLElement>('[data-category-count]');
-    if (sectionCount) sectionCount.textContent = `${matches} 个概念`;
   }
-  if (count) count.textContent = `${visible} 个概念`;
-  if (categoryCount) categoryCount.textContent = `${visibleCategories} 个领域`;
   if (empty) empty.hidden = visible !== 0;
   if (syncUrl) writeUrl();
 }

@@ -73,7 +73,7 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
           conceptHref={`/concepts/${entry.data.id}/`}
         />
         {macroNowQuestion && <a class="concept-macro-now-context" href={macroNowQuestion.href}>
-          <span class="eyebrow">Macro Now · 当前状态</span>
+          <span class="eyebrow">Macro Now · 当前宏观</span>
           <strong>{macroNowQuestion.label}：{macroNowQuestion.question}</strong>
           <span>在当前数据里查看这组读数 →</span>
         </a>}
