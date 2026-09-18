@@ -90,7 +90,7 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(filters, /popstate/);
 });
 
-test('knowledge library and concept search stay separate', () => {
+test('knowledge library and global search stay separate', () => {
   const index = readFileSync(conceptsIndex, 'utf8');
   const search = readFileSync(`${root}src/pages/search.astro`, 'utf8');
   const searchStyles = readFileSync(`${root}src/styles/search.css`, 'utf8');
@@ -100,12 +100,13 @@ test('knowledge library and concept search stay separate', () => {
   assert.match(index, /concept-filter-panel/);
   assert.match(index, /index-card-tags/);
   assert.match(index, /data-category-section/);
-  assert.match(search, /triggerFilters\(\{content:'concept'\}\)/);
+  assert.doesNotMatch(search, /triggerFilters\(\{content:'concept'\}\)/);
   assert.match(search, /triggerSearch\(query\)/);
-  assert.match(search, /知识库搜索/);
-  assert.match(search, /找一个概念/);
+  assert.match(search, /搜索 MacroLens/);
+  assert.match(search, /例如：M2 为什么不等于通胀/);
+  assert.match(search, /showSubResults:true/);
   assert.doesNotMatch(search, /返回知识库/);
   assert.doesNotMatch(search, /只搜索知识库内容/);
-  assert.match(searchStyles, /pagefind-ui__filter-panel\s*\{\s*display:\s*none/);
+  assert.match(searchStyles, /pagefind-ui__result/);
   assert.match(reader, /data-pagefind-filter="content:concept"/);
 });
