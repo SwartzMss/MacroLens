@@ -1,0 +1,81 @@
+---
+import { getRelationData, type Relation } from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+const { rows } = Astro.props as { rows: SnapshotEvidence[] };
+const graph = getRelationData('macro');
+const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const evidenceById = new Map(rows.map((evidence) => [evidence.id, evidence]));
+const relation = (source: string, target: string) => {
+  const found = graph.relations.find((item) => item.source === source && item.target === target);
+  if (!found) throw new Error(`Macro Now external graph relation is missing: ${source} -> ${target}`);
+  return found;
+};
+const paths: { evidence: SnapshotEvidence; relation: Relation; note: string }[] = [
+  {
+    evidence: evidenceById.get('exports')!,
+    relation: relation('exports', 'external-trade'),
+    note: '出口是对外贸易的一部分。',
+  },
+  {
+    evidence: evidenceById.get('imports')!,
+    relation: relation('imports', 'external-trade'),
+    note: '进口和出口一起组成货物贸易的两面。',
+  },
+  {
+    evidence: evidenceById.get('exports')!,
+    relation: relation('exports', 'economic-activity'),
+    note: '出口变化可能影响生产和经济活动，但要看订单、价格和传导时间。',
+  },
+  {
+    evidence: evidenceById.get('imports')!,
+    relation: relation('imports', 'domestic-demand-and-input-demand'),
+    note: '进口可以反映国内需求或生产投入线索，不能单独代表内需强弱。',
+  },
+];
+if (paths.some((path) => !path.evidence)) throw new Error('Macro Now external graph evidence is incomplete');
+
+const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const relationLabels: Record<string, string> = {
+  COMPONENT_OF: '统计组成',
+  REFLECTS: '反映线索',
+  AFFECTS: '可能影响',
+};
+const relationLabel = (item: Relation) => relationLabels[item.type] ?? '关系';
+---
+
+<section class="macro-now-section macro-now-external-map" aria-labelledby="macro-now-external-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把外贸放进关系图</div>
+      <h2 id="macro-now-external-map-title">两条金额读数怎样接到更大的经济问题？</h2>
+    </div>
+    <p>图谱帮助我们区分统计范围和可能的观察方向，不把出口或进口增长直接当成需求或增长的证明。</p>
+  </div>
+
+  <div class="macro-now-external-paths">
+    {paths.map(({ evidence, relation: edge, note }) => <article class="macro-now-external-path">
+      <div class="macro-now-external-steps">
+        <div class="macro-now-external-node is-evidence">
+          <small>当前读数</small>
+          <strong>{evidence.name}</strong>
+          <span>{evidence.valueLabel}</span>
+        </div>
+        <div class="macro-now-external-edge" aria-hidden="true">
+          <small>{relationLabel(edge)}</small>
+          <b>→</b>
+        </div>
+        <div class="macro-now-external-node">
+          <small>{edge.type === 'COMPONENT_OF' ? '统计范围' : '观察方向'}</small>
+          <strong>{nodeLabel(edge.target)}</strong>
+        </div>
+      </div>
+      <p>{note}</p>
+    </article>)}
+  </div>
+
+  <div class="macro-now-external-note">
+    <strong>图上没有“真实需求”这个读数</strong>
+    <p>要继续判断外部需求、出口数量和价格贡献，还需要贸易拆分、主要市场订单与汇率等证据；当前两条线只回答海关货物金额同比怎样变化。</p>
+  </div>
+</section>

@@ -30,6 +30,8 @@ const creditPage = fileURLToPath(new URL('../src/pages/now/credit.astro', import
 const creditMap = fileURLToPath(new URL('../src/components/MacroNowCreditMap.astro', import.meta.url));
 const policyPage = fileURLToPath(new URL('../src/pages/now/policy.astro', import.meta.url));
 const policyMap = fileURLToPath(new URL('../src/components/MacroNowPolicyMap.astro', import.meta.url));
+const externalPage = fileURLToPath(new URL('../src/pages/now/external.astro', import.meta.url));
+const externalMap = fileURLToPath(new URL('../src/components/MacroNowExternalMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -455,6 +457,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(readFileSync(creditPage, 'utf8'), /钱在变多，融资就一定更容易吗/);
   assert.match(component, /href="\/now\/policy\/"/);
   assert.match(readFileSync(policyPage, 'utf8'), /政策在放松，融资真的更容易了吗/);
+  assert.match(component, /href="\/now\/external\/"/);
+  assert.match(readFileSync(externalPage, 'utf8'), /出口在增长，外贸真的更强了吗/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
@@ -522,6 +526,21 @@ test('Macro Now policy page separates policy events from financing outcomes', ()
   assert.match(map, /policy-rate.*lpr/);
   assert.match(map, /financing-conditions.*credit/);
   assert.match(map, /不是立即发生的结果/);
+});
+
+test('Macro Now external page separates trade amounts from demand and activity', () => {
+  const page = readFileSync(externalPage, 'utf8');
+  const map = readFileSync(externalMap, 'utf8');
+
+  assert.match(page, /MacroNowExternalMap/);
+  assert.match(page, /金额不是数量/);
+  assert.match(page, /海关货物贸易不是国际收支/);
+  assert.match(page, /数量和价格是谁在拉动/);
+  assert.match(map, /exports.*external-trade/);
+  assert.match(map, /imports.*external-trade/);
+  assert.match(map, /exports.*economic-activity/);
+  assert.match(map, /imports.*domestic-demand-and-input-demand/);
+  assert.match(map, /不把出口或进口增长直接当成需求或增长的证明/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
