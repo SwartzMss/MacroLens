@@ -1,5 +1,6 @@
 ---
 import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import MacroNowNode from './MacroNowNode.astro';
 import type { SnapshotEvidence } from '../data/macroSnapshot';
 
 const { row } = Astro.props as { row: SnapshotEvidence };
@@ -42,11 +43,7 @@ const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relatio
     <article class="macro-now-labor-path">
       <header><strong>从一个比率到劳动市场</strong><span>先确认它反映的范围</span></header>
       <div class="macro-now-labor-steps">
-        <div class="macro-now-labor-node is-evidence">
-          <small>当前读数</small>
-          <strong>{row.name}</strong>
-          <span>{row.valueLabel}</span>
-        </div>
+        <MacroNowNode className="macro-now-labor-node is-evidence" caption="当前读数" label={row.name} value={row.valueLabel} href={row.conceptHref} />
         <div class="macro-now-labor-edge" aria-hidden="true">
           <small>{relationLabel(laborPath[0])}</small>
           <b>→</b>

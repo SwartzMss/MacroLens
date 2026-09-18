@@ -37,6 +37,7 @@ const laborPage = fileURLToPath(new URL('../src/pages/now/labor.astro', import.m
 const laborMap = fileURLToPath(new URL('../src/components/MacroNowLaborMap.astro', import.meta.url));
 const questionNav = fileURLToPath(new URL('../src/components/MacroNowQuestionNav.astro', import.meta.url));
 const conceptReader = fileURLToPath(new URL('../src/components/ConceptReader.astro', import.meta.url));
+const macroNowNode = fileURLToPath(new URL('../src/components/MacroNowNode.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -566,6 +567,19 @@ test('Macro Now labor page keeps unemployment scope separate from income outcome
   assert.match(map, /labor-market-conditions.*household-income-conditions/);
   assert.match(map, /labor-market-conditions.*economic-activity/);
   assert.match(map, /不把失业率变化当成所有人的就业结果/);
+});
+
+test('Macro Now graph reading nodes link directly to concept definitions', () => {
+  const node = readFileSync(macroNowNode, 'utf8');
+  const maps = [macroNowMap, priceMap, creditMap, policyMap, externalMap, laborMap];
+
+  assert.match(node, /查看\$\{label\}概念定义/);
+  for (const mapPath of maps) {
+    const map = readFileSync(mapPath, 'utf8');
+    assert.match(map, /MacroNowNode/);
+    assert.match(map, /conceptHref/);
+  }
+  assert.match(readFileSync(pricesPage, 'utf8'), /MacroNowPriceMap evidence=/);
 });
 
 test('Macro Now question pages provide a shared way to continue across current-state questions', () => {

@@ -1,5 +1,6 @@
 ---
 import { getRelationData, type Relation } from '../data/graphRegistry';
+import MacroNowNode from './MacroNowNode.astro';
 import type { SnapshotEvidence } from '../data/macroSnapshot';
 
 const { rows } = Astro.props as { rows: SnapshotEvidence[] };
@@ -56,11 +57,7 @@ const relationLabel = (item: Relation) => relationLabels[item.type] ?? '关系';
   <div class="macro-now-external-paths">
     {paths.map(({ evidence, relation: edge, note }) => <article class="macro-now-external-path">
       <div class="macro-now-external-steps">
-        <div class="macro-now-external-node is-evidence">
-          <small>当前读数</small>
-          <strong>{evidence.name}</strong>
-          <span>{evidence.valueLabel}</span>
-        </div>
+        <MacroNowNode className="macro-now-external-node is-evidence" caption="当前读数" label={evidence.name} value={evidence.valueLabel} href={evidence.conceptHref} />
         <div class="macro-now-external-edge" aria-hidden="true">
           <small>{relationLabel(edge)}</small>
           <b>→</b>
