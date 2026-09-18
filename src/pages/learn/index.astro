@@ -26,9 +26,6 @@ const publishedExplorations = explorations.filter(exploration => exploration.pub
             <h3>{chapter.published ? <a href={courseLessonHref(chapter.id)}>{chapter.title}</a> : chapter.title}</h3>
             <p>{chapter.summary}</p>
           </div>
-          <span class="course-state" data-course-marker={chapter.published ? chapter.id : undefined}>
-            {chapter.published ? '可以开始' : '正在编写'}
-          </span>
         </li>)}
       </ol>
     </section>

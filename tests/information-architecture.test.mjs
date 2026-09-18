@@ -59,6 +59,7 @@ test('topic pages and prerequisite component exist as static route sources', () 
 test('learning entry separates available lessons, the outline and independent exploration', () => {
   const source = readFileSync(`${root}src/pages/learn/index.astro`, 'utf8');
   for (const text of ['入门主线', '问题探索', '正在编写', 'chapter.published']) assert.ok(source.includes(text));
+  assert.doesNotMatch(source, /可以开始|data-course-marker/);
   assert.doesNotMatch(source, /ConceptReader|conceptId|LearningCard/);
 });
 
