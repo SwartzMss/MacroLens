@@ -27,6 +27,13 @@ export const explorations = [
     minutes: 10,
     published: true,
   },
+  {
+    id: 'why-downturns-make-everyone-more-cautious',
+    title: '为什么经济下行时，大家会一起变谨慎？',
+    summary: '家庭、企业和银行面对不确定的收入与风险时，可能都先保留现金、推迟决定。它们之间的联系会放大压力，但不会自动走成同一条路。',
+    minutes: 10,
+    published: true,
+  },
 ] as const;
 
 export const explorationHref = (id: string) => `/learn/explore/${id}/`;
