@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageFeedback from '../../../components/PageFeedback.astro';
 import CourseRuntime from '../../../components/learning/CourseRuntime.astro';
+import LearningSelfCheck from '../../../components/learning/LearningSelfCheck.astro';
 import { courseOutline, courseLessonHref } from '../../../data/courseOutline';
 import '../../../styles/course.css';
 export async function getStaticPaths() {
@@ -20,6 +21,7 @@ const previous = courseOutline[index - 1];
 const next = courseOutline[index + 1];
 const nextReason = courseOutline[index]?.nextReason;
 const sections = headings.filter(item => item.depth === 2);
+const isFinalLesson = lesson.id === 'reading-news';
 ---
 <BaseLayout title={`${lesson.data.title}｜学习经济｜MacroLens`} description={lesson.data.description}>
   <div class="course-shell" data-course-lesson={lesson.id} data-pagefind-body>
@@ -61,6 +63,7 @@ const sections = headings.filter(item => item.depth === 2);
             {lesson.data.takeaways.map(takeaway => <li>{takeaway}</li>)}
           </ul>
         </section>
+        {isFinalLesson && <LearningSelfCheck />}
         <section class="course-actions" aria-label="阅读进度">
           <button class="course-start" type="button" data-course-complete hidden>我读完这一章了</button>
           <p class="course-note" data-course-status aria-live="polite">开启 JavaScript 后可以保存阅读进度。</p>

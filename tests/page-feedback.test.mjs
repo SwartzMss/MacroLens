@@ -184,6 +184,7 @@ test('renders feedback on independent courses, not concept pages', () => {
   const page = readFileSync(conceptPage, 'utf8');
   const api = readFileSync(apiSource, 'utf8');
   const sql = readFileSync(migration, 'utf8');
+  const selfCheck = readFileSync(`${root}src/components/learning/LearningSelfCheck.astro`, 'utf8');
 
   assert.match(component, /读完这一章，你能解释开头的问题了吗/);
   assert.match(component, /这篇案例有没有帮你拆开这个问题/);
@@ -197,11 +198,19 @@ test('renders feedback on independent courses, not concept pages', () => {
   }
   assert.doesNotMatch(component, /unclear_chart|incomplete|图表不够清楚/);
   assert.doesNotMatch(component, /textarea|contenteditable|自由文本/);
+  assert.match(selfCheck, /能说清楚/);
+  assert.match(selfCheck, /还需要回头看/);
+  assert.match(selfCheck, /aria-pressed/);
+  assert.doesNotMatch(selfCheck, /localStorage|学习得分|排行榜|考试/);
   assert.doesNotMatch(page, /PageFeedback/);
   const course = readFileSync(`${root}src/pages/learn/course/[lessonId].astro`, 'utf8');
   assert.match(course, /PageFeedback pageId=\{`learn:course-[^`]+`\} mode="course"/);
+  assert.match(course, /lesson\.id === ['"]reading-news['"]/);
+  assert.match(course, /LearningSelfCheck/);
+  assert.ok(course.indexOf('LearningSelfCheck') < course.indexOf('class="course-actions"'));
   const exploration = readFileSync(`${root}src/pages/learn/explore/[explorationId].astro`, 'utf8');
   assert.match(exploration, /PageFeedback pageId=\{`learn:exploration-[^`]+`\} mode="exploration"/);
+  assert.doesNotMatch(exploration, /LearningSelfCheck/);
   assert.ok(course.indexOf('class="course-actions"') < course.indexOf('<PageFeedback'));
   assert.ok(exploration.indexOf('class="course-actions"') < exploration.indexOf('<PageFeedback'));
   assert.match(api, /parseVisitorCookie/);
