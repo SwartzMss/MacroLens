@@ -13,6 +13,13 @@ export const explorations = [
     minutes: 10,
     published: true,
   },
+  {
+    id: 'why-slower-inflation-doesnt-lower-prices',
+    title: '为什么通胀降了，东西却没有马上变便宜？',
+    summary: '价格上涨得慢一点，不等于已经涨过的价格回去了。要把价格现在是多少，和它最近涨得有多快分开看。',
+    minutes: 9,
+    published: true,
+  },
 ] as const;
 
 export const explorationHref = (id: string) => `/learn/explore/${id}/`;
