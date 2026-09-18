@@ -22,4 +22,9 @@ const lessons = defineCollection({
   schema: z.object({ title: z.string(), description: z.string(), minutes: z.number().positive() }),
 });
 
-export const collections = { concepts, lessons };
+const explorations = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/explorations' }),
+  schema: z.object({ title: z.string(), description: z.string(), minutes: z.number().positive() }),
+});
+
+export const collections = { concepts, lessons, explorations };

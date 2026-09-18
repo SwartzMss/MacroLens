@@ -198,6 +198,8 @@ test('renders feedback on independent courses, not concept pages', () => {
   assert.doesNotMatch(page, /PageFeedback/);
   const course = readFileSync(`${root}src/pages/learn/course/[lessonId].astro`, 'utf8');
   assert.match(course, /PageFeedback pageId=\{`learn:course-/);
+  const exploration = readFileSync(`${root}src/pages/learn/explore/[explorationId].astro`, 'utf8');
+  assert.match(exploration, /PageFeedback pageId=\{`learn:exploration-/);
   assert.match(api, /parseVisitorCookie/);
   assert.match(api, /FEEDBACK_DB/);
   assert.match(sql, /PRIMARY KEY\s*\(page_id, visitor_id\)/i);

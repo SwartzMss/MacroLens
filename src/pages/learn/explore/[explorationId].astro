@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageFeedback from '../../../components/PageFeedback.astro';
+import { explorations } from '../../../data/explorations';
+import '../../../styles/course.css';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('explorations');
+  return explorations.filter(item => item.published).map(item => {
+    const exploration = entries.find(entry => entry.id === item.id);
+    if (!exploration) throw new Error(`Missing published exploration: ${item.id}`);
+    return { params: { explorationId: item.id }, props: { exploration } };
+  });
+}
+
+const { exploration } = Astro.props;
+const { Content, headings } = await render(exploration);
+const sections = headings.filter(item => item.depth === 2);
+---
+<BaseLayout title={`${exploration.data.title}｜问题探索｜MacroLens`} description={exploration.data.description}>
+  <div class="course-shell" data-exploration={exploration.id} data-pagefind-body>
+    <header>
+      <a href="/learn/">← 返回学习入口</a>
+      <p class="course-kicker">问题探索 · 约 {exploration.data.minutes} 分钟</p>
+      <h1>{exploration.data.title}</h1>
+      <p class="course-lead">{exploration.data.description}</p>
+    </header>
+    <details class="course-mobile-toc">
+      <summary>这篇文章聊什么</summary>
+      <nav aria-label="文章目录（手机）">
+        {sections.map(item => <a href={`#${item.slug}`}>{item.text}</a>)}
+      </nav>
+    </details>
+    <div class="course-layout">
+      <article class="course-body">
+        <Content />
+        <section class="course-actions" aria-label="问题探索导航">
+          <p class="course-note">这是独立的问题探索，不计入入门主线的阅读进度。</p>
+          <a href="/learn/">返回学习入口，选择入门主线或其他问题 →</a>
+        </section>
+        <PageFeedback pageId={`learn:exploration-${exploration.id}`} />
+      </article>
+      <nav class="course-toc" aria-label="文章目录">
+        <strong>这篇文章聊什么</strong>
+        {sections.map(item => <a href={`#${item.slug}`}>{item.text}</a>)}
+      </nav>
+    </div>
+  </div>
+</BaseLayout>

@@ -2,8 +2,10 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import CourseRuntime from '../../components/learning/CourseRuntime.astro';
 import { courseOutline, courseLessonHref } from '../../data/courseOutline';
+import { explorations, explorationHref } from '../../data/explorations';
 import '../../styles/course.css';
 const publishedCount = courseOutline.filter(chapter => chapter.published).length;
+const publishedExplorations = explorations.filter(exploration => exploration.published);
 ---
 <BaseLayout title="学习经济｜MacroLens" description="从日常生活出发，一步步理解经济怎样运转。无需经济学基础。">
   <div class="course-shell" data-pagefind-body>
@@ -33,7 +35,15 @@ const publishedCount = courseOutline.filter(chapter => chapter.published).length
     <section class="course-explore" aria-labelledby="explore">
       <h2 id="explore">问题探索</h2>
       <p>带着一个具体问题，把事情想得更明白。这里的文章可以独立阅读，不影响入门主线进度。</p>
-      <p class="course-note">正在准备：为什么降息了，大家还是不愿意借钱？为什么订单多了，企业却没有马上招人？文章完成后会在这里开放。</p>
+      <div class="course-explore-list">
+        {publishedExplorations.map(exploration => <article class="course-explore-card">
+          <p class="course-kicker">问题探索 · 约 {exploration.minutes} 分钟</p>
+          <h3><a href={explorationHref(exploration.id)}>{exploration.title}</a></h3>
+          <p>{exploration.summary}</p>
+          <a class="course-explore-link" href={explorationHref(exploration.id)}>开始阅读 →</a>
+        </article>)}
+      </div>
+      <p class="course-note">后续问题会单独加入这里，不会改变入门主线的顺序或阅读进度。</p>
     </section>
   </div>
   <CourseRuntime />
