@@ -62,6 +62,7 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
           <div>
             <h4>{domain.label}</h4>
             {domain.id === 'growth' && <a class="snapshot-domain-link" href="/now/growth/">展开查看这组数据 →</a>}
+            {domain.id === 'prices' && <a class="snapshot-domain-link" href="/now/prices/">展开查看这组数据 →</a>}
           </div>
           <span class="snapshot-domain-state">{homeStateLabels[domain.state]}</span>
         </header>

@@ -1,0 +1,147 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowPriceMap from '../../components/MacroNowPriceMap.astro';
+import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
+import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
+import '../../styles/macro-now.css';
+
+const indicators = getMacroSnapshotIndicators();
+const snapshot = buildMacroSnapshot(indicators);
+const prices = snapshot.domains.find((domain) => domain.id === 'prices');
+if (!prices) throw new Error('Macro Now prices page requires the prices domain');
+
+const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件' };
+const evidenceRows = prices.evidence.map((evidence) => {
+  const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
+  return { evidence, sources: indicators[indicatorId].sources };
+});
+const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
+const formatRecentChange = (evidence: SnapshotEvidence) => evidence.change === null ? '暂无可比数据' : formatSignalChange(evidence);
+const readingText = (evidence: SnapshotEvidence) => evidence.change === null
+  ? '暂无上期可比读数，先记录本期水平。'
+  : `${evidence.changeLabel}，最近一次变化为 ${formatRecentChange(evidence)}。`;
+const evidenceById = new Map(prices.evidence.map((evidence) => [evidence.id, evidence]));
+---
+
+<BaseLayout
+  title="价格现在是在上升、放缓，还是分化？｜Macro Now｜MacroLens"
+  description="从 CPI、核心 CPI 和 PPI 的最新数据，理解居民端与生产端价格变化的区别、时间差和证据边界。"
+>
+  <main class="macro-now-question shell">
+    <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <header class="macro-now-question-head">
+      <div class="eyebrow">Macro Now · 当前状态</div>
+      <h1>价格现在是在上升、放缓，还是分化？</h1>
+      <p class="macro-now-lead">先把 CPI、核心 CPI 和 PPI 放回各自观察的价格环节，再判断价格压力是否朝同一个方向变化。</p>
+      <p class="macro-now-meta">数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</p>
+    </header>
+
+    <section class="macro-now-question-summary" aria-labelledby="macro-now-prices-current-title">
+      <div>
+        <div class="eyebrow">现在看到什么</div>
+        <h2 id="macro-now-prices-current-title">{homeStateLabels[prices.state]}</h2>
+      </div>
+      <p>{localizeExplanation(prices.explanation)}</p>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-prices-evidence-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">数据依据</div>
+          <h2 id="macro-now-prices-evidence-title">先分清它们各自测什么</h2>
+        </div>
+        <p>价格增速、价格水平和统计范围不同，不能把三条线直接当成同一件事。</p>
+      </div>
+      <div class="macro-now-evidence-grid">
+        {evidenceRows.map(({ evidence, sources }) => <article class="macro-now-evidence-card">
+          <header>
+            <div>
+              <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
+              <p>{evidence.valueLabel}</p>
+            </div>
+            <strong>{formatLatest(evidence)}</strong>
+          </header>
+          <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
+          <dl>
+            <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
+            <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>
+            <div><dt>更新</dt><dd>{evidence.updatedAt}</dd></div>
+          </dl>
+          <details class="macro-now-source-details">
+            <summary>查看数据来源</summary>
+            <ul>
+              {sources.map((source) => <li>
+                <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+                <small>{source.role === 'methodology' ? '口径说明' : '数据来源'} · {source.coverage} · {source.sourceDate}</small>
+              </li>)}
+            </ul>
+          </details>
+        </article>)}
+      </div>
+    </section>
+
+    <MacroNowPriceMap consumerEvidence={evidenceRows.filter(({ evidence }) => evidence.id !== 'ppi').map(({ evidence }) => evidence)} />
+
+    <section class="macro-now-section" aria-labelledby="macro-now-prices-reading-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">怎么读</div>
+          <h2 id="macro-now-prices-reading-title">价格变慢，不代表东西已经变便宜</h2>
+        </div>
+      </div>
+      <div class="macro-now-reading-grid">
+        <article>
+          <h3>增速回落和价格下降不是一回事</h3>
+          <p>如果 CPI 仍为正，只是涨得比上期慢，价格水平通常仍在上升。要说价格真的下降，需要看到负增长读数。</p>
+        </article>
+        <article>
+          <h3>居民端和生产端看的是不同环节</h3>
+          <p>CPI 更接近居民购买的消费篮子，PPI 观察工业生产者出厂价格。两者可能受同一冲击影响，也可能不同步。</p>
+        </article>
+        <article>
+          <h3>核心 CPI 不是“去掉所有波动”</h3>
+          <p>核心 CPI 是另一种统计口径。它能帮助观察消费价格中相对持续的部分，但仍然需要结合覆盖范围和具体分项。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-prices-gaps-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">证据边界</div>
+          <h2 id="macro-now-prices-gaps-title">还缺什么证据？</h2>
+        </div>
+        <p>三条价格指标能告诉我们价格变化到哪一步，还不能代替家庭和企业的具体感受。</p>
+      </div>
+      <div class="macro-now-gap-list">
+        <article>
+          <h3>不同家庭的支出压力一样吗？</h3>
+          <p>CPI 是加权平均，食品、能源、住房和服务在不同家庭预算中的占比不同。</p>
+          <div class="macro-now-links"><a href="/concepts/household-consumption/">居民消费 →</a><a href="/concepts/disposable-income/">可支配收入 →</a></div>
+        </article>
+        <article>
+          <h3>企业有没有把成本传下去？</h3>
+          <p>PPI 变化可能被利润率、库存或替代投入吸收，也可能在一段时间后才影响下游价格。</p>
+          <div class="macro-now-links"><a href="/concepts/price-transmission/">价格传导 →</a><a href="/concepts/industrial-profits/">工业利润 →</a></div>
+        </article>
+        <article>
+          <h3>政策会不会改变后续价格？</h3>
+          <p>价格数据是政策判断的一部分，还要结合经济活动、就业和预期；单一价格读数不能推出政策结果。</p>
+          <div class="macro-now-links"><a href="/concepts/monetary-policy/">货币政策 →</a><a href="/concepts/inflation-expectations/">通胀预期 →</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-next" aria-labelledby="macro-now-prices-next-title">
+      <div>
+        <div class="eyebrow">下一期看什么</div>
+        <h2 id="macro-now-prices-next-title">继续核对同一组价格证据</h2>
+      </div>
+      {prices.watchNext.length > 0 ? <ul>{prices.watchNext.map((conclusion) => <li>
+        <strong>{localizeExplanation(conclusion.title)}</strong>
+        <p>{localizeExplanation(conclusion.explanation)}</p>
+        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const evidence = evidenceById.get(id); return evidence ? <a href={evidence.conceptHref}>{evidence.name} →</a> : null; })}</div>
+      </li>)}</ul> : <p>目前没有单独触发的下一期观察项，继续按上面的读法核对新价格数据。</p>}
+    </section>
+  </main>
+</BaseLayout>

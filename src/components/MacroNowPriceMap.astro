@@ -1,0 +1,75 @@
+---
+import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+const { consumerEvidence } = Astro.props as { consumerEvidence: SnapshotEvidence[] };
+const graph = getRelationData('macro');
+const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const edge = (source: string, target: string) => graph.relations.find(
+  (relation) => relation.source === source && relation.target === target,
+);
+const chain = [
+  edge('ppi', 'producer-price-pressure'),
+  edge('producer-price-pressure', 'downstream-price-pressure'),
+  edge('downstream-price-pressure', 'consumer-price-pressure'),
+].filter((relation): relation is Relation => Boolean(relation));
+if (chain.length !== 3) throw new Error('Macro Now price graph chain is incomplete');
+
+const relationLabels: Record<string, string> = {
+  leading_indicator: '较早提示',
+  transmission: '可能传导',
+  synchronous_indicator: '同期观察',
+};
+const typeLabels: Record<string, string> = {
+  REFLECTS: '直接观察',
+  AFFECTS: '可能传导',
+};
+const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const relationLabel = (relation: Relation) => isExplainableRelation(relation)
+  ? relationLabels[relation.relation] ?? typeLabels[relation.type] ?? '关系'
+  : typeLabels[relation.type] ?? '关系';
+const limitations = [...new Set(chain.flatMap((relation) => relation.limitations ?? []))];
+---
+
+<section class="macro-now-section macro-now-price-map" aria-labelledby="macro-now-price-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把价格放进关系图</div>
+      <h2 id="macro-now-price-map-title">生产端的变化可能怎样走到居民端？</h2>
+    </div>
+    <p>这是一条需要时间和条件的可能路径，不能把 PPI 的变化直接当成 CPI 的结果。</p>
+  </div>
+
+  <div class="macro-now-price-chain" aria-label="价格传导关系">
+    {chain.map((relation, index) => <>
+      <div class:list={['macro-now-price-node', index === 0 && 'is-indicator', index === chain.length - 1 && 'is-consumer']}>
+        <small>{index === 0 ? '当前读数' : index === chain.length - 1 ? '居民端价格压力' : '中间环节'}</small>
+        <strong>{nodeLabel(relation.source)}</strong>
+      </div>
+      <div class="macro-now-price-edge" aria-hidden="true">
+        <small>{relationLabel(relation)}</small>
+        <b>→</b>
+        <span>{relation.lag}</span>
+      </div>
+      {index === chain.length - 1 && <div class="macro-now-price-node is-consumer">
+        <small>居民端价格压力</small>
+        <strong>{nodeLabel(relation.target)}</strong>
+      </div>}
+    </>)}
+  </div>
+
+  <div class="macro-now-price-observations">
+    <div>
+      <strong>居民端的两个读数</strong>
+      <p>CPI 看消费篮子的整体变化，核心 CPI 提供另一种观察消费价格底部变化的角度。</p>
+    </div>
+    <ul>
+      {consumerEvidence.map((evidence) => <li><a href={evidence.conceptHref}>{evidence.name} →</a><span>{evidence.valueLabel}</span></li>)}
+    </ul>
+  </div>
+
+  <details class="macro-now-price-detail">
+    <summary>这条关系还缺什么条件？</summary>
+    <ul>{limitations.map((limitation) => <li>{limitation}</li>)}</ul>
+  </details>
+</section>

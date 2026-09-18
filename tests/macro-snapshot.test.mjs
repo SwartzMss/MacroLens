@@ -24,6 +24,8 @@ const snapshotPage = fileURLToPath(new URL('../src/pages/snapshot.astro', import
 const macroNowPage = fileURLToPath(new URL('../src/pages/now.astro', import.meta.url));
 const growthPage = fileURLToPath(new URL('../src/pages/now/growth.astro', import.meta.url));
 const macroNowMap = fileURLToPath(new URL('../src/components/MacroNowRelationshipMap.astro', import.meta.url));
+const pricesPage = fileURLToPath(new URL('../src/pages/now/prices.astro', import.meta.url));
+const priceMap = fileURLToPath(new URL('../src/components/MacroNowPriceMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -443,6 +445,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(growth, /查看数据来源/);
   assert.match(growth, /还缺什么证据/);
   assert.match(growth, /\/concepts\/employment/);
+  assert.match(component, /href="\/now\/prices\/"/);
+  assert.match(readFileSync(pricesPage, 'utf8'), /价格现在是在上升、放缓，还是分化/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
@@ -471,6 +475,19 @@ test('Macro Now activity page uses graph relations as a reading map', () => {
   assert.match(map, /为什么这样连/);
   assert.match(map, /不把关系当成已经证明的因果/);
   assert.match(map, /economic-activity/);
+});
+
+test('Macro Now price page keeps production and consumer price paths conditional', () => {
+  const page = readFileSync(pricesPage, 'utf8');
+  const map = readFileSync(priceMap, 'utf8');
+
+  assert.match(page, /MacroNowPriceMap/);
+  assert.match(page, /价格增速、价格水平和统计范围不同/);
+  assert.match(page, /价格变慢，不代表东西已经变便宜/);
+  assert.match(map, /ppi.*producer-price-pressure/);
+  assert.match(map, /downstream-price-pressure/);
+  assert.match(map, /consumer-price-pressure/);
+  assert.match(map, /不能把 PPI 的变化直接当成 CPI 的结果/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
