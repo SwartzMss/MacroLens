@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowExternalMap from '../../components/MacroNowExternalMap.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
@@ -29,6 +30,7 @@ const evidenceById = new Map(external.evidence.map((evidence) => [evidence.id, e
 >
   <main class="macro-now-question shell">
     <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <MacroNowQuestionNav current="external" />
     <header class="macro-now-question-head">
       <div class="eyebrow">Macro Now · 当前状态</div>
       <h1>出口在增长，外贸真的更强了吗？</h1>

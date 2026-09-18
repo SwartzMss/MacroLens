@@ -34,6 +34,7 @@ const externalPage = fileURLToPath(new URL('../src/pages/now/external.astro', im
 const externalMap = fileURLToPath(new URL('../src/components/MacroNowExternalMap.astro', import.meta.url));
 const laborPage = fileURLToPath(new URL('../src/pages/now/labor.astro', import.meta.url));
 const laborMap = fileURLToPath(new URL('../src/components/MacroNowLaborMap.astro', import.meta.url));
+const questionNav = fileURLToPath(new URL('../src/components/MacroNowQuestionNav.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -563,6 +564,29 @@ test('Macro Now labor page keeps unemployment scope separate from income outcome
   assert.match(map, /labor-market-conditions.*household-income-conditions/);
   assert.match(map, /labor-market-conditions.*economic-activity/);
   assert.match(map, /不把失业率变化当成所有人的就业结果/);
+});
+
+test('Macro Now question pages provide a shared way to continue across current-state questions', () => {
+  const nav = readFileSync(questionNav, 'utf8');
+  const pages = [
+    ['growth', growthPage],
+    ['prices', pricesPage],
+    ['credit', creditPage],
+    ['policy', policyPage],
+    ['external', externalPage],
+    ['labor', laborPage],
+  ];
+
+  assert.match(nav, /换个问题继续看/);
+  for (const [id, pagePath] of pages) {
+    const page = readFileSync(pagePath, 'utf8');
+    assert.match(page, /MacroNowQuestionNav/);
+    assert.match(page, new RegExp(`current=["']${id}["']`));
+  }
+  for (const href of ['/now/growth/', '/now/prices/', '/now/credit/', '/now/policy/', '/now/labor/', '/now/external/']) {
+    assert.match(nav, new RegExp(href.replaceAll('/', '\\/')));
+  }
+  assert.match(nav, /aria-current/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {

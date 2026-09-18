@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowCreditMap from '../../components/MacroNowCreditMap.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
@@ -36,6 +37,7 @@ const evidenceById = new Map(credit.evidence.map((evidence) => [evidence.id, evi
 >
   <main class="macro-now-question shell">
     <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <MacroNowQuestionNav current="credit" />
     <header class="macro-now-question-head">
       <div class="eyebrow">Macro Now · 当前状态</div>
       <h1>钱在变多，融资就一定更容易吗？</h1>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowPolicyMap from '../../components/MacroNowPolicyMap.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
@@ -29,6 +30,7 @@ const evidenceById = new Map(policy.evidence.map((evidence) => [evidence.id, evi
 >
   <main class="macro-now-question shell">
     <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <MacroNowQuestionNav current="policy" />
     <header class="macro-now-question-head">
       <div class="eyebrow">Macro Now · 当前状态</div>
       <h1>政策在放松，融资真的更容易了吗？</h1>
