@@ -185,6 +185,108 @@
   font-size: 11px;
 }
 
+.macro-now-map-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.macro-now-map-path {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.macro-now-map-steps {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 72px minmax(150px, 1fr) 72px minmax(150px, 1fr);
+  align-items: stretch;
+  gap: 10px;
+}
+
+.macro-now-map-node {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 92px;
+  padding: 13px;
+  border-radius: 11px;
+  background: #f0f4ee;
+}
+
+.macro-now-map-node.is-indicator {
+  background: #e8eee9;
+}
+
+.macro-now-map-node.is-total {
+  background: #f4efe2;
+}
+
+.macro-now-map-node small,
+.macro-now-map-edge small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.macro-now-map-node strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.macro-now-map-node span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.macro-now-map-edge {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--green);
+  text-align: center;
+}
+
+.macro-now-map-edge b {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.macro-now-map-detail {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.macro-now-map-detail summary {
+  color: var(--green);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.macro-now-map-detail > div {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.macro-now-map-detail p,
+.macro-now-map-detail ul {
+  margin: 0;
+}
+
+.macro-now-map-detail ul {
+  padding-left: 18px;
+}
+
 .macro-now-reading-grid,
 .macro-now-gap-list {
   display: grid;
@@ -291,5 +393,19 @@
 
   .macro-now-evidence-card dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .macro-now-map-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-now-map-edge {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+
+  .macro-now-map-edge b {
+    transform: rotate(90deg);
   }
 }

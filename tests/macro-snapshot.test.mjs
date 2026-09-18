@@ -23,6 +23,7 @@ const snapshotStyles = fileURLToPath(new URL('../src/styles/snapshot.css', impor
 const snapshotPage = fileURLToPath(new URL('../src/pages/snapshot.astro', import.meta.url));
 const macroNowPage = fileURLToPath(new URL('../src/pages/now.astro', import.meta.url));
 const growthPage = fileURLToPath(new URL('../src/pages/now/growth.astro', import.meta.url));
+const macroNowMap = fileURLToPath(new URL('../src/components/MacroNowRelationshipMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -456,6 +457,20 @@ test('domain conclusions reference evidence from the same domain', () => {
       );
     }
   }
+});
+
+test('Macro Now activity page uses graph relations as a reading map', () => {
+  const page = readFileSync(growthPage, 'utf8');
+  const map = readFileSync(macroNowMap, 'utf8');
+
+  assert.match(page, /MacroNowRelationshipMap/);
+  assert.match(map, /getExplainableConceptRelations/);
+  assert.match(map, /当前读数/);
+  assert.match(map, /覆盖的部分/);
+  assert.match(map, /整体观察/);
+  assert.match(map, /为什么这样连/);
+  assert.match(map, /不把关系当成已经证明的因果/);
+  assert.match(map, /economic-activity/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
