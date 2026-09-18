@@ -18,7 +18,10 @@ const evidenceRows = external.evidence.map((evidence) => {
   const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
   return { evidence, indicator: indicators[indicatorId], sources: indicators[indicatorId].sources };
 });
-const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
+const formatLatest = (evidence: SnapshotEvidence) => {
+  const unit = evidence.unit === 'index' ? '点' : evidence.unit;
+  return `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${unit === '%' ? '%' : ` ${unit}`}`;
+};
 const formatRecentChange = (evidence: SnapshotEvidence) => evidence.change === null ? '暂无可比数据' : formatSignalChange(evidence);
 const readingText = (evidence: SnapshotEvidence) => evidence.change === null
   ? '暂无上期可比读数，先记录本期水平。'

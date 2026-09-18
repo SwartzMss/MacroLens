@@ -475,6 +475,15 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(readFileSync(laborPage, 'utf8'), /失业率下降了，就业真的变好了吗/);
 });
 
+test('Macro Now evidence cards use readable units for index values', () => {
+  const pages = [snapshotComponent, growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage];
+
+  for (const pagePath of pages) {
+    const page = readFileSync(pagePath, 'utf8');
+    assert.match(page, /unit === 'index' \? '点'/);
+  }
+});
+
 test('domain conclusions reference evidence from the same domain', () => {
   const snapshot = buildMacroSnapshot();
 

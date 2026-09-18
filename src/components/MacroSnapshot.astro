@@ -11,7 +11,10 @@ import { getMacroNowQuestionForDomain } from '../data/macroNow';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 
-const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ` ${unit}`}`;
+const formatValue = (value: number, unit: string) => {
+  const displayUnit = unit === 'index' ? '点' : unit;
+  return `${value.toFixed(1)}${displayUnit === '%' ? '%' : ` ${displayUnit}`}`;
+};
 const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件观察' };
 const formatChange = (change: number | null, changeUnit: string) => {
   if (change === null) return '—';
