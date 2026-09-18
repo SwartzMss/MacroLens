@@ -50,6 +50,13 @@ test('homepage components expose the required semantic sections and links', () =
   assert.match(source, /relation\.source/);
   assert.match(source, /relation\.target/);
   assert.match(source, /\/graph/);
+  assert.match(source, /href="\/concepts\/"/);
+  assert.match(source, /home-hero-entry-note/);
+  assert.match(source, /domainHrefs/);
+  assert.match(source, /home-domain-detail-link/);
+  for (const href of ['/now/growth/', '/now/credit/', '/now/prices/', '/now/policy/', '/now/labor/', '/now/external/']) {
+    assert.match(source, new RegExp(href.replaceAll('/', '\\/')));
+  }
   assert.match(styles, /:focus-visible/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
 });

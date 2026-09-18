@@ -7,6 +7,14 @@ const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 const domainOrder: MacroDomainId[] = [
   'growth', 'credit-liquidity', 'prices', 'policy-financial-conditions', 'labor', 'external',
 ];
+const domainHrefs: Record<MacroDomainId, string> = {
+  growth: '/now/growth/',
+  'credit-liquidity': '/now/credit/',
+  prices: '/now/prices/',
+  'policy-financial-conditions': '/now/policy/',
+  labor: '/now/labor/',
+  external: '/now/external/',
+};
 const domains = [...snapshot.domains].sort((a, b) => domainOrder.indexOf(a.id) - domainOrder.indexOf(b.id));
 ---
 
@@ -38,6 +46,7 @@ const domains = [...snapshot.domains].sort((a, b) => domainOrder.indexOf(a.id) -
         <p>{domain.id === 'policy-financial-conditions'
           ? `综合政策利率与 LPR 观察，当前状态为${homeStateLabels[domain.state]}。`
           : `${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
+        <a class="home-domain-detail-link" href={domainHrefs[domain.id]}>按问题查看这组数据 →</a>
       </div>
       <ul class="home-domain-readings" aria-label={`${domain.label}最新数据`}>
         {domain.evidence.map(item => <li><LatestReading signal={item} /></li>)}
