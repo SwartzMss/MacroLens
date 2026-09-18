@@ -23,7 +23,8 @@ const lessons = defineCollection({
     title: z.string(), description: z.string(), minutes: z.number().positive(),
     goals: z.array(z.string().trim().min(1)).min(2).max(3),
     takeaways: z.array(z.string().trim().min(1)).min(2).max(3),
-    recall: z.string().trim().min(1)
+    recall: z.string().trim().min(1),
+    model: z.string().trim().min(1)
   }),
 });
 

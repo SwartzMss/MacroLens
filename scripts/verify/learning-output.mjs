@@ -52,7 +52,7 @@ for (const chapter of courseOutline) {
   assert.match(html, /读完这一章，你能解释开头的问题了吗/);
   assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
   assert.doesNotMatch(html, /图表不够清楚/);
-  for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '学完后带走']) {
+  for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '先记住一个基本方向', '学完后带走']) {
     assert.match(html, new RegExp(phrase));
   }
   assert.match(html, /接下来：|主线先收束在这里/);
