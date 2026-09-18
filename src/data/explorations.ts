@@ -34,6 +34,13 @@ export const explorations = [
     minutes: 10,
     published: true,
   },
+  {
+    id: 'why-one-policy-feels-different',
+    title: '为什么同一个政策，不同人感受不一样？',
+    summary: '政策先改变某些合同、收入或条件，再通过借款、储蓄、价格和就业传开。每个人所在的位置不同，感受到的方向和时间也会不同。',
+    minutes: 10,
+    published: true,
+  },
 ] as const;
 
 export const explorationHref = (id: string) => `/learn/explore/${id}/`;
