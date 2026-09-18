@@ -90,3 +90,18 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(filters, /history\.pushState/);
   assert.match(filters, /popstate/);
 });
+
+test('concept search is prominent and scoped to concept pages', () => {
+  const index = readFileSync(conceptsIndex, 'utf8');
+  const search = readFileSync(`${root}src/pages/search.astro`, 'utf8');
+  const searchStyles = readFileSync(`${root}src/styles/search.css`, 'utf8');
+  const reader = readFileSync(`${root}src/components/ConceptReader.astro`, 'utf8');
+
+  assert.match(index, /class="concept-search"/);
+  assert.match(index, /name="q"/);
+  assert.match(index, /action="\/search\/"/);
+  assert.match(search, /triggerFilters\(\{content:'concept'\}\)/);
+  assert.match(search, /triggerSearch\(query\)/);
+  assert.match(searchStyles, /pagefind-ui__filter-panel\s*\{\s*display:\s*none/);
+  assert.match(reader, /data-pagefind-filter="content:concept"/);
+});
