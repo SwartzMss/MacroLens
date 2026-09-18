@@ -1,0 +1,108 @@
+---
+import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+const { row } = Astro.props as { row: SnapshotEvidence };
+const graph = getRelationData('macro');
+const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const edge = (source: string, target: string) => {
+  const found = graph.relations.find((relation) => relation.source === source && relation.target === target);
+  if (!found) throw new Error(`Macro Now labor graph relation is missing: ${source} -> ${target}`);
+  return found;
+};
+const laborPath = [
+  edge('unemployment-rate', 'labor-market-conditions'),
+  edge('labor-market-conditions', 'household-income-conditions'),
+];
+const activityEdge = edge('labor-market-conditions', 'economic-activity');
+const relationLabels: Record<string, string> = {
+  REFLECTS: '反映线索',
+  AFFECTS: '可能关联',
+};
+const explainableLabels: Record<string, string> = {
+  transmission: '可能传到',
+};
+const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const relationLabel = (relation: Relation) => isExplainableRelation(relation)
+  ? explainableLabels[relation.relation] ?? '关系'
+  : relationLabels[relation.type] ?? '关系';
+const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relation.lag : '';
+---
+
+<section class="macro-now-section macro-now-labor-map" aria-labelledby="macro-now-labor-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把就业放进关系图</div>
+      <h2 id="macro-now-labor-map-title">失业率怎样接到收入和经济活动？</h2>
+    </div>
+    <p>这条图只说明读数能观察到哪一层，以及可能的后续联系，不把失业率变化当成所有人的就业结果。</p>
+  </div>
+
+  <div class="macro-now-labor-paths">
+    <article class="macro-now-labor-path">
+      <header><strong>从一个比率到劳动市场</strong><span>先确认它反映的范围</span></header>
+      <div class="macro-now-labor-steps">
+        <div class="macro-now-labor-node is-evidence">
+          <small>当前读数</small>
+          <strong>{row.name}</strong>
+          <span>{row.valueLabel}</span>
+        </div>
+        <div class="macro-now-labor-edge" aria-hidden="true">
+          <small>{relationLabel(laborPath[0])}</small>
+          <b>→</b>
+        </div>
+        <div class="macro-now-labor-node">
+          <small>观察范围</small>
+          <strong>{nodeLabel(laborPath[0].target)}</strong>
+          <span>城镇劳动力中的失业比例</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="macro-now-labor-path">
+      <header><strong>从劳动市场到居民收入</strong><span>需要时间，也需要其他证据</span></header>
+      <div class="macro-now-labor-steps">
+        <div class="macro-now-labor-node">
+          <small>中间状态</small>
+          <strong>{nodeLabel(laborPath[1].source)}</strong>
+          <span>就业机会和劳动收入的共同背景</span>
+        </div>
+        <div class="macro-now-labor-edge" aria-hidden="true">
+          <small>{relationLabel(laborPath[1])}</small>
+          <b>→</b>
+          <span>{lagFor(laborPath[1])}</span>
+        </div>
+        <div class="macro-now-labor-node">
+          <small>可能传到</small>
+          <strong>{nodeLabel(laborPath[1].target)}</strong>
+          <span>不代表每个家庭同步改善</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="macro-now-labor-path">
+      <header><strong>从劳动市场到经济活动</strong><span>方向存在，但不是单一结果</span></header>
+      <div class="macro-now-labor-steps">
+        <div class="macro-now-labor-node">
+          <small>中间状态</small>
+          <strong>{nodeLabel(activityEdge.source)}</strong>
+          <span>劳动力需求和供给的综合状态</span>
+        </div>
+        <div class="macro-now-labor-edge" aria-hidden="true">
+          <small>{relationLabel(activityEdge)}</small>
+          <b>→</b>
+        </div>
+        <div class="macro-now-labor-node">
+          <small>更广范围</small>
+          <strong>{nodeLabel(activityEdge.target)}</strong>
+          <span>还要结合生产、消费和投资</span>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="macro-now-labor-note">
+    <strong>失业率下降也要问“为什么”</strong>
+    <p>可能是就业增加，也可能是部分人暂时退出劳动力市场。要判断就业是否真的改善，还需看就业人数、劳动参与、工资、工时和不同群体的读数。</p>
+  </div>
+</section>
