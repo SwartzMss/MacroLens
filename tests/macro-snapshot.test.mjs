@@ -28,6 +28,8 @@ const pricesPage = fileURLToPath(new URL('../src/pages/now/prices.astro', import
 const priceMap = fileURLToPath(new URL('../src/components/MacroNowPriceMap.astro', import.meta.url));
 const creditPage = fileURLToPath(new URL('../src/pages/now/credit.astro', import.meta.url));
 const creditMap = fileURLToPath(new URL('../src/components/MacroNowCreditMap.astro', import.meta.url));
+const policyPage = fileURLToPath(new URL('../src/pages/now/policy.astro', import.meta.url));
+const policyMap = fileURLToPath(new URL('../src/components/MacroNowPolicyMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -451,6 +453,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(readFileSync(pricesPage, 'utf8'), /价格现在是在上升、放缓，还是分化/);
   assert.match(component, /href="\/now\/credit\/"/);
   assert.match(readFileSync(creditPage, 'utf8'), /钱在变多，融资就一定更容易吗/);
+  assert.match(component, /href="\/now\/policy\/"/);
+  assert.match(readFileSync(policyPage, 'utf8'), /政策在放松，融资真的更容易了吗/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
@@ -505,6 +509,19 @@ test('Macro Now credit page separates money layers from financing paths', () => 
   assert.match(map, /credit.*m2/);
   assert.match(map, /social-financing.*real-economy-financing/);
   assert.match(map, /不把货币或融资增长直接当成经济改善/);
+});
+
+test('Macro Now policy page separates policy events from financing outcomes', () => {
+  const page = readFileSync(policyPage, 'utf8');
+  const map = readFileSync(policyMap, 'utf8');
+
+  assert.match(page, /MacroNowPolicyMap/);
+  assert.match(page, /政策变化和借款感受之间有几道门/);
+  assert.match(page, /实际贷款利率还会受到银行定价/);
+  assert.match(map, /monetary-policy.*policy-rate/);
+  assert.match(map, /policy-rate.*lpr/);
+  assert.match(map, /financing-conditions.*credit/);
+  assert.match(map, /不是立即发生的结果/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
