@@ -80,7 +80,13 @@ test('homepage remains a curated entry point', () => {
 
 test('concept index will expose all three browsing dimensions', () => {
   const source = readFileSync(conceptsIndex, 'utf8');
+  const filters = readFileSync(`${root}src/scripts/concept-filters.ts`, 'utf8');
   for (const name of ['category', 'topic', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
   for (const attribute of ['data-category', 'data-topics', 'data-level']) assert.match(source, new RegExp(attribute));
   assert.match(source, /concept-filters/);
+  assert.match(source, /concept-quick-nav/);
+  assert.match(source, /level-chip/);
+  assert.match(filters, /URLSearchParams/);
+  assert.match(filters, /history\.pushState/);
+  assert.match(filters, /popstate/);
 });

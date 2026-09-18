@@ -19,3 +19,16 @@
 .filter-empty p{color:var(--muted);margin:0 0 18px}
 .filter-empty button{min-height:44px;padding:10px 16px;border:1px solid var(--green);border-radius:9px;background:var(--green);color:var(--card);font:inherit;cursor:pointer}
 .filter-empty button:focus-visible{outline:3px solid #a9d8c3;outline-offset:3px}
+
+.level-chip{display:inline-block;margin-left:6px;padding:3px 8px;border-radius:20px;background:#eef0f2;color:#56616b;font-size:11px}
+.concept-quick-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.concept-quick-nav strong{margin-right:4px;font-size:13px}
+.concept-quick-nav a{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:8px;color:var(--green);font-size:13px;text-decoration:none}
+.concept-quick-nav a:hover{background:#e8f1ec}
+.concept-quick-nav a:focus-visible{outline:3px solid #a9d8c3;outline-offset:2px}
+.concept-quick-nav a span{color:var(--muted);font-size:11px}
+
+@media(max-width:560px){
+  .concept-quick-nav{align-items:flex-start;gap:5px;padding:12px}
+  .concept-quick-nav strong{width:100%;margin:0 0 2px}
+}
