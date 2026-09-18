@@ -22,6 +22,7 @@ import { getIndicatorData } from '../data/indicatorRegistry';
 import { getIndicatorPresentation } from '../data/indicatorPresentationAdapter';
 import { getConceptRelations } from '../data/graphRegistry';
 import { getCategory } from '../data/categories';
+import { getMacroNowQuestionForConcept } from '../data/macroNow';
 const { entry } = Astro.props as { entry: CollectionEntry<'concepts'> };
 const { Content, headings } = await render(entry);
 const indicator=entry.data.chart ? getIndicatorData(entry.data.chart) : null;
@@ -43,6 +44,7 @@ const knowledge = buildConceptKnowledge({
 });
 const hasKnowledge = knowledge.indicators.length > 0 || knowledge.chain.length > 0 || knowledge.limitations.length > 0;
 const hasConnections = relations.length > 0 || relatedConcepts.length > 0;
+const macroNowQuestion = getMacroNowQuestionForConcept(entry.data.id);
 const isMonetaryPolicy = entry.data.id === 'monetary-policy';
 const hasCustomEntry = entry.data.id === 'credit' || isMonetaryPolicy;
 const hasEntry = hasCustomEntry || Boolean(entry.data.intro);
@@ -70,6 +72,11 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
           learningHref="/learn/"
           conceptHref={`/concepts/${entry.data.id}/`}
         />
+        {macroNowQuestion && <a class="concept-macro-now-context" href={macroNowQuestion.href}>
+          <span class="eyebrow">Macro Now · 当前状态</span>
+          <strong>{macroNowQuestion.label}：{macroNowQuestion.question}</strong>
+          <span>在当前数据里查看这组读数 →</span>
+        </a>}
       </div>
     </header>
     <nav class="detail-mobile-navigation" aria-label="本页目录" data-detail-navigation>

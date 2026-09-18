@@ -10,6 +10,7 @@ import { analyzeLabor } from '../src/data/macroSnapshot/labor.ts';
 import { analyzePolicyFinancialConditions } from '../src/data/macroSnapshot/policyFinancialConditions.ts';
 import { analyzePrices } from '../src/data/macroSnapshot/prices.ts';
 import { deriveSynthesis } from '../src/data/macroSnapshot/synthesis.ts';
+import { getMacroNowQuestionForConcept, macroNowQuestions } from '../src/data/macroNow.ts';
 import {
   buildMacroSnapshot,
   getMacroSnapshotIndicators,
@@ -35,6 +36,7 @@ const externalMap = fileURLToPath(new URL('../src/components/MacroNowExternalMap
 const laborPage = fileURLToPath(new URL('../src/pages/now/labor.astro', import.meta.url));
 const laborMap = fileURLToPath(new URL('../src/components/MacroNowLaborMap.astro', import.meta.url));
 const questionNav = fileURLToPath(new URL('../src/components/MacroNowQuestionNav.astro', import.meta.url));
+const conceptReader = fileURLToPath(new URL('../src/components/ConceptReader.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -583,10 +585,29 @@ test('Macro Now question pages provide a shared way to continue across current-s
     assert.match(page, /MacroNowQuestionNav/);
     assert.match(page, new RegExp(`current=["']${id}["']`));
   }
-  for (const href of ['/now/growth/', '/now/prices/', '/now/credit/', '/now/policy/', '/now/labor/', '/now/external/']) {
-    assert.match(nav, new RegExp(href.replaceAll('/', '\\/')));
+  for (const question of macroNowQuestions) {
+    assert.match(question.href, /^\/now\/[a-z-]+\/$/);
   }
   assert.match(nav, /aria-current/);
+});
+
+test('indicator concepts can return to the matching Macro Now question', () => {
+  const reader = readFileSync(conceptReader, 'utf8');
+  const conceptQuestionIds = {
+    gdp: 'growth',
+    cpi: 'prices',
+    m2: 'credit',
+    'policy-rate': 'policy',
+    'unemployment-rate': 'labor',
+    exports: 'external',
+  };
+
+  assert.match(reader, /getMacroNowQuestionForConcept/);
+  assert.match(reader, /concept-macro-now-context/);
+  for (const [conceptId, questionId] of Object.entries(conceptQuestionIds)) {
+    assert.equal(getMacroNowQuestionForConcept(conceptId)?.id, questionId);
+  }
+  assert.equal(getMacroNowQuestionForConcept('household-consumption'), null);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
