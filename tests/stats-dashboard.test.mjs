@@ -98,6 +98,9 @@ test('stats page is noindex, Pagefind-ignored, and uses all three aggregate APIs
   assert.match(page, /helpfulRate\s*>=\s*85/);
   assert.match(page, /反馈原因/);
   assert.match(page, /data-stats-reason/);
+  assert.match(page, /data-stats-reasons/);
+  assert.match(page, /当前反馈少于 5 条，仅作待观察/);
+  assert.match(page, /原因数量用于定位内容问题，不代表学习得分/);
   assert.match(layout, /name="robots"\s+content="noindex,nofollow"/);
 });
 

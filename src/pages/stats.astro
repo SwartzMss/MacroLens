@@ -102,6 +102,19 @@ const feedbackReasons = [
                 <td class="stats-concept">
                   <a href={`${article.paths[0]}/`}>{article.title}</a>
                   <small>{article.label}</small>
+                  <details class="stats-reasons" data-stats-reasons>
+                    <summary data-stats-reasons-summary>查看反馈原因</summary>
+                    <div class="stats-reasons-body">
+                      <ul class="stats-reasons-list">
+                        {feedbackReasons.map(reason => <li data-stats-reason-item={reason.value} hidden>
+                          <span>{reason.label}</span>
+                          <strong data-stats-reason-count>—</strong>
+                        </li>)}
+                      </ul>
+                      <p class="stats-reasons-empty" data-stats-reasons-empty hidden>暂无主动填写的原因。</p>
+                      <p class="stats-reasons-status" data-stats-reasons-status>少于 5 条反馈时仅作待观察。</p>
+                    </div>
+                  </details>
                 </td>
                 <td data-total-uv>—</td>
                 <td data-today-uv>—</td>
@@ -248,6 +261,32 @@ const feedbackReasons = [
           const state = priority(count, rate);
           const priorityCell = row.querySelector('[data-priority]');
           if (priorityCell) priorityCell.innerHTML = `<span class="stats-priority ${state.className}">${state.label}</span>`;
+
+          const reasonItems = [...row.querySelectorAll<HTMLElement>('[data-stats-reason-item]')];
+          const reasonSummary = row.querySelector<HTMLElement>('[data-stats-reasons-summary]');
+          const reasonEmpty = row.querySelector<HTMLElement>('[data-stats-reasons-empty]');
+          const reasonStatus = row.querySelector<HTMLElement>('[data-stats-reasons-status]');
+          const reasonsAvailable = feedbackPayload?.available === true;
+          const reasonTotal = reasonsAvailable
+            ? feedbackReasonValues.reduce((total, reason) => total + (feedback?.reasons?.[reason] ?? 0), 0)
+            : 0;
+
+          for (const item of reasonItems) {
+            const reason = item.dataset.statsReasonItem;
+            const reasonCount = reasonsAvailable && reason ? feedback?.reasons?.[reason] ?? 0 : 0;
+            item.hidden = !reasonsAvailable || reasonCount === 0;
+            setText(item.querySelector('[data-stats-reason-count]'), reasonsAvailable ? number.format(reasonCount) : '—');
+          }
+          setText(reasonSummary, reasonsAvailable && reasonTotal > 0 ? `查看反馈原因（${number.format(reasonTotal)}）` : '查看反馈原因');
+          if (reasonEmpty) reasonEmpty.hidden = !reasonsAvailable || reasonTotal > 0;
+          setText(
+            reasonStatus,
+            !reasonsAvailable
+              ? '反馈原因数据不可用。'
+              : count < 5
+                ? '当前反馈少于 5 条，仅作待观察。'
+                : '原因数量用于定位内容问题，不代表学习得分。',
+          );
         }
 
         setText(trackedPages, pagePayload?.available === true ? number.format(tracked) : '—');
