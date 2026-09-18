@@ -28,6 +28,24 @@
   color:var(--muted);
   max-width:720px;
 }
+.exploration-focus {
+  max-width:720px;
+  margin-top:24px;
+  padding:16px 20px;
+  border-left:4px solid var(--green);
+  border-radius:0 10px 10px 0;
+  background:#f0f4ee;
+}
+.exploration-focus strong {
+  display:block;
+  margin-bottom:4px;
+  color:var(--green);
+  font-size:14px;
+}
+.exploration-focus p {
+  margin:0;
+  line-height:1.75;
+}
 .course-start {
   display:inline-block;
   background:var(--green);
