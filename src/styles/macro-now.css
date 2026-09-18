@@ -624,6 +624,103 @@
   line-height: 1.7;
 }
 
+.macro-now-external-paths {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.macro-now-external-path {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.macro-now-external-steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 10px;
+}
+
+.macro-now-external-node {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 108px;
+  padding: 13px;
+  border-radius: 11px;
+  background: #f0f4ee;
+}
+
+.macro-now-external-node.is-evidence {
+  background: #e8eee9;
+}
+
+.macro-now-external-node small,
+.macro-now-external-edge small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.macro-now-external-node strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.macro-now-external-node span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.macro-now-external-edge {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--green);
+  text-align: center;
+}
+
+.macro-now-external-edge b {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.macro-now-external-path > p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.macro-now-external-note {
+  display: grid;
+  grid-template-columns: minmax(180px, .35fr) 1fr;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f0f4ee;
+}
+
+.macro-now-external-note strong {
+  font-size: 15px;
+}
+
+.macro-now-external-note p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 .macro-now-reading-grid,
 .macro-now-gap-list {
   display: grid;
@@ -805,6 +902,28 @@
   }
 
   .macro-now-policy-note {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-now-external-paths {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-now-external-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-now-external-edge {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+
+  .macro-now-external-edge b {
+    transform: rotate(90deg);
+  }
+
+  .macro-now-external-note {
     grid-template-columns: 1fr;
   }
 }
