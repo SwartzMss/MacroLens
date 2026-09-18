@@ -56,6 +56,10 @@ for (const chapter of courseOutline) {
   assert.equal(new Set(ids).size, ids.length);
   for (const match of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(decodeURIComponent(match[1])), `Missing anchor: ${match[1]}`);
 }
+const capstone = read('learn/course/reading-news/index.html');
+for (const phrase of ['完整的假设新闻', '经济活动', '就业与收入', '信用与利率', '政策动作', '综合练习']) {
+  assert.match(capstone, new RegExp(phrase));
+}
 for (const path of publishedLearningPaths) {
   for (const route of [`learn/${path.id}/index.html`, ...path.steps.map(step => `learn/${path.id}/${step.id}/index.html`)]) {
     const html = read(route);
