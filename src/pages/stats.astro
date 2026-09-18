@@ -22,6 +22,15 @@ const articles = [
   })),
   ...legacyArticles.map(article => ({ pageId: article.pageId, title: article.concept!.data.name, label: '旧版导读 · 历史记录', paths: article.paths })),
 ];
+const feedbackReasons = [
+  { value: 'too_complex', label: '概念太难' },
+  { value: 'sequence_jump', label: '前后顺序跳跃' },
+  { value: 'missing_example', label: '缺少实际例子' },
+  { value: 'missing_step', label: '少了关键的一步' },
+  { value: 'questionable', label: '数据或解释有疑问' },
+  { value: 'unclear_chart', label: '历史：图表不够清楚' },
+  { value: 'incomplete', label: '历史：内容不够完整' },
+];
 ---
 <BaseLayout
   title="内容统计｜MacroLens"
@@ -63,11 +72,11 @@ const articles = [
 
     <div class="stats-source-state" data-stats-status role="status" aria-live="polite">正在加载统计数据…</div>
 
-    <section class="stats-panel" aria-labelledby="concept-stats-title">
+    <section class="stats-panel" aria-labelledby="learning-stats-title">
       <header class="stats-panel-head">
         <div>
-          <h2 id="concept-stats-title">学习文章表现</h2>
-          <p>新课程与旧版导读分别统计，历史反馈不会算入新课程。反馈少于 5 条时只标记“待观察”，避免被极小样本误导。</p>
+          <h2 id="learning-stats-title">学习文章表现</h2>
+          <p>新课程与旧版导读分别统计，历史反馈不会算入新课程。这里的反馈是内容筛选信号，不代表用户已经学会；少于 5 条时只标记“待观察”。</p>
         </div>
       </header>
 
@@ -107,6 +116,21 @@ const articles = [
 
       <p class="stats-note">学习文章 UV 按文章 ID 和访客去重。旧版导读保留历史记录；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
     </section>
+
+    <section class="stats-panel" aria-labelledby="feedback-reasons-title">
+      <header class="stats-panel-head">
+        <div>
+          <h2 id="feedback-reasons-title">反馈原因</h2>
+          <p>只统计选择“还没讲清楚”或“还没拆开”后主动填写的原因；没有填写原因的反馈不会被猜测或补齐。</p>
+        </div>
+      </header>
+      <ul class="stats-reason-list" data-stats-reason-list>
+        {feedbackReasons.map(reason => <li data-stats-reason={reason.value}>
+          <span>{reason.label}</span>
+          <strong data-stats-reason-count>—</strong>
+        </li>)}
+      </ul>
+    </section>
   </section>
 
   <script>
@@ -120,6 +144,7 @@ const articles = [
       const trackedPages = root.querySelector<HTMLElement>('[data-tracked-pages]');
       const feedbackTotal = root.querySelector<HTMLElement>('[data-feedback-total]');
       const feedbackRate = root.querySelector<HTMLElement>('[data-feedback-rate]');
+      const feedbackReasonValues = ['too_complex', 'sequence_jump', 'missing_example', 'missing_step', 'questionable', 'unclear_chart', 'incomplete'];
 
       const number = new Intl.NumberFormat('zh-CN');
       const rows = () => body ? [...body.querySelectorAll<HTMLTableRowElement>('tr[data-page-id]')] : [];
@@ -181,6 +206,7 @@ const articles = [
           helpful: number;
           needsImprovement: number;
           helpfulRate: number;
+          reasons: Record<string, number>;
         }>();
         if (feedbackPayload?.available === true && Array.isArray(feedbackPayload.pages)) {
           for (const page of feedbackPayload.pages) {
@@ -193,6 +219,7 @@ const articles = [
         let tracked = 0;
         let feedbackCountTotal = 0;
         let helpfulTotal = 0;
+        const reasonTotals = new Map(feedbackReasonValues.map(reason => [reason, 0]));
 
         for (const row of rows()) {
           const pageId = row.dataset.pageId ?? '';
@@ -206,6 +233,10 @@ const articles = [
           if (totalUv > 0) tracked += 1;
           feedbackCountTotal += count;
           helpfulTotal += feedback?.helpful ?? 0;
+          for (const reason of feedbackReasonValues) {
+            const reasonCount = feedback?.reasons?.[reason] ?? 0;
+            if (Number.isFinite(reasonCount)) reasonTotals.set(reason, (reasonTotals.get(reason) ?? 0) + reasonCount);
+          }
 
           row.dataset.totalUv = String(totalUv);
           row.dataset.feedbackCount = String(count);
@@ -227,6 +258,10 @@ const articles = [
             ? `整体有帮助率 ${((helpfulTotal / feedbackCountTotal) * 100).toFixed(1)}%`
             : feedbackPayload?.available === true ? '暂无反馈' : '反馈数据不可用',
         );
+        root.querySelectorAll<HTMLElement>('[data-stats-reason]').forEach((item) => {
+          const reason = item.dataset.statsReason;
+          setText(item.querySelector('[data-stats-reason-count]'), feedbackPayload?.available === true && reason ? number.format(reasonTotals.get(reason) ?? 0) : '—');
+        });
 
         if (body && pagePayload?.available === true) {
           const sorted = rows().sort((a, b) => {

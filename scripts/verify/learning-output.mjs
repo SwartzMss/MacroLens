@@ -24,6 +24,9 @@ for (const exploration of explorations) {
   assert.match(html, /data-pagefind-body/);
   assert.match(html, /data-exploration=/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-course-complete|data-course-lesson/);
+  assert.match(html, /这篇案例有没有帮你拆开这个问题/);
+  assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
+  assert.doesNotMatch(html, /图表不够清楚/);
   assert.match(html, /假设故事/);
   assert.match(html, /正文参考来源/);
   assert.ok(html.includes(`data-page-id="learn:exploration-${exploration.id}"`));
@@ -45,6 +48,9 @@ for (const chapter of courseOutline) {
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
   assert.match(html, /data-course-complete/);
+  assert.match(html, /读完这一章，你能解释开头的问题了吗/);
+  assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
+  assert.doesNotMatch(html, /图表不够清楚/);
   for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '学完后带走']) {
     assert.match(html, new RegExp(phrase));
   }

@@ -3,10 +3,13 @@ import { parseVisitorCookie } from '../visitor.ts';
 export type FeedbackVote = 'helpful' | 'needs-improvement';
 export type FeedbackReason =
   | 'too_complex'
+  | 'sequence_jump'
   | 'missing_example'
+  | 'missing_step'
+  | 'questionable'
+  // 保留旧反馈值，便于读取历史记录；新的学习页面不再展示它们。
   | 'unclear_chart'
-  | 'incomplete'
-  | 'questionable';
+  | 'incomplete';
 
 type FeedbackStatement = {
   bind(...values: unknown[]): FeedbackStatement;
@@ -28,10 +31,12 @@ const learningArticleIdPattern = /^learn:[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const legacyPageIdPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const feedbackReasons = new Set<FeedbackReason>([
   'too_complex',
+  'sequence_jump',
   'missing_example',
+  'missing_step',
+  'questionable',
   'unclear_chart',
   'incomplete',
-  'questionable',
 ]);
 
 const voteValues: Record<FeedbackVote, number> = {
