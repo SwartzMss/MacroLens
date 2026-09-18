@@ -147,7 +147,7 @@ const evidenceById = new Map(labor.evidence.map((item) => [item.id, item]));
       {labor.watchNext.length > 0 ? <ul>{labor.watchNext.map((conclusion) => <li>
         <strong>{localizeExplanation(conclusion.title)}</strong>
         <p>{localizeExplanation(conclusion.explanation)}</p>
-        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const item = evidenceById.get(id); return item ? <a href={item.conceptHref}>{item.name} →</a> : null; })}</div>
+        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const item = evidenceById.get(id); return item ? <a href={`#macro-now-evidence-${id}`}>{item.name} →</a> : null; })}</div>
       </li>)}</ul> : <p>目前没有单独触发的下一期观察项，继续按上面的读法核对新的劳动市场数据。</p>}
     </section>
   </main>
