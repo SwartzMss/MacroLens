@@ -20,6 +20,13 @@ export const explorations = [
     minutes: 9,
     published: true,
   },
+  {
+    id: 'why-growth-doesnt-feel-richer',
+    title: '为什么经济增长了，普通人却不一定觉得更有钱？',
+    summary: '总量增加、平均收入上升和每个家庭的购买力不是同一个问题。行业、地区、工作时间和生活成本的差异，会改变每个人的感受。',
+    minutes: 10,
+    published: true,
+  },
 ] as const;
 
 export const explorationHref = (id: string) => `/learn/explore/${id}/`;
