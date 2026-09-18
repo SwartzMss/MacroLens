@@ -51,6 +51,8 @@ test('homepage components expose the required semantic sections and links', () =
   assert.match(source, /getMacroNowQuestionForDomain/);
   assert.match(source, /home-domain-grid/);
   assert.match(source, /home-domain-question/);
+  assert.match(source, /home-learning-promo/);
+  assert.doesNotMatch(source, /(?:01|02)\s*\//);
   assert.doesNotMatch(source, /home-hero-entry-note/);
   assert.doesNotMatch(source, /MacroLens · 宏观经济观察与学习/);
   assert.doesNotMatch(source, /home-featured-grid/);
@@ -67,6 +69,7 @@ test('homepage is a narrative entry point and full snapshot has its own route', 
   for (const name of ['HomeHero', 'LearningPaths', 'MacroStateSummary']) {
     assert.match(home, new RegExp(name));
   }
+  assert.match(home, /home-landing/);
   assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths|<NotableSignals/);
   assert.doesNotMatch(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
   assert.match(`${home}\n${homeComponents}`, /href=["']\/now\/["']/);

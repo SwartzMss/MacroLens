@@ -1,13 +1,10 @@
 ---
 import { courseOutline, courseLessonHref } from '../../data/courseOutline';
 ---
-<section class="home-section home-learning" id="learning-paths" aria-labelledby="learning-paths-title">
-  <div class="home-section-heading"><div><div class="eyebrow">01 / 从这里开始</div><h2 id="learning-paths-title">从生活里的问题，开始学习经济</h2></div><a class="home-inline-link" href="/learn/">查看学习主线 →</a></div>
+<aside class="home-learning-promo" id="learning-paths" aria-labelledby="learning-paths-title">
+  <div class="eyebrow">学习经济</div>
+  <h2 id="learning-paths-title">从生活里的问题开始</h2>
   <p>不需要先记住一串名词。从一份早餐开始，看看购买、收入、生产和工作怎样联系起来。</p>
-  <a class="home-learning-card" href={courseLessonHref(courseOutline[0].id)}>
-    <span class="eyebrow">第一章</span>
-    <strong>{courseOutline[0].title}</strong>
-    <span>{courseOutline[0].summary}</span>
-    <b>开始第一章 →</b>
-  </a>
-</section>
+  <a class="home-learning-promo-primary" href={courseLessonHref(courseOutline[0].id)}>开始第一章 →</a>
+  <a class="home-learning-promo-secondary" href="/learn/">查看学习主线</a>
+</aside>

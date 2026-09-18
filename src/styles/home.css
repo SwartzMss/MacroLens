@@ -688,3 +688,70 @@
   .home-hero { padding: 42px 0 36px; }
   .home-section { padding: 36px 0; }
 }
+
+/* The home page introduces the two primary ways in: learn on the side, then read the current data. */
+.home-landing {
+  display: grid;
+  width: min(1120px, calc(100% - 40px));
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  gap: 64px;
+  align-items: stretch;
+  margin-inline: auto;
+  padding: 56px 0 52px;
+}
+.home-landing > .home-hero {
+  width: auto;
+  margin: 0;
+  padding: 0;
+}
+.home-learning-promo {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+  border: 1px solid #b9d7c8;
+  border-radius: 18px;
+  background: #e8f1ec;
+}
+.home-learning-promo .eyebrow { font-size: 12px; }
+.home-learning-promo h2 {
+  margin: 14px 0 12px;
+  font: 700 28px/1.4 var(--serif);
+}
+.home-learning-promo p {
+  margin: 0;
+  color: #46584f;
+  line-height: 1.75;
+}
+.home-learning-promo-primary {
+  align-self: flex-start;
+  margin-top: 24px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--card);
+  font-size: 14px;
+  font-weight: 700;
+}
+.home-learning-promo-primary:hover { background: var(--ink); }
+.home-learning-promo-secondary {
+  align-self: flex-start;
+  margin-top: 14px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+.home-learning-promo-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
+.home-state { border-top: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .home-landing {
+    width: calc(100% - 40px);
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 42px 0 40px;
+  }
+  .home-landing > .home-hero { padding: 0; }
+  .home-state { width: calc(100% - 40px); }
+  .home-learning-promo { min-height: 0; padding: 24px; }
+}
