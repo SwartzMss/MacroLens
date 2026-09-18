@@ -437,6 +437,10 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /updatedAt/);
   assert.match(component, /Macro Now · 当前状态/);
   assert.match(component, /各方面的变化和依据/);
+  assert.match(component, /当前状态的读法/);
+  assert.match(component, /先找方向，再追到证据/);
+  assert.match(component, /snapshot-reading-guide/);
+  assert.match(component, /domainHrefs/);
   assert.doesNotMatch(component, /<div class="eyebrow">\{domain\.id\}<\/div>/);
   assert.doesNotMatch(component, /snapshot\.phase|snapshot\.signals|rulesVersion|Macro Score|confidence score/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);

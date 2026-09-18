@@ -58,6 +58,70 @@
   margin: 4px 0;
 }
 
+.snapshot-reading-guide {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.45fr) 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 14px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+
+.snapshot-reading-guide h3 {
+  margin: 4px 0 8px;
+  font: 700 24px/1.2 var(--serif);
+}
+
+.snapshot-reading-guide p,
+.snapshot-reading-guide-steps p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.snapshot-reading-guide-steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.snapshot-reading-guide-steps li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.snapshot-reading-guide-steps li > span {
+  color: var(--green);
+  font: 700 16px var(--serif);
+}
+
+.snapshot-reading-guide-steps strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.snapshot-reading-guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 8px;
+}
+
+.snapshot-reading-guide-links a {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .snapshot-domains {
   margin-top: 40px;
 }
@@ -264,6 +328,7 @@
   }
 
   .snapshot-synthesis,
+  .snapshot-reading-guide,
   .snapshot-domain-conclusions {
     grid-template-columns: 1fr;
   }
