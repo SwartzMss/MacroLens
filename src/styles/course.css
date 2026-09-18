@@ -126,6 +126,40 @@
   line-height:1.95;
   min-width:0;
 }
+.course-overview,
+.course-takeaways {
+  background:#f0f4ee;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px 24px;
+  margin-bottom:34px;
+}
+.course-overview {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+}
+.course-overview + h2 {
+  margin-top:0;
+}
+.course-overview h2,
+.course-takeaways h2 {
+  font-size:21px;
+  margin:0 0 10px;
+}
+.course-overview p,
+.course-overview ul,
+.course-takeaways ul {
+  margin:0;
+}
+.course-overview li,
+.course-takeaways li {
+  margin:6px 0;
+}
+.course-takeaways {
+  margin:42px 0 0;
+  background:#fffef9;
+}
 .course-body h2 {
   font-size:26px;
   margin:42px 0 16px;
@@ -233,6 +267,15 @@
   }
   .course-body {
     font-size:17px;
+  }
+  .course-overview {
+    display:block;
+    padding:18px 20px;
+  }
+  .course-overview > div + div {
+    border-top:1px solid var(--line);
+    margin-top:18px;
+    padding-top:18px;
   }
   .course-outline li {
     grid-template-columns:28px 1fr;

@@ -18,6 +18,7 @@ const { Content, headings } = await render(lesson);
 const index = courseOutline.findIndex(item => item.id === lesson.id);
 const previous = courseOutline[index - 1];
 const next = courseOutline[index + 1];
+const nextReason = courseOutline[index]?.nextReason;
 const sections = headings.filter(item => item.depth === 2);
 ---
 <BaseLayout title={`${lesson.data.title}｜学习经济｜MacroLens`} description={lesson.data.description}>
@@ -36,16 +37,39 @@ const sections = headings.filter(item => item.depth === 2);
     </details>
     <div class="course-layout">
       <article class="course-body">
+        <section class="course-overview" aria-label="本章学习提示">
+          <div>
+            <h2 id={`${lesson.id}-goals`}>这一章要弄明白什么</h2>
+            <ul>
+              {lesson.data.goals.map(goal => <li>{goal}</li>)}
+            </ul>
+          </div>
+          <div>
+            <h2 id={`${lesson.id}-recall`}>先把前面的问题接回来</h2>
+            <p>{lesson.data.recall}</p>
+          </div>
+        </section>
         <Content />
+        <section class="course-takeaways" aria-labelledby={`${lesson.id}-takeaways`}>
+          <h2 id={`${lesson.id}-takeaways`}>学完后带走</h2>
+          <ul>
+            {lesson.data.takeaways.map(takeaway => <li>{takeaway}</li>)}
+          </ul>
+        </section>
         <section class="course-actions" aria-label="阅读进度">
           <button class="course-start" type="button" data-course-complete hidden>我读完这一章了</button>
           <p class="course-note" data-course-status aria-live="polite">开启 JavaScript 后可以保存阅读进度。</p>
           {previous?.published && <a href={courseLessonHref(previous.id)}>← 上一章：{previous.title}</a>}
           {next && <div class="course-next">
             <strong>接下来：{next.title}</strong>
+            <p>{nextReason}</p>
             {next.published
               ? <a href={courseLessonHref(next.id)}>继续下一章 →</a>
               : <p class="course-note">这一章正在编写，完成后会在入门主线开放。</p>}
+          </div>}
+          {!next && <div class="course-next">
+            <strong>主线先收束在这里</strong>
+            <p>{nextReason}</p>
           </div>}
           <a href="/learn/">返回主线，查看完整大纲 →</a>
         </section>
