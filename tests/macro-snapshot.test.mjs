@@ -585,6 +585,16 @@ test('Macro Now graph reading nodes return to the matching current evidence card
   assert.match(readFileSync(pricesPage, 'utf8'), /MacroNowPriceMap evidence=/);
 });
 
+test('Macro Now watch-next links return to current evidence cards', () => {
+  const pages = [growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage];
+
+  for (const pagePath of pages) {
+    const page = readFileSync(pagePath, 'utf8');
+    assert.match(page, /下一期看什么/);
+    assert.match(page, /href=\{`#macro-now-evidence-\$\{id\}`\}/);
+  }
+});
+
 test('Macro Now evidence cards explain how each reading is compared', () => {
   const note = readFileSync(comparisonNote, 'utf8');
   const pages = [growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage];

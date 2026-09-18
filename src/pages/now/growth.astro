@@ -150,7 +150,7 @@ const readingText = (evidence: SnapshotEvidence) => evidence.id === 'pmi'
       {growth.watchNext.length > 0 ? <ul>{growth.watchNext.map((conclusion) => <li>
         <strong>{localizeExplanation(conclusion.title)}</strong>
         <p>{localizeExplanation(conclusion.explanation)}</p>
-        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const evidence = evidenceById.get(id); return evidence ? <a href={evidence.conceptHref}>{evidence.name} →</a> : null; })}</div>
+        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const evidence = evidenceById.get(id); return evidence ? <a href={`#macro-now-evidence-${id}`}>{evidence.name} →</a> : null; })}</div>
       </li>)}</ul> : <p>目前没有单独触发的下一期观察项，继续按上面的读法核对新数据。</p>}
     </section>
   </main>
