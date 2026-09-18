@@ -19,7 +19,10 @@ const evidenceRows = labor.evidence.map((evidence) => {
   return { evidence, indicator: indicators[indicatorId], sources: indicators[indicatorId].sources };
 });
 const evidence = evidenceRows[0].evidence;
-const formatLatest = (item: SnapshotEvidence) => `${item.latest.toFixed(item.metric === 'rate' ? 2 : 1)}${item.unit === '%' ? '%' : ` ${item.unit}`}`;
+const formatLatest = (item: SnapshotEvidence) => {
+  const unit = item.unit === 'index' ? '点' : item.unit;
+  return `${item.latest.toFixed(item.metric === 'rate' ? 2 : 1)}${unit === '%' ? '%' : ` ${unit}`}`;
+};
 const formatRecentChange = (item: SnapshotEvidence) => item.change === null ? '暂无可比数据' : formatSignalChange(item);
 const readingText = evidence.change === null
   ? '暂无上期可比读数，先记录本期水平。'
