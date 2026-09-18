@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowComparisonNote from '../../components/MacroNowComparisonNote.astro';
 import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowCreditMap from '../../components/MacroNowCreditMap.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
@@ -71,6 +72,7 @@ const evidenceById = new Map(credit.evidence.map((evidence) => [evidence.id, evi
             <strong>{formatLatest(evidence)}</strong>
           </header>
           <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
+          <MacroNowComparisonNote method={evidence.comparisonMethod} />
           <dl>
             <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
             <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>
