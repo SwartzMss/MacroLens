@@ -1,0 +1,95 @@
+---
+import {
+  getExplainableConceptRelations,
+  getRelationData,
+  isExplainableRelation,
+  type Relation,
+} from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+type EvidenceRow = { evidence: SnapshotEvidence };
+const { rows } = Astro.props as { rows: EvidenceRow[] };
+const graphNodes = new Map(getRelationData('macro').nodes.map((node) => [node.id, node]));
+const relationLabels: Record<string, string> = {
+  leading_indicator: '较早提示',
+  leading_factor: '可能先于变化',
+  synchronous_indicator: '同期观察',
+  lagging_indicator: '随后体现',
+  transmission: '可能传到',
+};
+
+function relationBetween(source: string, target: string) {
+  return getExplainableConceptRelations('macro', source)
+    .find((item) => item.relation.source === source && item.relation.target === target);
+}
+
+function pathFor(evidence: SnapshotEvidence) {
+  const direct = relationBetween(evidence.id, 'economic-activity');
+  if (direct) return { evidence, first: direct, second: null };
+
+  const first = getExplainableConceptRelations('macro', evidence.id)
+    .find((item) => item.relation.source === evidence.id);
+  if (!first) throw new Error(`Macro Now graph path missing for ${evidence.id}`);
+  const second = relationBetween(first.other.id, 'economic-activity');
+  if (!second) throw new Error(`Macro Now graph path missing final activity edge for ${evidence.id}`);
+  return { evidence, first, second };
+}
+
+const paths = rows.map(({ evidence }) => pathFor(evidence));
+const labelFor = (id: string) => graphNodes.get(id)?.label ?? id;
+const relationLabel = (relation: Relation) => isExplainableRelation(relation)
+  ? relationLabels[relation.relation] ?? '关系'
+  : '关系';
+---
+
+<section class="macro-now-section macro-now-map" aria-labelledby="macro-now-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把数据放进关系图</div>
+      <h2 id="macro-now-map-title">这些读数分别代表哪一段经济活动？</h2>
+    </div>
+    <p>图谱帮助我们放回统计范围和时间位置，不把关系当成已经证明的因果。</p>
+  </div>
+
+  <div class="macro-now-map-grid">
+    {paths.map(({ evidence, first, second }) => <article class="macro-now-map-path">
+      <div class="macro-now-map-steps">
+        <div class="macro-now-map-node is-indicator">
+          <small>当前读数</small>
+          <strong>{evidence.name}</strong>
+          <span>{evidence.valueLabel}</span>
+        </div>
+        <div class="macro-now-map-edge" aria-hidden="true">
+          <small>{relationLabel(first.relation)}</small>
+          <b>→</b>
+        </div>
+        <div class="macro-now-map-node">
+          <small>覆盖的部分</small>
+          <strong>{labelFor(first.other.id)}</strong>
+          <span>{first.relation.lag}</span>
+        </div>
+        {second && <>
+          <div class="macro-now-map-edge" aria-hidden="true">
+            <small>{relationLabel(second.relation)}</small>
+            <b>→</b>
+          </div>
+          <div class="macro-now-map-node is-total">
+            <small>整体观察</small>
+            <strong>{labelFor(second.other.id)}</strong>
+            <span>{second.relation.lag}</span>
+          </div>
+        </>}
+      </div>
+      <details class="macro-now-map-detail">
+        <summary>为什么这样连？</summary>
+        <div>
+          <p>{first.relation.explanation}</p>
+          {second && <p>{second.relation.explanation}</p>}
+          <ul>
+            {[...(first.relation.limitations ?? []), ...(second?.relation.limitations ?? [])].map((limitation) => <li>{limitation}</li>)}
+          </ul>
+        </div>
+      </details>
+    </article>)}
+  </div>
+</section>
