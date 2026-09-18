@@ -97,6 +97,14 @@
   font: 700 24px/1.2 var(--serif);
 }
 
+.snapshot-domain-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .snapshot-domain-state {
   padding: 5px 9px;
   border: 1px solid #b9d7c8;

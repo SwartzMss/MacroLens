@@ -22,6 +22,7 @@ const snapshotComponent = fileURLToPath(new URL('../src/components/MacroSnapshot
 const snapshotStyles = fileURLToPath(new URL('../src/styles/snapshot.css', import.meta.url));
 const snapshotPage = fileURLToPath(new URL('../src/pages/snapshot.astro', import.meta.url));
 const macroNowPage = fileURLToPath(new URL('../src/pages/now.astro', import.meta.url));
+const growthPage = fileURLToPath(new URL('../src/pages/now/growth.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -416,6 +417,7 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   const styles = readFileSync(snapshotStyles, 'utf8');
   const page = readFileSync(snapshotPage, 'utf8');
   const now = readFileSync(macroNowPage, 'utf8');
+  const growth = readFileSync(growthPage, 'utf8');
 
   assert.match(component, /snapshot\.synthesis/);
   assert.match(component, /snapshot\.domains/);
@@ -433,6 +435,13 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(now, /title="Macro Now｜当前宏观状态｜MacroLens"/);
   assert.match(now, /canonicalPath="\/now\/"/);
   assert.match(now, /MacroSnapshot/);
+  assert.match(component, /href="\/now\/growth\/"/);
+  assert.match(growth, /经济活动在变快还是变慢/);
+  assert.match(growth, /buildMacroSnapshot/);
+  assert.match(growth, /getMacroSnapshotIndicators/);
+  assert.match(growth, /查看数据来源/);
+  assert.match(growth, /还缺什么证据/);
+  assert.match(growth, /\/concepts\/employment/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
