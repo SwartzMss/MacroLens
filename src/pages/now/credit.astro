@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowCreditMap from '../../components/MacroNowCreditMap.astro';
+import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
+import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
+import '../../styles/macro-now.css';
+
+const indicators = getMacroSnapshotIndicators();
+const snapshot = buildMacroSnapshot(indicators);
+const credit = snapshot.domains.find((domain) => domain.id === 'credit-liquidity');
+if (!credit) throw new Error('Macro Now credit page requires the credit-liquidity domain');
+
+const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件' };
+const evidenceRows = credit.evidence.map((evidence) => {
+  const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
+  return { evidence, sources: indicators[indicatorId].sources };
+});
+const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
+const formatRecentChange = (evidence: SnapshotEvidence) => evidence.change === null ? '暂无可比数据' : formatSignalChange(evidence);
+const readingText = (evidence: SnapshotEvidence) => {
+  const descriptions: Record<string, string> = {
+    m0: 'M0 更接近流通中的现金，不能代表全部存款和融资。',
+    m1: 'M1 更靠近可用于交易的货币部分，和 M2 的口径不同。',
+    m2: 'M2 反映更广义的货币余额，增长不等于资金已经进入有效支出。',
+    credit: '人民币贷款观察银行贷款这一部分，和社会融资存在重叠但不完全相同。',
+    'social-financing': '社会融资覆盖更多融资渠道，仍要区分存量、增量和同比增速。',
+  };
+  return `${descriptions[evidence.id] ?? ''} 最近一次变化为 ${formatRecentChange(evidence)}。`;
+};
+const evidenceById = new Map(credit.evidence.map((evidence) => [evidence.id, evidence]));
+---
+
+<BaseLayout
+  title="钱在变多，融资就一定更容易吗？｜Macro Now｜MacroLens"
+  description="从 M0、M1、M2、人民币贷款和社会融资的最新数据，理解货币、融资和经济活动之间的区别与证据边界。"
+>
+  <main class="macro-now-question shell">
+    <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <header class="macro-now-question-head">
+      <div class="eyebrow">Macro Now · 当前状态</div>
+      <h1>钱在变多，融资就一定更容易吗？</h1>
+      <p class="macro-now-lead">先把货币余额、银行贷款和社会融资分开，再判断“钱变多”有没有真的变成更容易借到、也更愿意使用的资金。</p>
+      <p class="macro-now-meta">数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</p>
+    </header>
+
+    <section class="macro-now-question-summary" aria-labelledby="macro-now-credit-current-title">
+      <div>
+        <div class="eyebrow">现在看到什么</div>
+        <h2 id="macro-now-credit-current-title">{homeStateLabels[credit.state]}</h2>
+      </div>
+      <p>{localizeExplanation(credit.explanation)}</p>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-credit-evidence-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">数据依据</div>
+          <h2 id="macro-now-credit-evidence-title">先分清钱、贷款和融资</h2>
+        </div>
+        <p>这些指标都和资金有关，但回答的是不同问题，不能只看一个增速。</p>
+      </div>
+      <div class="macro-now-evidence-grid">
+        {evidenceRows.map(({ evidence, sources }) => <article class="macro-now-evidence-card">
+          <header>
+            <div>
+              <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
+              <p>{evidence.valueLabel}</p>
+            </div>
+            <strong>{formatLatest(evidence)}</strong>
+          </header>
+          <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
+          <dl>
+            <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
+            <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>
+            <div><dt>更新</dt><dd>{evidence.updatedAt}</dd></div>
+          </dl>
+          <details class="macro-now-source-details">
+            <summary>查看数据来源</summary>
+            <ul>
+              {sources.map((source) => <li>
+                <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+                <small>{source.role === 'methodology' ? '口径说明' : '数据来源'} · {source.coverage} · {source.sourceDate}</small>
+              </li>)}
+            </ul>
+          </details>
+        </article>)}
+      </div>
+    </section>
+
+    <MacroNowCreditMap rows={evidenceRows.map(({ evidence }) => evidence)} />
+
+    <section class="macro-now-section" aria-labelledby="macro-now-credit-reading-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">怎么读</div>
+          <h2 id="macro-now-credit-reading-title">钱变多和融资变好不是同一件事</h2>
+        </div>
+      </div>
+      <div class="macro-now-reading-grid">
+        <article>
+          <h3>余额增长不等于新增需求</h3>
+          <p>M0、M1、M2 的增速描述余额变化。它们不能单独说明家庭和企业是否想借钱、是否愿意花钱。</p>
+        </article>
+        <article>
+          <h3>贷款和社会融资有重叠</h3>
+          <p>人民币贷款是社会融资的重要部分，但社会融资还包含债券、股票等渠道，两个数字不能直接相加。</p>
+        </article>
+        <article>
+          <h3>融资要看能不能用起来</h3>
+          <p>融资条件、风险评估、抵押品、收入预期和项目回报，都会影响“资金变多”能不能变成真实支出。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-credit-gaps-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">证据边界</div>
+          <h2 id="macro-now-credit-gaps-title">还缺什么证据？</h2>
+        </div>
+        <p>当前数据能说明货币和融资规模如何变化，还不能替代借款人的实际感受。</p>
+      </div>
+      <div class="macro-now-gap-list">
+        <article>
+          <h3>谁拿到了资金？</h3>
+          <p>总量数据没有告诉我们资金流向了哪些行业、企业和家庭，还需要看结构和分项。</p>
+          <div class="macro-now-links"><a href="/concepts/credit/">人民币贷款 →</a><a href="/concepts/social-financing/">社会融资 →</a></div>
+        </article>
+        <article>
+          <h3>借钱的成本和条件变了吗？</h3>
+          <p>融资规模增长不代表每个人都更容易借到钱，还要看利率、风险评估、抵押品和期限。</p>
+          <div class="macro-now-links"><a href="/concepts/financing-conditions/">融资条件 →</a><a href="/concepts/lpr/">LPR →</a></div>
+        </article>
+        <article>
+          <h3>资金有没有进入真实活动？</h3>
+          <p>下一步要把融资数据和消费、投资、生产放在一起，看资金是否形成了实际支出。</p>
+          <div class="macro-now-links"><a href="/concepts/household-consumption/">居民消费 →</a><a href="/concepts/fixed-asset-investment/">固定资产投资 →</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-next" aria-labelledby="macro-now-credit-next-title">
+      <div>
+        <div class="eyebrow">下一期看什么</div>
+        <h2 id="macro-now-credit-next-title">继续核对同一组融资证据</h2>
+      </div>
+      {credit.watchNext.length > 0 ? <ul>{credit.watchNext.map((conclusion) => <li>
+        <strong>{localizeExplanation(conclusion.title)}</strong>
+        <p>{localizeExplanation(conclusion.explanation)}</p>
+        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const evidence = evidenceById.get(id); return evidence ? <a href={evidence.conceptHref}>{evidence.name} →</a> : null; })}</div>
+      </li>)}</ul> : <p>目前没有单独触发的下一期观察项，继续按上面的读法核对新融资数据。</p>}
+    </section>
+  </main>
+</BaseLayout>

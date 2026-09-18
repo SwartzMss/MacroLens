@@ -414,6 +414,105 @@
   line-height: 1.7;
 }
 
+.macro-now-credit-paths {
+  display: grid;
+  gap: 14px;
+}
+
+.macro-now-credit-path {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+
+.macro-now-credit-path header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.macro-now-credit-path header strong {
+  font-size: 16px;
+}
+
+.macro-now-credit-path header span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.macro-now-credit-steps {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 92px minmax(150px, 1fr) 92px minmax(150px, 1fr);
+  align-items: stretch;
+  gap: 10px;
+}
+
+.macro-now-credit-node {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  min-height: 92px;
+  padding: 13px;
+  border-radius: 11px;
+  background: #f0f4ee;
+}
+
+.macro-now-credit-node.is-money {
+  background: #e8eee9;
+}
+
+.macro-now-credit-node.is-activity {
+  background: #f4efe2;
+}
+
+.macro-now-credit-node small,
+.macro-now-credit-edge small,
+.macro-now-credit-edge span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.macro-now-credit-node strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.macro-now-credit-node span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.macro-now-credit-edge {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--green);
+  text-align: center;
+}
+
+.macro-now-credit-edge b {
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.macro-now-credit-note {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 .macro-now-reading-grid,
 .macro-now-gap-list {
   display: grid;
@@ -552,5 +651,25 @@
 
   .macro-now-price-observations {
     grid-template-columns: 1fr;
+  }
+
+  .macro-now-credit-path header {
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .macro-now-credit-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-now-credit-edge {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 8px;
+  }
+
+  .macro-now-credit-edge b {
+    transform: rotate(90deg);
   }
 }

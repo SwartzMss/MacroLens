@@ -1,0 +1,97 @@
+---
+import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+const { rows } = Astro.props as { rows: SnapshotEvidence[] };
+const graph = getRelationData('macro');
+const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const evidenceById = new Map(rows.map((evidence) => [evidence.id, evidence]));
+const edge = (source: string, target: string) => graph.relations.find(
+  (relation) => relation.source === source && relation.target === target,
+);
+const monetaryEdges = [edge('m0', 'm1'), edge('m1', 'm2')].filter((relation): relation is Relation => Boolean(relation));
+const creditEdges = [edge('credit', 'm2'), edge('m2', 'activity')].filter((relation): relation is Relation => Boolean(relation));
+const financingEdges = [edge('social-financing', 'real-economy-financing'), edge('real-economy-financing', 'activity')]
+  .filter((relation): relation is Relation => Boolean(relation));
+if (monetaryEdges.length !== 2 || creditEdges.length !== 2 || financingEdges.length !== 2) {
+  throw new Error('Macro Now credit graph paths are incomplete');
+}
+
+const relationLabels: Record<string, string> = {
+  transmission: '可能传导',
+  leading_indicator: '较早提示',
+  leading_factor: '可能先于变化',
+  synchronous_indicator: '同期观察',
+};
+const typeLabels: Record<string, string> = {
+  COMPONENT_OF: '统计层级',
+  AFFECTS: '可能影响',
+  CORRELATES: '可能相关',
+  MEASURES: '衡量',
+};
+const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const relationLabel = (relation: Relation) => isExplainableRelation(relation)
+  ? relationLabels[relation.relation] ?? typeLabels[relation.type] ?? '关系'
+  : typeLabels[relation.type] ?? '关系';
+const edgeAt = (edges: Relation[], index: number) => edges[index]!;
+const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relation.lag : '';
+const nodeValue = (id: string) => evidenceById.get(id)?.valueLabel;
+const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation) => relation.target)];
+---
+
+<section class="macro-now-section macro-now-credit-map" aria-labelledby="macro-now-credit-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把信用放进关系图</div>
+      <h2 id="macro-now-credit-map-title">这些数字怎样连到融资和活动？</h2>
+    </div>
+    <p>图谱把统计层级和可能的传导路径分开显示，不把货币或融资增长直接当成经济改善。</p>
+  </div>
+
+  <div class="macro-now-credit-paths">
+    <article class="macro-now-credit-path">
+      <header><strong>货币指标的层级</strong><span>M0、M1、M2 不是三个相同口径的数字</span></header>
+      <div class="macro-now-credit-steps">
+        {nodeIds(monetaryEdges).map((id, index) => <>
+          <div class="macro-now-credit-node is-money">
+            <small>{index === 0 ? '现金层' : index === 1 ? '交易性货币' : '广义货币'}</small>
+            <strong>{nodeLabel(id)}</strong>
+            {nodeValue(id) && <span>{nodeValue(id)}</span>}
+          </div>
+          {index < monetaryEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(monetaryEdges, index))}</small><b>→</b></div>}
+        </>)}
+      </div>
+      <p class="macro-now-credit-note">这条链表示统计层级，不能读成“前一个指标必然造成后一个指标变化”。</p>
+    </article>
+
+    <article class="macro-now-credit-path">
+      <header><strong>信贷可能怎样传到活动</strong><span>需要借款需求和银行供给同时存在</span></header>
+      <div class="macro-now-credit-steps">
+        {nodeIds(creditEdges).map((id, index) => <>
+          <div class:list={['macro-now-credit-node', index === 0 && 'is-money', index === creditEdges.length && 'is-activity']}>
+            <small>{index === 0 ? '当前读数' : index === 1 ? '货币结果' : '活动结果'}</small>
+            <strong>{nodeLabel(id)}</strong>
+            {nodeValue(id) && <span>{nodeValue(id)}</span>}
+          </div>
+          {index < creditEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(creditEdges, index))}</small><b>→</b><span>{lagFor(edgeAt(creditEdges, index))}</span></div>}
+        </>)}
+      </div>
+      <p class="macro-now-credit-note">信贷可能扩大存款余额，但 M2 增长不保证资金已经变成有效支出。</p>
+    </article>
+
+    <article class="macro-now-credit-path">
+      <header><strong>社会融资怎样连接实体活动</strong><span>先看资金是否真的形成了融资</span></header>
+      <div class="macro-now-credit-steps">
+        {nodeIds(financingEdges).map((id, index) => <>
+          <div class:list={['macro-now-credit-node', index === 0 && 'is-money', index === financingEdges.length && 'is-activity']}>
+            <small>{index === 0 ? '当前读数' : index === 1 ? '已实现的融资' : '活动结果'}</small>
+            <strong>{nodeLabel(id)}</strong>
+            {nodeValue(id) && <span>{nodeValue(id)}</span>}
+          </div>
+          {index < financingEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(financingEdges, index))}</small><b>→</b><span>{lagFor(edgeAt(financingEdges, index))}</span></div>}
+        </>)}
+      </div>
+      <p class="macro-now-credit-note">社会融资记录已经实现的融资活动，规模增长仍不代表每个借款人都更容易获得资金。</p>
+    </article>
+  </div>
+</section>
