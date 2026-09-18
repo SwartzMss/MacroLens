@@ -24,8 +24,12 @@ const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ i
 const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
 <BaseLayout title="知识库｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
-  <header class="index-head">
-    <div class="shell"><h1>知识库</h1><p class="lead">按领域浏览宏观经济概念，进入详情查看定义、数据和统计口径。</p></div>
+  <header class="index-head concept-library-head">
+    <div class="shell">
+      <div class="eyebrow">知识库</div>
+      <h1>按领域认识宏观概念</h1>
+      <p class="lead">按领域浏览宏观经济概念，进入详情查看定义、数据和统计口径。</p>
+    </div>
   </header>
   <div class="shell concept-index">
     <details class="concept-filter-panel" data-filter-panel>

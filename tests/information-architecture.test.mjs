@@ -83,6 +83,10 @@ test('homepage remains a curated entry point', () => {
 test('concept index will expose all three browsing dimensions', () => {
   const source = readFileSync(conceptsIndex, 'utf8');
   const filters = readFileSync(`${root}src/scripts/concept-filters.ts`, 'utf8');
+  assert.match(source, /concept-library-head/);
+  assert.match(source, /<div class="eyebrow">知识库<\/div>/);
+  assert.match(source, /按领域认识宏观概念/);
+  assert.doesNotMatch(source, /(?:01|02|03)\s*\//);
   for (const name of ['category', 'topic', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
   for (const attribute of ['data-category', 'data-topics', 'data-level']) assert.match(source, new RegExp(attribute));
   assert.match(source, /concept-filters/);
