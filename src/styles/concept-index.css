@@ -6,8 +6,7 @@
 .concept-search input { flex: 1; min-width: 0; padding: 14px 16px; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 20px; outline: none; }
 .concept-search button { padding: 14px 32px; border: 0; border-radius: 8px; background: var(--green); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .concept-index { padding-bottom: 64px; }
-.index-summary { display: flex; gap: 14px; padding-right: 80px; color: var(--muted); font-size: 13px; }
-.concept-filter-panel { margin-top: -22px; text-align: right; }
+.concept-filter-panel { text-align: right; }
 .concept-filter-panel summary { display: inline-block; padding: 0 4px 8px; color: var(--green); cursor: pointer; font-size: 13px; }
 .concept-filter-panel summary::after { content: ' ＋'; }
 .concept-filter-panel[open] summary::after { content: ' −'; }
@@ -15,15 +14,13 @@
 .filter-field { display: grid; gap: 6px; min-width: 0; }
 .filter-field label { font-size: 13px; color: var(--muted); }
 .filter-field select { width: 100%; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; }
-.concept-quick-nav { margin: 16px 0 28px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.concept-quick-nav { margin: 4px 0 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
 .concept-quick-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .concept-quick-links a { display: inline-flex; gap: 6px; padding: 4px 0; font-size: 13px; color: var(--muted); text-decoration: none; }
 .concept-quick-links a:hover { color: var(--green); }
-.concept-quick-links a span { font-size: 11px; opacity: .7; }
 .category-section { padding: 0 0 28px; scroll-margin-top: 90px; }
 .category-section > header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .category-section h2 { margin: 0; font-size: 16px; }
-.category-section > header > span { color: var(--muted); font-size: 12px; }
 .index-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
 .index-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 14px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); text-decoration: none; }
 .index-card h3 { margin: 0; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }

@@ -19,7 +19,7 @@ for (const concept of catalog.concepts) {
 const categoryGroups = [...grouped.entries()]
   .map(([id, items]) => ({ id, ...getCategory(id), items: items.sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id)) }))
   .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id], count: grouped.get(id)?.length ?? 0 }));
+const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id] }));
 const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
 <BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
@@ -35,7 +35,6 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
     </div>
   </header>
   <div class="shell concept-index">
-    <div class="index-summary" aria-live="polite" aria-atomic="true"><span data-filter-count>{concepts.length} 个概念</span><span data-filter-category-count>{categoryGroups.length} 个领域</span></div>
     <details class="concept-filter-panel" data-filter-panel>
       <summary>筛选</summary>
       <form class="concept-filters" data-concept-filters>
@@ -45,7 +44,7 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
       </form>
     </details>
     <nav class="concept-quick-nav" aria-label="按领域快速浏览">
-      <div class="concept-quick-links">{categoryOptions.map(option => <a href={`#${option.id}`}>{option.label}<span>{option.count}</span></a>)}</div>
+      <div class="concept-quick-links">{categoryOptions.map(option => <a href={`#${option.id}`}>{option.label}</a>)}</div>
     </nav>
     <div class="filter-empty" data-filter-empty hidden>
       <h2>暂无匹配的概念</h2>
@@ -53,7 +52,7 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
       <button type="button" data-filter-reset>清除筛选</button>
     </div>
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
-      <header><h2>{group.label}</h2><span data-category-count>{group.items.length}</span></header>
+      <header><h2>{group.label}</h2></header>
       <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
         <h3>{concept.data.name}</h3><span aria-hidden="true">↗</span>
       </a>)}</div>
