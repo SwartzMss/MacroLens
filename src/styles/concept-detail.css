@@ -29,6 +29,38 @@
   gap: 8px 20px;
 }
 
+.concept-macro-now-context {
+  display: grid;
+  gap: 4px;
+  max-width: 680px;
+  margin-top: 12px;
+  padding: 13px 16px;
+  border: 1px solid #bfd6c9;
+  border-radius: 12px;
+  background: #e8f1ec;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.concept-macro-now-context:hover {
+  border-color: var(--green);
+}
+
+.concept-macro-now-context .eyebrow {
+  color: var(--green);
+}
+
+.concept-macro-now-context strong {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.concept-macro-now-context > span:last-child {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .detail-header .breadcrumbs {
   font-size: 12px;
 }

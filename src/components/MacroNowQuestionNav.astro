@@ -1,16 +1,7 @@
 ---
-type QuestionId = 'growth' | 'prices' | 'credit' | 'policy' | 'labor' | 'external';
+import { macroNowQuestions, type MacroNowQuestionId } from '../data/macroNow';
 
-const { current } = Astro.props as { current: QuestionId };
-
-const questions: Array<{ id: QuestionId; label: string; href: string; question: string }> = [
-  { id: 'growth', label: '经济活动', href: '/now/growth/', question: '在变快还是变慢？' },
-  { id: 'prices', label: '价格变化', href: '/now/prices/', question: '上升、放缓，还是分化？' },
-  { id: 'credit', label: '钱与融资', href: '/now/credit/', question: '钱变多就更容易融资吗？' },
-  { id: 'policy', label: '政策与利率', href: '/now/policy/', question: '放松后融资更容易了吗？' },
-  { id: 'labor', label: '就业情况', href: '/now/labor/', question: '失业率下降就变好了吗？' },
-  { id: 'external', label: '外贸变化', href: '/now/external/', question: '出口增长就更强了吗？' },
-];
+const { current } = Astro.props as { current: MacroNowQuestionId };
 ---
 
 <section class="macro-now-question-nav" aria-labelledby="macro-now-question-nav-title">
@@ -19,7 +10,7 @@ const questions: Array<{ id: QuestionId; label: string; href: string; question: 
     <h2 id="macro-now-question-nav-title">换个问题继续看</h2>
   </div>
   <nav aria-label="当前状态问题">
-    {questions.map((question) => <a
+    {macroNowQuestions.map((question) => <a
       class:list={['macro-now-question-nav-item', question.id === current && 'is-current']}
       href={question.href}
       aria-current={question.id === current ? 'page' : undefined}
