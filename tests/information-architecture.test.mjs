@@ -98,6 +98,8 @@ test('concept search is prominent and scoped to concept pages', () => {
   const reader = readFileSync(`${root}src/components/ConceptReader.astro`, 'utf8');
 
   assert.match(index, /class="concept-search"/);
+  assert.match(index, /index-head-layout/);
+  assert.match(index, /concept-filter-panel/);
   assert.match(index, /name="q"/);
   assert.match(index, /action="\/search\/"/);
   assert.match(search, /triggerFilters\(\{content:'concept'\}\)/);

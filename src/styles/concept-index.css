@@ -48,3 +48,96 @@
   .concept-quick-nav{align-items:flex-start;gap:5px;padding:12px}
   .concept-quick-nav strong{width:100%;margin:0 0 2px}
 }
+
+.concept-index { padding-top: 28px; }
+.concept-filter-panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.concept-filter-panel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  list-style: none;
+}
+.concept-filter-panel > summary::-webkit-details-marker { display: none; }
+.concept-filter-panel > summary::after { content: '+'; color: var(--green); font-size: 20px; font-weight: 400; }
+.concept-filter-panel[open] > summary { border-bottom: 1px solid var(--line); }
+.concept-filter-panel[open] > summary::after { content: '−'; }
+.concept-filter-panel > summary small { margin-left: auto; color: var(--muted); font-size: 12px; font-weight: 400; }
+.concept-filter-panel > summary:focus-visible { outline: 3px solid #a9d8c3; outline-offset: -3px; }
+.concept-filter-panel .concept-filters { border: 0; border-radius: 0 0 16px 16px; background: #f4f7f3; }
+.concept-quick-nav {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #f4f7f3;
+}
+.concept-quick-heading { display: grid; gap: 3px; }
+.concept-quick-heading strong { margin: 0; font-size: 14px; }
+.concept-quick-heading span { color: var(--muted); font-size: 12px; }
+.concept-quick-links { display: flex; flex-wrap: wrap; gap: 7px; }
+.concept-quick-nav a { padding: 7px 10px; background: var(--card); border: 1px solid transparent; }
+.concept-quick-nav a:hover { border-color: #b9d7c8; background: var(--card); }
+.category-section { padding: 48px 0 18px; border-top: 1px solid var(--line); }
+.category-section:first-of-type { border-top: 0; }
+.category-section>header { margin-bottom: 18px; }
+.category-section h2 { margin-top: 0; }
+.category-section>header>span { padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: #f4f7f3; }
+.index-grid { gap: 16px; }
+.index-card { min-height: 212px; padding: 22px 24px; border-radius: 18px; }
+.index-card:hover { transform: translateY(-2px); }
+.index-card-tags { min-height: 24px; }
+.index-card h3 { margin-top: 18px; }
+.index-card p { line-height: 1.65; }
+.index-card>b { letter-spacing: .01em; }
+
+@media (max-width: 900px) {
+  .concept-quick-nav { grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 560px) {
+  .concept-index { padding-top: 18px; }
+  .concept-filter-panel > summary { align-items: flex-start; flex-wrap: wrap; padding: 14px 16px; }
+  .concept-filter-panel > summary small { width: 100%; margin-left: 0; }
+  .concept-quick-nav { padding: 14px; }
+  .category-section { padding: 34px 0 10px; }
+  .category-section>header>span { padding: 4px 8px; }
+  .index-card { padding: 18px; border-radius: 16px; }
+}
+
+.concept-search {
+  max-width: none;
+  margin: 0;
+  padding: 26px;
+  border: 1px solid #c9d9cf;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 18px 38px rgba(23, 74, 56, .09);
+}
+.concept-search > .concept-search-kicker { display: block; }
+.concept-search-kicker { margin-bottom: 20px; color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.concept-search label { margin-bottom: 8px; }
+.concept-search-control { display: flex; gap: 8px; }
+.concept-search input { min-height: 48px; border-radius: 10px; }
+.concept-search button { min-height: 48px; padding-inline: 20px; border-radius: 10px; }
+.concept-search p { margin-top: 14px; }
+.concept-search p::before { content: ' '; }
+
+@media (max-width: 560px) {
+  .concept-search { padding: 20px; border-radius: 16px; }
+  .concept-search-kicker { margin-bottom: 16px; }
+  .concept-search-control { gap: 6px; }
+  .concept-search button { padding-inline: 16px; }
+}
