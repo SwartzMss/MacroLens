@@ -48,7 +48,7 @@ const limitations = [...new Set(chain.flatMap((relation) => relation.limitations
         className={['macro-now-price-node', index === 0 && 'is-indicator', index === chain.length - 1 && 'is-consumer'].filter(Boolean).join(' ')}
         caption={index === 0 ? '当前读数' : index === chain.length - 1 ? '居民端价格压力' : '中间环节'}
         label={nodeLabel(relation.source)}
-        value={evidenceById.get(relation.source)?.valueLabel}
+        evidence={evidenceById.get(relation.source)}
         href={evidenceById.get(relation.source)?.conceptHref}
       />
       <div class="macro-now-price-edge" aria-hidden="true">
@@ -66,7 +66,7 @@ const limitations = [...new Set(chain.flatMap((relation) => relation.limitations
       <p>CPI 看消费篮子的整体变化，核心 CPI 提供另一种观察消费价格底部变化的角度。</p>
     </div>
     <ul>
-      {evidence.filter((item) => item.id !== 'ppi').map((item) => <li><a href={item.conceptHref}>{item.name} →</a><span>{item.valueLabel}</span></li>)}
+      {evidence.filter((item) => item.id !== 'ppi').map((item) => <li><a href={item.conceptHref}>{item.name} →</a><span>{item.latest.toFixed(item.metric === 'rate' ? 2 : 1)}{item.unit === '%' ? '%' : ` ${item.unit === 'index' ? '点' : item.unit}`} · {item.valueLabel}</span></li>)}
     </ul>
   </div>
 

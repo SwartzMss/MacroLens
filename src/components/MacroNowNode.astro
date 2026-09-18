@@ -1,22 +1,34 @@
 ---
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
 type Props = {
   className: string;
   caption: string;
   label: string;
   value?: string;
+  detail?: string;
+  evidence?: SnapshotEvidence;
   href?: string;
 };
 
-const { className, caption, label, value, href } = Astro.props as Props;
+const { className, caption, label, value, detail, evidence, href } = Astro.props as Props;
 const classes = [className, href && 'is-link'];
+const formatEvidenceValue = (item: SnapshotEvidence) => {
+  const unit = item.unit === 'index' ? '点' : item.unit;
+  return `${item.latest.toFixed(item.metric === 'rate' ? 2 : 1)}${unit === '%' ? '%' : ` ${unit}`}`;
+};
+const displayValue = evidence ? formatEvidenceValue(evidence) : value;
+const displayDetail = evidence?.valueLabel ?? detail;
 ---
 
 {href ? <a class:list={classes} href={href} aria-label={`查看${label}概念定义`}>
   <small>{caption}</small>
   <strong>{label}</strong>
-  {value && <span>{value}</span>}
+  {displayValue && <span>{displayValue}</span>}
+  {displayDetail && <span>{displayDetail}</span>}
 </a> : <div class:list={classes}>
   <small>{caption}</small>
   <strong>{label}</strong>
-  {value && <span>{value}</span>}
+  {displayValue && <span>{displayValue}</span>}
+  {displayDetail && <span>{displayDetail}</span>}
 </div>}

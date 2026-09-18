@@ -572,10 +572,12 @@ test('Macro Now graph reading nodes link directly to concept definitions', () =>
   const maps = [macroNowMap, priceMap, creditMap, policyMap, externalMap, laborMap];
 
   assert.match(node, /查看\$\{label\}概念定义/);
+  assert.match(node, /formatEvidenceValue/);
   for (const mapPath of maps) {
     const map = readFileSync(mapPath, 'utf8');
     assert.match(map, /MacroNowNode/);
     assert.match(map, /conceptHref/);
+    assert.match(map, /evidence=/);
   }
   assert.match(readFileSync(pricesPage, 'utf8'), /MacroNowPriceMap evidence=/);
 });
