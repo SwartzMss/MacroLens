@@ -645,3 +645,64 @@
     transition: none;
   }
 }
+
+/* The home page is an entry point: keep the first decision and the next reading close together. */
+.home-hero {
+  display: block;
+  padding: 72px 0 60px;
+}
+.home-hero-copy { max-width: 780px; }
+.home-hero h1 { margin-bottom: 20px; }
+.home-hero .lead { max-width: 620px; line-height: 1.75; }
+.home-hero-actions { margin-top: 28px; }
+.home-section { padding: 48px 0; }
+.home-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.home-featured-domain {
+  display: flex;
+  min-width: 0;
+  min-height: 310px;
+  flex-direction: column;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--card);
+}
+.home-featured-domain .home-domain-topline { justify-content: space-between; }
+.home-featured-domain .home-domain-label { font-size: 15px; }
+.home-featured-question { margin: 20px 0 8px; font: 700 23px/1.4 var(--serif); }
+.home-featured-question a { color: var(--ink); text-decoration: none; }
+.home-featured-question a:hover { color: var(--green); }
+.home-featured-domain .home-domain-intro > p { min-height: 44px; }
+.home-featured-domain .home-reading { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.home-featured-domain .home-reading-heading { gap: 8px; }
+.home-featured-domain .home-reading-value strong { font-size: 30px; }
+.home-featured-domain .home-domain-detail-link { margin-top: auto; padding-top: 18px; }
+.home-learning-card {
+  display: grid;
+  max-width: 720px;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+}
+.home-learning-card:hover { border-color: #9fc2b4; background: #f5f8f4; }
+.home-learning-card .eyebrow { font-size: 12px; }
+.home-learning-card strong { font: 700 22px/1.4 var(--serif); }
+.home-learning-card > span:not(.eyebrow) { color: var(--muted); font-size: 14px; line-height: 1.65; }
+.home-learning-card b { margin-top: 6px; color: var(--green); font-size: 13px; }
+.home-freshness { margin-bottom: 0; }
+@media (max-width: 760px) {
+  .home-hero { padding: 42px 0 36px; }
+  .home-featured-grid { grid-template-columns: 1fr; }
+  .home-featured-domain { min-height: 0; }
+  .home-featured-domain .home-domain-intro > p { min-height: 0; }
+  .home-section { padding: 36px 0; }
+}
