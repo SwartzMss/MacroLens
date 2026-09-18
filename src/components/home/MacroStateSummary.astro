@@ -18,18 +18,20 @@ const domains = featuredDomainIds.map(id => snapshot.domains.find(domain => doma
     <a class="home-inline-link" href="/now/">查看当前宏观 →</a>
   </div>
 
-  <div class="home-featured-grid">
-    {domains.map((domain) => { const question = getMacroNowQuestionForDomain(domain.id); return <article class="home-featured-domain" data-domain={domain.id} data-state={domain.state}>
+  <div class="home-domain-grid">
+    {domains.map((domain) => { const question = getMacroNowQuestionForDomain(domain.id); return <article class="home-domain" data-domain={domain.id} data-state={domain.state}>
       <div class="home-domain-intro">
         <div class="home-domain-topline">
-          <span class="home-domain-label">{question.label}</span>
+          <h3 class="home-domain-label">{question.label}</h3>
           <span class="home-state-chip">{homeStateLabels[domain.state]}</span>
         </div>
-        <h3 class="home-featured-question"><a href={question.href}>{question.question}</a></h3>
+        <p class="home-domain-question"><a href={question.href}>{question.question}</a></p>
         <p>{`${localizeExplanation(domain.explanation).split(/[；;。]/)[0]}。`}</p>
+        <a class="home-domain-detail-link" href={question.href}>查看这组数据 →</a>
       </div>
-      <LatestReading signal={domain.evidence[0]} />
-      <a class="home-domain-detail-link" href={question.href}>查看这组数据 →</a>
+      <ul class="home-domain-readings" aria-label={`${domain.label}最新数据`}>
+        {domain.evidence.map(item => <li><LatestReading signal={item} /></li>)}
+      </ul>
     </article>; })}
   </div>
   <p class="home-freshness">数据更新时间：<time>{snapshot.freshness.latestUpdatedAt}</time> · 详细期间和口径见当前宏观。</p>

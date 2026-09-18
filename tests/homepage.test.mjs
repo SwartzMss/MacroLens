@@ -49,7 +49,11 @@ test('homepage components expose the required semantic sections and links', () =
   assert.match(source, /signal\.conceptHref/);
   assert.match(source, /featuredDomainIds/);
   assert.match(source, /getMacroNowQuestionForDomain/);
+  assert.match(source, /home-domain-grid/);
+  assert.match(source, /home-domain-question/);
   assert.doesNotMatch(source, /home-hero-entry-note/);
+  assert.doesNotMatch(source, /MacroLens · 宏观经济观察与学习/);
+  assert.doesNotMatch(source, /home-featured-grid/);
   assert.doesNotMatch(source, /RelationshipPreview/);
   assert.match(source, /home-domain-detail-link/);
   assert.match(styles, /:focus-visible/);
