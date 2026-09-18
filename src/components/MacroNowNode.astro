@@ -9,9 +9,10 @@ type Props = {
   detail?: string;
   evidence?: SnapshotEvidence;
   href?: string;
+  ariaLabel?: string;
 };
 
-const { className, caption, label, value, detail, evidence, href } = Astro.props as Props;
+const { className, caption, label, value, detail, evidence, href, ariaLabel } = Astro.props as Props;
 const classes = [className, href && 'is-link'];
 const formatEvidenceValue = (item: SnapshotEvidence) => {
   const unit = item.unit === 'index' ? '点' : item.unit;
@@ -21,7 +22,7 @@ const displayValue = evidence ? formatEvidenceValue(evidence) : value;
 const displayDetail = evidence?.valueLabel ?? detail;
 ---
 
-{href ? <a class:list={classes} href={href} aria-label={`查看${label}概念定义`}>
+{href ? <a class:list={classes} href={href} aria-label={ariaLabel ?? `查看${label}概念定义`}>
   <small>{caption}</small>
   <strong>{label}</strong>
   {displayValue && <span>{displayValue}</span>}

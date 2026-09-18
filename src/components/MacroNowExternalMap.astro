@@ -57,7 +57,7 @@ const relationLabel = (item: Relation) => relationLabels[item.type] ?? '关系';
   <div class="macro-now-external-paths">
     {paths.map(({ evidence, relation: edge, note }) => <article class="macro-now-external-path">
       <div class="macro-now-external-steps">
-        <MacroNowNode className="macro-now-external-node is-evidence" caption="当前读数" label={evidence.name} evidence={evidence} href={evidence.conceptHref} />
+        <MacroNowNode className="macro-now-external-node is-evidence" caption="当前读数" label={evidence.name} evidence={evidence} href={`#macro-now-evidence-${evidence.id}`} ariaLabel={`回到${evidence.name}当前读数`} />
         <div class="macro-now-external-edge" aria-hidden="true">
           <small>{relationLabel(edge)}</small>
           <b>→</b>

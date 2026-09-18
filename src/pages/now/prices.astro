@@ -57,7 +57,7 @@ const evidenceById = new Map(prices.evidence.map((evidence) => [evidence.id, evi
         <p>价格增速、价格水平和统计范围不同，不能把三条线直接当成同一件事。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article id={`macro-now-evidence-${evidence.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
