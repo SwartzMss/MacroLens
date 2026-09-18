@@ -5,6 +5,7 @@ import { categories, categoryIds, getCategory, type CategoryId } from '../../dat
 import { buildConceptCatalog } from '../../data/conceptCatalog';
 import { topicRegistry } from '../../data/topics';
 import '../../styles/concept-index.css';
+import '../../styles/catalog-header.css';
 
 const concepts = await getCollection('concepts');
 const catalog = buildConceptCatalog(concepts, topicRegistry);
@@ -24,15 +25,7 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
 ---
 <BaseLayout title="知识库｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
   <header class="index-head">
-    <div class="shell index-head-layout">
-      <div class="index-head-copy">
-        <h1>知识库</h1>
-      </div>
-      <form class="concept-search" action="/search/" method="get" role="search">
-        <label class="sr-only" for="concept-search-query">搜索概念</label>
-        <div class="concept-search-control"><input id="concept-search-query" name="q" type="search" placeholder="搜索概念，如 M1、M2、GDP" autocomplete="off" /><button type="submit">搜索</button></div>
-      </form>
-    </div>
+    <div class="shell"><h1>知识库</h1><p class="lead">按领域浏览宏观经济概念，进入详情查看定义、数据和统计口径。</p></div>
   </header>
   <div class="shell concept-index">
     <details class="concept-filter-panel" data-filter-panel>
@@ -52,9 +45,10 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
       <button type="button" data-filter-reset>清除筛选</button>
     </div>
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
-      <header><h2>{group.label}</h2></header>
+      <header><div><h2>{group.label}</h2><p>{group.description}</p></div></header>
       <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
-        <h3>{concept.data.name}</h3><span aria-hidden="true">↗</span>
+        <div class="index-card-tags"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
+        <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">查看定义与数据 →</b>
       </a>)}</div>
     </section>)}
   </div>
