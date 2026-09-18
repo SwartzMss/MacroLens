@@ -22,6 +22,22 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
     .map((id) => evidenceById.get(id))
     .filter((evidence): evidence is SnapshotEvidence => Boolean(evidence));
 };
+const domainHrefs: Record<MacroDomainState['id'], string> = {
+  growth: '/now/growth/',
+  prices: '/now/prices/',
+  'credit-liquidity': '/now/credit/',
+  'policy-financial-conditions': '/now/policy/',
+  labor: '/now/labor/',
+  external: '/now/external/',
+};
+const prioritizedDomainIds = [
+  ...snapshot.synthesis.conflictingDomainIds,
+  ...snapshot.synthesis.supportingDomainIds,
+  ...snapshot.synthesis.contextualDomainIds,
+];
+const prioritizedDomains = prioritizedDomainIds
+  .map((id) => snapshot.domains.find((domain) => domain.id === id))
+  .filter((domain): domain is MacroDomainState => Boolean(domain));
 ---
 
 <section class="snapshot section" aria-labelledby="snapshot-title">
@@ -45,6 +61,40 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
       <h3 id="snapshot-synthesis-title">{snapshot.synthesis.label}</h3>
     </div>
     <p>{localizeExplanation(snapshot.synthesis.explanation)}</p>
+  </section>
+
+  <section class="snapshot-reading-guide" aria-labelledby="snapshot-reading-guide-title">
+    <div class="snapshot-reading-guide-head">
+      <div class="eyebrow">当前状态的读法</div>
+      <h3 id="snapshot-reading-guide-title">先找方向，再追到证据</h3>
+      <p>总览不把六个领域压成一个分数。先看综合观察，再点开最需要解释的领域，最后回到证据边界。</p>
+    </div>
+    <ol class="snapshot-reading-guide-steps">
+      <li>
+        <span>01</span>
+        <div>
+          <strong>先看综合观察</strong>
+          <p>{snapshot.synthesis.label}，先知道哪些信号可以放在一起，哪些只能分别看。</p>
+        </div>
+      </li>
+      <li>
+        <span>02</span>
+        <div>
+          <strong>点开需要解释的领域</strong>
+          <p>优先看下面这些领域的详细读法，再回到其他领域补背景。</p>
+          <div class="snapshot-reading-guide-links">
+            {prioritizedDomains.map((domain) => <a href={domainHrefs[domain.id]}>{domain.label} · {homeStateLabels[domain.state]} →</a>)}
+          </div>
+        </div>
+      </li>
+      <li>
+        <span>03</span>
+        <div>
+          <strong>最后核对证据边界</strong>
+          <p>每个领域页都会说明当前读数还不能回答什么，以及下一期应该继续看什么。</p>
+        </div>
+      </li>
+    </ol>
   </section>
 
   <section class="snapshot-domains" aria-labelledby="snapshot-domains-title">
