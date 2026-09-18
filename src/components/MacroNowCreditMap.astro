@@ -36,7 +36,6 @@ const relationLabel = (relation: Relation) => isExplainableRelation(relation)
   : typeLabels[relation.type] ?? '关系';
 const edgeAt = (edges: Relation[], index: number) => edges[index]!;
 const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relation.lag : '';
-const nodeValue = (id: string) => evidenceById.get(id)?.valueLabel;
 const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation) => relation.target)];
 ---
 
@@ -54,7 +53,7 @@ const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation)
       <header><strong>货币指标的层级</strong><span>M0、M1、M2 不是三个相同口径的数字</span></header>
       <div class="macro-now-credit-steps">
         {nodeIds(monetaryEdges).map((id, index) => <>
-          <MacroNowNode className="macro-now-credit-node is-money" caption={index === 0 ? '现金层' : index === 1 ? '交易性货币' : '广义货币'} label={nodeLabel(id)} value={nodeValue(id)} href={evidenceById.get(id)?.conceptHref} />
+          <MacroNowNode className="macro-now-credit-node is-money" caption={index === 0 ? '现金层' : index === 1 ? '交易性货币' : '广义货币'} label={nodeLabel(id)} evidence={evidenceById.get(id)} href={evidenceById.get(id)?.conceptHref} />
           {index < monetaryEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(monetaryEdges, index))}</small><b>→</b></div>}
         </>)}
       </div>
@@ -65,7 +64,7 @@ const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation)
       <header><strong>信贷可能怎样传到活动</strong><span>需要借款需求和银行供给同时存在</span></header>
       <div class="macro-now-credit-steps">
         {nodeIds(creditEdges).map((id, index) => <>
-          <MacroNowNode className={['macro-now-credit-node', index === 0 && 'is-money', index === creditEdges.length && 'is-activity'].filter(Boolean).join(' ')} caption={index === 0 ? '当前读数' : index === 1 ? '货币结果' : '活动结果'} label={nodeLabel(id)} value={nodeValue(id)} href={evidenceById.get(id)?.conceptHref} />
+          <MacroNowNode className={['macro-now-credit-node', index === 0 && 'is-money', index === creditEdges.length && 'is-activity'].filter(Boolean).join(' ')} caption={index === 0 ? '当前读数' : index === 1 ? '货币结果' : '活动结果'} label={nodeLabel(id)} evidence={evidenceById.get(id)} href={evidenceById.get(id)?.conceptHref} />
           {index < creditEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(creditEdges, index))}</small><b>→</b><span>{lagFor(edgeAt(creditEdges, index))}</span></div>}
         </>)}
       </div>
@@ -76,7 +75,7 @@ const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation)
       <header><strong>社会融资怎样连接实体活动</strong><span>先看资金是否真的形成了融资</span></header>
       <div class="macro-now-credit-steps">
         {nodeIds(financingEdges).map((id, index) => <>
-          <MacroNowNode className={['macro-now-credit-node', index === 0 && 'is-money', index === financingEdges.length && 'is-activity'].filter(Boolean).join(' ')} caption={index === 0 ? '当前读数' : index === 1 ? '已实现的融资' : '活动结果'} label={nodeLabel(id)} value={nodeValue(id)} href={evidenceById.get(id)?.conceptHref} />
+          <MacroNowNode className={['macro-now-credit-node', index === 0 && 'is-money', index === financingEdges.length && 'is-activity'].filter(Boolean).join(' ')} caption={index === 0 ? '当前读数' : index === 1 ? '已实现的融资' : '活动结果'} label={nodeLabel(id)} evidence={evidenceById.get(id)} href={evidenceById.get(id)?.conceptHref} />
           {index < financingEdges.length && <div class="macro-now-credit-edge"><small>{relationLabel(edgeAt(financingEdges, index))}</small><b>→</b><span>{lagFor(edgeAt(financingEdges, index))}</span></div>}
         </>)}
       </div>

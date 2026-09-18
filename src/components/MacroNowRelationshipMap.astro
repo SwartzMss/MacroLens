@@ -55,7 +55,7 @@ const relationLabel = (relation: Relation) => isExplainableRelation(relation)
   <div class="macro-now-map-grid">
     {paths.map(({ evidence, first, second }) => <article class="macro-now-map-path">
       <div class="macro-now-map-steps">
-        <MacroNowNode className="macro-now-map-node is-indicator" caption="当前读数" label={evidence.name} value={evidence.valueLabel} href={evidence.conceptHref} />
+        <MacroNowNode className="macro-now-map-node is-indicator" caption="当前读数" label={evidence.name} evidence={evidence} href={evidence.conceptHref} />
         <div class="macro-now-map-edge" aria-hidden="true">
           <small>{relationLabel(first.relation)}</small>
           <b>→</b>
