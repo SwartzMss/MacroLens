@@ -104,9 +104,10 @@ npx wrangler d1 migrations apply <DATABASE_NAME> --remote
 /api/page-stats        学习文章 total / today UV 原始聚合
 /api/visitor-stats     全站 total / today visitor 原始聚合
 /api/feedback-stats    学习文章反馈原始聚合（含历史概念页记录）
+/api/module-stats      首页、学习、当前宏观、知识库、搜索的模块 UV 聚合
 ~~~
 
-`/stats` 会把全站访客、学习文章 UV 和 D1 学习文章反馈合并到同一张表中，用于发现“高访问 + 低有帮助率”的优先优化文章。同一概念在多条路线出现时只占一行。该页面不加入主导航、使用 `noindex`，并排除在 Pagefind 索引之外；但它不是鉴权边界，知道 URL 的人仍可访问聚合数据。如果以后需要真正的私有后台，应再使用 Cloudflare Access 等方式保护。
+`/stats` 会把全站访客、模块 UV、学习文章 UV 和 D1 学习文章反馈放在一起，用于先看各入口的访问分布，再发现“高访问 + 低有帮助率”的优先优化文章。同一概念在多条路线出现时只占一行。该页面隐藏公开主导航、使用 `noindex`，并排除在 Pagefind 索引之外；但它不是鉴权边界，知道 URL 的人仍可访问聚合数据。如果以后需要真正的私有后台，应再使用 Cloudflare Access 等方式保护。
 
 页面反馈原始记录保存在 D1 的 `page_feedback` 表中。需要排查单条记录时，可直接查询生产数据库：
 
