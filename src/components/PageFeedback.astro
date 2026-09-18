@@ -1,32 +1,49 @@
 ---
-const { pageId } = Astro.props as { pageId: string };
+type FeedbackMode = 'course' | 'exploration';
+type FeedbackReason = 'too_complex' | 'sequence_jump' | 'missing_example' | 'missing_step' | 'questionable';
+
+const { pageId, mode } = Astro.props as { pageId: string; mode: FeedbackMode };
+const copy = mode === 'course'
+  ? {
+      title: '读完这一章，你能解释开头的问题了吗？',
+      helpful: '能解释清楚',
+      needsImprovement: '还没讲清楚',
+    }
+  : {
+      title: '这篇案例有没有帮你拆开这个问题？',
+      helpful: '能拆开了',
+      needsImprovement: '还没拆开',
+    };
+const reasons: { value: FeedbackReason; label: string }[] = [
+  { value: 'too_complex', label: '概念太难' },
+  { value: 'sequence_jump', label: '前后顺序跳跃' },
+  { value: 'missing_example', label: '缺少实际例子' },
+  { value: 'missing_step', label: '少了关键的一步' },
+  { value: 'questionable', label: '数据或解释有疑问' },
+];
 ---
 
 <section class="page-feedback" data-page-feedback data-pagefind-ignore data-page-id={pageId} aria-labelledby={`${pageId}-feedback-title`}>
-  <h2 id={`${pageId}-feedback-title`}>这篇解释对你有帮助吗？</h2>
+  <h2 id={`${pageId}-feedback-title`}>{copy.title}</h2>
   <div class="feedback-votes" role="group" aria-label="页面反馈">
-    <button type="button" data-feedback-vote="helpful" aria-pressed="false">👍 有帮助</button>
-    <button type="button" data-feedback-vote="needs-improvement" aria-pressed="false">👎 需要改进</button>
+    <button type="button" data-feedback-vote="helpful" aria-pressed="false">👍 {copy.helpful}</button>
+    <button type="button" data-feedback-vote="needs-improvement" aria-pressed="false">👎 {copy.needsImprovement}</button>
   </div>
   <p class="feedback-status" data-feedback-status role="status" aria-live="polite"></p>
   <fieldset class="feedback-reasons" data-feedback-reasons hidden>
-    <legend>哪里需要改进？（可选）</legend>
-    <label><input type="radio" name={`feedback-reason-${pageId}`} value="too_complex" data-feedback-reason> 概念太难理解</label>
-    <label><input type="radio" name={`feedback-reason-${pageId}`} value="missing_example" data-feedback-reason> 缺少实际例子</label>
-    <label><input type="radio" name={`feedback-reason-${pageId}`} value="unclear_chart" data-feedback-reason> 图表不够清楚</label>
-    <label><input type="radio" name={`feedback-reason-${pageId}`} value="incomplete" data-feedback-reason> 内容不够完整</label>
-    <label><input type="radio" name={`feedback-reason-${pageId}`} value="questionable" data-feedback-reason> 数据或解释有疑问</label>
+    <legend>哪里还卡住？（可选）</legend>
+    {reasons.map(reason => <label><input type="radio" name={`feedback-reason-${pageId}`} value={reason.value} data-feedback-reason> {reason.label}</label>)}
   </fieldset>
 </section>
 
 <script>
   type Vote = 'helpful' | 'needs-improvement';
-  type Reason = 'too_complex' | 'missing_example' | 'unclear_chart' | 'incomplete' | 'questionable';
+  type Reason = 'too_complex' | 'sequence_jump' | 'missing_example' | 'missing_step' | 'questionable';
   type FeedbackResponse = { ok: boolean; vote?: Vote | null; reason?: Reason | null };
 
   const isVote = (value: unknown): value is Vote => value === 'helpful' || value === 'needs-improvement';
   const isReason = (value: unknown): value is Reason => [
-    'too_complex', 'missing_example', 'unclear_chart', 'incomplete', 'questionable',
+    'too_complex', 'sequence_jump', 'missing_example', 'missing_step', 'questionable',
   ].includes(value as string);
 
   document.querySelectorAll<HTMLElement>('[data-page-feedback]').forEach((root) => {
@@ -101,7 +118,7 @@ const { pageId } = Astro.props as { pageId: string };
         setVote(result.vote);
         if (isReason(result.reason)) setReason(result.reason);
       } catch {
-        // Feedback is optional; keep the concept page usable when the API is unavailable.
+        // Feedback is optional; keep the learning page usable when the API is unavailable.
       }
     })();
   });

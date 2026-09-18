@@ -39,7 +39,7 @@ const sections = headings.filter(item => item.depth === 2);
           <p class="course-note">这是独立的问题探索，不计入入门主线的阅读进度。</p>
           <a href="/learn/">返回学习入口，选择入门主线或其他问题 →</a>
         </section>
-        <PageFeedback pageId={`learn:exploration-${exploration.id}`} />
+        <PageFeedback pageId={`learn:exploration-${exploration.id}`} mode="exploration" />
       </article>
       <nav class="course-toc" aria-label="文章目录">
         <strong>这篇文章聊什么</strong>

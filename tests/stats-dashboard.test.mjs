@@ -16,28 +16,31 @@ const database = (results) => ({
   },
 });
 
-test('feedback aggregate query exposes only per-page counts', () => {
+test('feedback aggregate query exposes per-page counts and reason totals', () => {
   const sql = feedbackStatsQuery();
   assert.match(sql, /GROUP\s+BY\s+page_id/i);
   assert.match(sql, /COUNT\s*\(\*\)/i);
   assert.match(sql, /vote\s*=\s*1/i);
   assert.match(sql, /vote\s*=\s*-1/i);
+  assert.match(sql, /reason_too_complex/i);
+  assert.match(sql, /reason_sequence_jump/i);
   assert.doesNotMatch(sql, /visitor_id/i);
 });
 
 test('parses aggregate feedback and computes helpful rate', () => {
   assert.deepEqual(parseFeedbackStats({ results: [
-    { page_id: 'learn:gdp', feedback_count: '20', helpful: '15', needs_improvement: '5' },
-    { page_id: 'learn:m1', feedback_count: 3, helpful: 3, needs_improvement: 0 },
+    { page_id: 'learn:gdp', feedback_count: '20', helpful: '15', needs_improvement: '5', reason_too_complex: 2, reason_sequence_jump: 1, reason_missing_example: 1, reason_missing_step: 1, reason_questionable: 0, reason_unclear_chart: 0, reason_incomplete: 0 },
+    { page_id: 'learn:m1', feedback_count: 3, helpful: 3, needs_improvement: 0, reason_too_complex: 0, reason_sequence_jump: 0, reason_missing_example: 0, reason_missing_step: 0, reason_questionable: 0, reason_unclear_chart: 0, reason_incomplete: 0 },
   ] }), [
-    { pageId: 'learn:gdp', feedbackCount: 20, helpful: 15, needsImprovement: 5, helpfulRate: 75 },
-    { pageId: 'learn:m1', feedbackCount: 3, helpful: 3, needsImprovement: 0, helpfulRate: 100 },
+    { pageId: 'learn:gdp', feedbackCount: 20, helpful: 15, needsImprovement: 5, helpfulRate: 75, reasons: { too_complex: 2, sequence_jump: 1, missing_example: 1, missing_step: 1, questionable: 0, unclear_chart: 0, incomplete: 0 } },
+    { pageId: 'learn:m1', feedbackCount: 3, helpful: 3, needsImprovement: 0, helpfulRate: 100, reasons: { too_complex: 0, sequence_jump: 0, missing_example: 0, missing_step: 0, questionable: 0, unclear_chart: 0, incomplete: 0 } },
   ]);
 });
 
 test('rejects malformed aggregate rows', () => {
   assert.equal(parseFeedbackStats({ results: [{ page_id: 'learn:../bad', feedback_count: 1, helpful: 1, needs_improvement: 0 }] }), null);
   assert.equal(parseFeedbackStats({ results: [{ page_id: 'learn:gdp', feedback_count: 2, helpful: 2, needs_improvement: 1 }] }), null);
+  assert.equal(parseFeedbackStats({ results: [{ page_id: 'learn:gdp', feedback_count: 2, helpful: 1, needs_improvement: 1, reason_too_complex: 2, reason_sequence_jump: 0, reason_missing_example: 0, reason_missing_step: 0, reason_questionable: 0, reason_unclear_chart: 0, reason_incomplete: 0 }] }), null);
   assert.equal(parseFeedbackStats({ results: null }), null);
 });
 
@@ -45,13 +48,13 @@ test('feedback stats endpoint returns aggregate data without visitor IDs', async
   const response = await onFeedbackStatsRequest({
     request: request(),
     env: { FEEDBACK_DB: database([
-      { page_id: 'learn:gdp', feedback_count: 4, helpful: 3, needs_improvement: 1 },
+      { page_id: 'learn:gdp', feedback_count: 4, helpful: 3, needs_improvement: 1, reason_too_complex: 1, reason_sequence_jump: 0, reason_missing_example: 0, reason_missing_step: 0, reason_questionable: 0, reason_unclear_chart: 0, reason_incomplete: 0 },
     ]) },
   });
   const body = await response.json();
   assert.deepEqual(body, {
     available: true,
-    pages: [{ pageId: 'learn:gdp', feedbackCount: 4, helpful: 3, needsImprovement: 1, helpfulRate: 75 }],
+    pages: [{ pageId: 'learn:gdp', feedbackCount: 4, helpful: 3, needsImprovement: 1, helpfulRate: 75, reasons: { too_complex: 1, sequence_jump: 0, missing_example: 0, missing_step: 0, questionable: 0, unclear_chart: 0, incomplete: 0 } }],
   });
   assert.equal(response.headers.get('cache-control'), 'public, max-age=60, s-maxage=300');
   assert.doesNotMatch(JSON.stringify(body), /visitor/i);
@@ -93,6 +96,8 @@ test('stats page is noindex, Pagefind-ignored, and uses all three aggregate APIs
   assert.match(page, /feedbackCount\s*<\s*5/);
   assert.match(page, /helpfulRate\s*<\s*70/);
   assert.match(page, /helpfulRate\s*>=\s*85/);
+  assert.match(page, /反馈原因/);
+  assert.match(page, /data-stats-reason/);
   assert.match(layout, /name="robots"\s+content="noindex,nofollow"/);
 });
 

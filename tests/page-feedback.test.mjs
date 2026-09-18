@@ -185,21 +185,25 @@ test('renders feedback on independent courses, not concept pages', () => {
   const api = readFileSync(apiSource, 'utf8');
   const sql = readFileSync(migration, 'utf8');
 
-  assert.match(component, /这篇解释对你有帮助吗/);
+  assert.match(component, /读完这一章，你能解释开头的问题了吗/);
+  assert.match(component, /这篇案例有没有帮你拆开这个问题/);
   assert.match(component, /data-pagefind-ignore/);
   assert.match(component, /data-feedback-vote="helpful"/);
   assert.match(component, /aria-pressed/);
   assert.match(component, /credentials:\s*['"]same-origin['"]/);
-  for (const reason of ['too_complex', 'missing_example', 'unclear_chart', 'incomplete', 'questionable']) {
+  for (const reason of ['too_complex', 'sequence_jump', 'missing_example', 'missing_step', 'questionable']) {
     assert.match(component, new RegExp(reason));
     assert.match(api, new RegExp(reason));
   }
+  assert.doesNotMatch(component, /unclear_chart|incomplete|图表不够清楚/);
   assert.doesNotMatch(component, /textarea|contenteditable|自由文本/);
   assert.doesNotMatch(page, /PageFeedback/);
   const course = readFileSync(`${root}src/pages/learn/course/[lessonId].astro`, 'utf8');
-  assert.match(course, /PageFeedback pageId=\{`learn:course-/);
+  assert.match(course, /PageFeedback pageId=\{`learn:course-[^`]+`\} mode="course"/);
   const exploration = readFileSync(`${root}src/pages/learn/explore/[explorationId].astro`, 'utf8');
-  assert.match(exploration, /PageFeedback pageId=\{`learn:exploration-/);
+  assert.match(exploration, /PageFeedback pageId=\{`learn:exploration-[^`]+`\} mode="exploration"/);
+  assert.ok(course.indexOf('class="course-actions"') < course.indexOf('<PageFeedback'));
+  assert.ok(exploration.indexOf('class="course-actions"') < exploration.indexOf('<PageFeedback'));
   assert.match(api, /parseVisitorCookie/);
   assert.match(api, /FEEDBACK_DB/);
   assert.match(sql, /PRIMARY KEY\s*\(page_id, visitor_id\)/i);

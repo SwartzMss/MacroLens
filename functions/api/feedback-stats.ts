@@ -1,9 +1,11 @@
+import type { FeedbackReason } from './feedback.ts';
+
 type FeedbackAggregateRow = {
   page_id?: unknown;
   feedback_count?: unknown;
   helpful?: unknown;
   needs_improvement?: unknown;
-};
+} & Partial<Record<`reason_${FeedbackReason}`, unknown>>;
 
 type FeedbackAggregateStatement = {
   all<T>(): Promise<{ results?: T[] }>;
@@ -24,9 +26,19 @@ export type FeedbackPageStat = {
   helpful: number;
   needsImprovement: number;
   helpfulRate: number;
+  reasons: Record<FeedbackReason, number>;
 };
 
 const pageIdPattern = /^(?:learn:)?[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const feedbackReasonValues: FeedbackReason[] = [
+  'too_complex',
+  'sequence_jump',
+  'missing_example',
+  'missing_step',
+  'questionable',
+  'unclear_chart',
+  'incomplete',
+];
 const responseHeaders = { 'Cache-Control': 'public, max-age=60, s-maxage=300' };
 const unavailable = () => Response.json(
   { available: false },
@@ -34,12 +46,16 @@ const unavailable = () => Response.json(
 );
 
 export function feedbackStatsQuery(): string {
+  const reasonColumns = feedbackReasonValues
+    .map(reason => `SUM(CASE WHEN reason = '${reason}' THEN 1 ELSE 0 END) AS reason_${reason}`)
+    .join(',\n      ');
   return `
     SELECT
       page_id,
       COUNT(*) AS feedback_count,
       SUM(CASE WHEN vote = 1 THEN 1 ELSE 0 END) AS helpful,
-      SUM(CASE WHEN vote = -1 THEN 1 ELSE 0 END) AS needs_improvement
+      SUM(CASE WHEN vote = -1 THEN 1 ELSE 0 END) AS needs_improvement,
+      ${reasonColumns}
     FROM page_feedback
     GROUP BY page_id
     ORDER BY feedback_count DESC, page_id ASC
@@ -74,6 +90,16 @@ export function parseFeedbackStats(payload: unknown): FeedbackPageStat[] | null 
       || seen.has(pageId)
     ) return null;
 
+    const reasons = {} as Record<FeedbackReason, number>;
+    let reasonTotal = 0;
+    for (const reason of feedbackReasonValues) {
+      const count = parseCount(row[`reason_${reason}`]);
+      if (count === null) return null;
+      reasons[reason] = count;
+      reasonTotal += count;
+    }
+    if (reasonTotal > needsImprovement) return null;
+
     seen.add(pageId);
     pages.push({
       pageId,
@@ -81,6 +107,7 @@ export function parseFeedbackStats(payload: unknown): FeedbackPageStat[] | null 
       helpful,
       needsImprovement,
       helpfulRate: feedbackCount === 0 ? 0 : Math.round((helpful / feedbackCount) * 1000) / 10,
+      reasons,
     });
   }
   return pages;
