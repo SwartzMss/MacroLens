@@ -38,10 +38,10 @@ const readingText = (evidence: SnapshotEvidence) => evidence.id === 'pmi'
   description="从生产、消费、投资和 PMI 的最新数据，理解当前经济活动的变化、比较方法和证据边界。"
 >
   <main class="macro-now-question shell">
-    <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <a class="macro-now-back" href="/now/">← 回到当前宏观</a>
     <MacroNowQuestionNav current="growth" />
     <header class="macro-now-question-head">
-      <div class="eyebrow">Macro Now · 当前状态</div>
+      <div class="eyebrow">Macro Now · 当前宏观</div>
       <h1>经济活动在变快还是变慢？</h1>
       <p class="macro-now-lead">先看生产、消费、投资和调查指数各自的变化，再判断它们是否指向同一个方向。</p>
       <p class="macro-now-meta">数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</p>

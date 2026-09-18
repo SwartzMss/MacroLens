@@ -6,8 +6,8 @@ const { title = 'MacroLens｜用一个镜头理解宏观经济', description = '
 const canonicalUrl = Astro.site ? new URL(canonicalPath, Astro.site) : undefined;
 const navItems = [
   { href: '/learn', label: '学习' },
-  { href: '/now', label: '当前状态', aliases: ['/snapshot'] },
-  { href: '/concepts', label: '概念查询' },
+  { href: '/now', label: '当前宏观', aliases: ['/snapshot'] },
+  { href: '/concepts', label: '知识库' },
 ];
 const pathname = Astro.url.pathname;
 const isCurrent = (item: (typeof navItems)[number]) => [item.href, ...(item.aliases ?? [])].some((href) => {

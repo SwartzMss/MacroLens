@@ -22,11 +22,11 @@ const categoryGroups = [...grouped.entries()]
 const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id] }));
 const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
-<BaseLayout title="概念索引｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
+<BaseLayout title="知识库｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
   <header class="index-head">
     <div class="shell index-head-layout">
       <div class="index-head-copy">
-        <h1>概念查询</h1>
+        <h1>知识库</h1>
       </div>
       <form class="concept-search" action="/search/" method="get" role="search">
         <label class="sr-only" for="concept-search-query">搜索概念</label>

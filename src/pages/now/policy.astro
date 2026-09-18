@@ -34,10 +34,10 @@ const evidenceById = new Map(policy.evidence.map((evidence) => [evidence.id, evi
   description="从政策利率和 LPR 的最新读数，理解政策动作、报价、融资条件和实际借款感受之间的时间差与证据边界。"
 >
   <main class="macro-now-question shell">
-    <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <a class="macro-now-back" href="/now/">← 回到当前宏观</a>
     <MacroNowQuestionNav current="policy" />
     <header class="macro-now-question-head">
-      <div class="eyebrow">Macro Now · 当前状态</div>
+      <div class="eyebrow">Macro Now · 当前宏观</div>
       <h1>政策在放松，融资真的更容易了吗？</h1>
       <p class="macro-now-lead">先看政策利率和 LPR 发生了什么，再核对报价、合同和借款需求有没有真的跟上。</p>
       <p class="macro-now-meta">数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</p>

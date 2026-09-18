@@ -446,9 +446,9 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /quarterly: '季度'/);
   assert.match(component, /event: '事件观察'/);
   assert.match(component, /frequencyLabels\[evidence\.frequency\]/);
-  assert.match(component, /Macro Now · 当前状态/);
+  assert.match(component, /Macro Now · 当前宏观/);
   assert.match(component, /各方面的变化和依据/);
-  assert.match(component, /当前状态的读法/);
+  assert.match(component, /当前宏观的读法/);
   assert.match(component, /先找方向，再追到证据/);
   assert.match(component, /snapshot-reading-guide/);
   assert.match(component, /getMacroNowQuestionForDomain/);
@@ -459,7 +459,7 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(page, /MacroSnapshot/);
   assert.match(page, /buildMacroSnapshot/);
   assert.match(page, /canonicalPath="\/now\/"/);
-  assert.match(now, /title="Macro Now｜当前宏观状态｜MacroLens"/);
+  assert.match(now, /title="当前宏观｜MacroLens"/);
   assert.match(now, /canonicalPath="\/now\/"/);
   assert.match(now, /MacroSnapshot/);
   assert.match(growth, /经济活动在变快还是变慢/);
