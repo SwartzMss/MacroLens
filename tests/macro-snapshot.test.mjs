@@ -32,6 +32,8 @@ const policyPage = fileURLToPath(new URL('../src/pages/now/policy.astro', import
 const policyMap = fileURLToPath(new URL('../src/components/MacroNowPolicyMap.astro', import.meta.url));
 const externalPage = fileURLToPath(new URL('../src/pages/now/external.astro', import.meta.url));
 const externalMap = fileURLToPath(new URL('../src/components/MacroNowExternalMap.astro', import.meta.url));
+const laborPage = fileURLToPath(new URL('../src/pages/now/labor.astro', import.meta.url));
+const laborMap = fileURLToPath(new URL('../src/components/MacroNowLaborMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -459,6 +461,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(readFileSync(policyPage, 'utf8'), /政策在放松，融资真的更容易了吗/);
   assert.match(component, /href="\/now\/external\/"/);
   assert.match(readFileSync(externalPage, 'utf8'), /出口在增长，外贸真的更强了吗/);
+  assert.match(component, /href="\/now\/labor\/"/);
+  assert.match(readFileSync(laborPage, 'utf8'), /失业率下降了，就业真的变好了吗/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
@@ -541,6 +545,20 @@ test('Macro Now external page separates trade amounts from demand and activity',
   assert.match(map, /exports.*economic-activity/);
   assert.match(map, /imports.*domestic-demand-and-input-demand/);
   assert.match(map, /不把出口或进口增长直接当成需求或增长的证明/);
+});
+
+test('Macro Now labor page keeps unemployment scope separate from income outcomes', () => {
+  const page = readFileSync(laborPage, 'utf8');
+  const map = readFileSync(laborMap, 'utf8');
+
+  assert.match(page, /MacroNowLaborMap/);
+  assert.match(page, /它是一个比率，不是人数/);
+  assert.match(page, /收入和消费还要再看/);
+  assert.match(page, /是就业增加，还是有人退出/);
+  assert.match(map, /unemployment-rate.*labor-market-conditions/);
+  assert.match(map, /labor-market-conditions.*household-income-conditions/);
+  assert.match(map, /labor-market-conditions.*economic-activity/);
+  assert.match(map, /不把失业率变化当成所有人的就业结果/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
