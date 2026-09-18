@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { publishedLearningPaths } from '../../src/data/learningPaths.ts';
 import { courseOutline, courseLessonHref } from '../../src/data/courseOutline.ts';
+import { explorations, explorationHref } from '../../src/data/explorations.ts';
 const dist = new URL('../../dist/', import.meta.url);
 const read = path => readFileSync(new URL(path, dist), 'utf8');
 const index = read('learn/index.html');
@@ -10,6 +11,26 @@ if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正�
 else assert.doesNotMatch(index, /正在编写/);
 assert.doesNotMatch(index, /data-learning-card|graph\?node/);
 assert.ok(index.includes(`目前已开放 ${courseOutline.filter(chapter => chapter.published).length} 章`));
+for (const exploration of explorations) {
+  const route = `learn/explore/${exploration.id}/index.html`;
+  if (!exploration.published) {
+    assert.equal(existsSync(new URL(route, dist)), false);
+    assert.ok(!index.includes(`href="${explorationHref(exploration.id)}"`));
+    continue;
+  }
+  assert.ok(index.includes(`href="${explorationHref(exploration.id)}"`));
+  assert.ok(index.includes(exploration.title));
+  const html = read(route);
+  assert.match(html, /data-pagefind-body/);
+  assert.match(html, /data-exploration=/);
+  assert.doesNotMatch(html, /noindex|concept-long-form|data-course-complete|data-course-lesson/);
+  assert.match(html, /假设故事/);
+  assert.match(html, /正文参考来源/);
+  assert.ok(html.includes(`data-page-id="learn:exploration-${exploration.id}"`));
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length);
+  for (const match of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(decodeURIComponent(match[1])), `Missing anchor: ${match[1]}`);
+}
 for (const chapter of courseOutline) {
   const route = `learn/course/${chapter.id}/index.html`;
   if (!chapter.published) {
@@ -49,6 +70,10 @@ if (process.env.PUBLIC_SITE_URL) {
   for (const chapter of courseOutline.filter(chapter => chapter.published)) {
     assert.ok(sitemap.includes(courseLessonHref(chapter.id)));
     assert.ok(read(`learn/course/${chapter.id}/index.html`).includes(`rel="canonical" href="${new URL(courseLessonHref(chapter.id), process.env.PUBLIC_SITE_URL)}"`));
+  }
+  for (const exploration of explorations.filter(item => item.published)) {
+    assert.ok(sitemap.includes(explorationHref(exploration.id)));
+    assert.ok(read(`learn/explore/${exploration.id}/index.html`).includes(`rel="canonical" href="${new URL(explorationHref(exploration.id), process.env.PUBLIC_SITE_URL)}"`));
   }
   for (const path of publishedLearningPaths) assert.ok(!sitemap.includes(`/learn/${path.id}/`));
 }

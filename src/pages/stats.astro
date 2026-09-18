@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { courseOutline, courseLessonHref } from '../data/courseOutline';
+import { explorations, explorationHref } from '../data/explorations';
 import { learningArticles } from '../data/learningArticles';
 import '../styles/stats.css';
 
@@ -15,6 +16,9 @@ const legacyArticles = learningArticles
 const articles = [
   ...courseOutline.filter(chapter => chapter.published).map(chapter => ({
     pageId: `learn:course-${chapter.id}`, title: chapter.title, label: '独立课程', paths: [courseLessonHref(chapter.id).replace(/\/$/, '')],
+  })),
+  ...explorations.filter(exploration => exploration.published).map(exploration => ({
+    pageId: `learn:exploration-${exploration.id}`, title: exploration.title, label: '问题探索', paths: [explorationHref(exploration.id).replace(/\/$/, '')],
   })),
   ...legacyArticles.map(article => ({ pageId: article.pageId, title: article.concept!.data.name, label: '旧版导读 · 历史记录', paths: article.paths })),
 ];

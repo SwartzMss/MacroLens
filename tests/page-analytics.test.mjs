@@ -15,6 +15,7 @@ test('normalizes pathname identity without query, fragment, duplicate, or traili
   assert.equal(normalizeConceptPath('/topics/money'), null);
   assert.equal(normalizeConceptPath('/concepts/'), null);
   assert.equal(learningArticleIdForPath('/learn/macro-foundations/gdp/'), 'learn:gdp');
+  assert.equal(learningArticleIdForPath('/learn/explore/why-rate-cuts-dont-boost-loans/'), 'learn:exploration-why-rate-cuts-dont-boost-loans');
   assert.equal(learningArticleIdForPath('/learn/money-credit/m2/?from=route'), 'learn:m2');
   assert.equal(learningArticleIdForPath('/learn/money-credit/recap/'), null);
 });
