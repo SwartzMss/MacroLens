@@ -26,6 +26,8 @@ const growthPage = fileURLToPath(new URL('../src/pages/now/growth.astro', import
 const macroNowMap = fileURLToPath(new URL('../src/components/MacroNowRelationshipMap.astro', import.meta.url));
 const pricesPage = fileURLToPath(new URL('../src/pages/now/prices.astro', import.meta.url));
 const priceMap = fileURLToPath(new URL('../src/components/MacroNowPriceMap.astro', import.meta.url));
+const creditPage = fileURLToPath(new URL('../src/pages/now/credit.astro', import.meta.url));
+const creditMap = fileURLToPath(new URL('../src/components/MacroNowCreditMap.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -447,6 +449,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(growth, /\/concepts\/employment/);
   assert.match(component, /href="\/now\/prices\/"/);
   assert.match(readFileSync(pricesPage, 'utf8'), /价格现在是在上升、放缓，还是分化/);
+  assert.match(component, /href="\/now\/credit\/"/);
+  assert.match(readFileSync(creditPage, 'utf8'), /钱在变多，融资就一定更容易吗/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
@@ -488,6 +492,19 @@ test('Macro Now price page keeps production and consumer price paths conditional
   assert.match(map, /downstream-price-pressure/);
   assert.match(map, /consumer-price-pressure/);
   assert.match(map, /不能把 PPI 的变化直接当成 CPI 的结果/);
+});
+
+test('Macro Now credit page separates money layers from financing paths', () => {
+  const page = readFileSync(creditPage, 'utf8');
+  const map = readFileSync(creditMap, 'utf8');
+
+  assert.match(page, /MacroNowCreditMap/);
+  assert.match(page, /余额增长不等于新增需求/);
+  assert.match(page, /资金有没有进入真实活动/);
+  assert.match(map, /m0.*m1/);
+  assert.match(map, /credit.*m2/);
+  assert.match(map, /social-financing.*real-economy-financing/);
+  assert.match(map, /不把货币或融资增长直接当成经济改善/);
 });
 
 test('domain classifications do not depend on presentation labels', () => {
