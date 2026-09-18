@@ -6,6 +6,13 @@ export const explorations = [
     minutes: 10,
     published: true,
   },
+  {
+    id: 'why-orders-dont-immediately-create-jobs',
+    title: '为什么订单多了，企业却没有马上招人？',
+    summary: '订单是一个信号，但企业还要确认收入什么时候到账、现有员工能不能先完成、招人是否值得，以及这次需求会不会很快消失。',
+    minutes: 10,
+    published: true,
+  },
 ] as const;
 
 export const explorationHref = (id: string) => `/learn/explore/${id}/`;
