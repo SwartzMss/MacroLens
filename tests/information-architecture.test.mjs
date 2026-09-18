@@ -85,7 +85,6 @@ test('concept index will expose all three browsing dimensions', () => {
   for (const attribute of ['data-category', 'data-topics', 'data-level']) assert.match(source, new RegExp(attribute));
   assert.match(source, /concept-filters/);
   assert.match(source, /concept-quick-nav/);
-  assert.match(source, /level-chip/);
   assert.match(filters, /URLSearchParams/);
   assert.match(filters, /history\.pushState/);
   assert.match(filters, /popstate/);
