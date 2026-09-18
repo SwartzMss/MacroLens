@@ -6,7 +6,8 @@ const dist = new URL('../../dist/', import.meta.url);
 const read = path => readFileSync(new URL(path, dist), 'utf8');
 const index = read('learn/index.html');
 assert.match(index, /问题探索/);
-assert.match(index, /正在编写/);
+if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正在编写/);
+else assert.doesNotMatch(index, /正在编写/);
 assert.doesNotMatch(index, /data-learning-card|graph\?node/);
 assert.ok(index.includes(`目前已开放 ${courseOutline.filter(chapter => chapter.published).length} 章`));
 for (const chapter of courseOutline) {
@@ -20,7 +21,7 @@ for (const chapter of courseOutline) {
   const html = read(route);
   assert.match(html, /data-pagefind-body/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
-  assert.match(html, /假设(?:故事|贷款)/);
+  assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
   assert.match(html, /data-course-complete/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));

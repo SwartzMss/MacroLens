@@ -8,7 +8,7 @@ test('new course never treats legacy reading as completion', () => {
 });
 test('damaged, future and unpublished progress cannot mark courses complete', () => {
   for (const raw of [null, 'broken', 'null', '{}', '{"version":2,"completed":[]}']) assert.deepEqual(parseCourseProgress(raw).completed, []);
-  assert.deepEqual(parseCourseProgress(JSON.stringify({ version: 1, completed: ['connected-economy', 'connected-economy', 'reading-news', 5, '__proto__'], lastVisited: 'reading-news' })), { version: 1, completed: ['connected-economy'], lastVisited: null });
+  assert.deepEqual(parseCourseProgress(JSON.stringify({ version: 1, completed: ['connected-economy', 'connected-economy', 'future-chapter', 5, '__proto__'], lastVisited: 'future-chapter' })), { version: 1, completed: ['connected-economy'], lastVisited: null });
 });
 
 test('new course analytics IDs cannot merge with legacy article feedback', async () => {
@@ -23,7 +23,7 @@ test('completion is explicit and reversible, including when persistence is unava
   assert.deepEqual(initial.completed, []);
   assert.deepEqual(done.completed, ['connected-economy']);
   assert.deepEqual(toggleCourseCompletion(done, 'connected-economy').completed, []);
-  assert.equal(toggleCourseCompletion(initial, 'reading-news'), initial);
+  assert.equal(toggleCourseCompletion(initial, 'future-chapter'), initial);
   assert.equal(saveCourseProgress({ setItem() { throw new Error('disabled'); } }, done), false);
   let saved;
   assert.equal(saveCourseProgress({ setItem(key, raw) { assert.equal(key, courseStorageKey); saved = raw; } }, done), true);
@@ -48,5 +48,5 @@ test('resume handles fresh, out-of-order and cleared progress without entering u
   const jumped = { version: 1, completed: [], lastVisited: 'money' };
   assert.deepEqual(courseResumeTarget(jumped), { id: 'money', label: '继续阅读 →' });
   assert.deepEqual(courseResumeTarget(toggleCourseCompletion(jumped, 'money')), { id: 'connected-economy', label: '继续学习 →' });
-  assert.equal(courseResumeTarget(parseCourseProgress('{"version":1,"completed":[],"lastVisited":"reading-news"}')).id, 'connected-economy');
+  assert.equal(courseResumeTarget(parseCourseProgress('{"version":1,"completed":[],"lastVisited":"future-chapter"}')).id, 'connected-economy');
 });
