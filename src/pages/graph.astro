@@ -2,21 +2,34 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import RelationshipExplorer from '../components/RelationshipExplorer.astro';
+import TransmissionPaths from '../components/TransmissionPaths.astro';
 import { getRelationData } from '../data/graphRegistry';
+import { getTransmissionPaths } from '../data/transmissionPaths';
 import '../styles/explorer.css';
 
 const concepts = await getCollection('concepts');
 const { nodes } = getRelationData('macro');
+const paths = getTransmissionPaths();
 ---
 
-<BaseLayout title="关系浏览器｜MacroLens" description="按节点浏览宏观指标、政策工具与经济活动之间的关系类型；解释性关系还提供时间关系、适用条件、局限和证据。">
+<BaseLayout title="宏观关系路径｜MacroLens" description="从常见宏观问题出发，按传导路径理解指标、政策工具与经济活动之间的关系；也可展开节点浏览。">
   <div class="shell graph-page">
     <header class="graph-page-head">
       <div class="eyebrow">宏观关系</div>
-      <h1>按节点浏览关系</h1>
-      <p class="lead">选择一个节点，看看它受什么影响、影响什么，以及与什么相关。</p>
+      <h1>按问题理解宏观关系</h1>
+      <p class="lead">先从一个常见问题出发，看一条关系路径经过哪些环节，再按需要打开节点详情。</p>
       <details class="graph-disclaimer"><summary>经验关系不代表确定因果 · 阅读边界</summary><p>关系由 MacroLens 手工维护，不做实时预测，也不提供投资建议。解释性关系卡片可查看时间关系、适用条件、局限和证据来源；其他关系保留为轻量连接提示。</p></details>
     </header>
-    <RelationshipExplorer nodes={nodes} concepts={concepts} initialNodeId="m2" />
+    <TransmissionPaths paths={paths} nodes={nodes} concepts={concepts} />
+    <details class="graph-explorer-details" data-graph-explorer>
+      <summary>按节点查找（进阶）</summary>
+      <p>如果你已经知道某个指标或机制，再从这里查看它的上游、下游和相关关系。</p>
+      <RelationshipExplorer nodes={nodes} concepts={concepts} initialNodeId="m2" />
+    </details>
   </div>
 </BaseLayout>
+
+<script>
+  const details = document.querySelector<HTMLElement>('[data-graph-explorer]');
+  if (details && new URLSearchParams(window.location.search).has('node')) details.setAttribute('open', '');
+</script>
