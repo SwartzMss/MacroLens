@@ -12,6 +12,7 @@ import { getMacroNowQuestionForDomain } from '../data/macroNow';
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 
 const formatValue = (value: number, unit: string) => `${value.toFixed(1)}${unit === '%' ? '%' : ` ${unit}`}`;
+const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件观察' };
 const formatChange = (change: number | null, changeUnit: string) => {
   if (change === null) return '—';
   const suffix = changeUnit === 'percentage-points' ? ' 个百分点' : changeUnit === 'points' ? ' 点' : '';
@@ -120,7 +121,7 @@ const prioritizedDomains = prioritizedDomainIds
             <div class="snapshot-evidence-change">{evidence.changeLabel} {formatChange(evidence.change, evidence.changeUnit)}</div>
             <dl class="snapshot-evidence-meta">
               <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
-              <div><dt>频率</dt><dd>{evidence.isEvent ? '事件观察' : evidence.frequency}</dd></div>
+              <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>
               <div><dt>更新</dt><dd>{evidence.updatedAt}</dd></div>
               {evidence.verifiedThrough ? <div><dt>核验至</dt><dd>{evidence.verifiedThrough}</dd></div> : null}
             </dl>

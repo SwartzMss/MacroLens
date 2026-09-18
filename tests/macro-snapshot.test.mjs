@@ -442,6 +442,10 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /domain\.evidence/);
   assert.match(component, /observationPeriod/);
   assert.match(component, /updatedAt/);
+  assert.match(component, /monthly: '月度'/);
+  assert.match(component, /quarterly: '季度'/);
+  assert.match(component, /event: '事件观察'/);
+  assert.match(component, /frequencyLabels\[evidence\.frequency\]/);
   assert.match(component, /Macro Now · 当前状态/);
   assert.match(component, /各方面的变化和依据/);
   assert.match(component, /当前状态的读法/);
