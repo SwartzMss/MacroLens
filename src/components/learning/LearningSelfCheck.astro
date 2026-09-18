@@ -1,0 +1,28 @@
+<section class="learning-self-check" data-learning-self-check aria-labelledby="learning-self-check-title">
+  <p class="learning-self-check-kicker">读完后，停一下</p>
+  <h2 id="learning-self-check-title">看完这条经济新闻，你现在能自己说清楚吗？</h2>
+  <p>试着说清楚数字分别对应哪一环，以及还缺什么证据。</p>
+  <div class="learning-self-check-options" role="group" aria-label="自我判断">
+    <button type="button" data-learning-self-check-choice="clear" aria-pressed="false">能说清楚</button>
+    <button type="button" data-learning-self-check-choice="revisit" aria-pressed="false">还需要回头看</button>
+  </div>
+  <p class="learning-self-check-status" data-learning-self-check-status role="status" aria-live="polite" hidden></p>
+</section>
+
+<script>
+  const selfCheck = document.querySelector<HTMLElement>('[data-learning-self-check]');
+  const choices = [...(selfCheck?.querySelectorAll<HTMLButtonElement>('[data-learning-self-check-choice]') ?? [])];
+  const status = selfCheck?.querySelector<HTMLElement>('[data-learning-self-check-status]');
+
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const selected = choice.dataset.learningSelfCheckChoice;
+      choices.forEach(item => item.setAttribute('aria-pressed', String(item === choice)));
+      if (!status) return;
+      status.hidden = false;
+      status.textContent = selected === 'clear'
+        ? '你可以继续往下读，也可以再回到上面的五步检查一遍。'
+        : '可以回到上面的五步，再看一次数字、口径和还缺的证据。';
+    });
+  });
+</script>
