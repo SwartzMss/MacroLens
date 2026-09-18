@@ -7,6 +7,7 @@ import type {
 } from '../data/macroSnapshot';
 import '../styles/snapshot.css';
 import { homeStateLabels, localizeExplanation } from '../data/home';
+import { getMacroNowQuestionForDomain } from '../data/macroNow';
 
 const { snapshot } = Astro.props as { snapshot: MacroSnapshot };
 
@@ -21,14 +22,6 @@ const evidenceForConclusion = (domain: MacroDomainState, conclusion: SnapshotCon
   return conclusion.evidenceIds
     .map((id) => evidenceById.get(id))
     .filter((evidence): evidence is SnapshotEvidence => Boolean(evidence));
-};
-const domainHrefs: Record<MacroDomainState['id'], string> = {
-  growth: '/now/growth/',
-  prices: '/now/prices/',
-  'credit-liquidity': '/now/credit/',
-  'policy-financial-conditions': '/now/policy/',
-  labor: '/now/labor/',
-  external: '/now/external/',
 };
 const prioritizedDomainIds = [
   ...snapshot.synthesis.conflictingDomainIds,
@@ -83,7 +76,7 @@ const prioritizedDomains = prioritizedDomainIds
           <strong>点开需要解释的领域</strong>
           <p>优先看下面这些领域的详细读法，再回到其他领域补背景。</p>
           <div class="snapshot-reading-guide-links">
-            {prioritizedDomains.map((domain) => <a href={domainHrefs[domain.id]}>{domain.label} · {homeStateLabels[domain.state]} →</a>)}
+            {prioritizedDomains.map((domain) => { const question = getMacroNowQuestionForDomain(domain.id); return <a href={question.href}>{domain.label}：{question.question} →</a>; })}
           </div>
         </div>
       </li>
@@ -111,12 +104,7 @@ const prioritizedDomains = prioritizedDomainIds
         <header class="snapshot-domain-head">
           <div>
             <h4>{domain.label}</h4>
-            {domain.id === 'growth' && <a class="snapshot-domain-link" href="/now/growth/">展开查看这组数据 →</a>}
-            {domain.id === 'prices' && <a class="snapshot-domain-link" href="/now/prices/">展开查看这组数据 →</a>}
-            {domain.id === 'credit-liquidity' && <a class="snapshot-domain-link" href="/now/credit/">展开查看这组数据 →</a>}
-            {domain.id === 'policy-financial-conditions' && <a class="snapshot-domain-link" href="/now/policy/">展开查看这组数据 →</a>}
-            {domain.id === 'external' && <a class="snapshot-domain-link" href="/now/external/">展开查看这组数据 →</a>}
-            {domain.id === 'labor' && <a class="snapshot-domain-link" href="/now/labor/">展开查看这组数据 →</a>}
+            <a class="snapshot-domain-link" href={getMacroNowQuestionForDomain(domain.id).href}>问题：{getMacroNowQuestionForDomain(domain.id).question} →</a>
           </div>
           <span class="snapshot-domain-state">{homeStateLabels[domain.state]}</span>
         </header>
