@@ -25,6 +25,10 @@ const sections = headings.filter(item => item.depth === 2);
       <p class="course-kicker">问题探索 · 约 {exploration.data.minutes} 分钟</p>
       <h1>{exploration.data.title}</h1>
       <p class="course-lead">{exploration.data.description}</p>
+      <aside class="exploration-focus" aria-label="这篇问题探索的重点">
+        <strong>这篇只补充一个角度</strong>
+        <p>{exploration.data.focus}</p>
+      </aside>
     </header>
     <details class="course-mobile-toc">
       <summary>这篇文章聊什么</summary>

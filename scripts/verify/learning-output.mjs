@@ -24,6 +24,7 @@ for (const exploration of explorations) {
   assert.match(html, /data-pagefind-body/);
   assert.match(html, /data-exploration=/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-course-complete|data-course-lesson/);
+  assert.match(html, /这篇只补充一个角度/);
   assert.match(html, /这篇案例有没有帮你拆开这个问题/);
   assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
   assert.doesNotMatch(html, /图表不够清楚/);
