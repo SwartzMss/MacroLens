@@ -4,12 +4,34 @@ const sections = [...document.querySelectorAll<HTMLElement>('[data-category-sect
 const count = document.querySelector<HTMLElement>('[data-filter-count]');
 const categoryCount = document.querySelector<HTMLElement>('[data-filter-category-count]');
 const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
+const filterNames = ['category', 'level', 'topic'] as const;
 
 function selected(name: string) {
   return form?.elements.namedItem(name) as HTMLSelectElement | null;
 }
 
-function apply() {
+function readUrl() {
+  const params = new URLSearchParams(window.location.search);
+  for (const name of filterNames) {
+    const control = selected(name);
+    const value = params.get(name);
+    if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
+  }
+}
+
+function writeUrl() {
+  const url = new URL(window.location.href);
+  for (const name of filterNames) {
+    const value = selected(name)?.value ?? 'all';
+    if (value === 'all') url.searchParams.delete(name);
+    else url.searchParams.set(name, value);
+  }
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  if (current !== next) window.history.pushState(null, '', next);
+}
+
+function apply({ syncUrl = false } = {}) {
   const category = selected('category')?.value ?? 'all';
   const topic = selected('topic')?.value ?? 'all';
   const level = selected('level')?.value ?? 'all';
@@ -33,12 +55,18 @@ function apply() {
   if (count) count.textContent = `${visible} 个概念`;
   if (categoryCount) categoryCount.textContent = `${visibleCategories} 个领域`;
   if (empty) empty.hidden = visible !== 0;
+  if (syncUrl) writeUrl();
 }
 
-form?.addEventListener('change', apply);
+form?.addEventListener('change', () => apply({ syncUrl: true }));
+window.addEventListener('popstate', () => {
+  readUrl();
+  apply();
+});
 document.querySelector<HTMLButtonElement>('[data-filter-reset]')?.addEventListener('click', () => {
   form?.reset();
-  apply();
+  apply({ syncUrl: true });
   selected('category')?.focus();
 });
+readUrl();
 apply();
