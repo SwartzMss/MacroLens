@@ -8,6 +8,7 @@ const navItems = [
   { href: '/learn', label: '学习' },
   { href: '/now', label: '当前宏观', aliases: ['/snapshot'] },
   { href: '/concepts', label: '知识库' },
+  { href: '/search', label: '搜索' },
 ];
 const pathname = Astro.url.pathname;
 const isCurrent = (item: (typeof navItems)[number]) => [item.href, ...(item.aliases ?? [])].some((href) => {
