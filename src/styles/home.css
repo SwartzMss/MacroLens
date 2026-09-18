@@ -69,6 +69,17 @@
   background: #e8f1ec;
 }
 
+.home-hero-entry-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.home-hero-entry-note strong {
+  color: var(--ink);
+}
+
 .home-hero a:focus-visible, .home-section a:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 4px;
@@ -284,6 +295,14 @@
   font-size: 13px;
   line-height: 1.65;
   color: #52635a;
+}
+
+.home-domain-detail-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .home-domain-readings {
