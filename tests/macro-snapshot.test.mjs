@@ -598,6 +598,8 @@ test('Macro Now evidence cards show a compact recent trend without replacing the
   assert.match(trend, /近期走势/);
   assert.match(trend, /slice\(-12\)/);
   assert.match(trend, /完整数据和口径说明/);
+  assert.match(trend, /查看近期读数/);
+  assert.match(trend, /近期读数/);
   for (const pagePath of pages) {
     const page = readFileSync(pagePath, 'utf8');
     assert.match(page, /MacroNowTrend/);

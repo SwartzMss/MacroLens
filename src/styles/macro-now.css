@@ -236,6 +236,47 @@
   line-height: 1.5;
 }
 
+.macro-now-trend-table-details {
+  margin-top: 9px;
+  font-size: 12px;
+}
+
+.macro-now-trend-table-details summary {
+  color: var(--green);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.macro-now-trend-table-wrap {
+  overflow-x: auto;
+  margin-top: 8px;
+}
+
+.macro-now-trend-table-details table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.macro-now-trend-table-details th,
+.macro-now-trend-table-details td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.macro-now-trend-table-details thead th {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.macro-now-trend-table-details tbody td {
+  text-align: right;
+}
+
 .macro-now-evidence-card dl {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
