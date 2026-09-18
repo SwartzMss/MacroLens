@@ -50,6 +50,7 @@ function makeSeriesEvidence(dataset: IndicatorDataset, id: string, series?: Indi
     frequency: dataset.frequency,
     valueLabel: presentation.valueLabel,
     changeLabel: presentation.changeLabel,
+    comparisonMethod: presentation.comparisonMethod,
     conceptHref: `/concepts/${id}`,
     latest: latest.value,
     previous: previous?.value ?? null,

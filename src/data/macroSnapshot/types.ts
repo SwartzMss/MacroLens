@@ -19,6 +19,7 @@ export type SnapshotEvidence = {
   frequency: string;
   valueLabel: string;
   changeLabel: string;
+  comparisonMethod: string;
   conceptHref: string;
   latest: number;
   previous: number | null;

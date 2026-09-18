@@ -38,6 +38,7 @@ const laborMap = fileURLToPath(new URL('../src/components/MacroNowLaborMap.astro
 const questionNav = fileURLToPath(new URL('../src/components/MacroNowQuestionNav.astro', import.meta.url));
 const conceptReader = fileURLToPath(new URL('../src/components/ConceptReader.astro', import.meta.url));
 const macroNowNode = fileURLToPath(new URL('../src/components/MacroNowNode.astro', import.meta.url));
+const comparisonNote = fileURLToPath(new URL('../src/components/MacroNowComparisonNote.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -80,6 +81,7 @@ test('normalizes single-series, LPR, and policy-rate evidence with timing contex
   const policy = makeEvidence(indicators['policy-rate'], 'policy-rate');
 
   assert.equal(gdp[0].frequency, 'quarterly');
+  assert.match(gdp[0].comparisonMethod, /同比|比较/);
   assert.equal(gdp[0].observationPeriod, indicators.gdp.data.at(-1).date);
   assert.equal(gdp[0].updatedAt, indicators.gdp.updatedAt);
   assert.equal(gdp[0].verifiedThrough, null);
@@ -575,6 +577,17 @@ test('Macro Now graph reading nodes link directly to concept definitions', () =>
     assert.match(map, /conceptHref/);
   }
   assert.match(readFileSync(pricesPage, 'utf8'), /MacroNowPriceMap evidence=/);
+});
+
+test('Macro Now evidence cards explain how each reading is compared', () => {
+  const note = readFileSync(comparisonNote, 'utf8');
+  const pages = [growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage];
+
+  assert.match(note, /这项读数怎么比较/);
+  for (const pagePath of pages) {
+    assert.match(readFileSync(pagePath, 'utf8'), /MacroNowComparisonNote/);
+    assert.match(readFileSync(pagePath, 'utf8'), /comparisonMethod/);
+  }
 });
 
 test('Macro Now question pages provide a shared way to continue across current-state questions', () => {
