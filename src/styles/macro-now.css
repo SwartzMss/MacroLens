@@ -157,6 +157,10 @@
   background: var(--card);
 }
 
+.macro-now-evidence-card {
+  scroll-margin-top: 24px;
+}
+
 .macro-now-evidence-card > header {
   display: flex;
   justify-content: space-between;

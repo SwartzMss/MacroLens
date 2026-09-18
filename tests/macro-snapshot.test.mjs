@@ -567,17 +567,20 @@ test('Macro Now labor page keeps unemployment scope separate from income outcome
   assert.match(map, /不把失业率变化当成所有人的就业结果/);
 });
 
-test('Macro Now graph reading nodes link directly to concept definitions', () => {
+test('Macro Now graph reading nodes return to the matching current evidence card', () => {
   const node = readFileSync(macroNowNode, 'utf8');
   const maps = [macroNowMap, priceMap, creditMap, policyMap, externalMap, laborMap];
 
-  assert.match(node, /查看\$\{label\}概念定义/);
+  assert.match(node, /ariaLabel/);
   assert.match(node, /formatEvidenceValue/);
   for (const mapPath of maps) {
     const map = readFileSync(mapPath, 'utf8');
     assert.match(map, /MacroNowNode/);
-    assert.match(map, /conceptHref/);
+    assert.match(map, /#macro-now-evidence-/);
     assert.match(map, /evidence=/);
+  }
+  for (const pagePath of [growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage]) {
+    assert.match(readFileSync(pagePath, 'utf8'), /macro-now-evidence-/);
   }
   assert.match(readFileSync(pricesPage, 'utf8'), /MacroNowPriceMap evidence=/);
 });

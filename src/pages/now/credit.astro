@@ -64,7 +64,7 @@ const evidenceById = new Map(credit.evidence.map((evidence) => [evidence.id, evi
         <p>这些指标都和资金有关，但回答的是不同问题，不能只看一个增速。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article id={`macro-now-evidence-${evidence.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>

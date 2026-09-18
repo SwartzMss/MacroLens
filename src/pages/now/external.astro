@@ -57,7 +57,7 @@ const evidenceById = new Map(external.evidence.map((evidence) => [evidence.id, e
         <p>两条数据都是海关总署按人民币计价的全国货物贸易金额月度同比，不是数量、价格、服务贸易或国际收支数据。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article id={`macro-now-evidence-${evidence.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>

@@ -43,7 +43,7 @@ const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relatio
     <article class="macro-now-labor-path">
       <header><strong>从一个比率到劳动市场</strong><span>先确认它反映的范围</span></header>
       <div class="macro-now-labor-steps">
-        <MacroNowNode className="macro-now-labor-node is-evidence" caption="当前读数" label={row.name} evidence={row} href={row.conceptHref} />
+        <MacroNowNode className="macro-now-labor-node is-evidence" caption="当前读数" label={row.name} evidence={row} href={`#macro-now-evidence-${row.id}`} ariaLabel={`回到${row.name}当前读数`} />
         <div class="macro-now-labor-edge" aria-hidden="true">
           <small>{relationLabel(laborPath[0])}</small>
           <b>→</b>

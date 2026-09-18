@@ -57,7 +57,7 @@ const evidenceById = new Map(policy.evidence.map((evidence) => [evidence.id, evi
         <p>政策利率记录事件，LPR 记录报价；它们都不能单独代表每个人实际拿到的贷款利率。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article id={`macro-now-evidence-${evidence.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>

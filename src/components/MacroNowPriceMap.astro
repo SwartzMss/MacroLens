@@ -49,7 +49,8 @@ const limitations = [...new Set(chain.flatMap((relation) => relation.limitations
         caption={index === 0 ? '当前读数' : index === chain.length - 1 ? '居民端价格压力' : '中间环节'}
         label={nodeLabel(relation.source)}
         evidence={evidenceById.get(relation.source)}
-        href={evidenceById.get(relation.source)?.conceptHref}
+        href={evidenceById.has(relation.source) ? `#macro-now-evidence-${relation.source}` : undefined}
+        ariaLabel={evidenceById.has(relation.source) ? `回到${nodeLabel(relation.source)}当前读数` : undefined}
       />
       <div class="macro-now-price-edge" aria-hidden="true">
         <small>{relationLabel(relation)}</small>

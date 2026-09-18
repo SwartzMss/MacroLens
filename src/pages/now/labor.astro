@@ -58,7 +58,7 @@ const evidenceById = new Map(labor.evidence.map((item) => [item.id, item]));
         <p>全国城镇调查失业率的分母是城镇劳动力，不是全部劳动年龄人口，也不是登记失业率。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence: item, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence: item, indicator, sources }) => <article id={`macro-now-evidence-${item.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={item.conceptHref}>{item.name} →</a>

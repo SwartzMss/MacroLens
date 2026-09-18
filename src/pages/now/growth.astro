@@ -61,7 +61,7 @@ const readingText = (evidence: SnapshotEvidence) => evidence.id === 'pmi'
         <p>读数的对象、时间和比较方法不同，不能直接拼成一个结论。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article id={`macro-now-evidence-${evidence.id}`} class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
