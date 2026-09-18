@@ -104,6 +104,7 @@ test('knowledge library and concept search stay separate', () => {
   assert.match(search, /triggerSearch\(query\)/);
   assert.match(search, /知识库搜索/);
   assert.match(search, /搜索概念/);
+  assert.doesNotMatch(search, /返回知识库/);
   assert.match(searchStyles, /pagefind-ui__filter-panel\s*\{\s*display:\s*none/);
   assert.match(reader, /data-pagefind-filter="content:concept"/);
 });
