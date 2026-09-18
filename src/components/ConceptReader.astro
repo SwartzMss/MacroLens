@@ -88,7 +88,7 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
       </div>
     </nav>
     <div class="shell concept-layout detail-layout">
-      <article class="prose detail-article" data-pagefind-body>
+      <article class="prose detail-article" data-pagefind-body data-pagefind-filter="content:concept">
         {entry.data.id === 'credit' && <CreditUnderstanding />}
         {isMonetaryPolicy && <MonetaryPolicyUnderstanding />}
         {!hasCustomEntry && entry.data.intro && <ConceptUnderstanding conceptId={entry.data.id} intro={entry.data.intro} />}
