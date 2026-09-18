@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MacroNowPolicyMap from '../../components/MacroNowPolicyMap.astro';
+import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
+import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
+import '../../styles/macro-now.css';
+
+const indicators = getMacroSnapshotIndicators();
+const snapshot = buildMacroSnapshot(indicators);
+const policy = snapshot.domains.find((domain) => domain.id === 'policy-financial-conditions');
+if (!policy) throw new Error('Macro Now policy page requires the policy-financial-conditions domain');
+
+const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件' };
+const evidenceRows = policy.evidence.map((evidence) => {
+  const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
+  return { evidence, sources: indicators[indicatorId].sources };
+});
+const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
+const formatRecentChange = (evidence: SnapshotEvidence) => evidence.change === null ? '暂无可比数据' : formatSignalChange(evidence);
+const readingText = (evidence: SnapshotEvidence) => evidence.isEvent
+  ? `这是一次政策事件，最近变化为 ${formatRecentChange(evidence)}；核验日期和事件日期要分开看。`
+  : `${evidence.changeLabel}，最近一次变化为 ${formatRecentChange(evidence)}；报价变化不等于每份贷款合同立即变化。`;
+const evidenceById = new Map(policy.evidence.map((evidence) => [evidence.id, evidence]));
+---
+
+<BaseLayout
+  title="政策在放松，融资真的更容易了吗？｜Macro Now｜MacroLens"
+  description="从政策利率和 LPR 的最新读数，理解政策动作、报价、融资条件和实际借款感受之间的时间差与证据边界。"
+>
+  <main class="macro-now-question shell">
+    <a class="macro-now-back" href="/now/">← 回到当前状态</a>
+    <header class="macro-now-question-head">
+      <div class="eyebrow">Macro Now · 当前状态</div>
+      <h1>政策在放松，融资真的更容易了吗？</h1>
+      <p class="macro-now-lead">先看政策利率和 LPR 发生了什么，再核对报价、合同和借款需求有没有真的跟上。</p>
+      <p class="macro-now-meta">数据集更新时间范围：{snapshot.freshness.earliestUpdatedAt} 至 {snapshot.freshness.latestUpdatedAt}</p>
+    </header>
+
+    <section class="macro-now-question-summary" aria-labelledby="macro-now-policy-current-title">
+      <div>
+        <div class="eyebrow">现在看到什么</div>
+        <h2 id="macro-now-policy-current-title">{homeStateLabels[policy.state]}</h2>
+      </div>
+      <p>{localizeExplanation(policy.explanation)}</p>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-policy-evidence-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">数据依据</div>
+          <h2 id="macro-now-policy-evidence-title">先分清政策事件和报价</h2>
+        </div>
+        <p>政策利率记录事件，LPR 记录报价；它们都不能单独代表每个人实际拿到的贷款利率。</p>
+      </div>
+      <div class="macro-now-evidence-grid">
+        {evidenceRows.map(({ evidence, sources }) => <article class="macro-now-evidence-card">
+          <header>
+            <div>
+              <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
+              <p>{evidence.valueLabel}</p>
+            </div>
+            <strong>{formatLatest(evidence)}</strong>
+          </header>
+          <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
+          <dl>
+            <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
+            <div><dt>频率</dt><dd>{evidence.isEvent ? '事件' : frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>
+            <div><dt>更新</dt><dd>{evidence.updatedAt}</dd></div>
+            {evidence.verifiedThrough ? <div><dt>核验至</dt><dd>{evidence.verifiedThrough}</dd></div> : null}
+          </dl>
+          <details class="macro-now-source-details">
+            <summary>查看数据来源</summary>
+            <ul>
+              {sources.map((source) => <li>
+                <a href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>
+                <small>{source.role === 'methodology' ? '口径说明' : '数据来源'} · {source.coverage} · {source.sourceDate}</small>
+              </li>)}
+            </ul>
+          </details>
+        </article>)}
+      </div>
+    </section>
+
+    <MacroNowPolicyMap rows={evidenceRows.map(({ evidence }) => evidence)} />
+
+    <section class="macro-now-section" aria-labelledby="macro-now-policy-reading-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">怎么读</div>
+          <h2 id="macro-now-policy-reading-title">政策变化和借款感受之间有几道门</h2>
+        </div>
+      </div>
+      <div class="macro-now-reading-grid">
+        <article>
+          <h3>政策利率先是一个事件</h3>
+          <p>政策利率的调整日期、核验日期和实际生效范围要分开。没有新事件，不代表所有融资条件每天都在同样变化。</p>
+        </article>
+        <article>
+          <h3>LPR 也不是每份贷款合同</h3>
+          <p>LPR 是报价序列，实际贷款利率还会受到银行定价、借款人风险和合同重定价日期影响。</p>
+        </article>
+        <article>
+          <h3>利率下降也要有人愿意借</h3>
+          <p>借款需求、收入预期、抵押品和项目回报都会影响融资是否真正增加，政策动作不会自动变成新增贷款。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-section" aria-labelledby="macro-now-policy-gaps-title">
+      <div class="macro-now-section-head">
+        <div>
+          <div class="eyebrow">证据边界</div>
+          <h2 id="macro-now-policy-gaps-title">还缺什么证据？</h2>
+        </div>
+        <p>当前数据能说明政策和报价的变化，还不能直接说明每个借款人的实际成本。</p>
+      </div>
+      <div class="macro-now-gap-list">
+        <article>
+          <h3>新贷款和存量贷款一样吗？</h3>
+          <p>新发贷款可以较快参考报价变化，存量贷款要等合同约定的重定价日期。</p>
+          <div class="macro-now-links"><a href="/concepts/lpr/">LPR →</a><a href="/concepts/mortgage/">房贷 →</a></div>
+        </article>
+        <article>
+          <h3>银行真的愿意放贷吗？</h3>
+          <p>资金成本只是条件之一，资本约束、风险评估、抵押品和期限溢价都会影响实际供给。</p>
+          <div class="macro-now-links"><a href="/concepts/financing-conditions/">融资条件 →</a><a href="/concepts/credit/">人民币贷款 →</a></div>
+        </article>
+        <article>
+          <h3>借款人真的想借吗？</h3>
+          <p>收入预期、偿债压力和项目回报会影响需求。利率变化本身不能证明消费或投资一定增加。</p>
+          <div class="macro-now-links"><a href="/concepts/income-expectations/">收入预期 →</a><a href="/concepts/household-consumption/">居民消费 →</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="macro-now-next" aria-labelledby="macro-now-policy-next-title">
+      <div>
+        <div class="eyebrow">下一期看什么</div>
+        <h2 id="macro-now-policy-next-title">继续核对政策和报价</h2>
+      </div>
+      {policy.watchNext.length > 0 ? <ul>{policy.watchNext.map((conclusion) => <li>
+        <strong>{localizeExplanation(conclusion.title)}</strong>
+        <p>{localizeExplanation(conclusion.explanation)}</p>
+        <div class="macro-now-links">{conclusion.evidenceIds.map((id) => { const evidence = evidenceById.get(id); return evidence ? <a href={evidence.conceptHref}>{evidence.name} →</a> : null; })}</div>
+      </li>)}</ul> : <p>目前没有单独触发的下一期观察项，继续按上面的读法核对新的政策事件和 LPR 报价。</p>}
+    </section>
+  </main>
+</BaseLayout>

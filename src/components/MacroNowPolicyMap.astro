@@ -1,0 +1,83 @@
+---
+import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import type { SnapshotEvidence } from '../data/macroSnapshot';
+
+const { rows } = Astro.props as { rows: SnapshotEvidence[] };
+const graph = getRelationData('macro');
+const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const evidenceById = new Map(rows.map((evidence) => [evidence.id, evidence]));
+const edge = (source: string, target: string) => graph.relations.find(
+  (relation) => relation.source === source && relation.target === target,
+);
+const pricePath = [
+  edge('monetary-policy', 'policy-rate'),
+  edge('policy-rate', 'lpr'),
+  edge('lpr', 'credit'),
+].filter((relation): relation is Relation => Boolean(relation));
+const conditionPath = [
+  edge('policy-rate', 'financing-conditions'),
+  edge('financing-conditions', 'credit'),
+].filter((relation): relation is Relation => Boolean(relation));
+if (pricePath.length !== 3 || conditionPath.length !== 2) throw new Error('Macro Now policy graph paths are incomplete');
+
+const relationLabels: Record<string, string> = {
+  leading_factor: '政策输入',
+  transmission: '可能传导',
+};
+const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const relationLabel = (relation: Relation) => isExplainableRelation(relation)
+  ? relationLabels[relation.relation] ?? '关系'
+  : '关系';
+const edgeAt = (edges: Relation[], index: number) => edges[index]!;
+const lagFor = (relation: Relation) => isExplainableRelation(relation) ? relation.lag : '';
+const valueFor = (id: string) => {
+  if (id === 'lpr') return rows.filter((evidence) => evidence.id.startsWith('lpr:')).map((evidence) => `${evidence.name} ${evidence.latest.toFixed(2)}%`).join(' · ');
+  return evidenceById.get(id)?.valueLabel;
+};
+const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation) => relation.target)];
+---
+
+<section class="macro-now-section macro-now-policy-map" aria-labelledby="macro-now-policy-map-title">
+  <div class="macro-now-section-head">
+    <div>
+      <div class="eyebrow">把政策放进关系图</div>
+      <h2 id="macro-now-policy-map-title">政策动作怎样走到借款条件？</h2>
+    </div>
+    <p>利率变化要经过报价、资金成本和合同重定价，图上的箭头表示可能路径，不是立即发生的结果。</p>
+  </div>
+
+  <div class="macro-now-policy-paths">
+    <article class="macro-now-policy-path">
+      <header><strong>价格路径</strong><span>政策利率 → LPR → 信贷</span></header>
+      <div class="macro-now-policy-steps">
+        {nodeIds(pricePath).map((id, index) => <>
+          <div class:list={['macro-now-policy-node', index === 0 && 'is-policy', index === pricePath.length && 'is-credit']}>
+            <small>{index === 0 ? '政策框架' : index === 1 ? '当前事件' : index === 2 ? '当前报价' : '实际融资'}</small>
+            <strong>{nodeLabel(id)}</strong>
+            {valueFor(id) && <span>{valueFor(id)}</span>}
+          </div>
+          {index < pricePath.length && <div class="macro-now-policy-edge"><small>{relationLabel(edgeAt(pricePath, index))}</small><b>→</b><span>{lagFor(edgeAt(pricePath, index))}</span></div>}
+        </>)}
+      </div>
+    </article>
+
+    <article class="macro-now-policy-path">
+      <header><strong>条件路径</strong><span>政策利率 → 融资条件 → 信贷</span></header>
+      <div class="macro-now-policy-steps">
+        {nodeIds(conditionPath).map((id, index) => <>
+          <div class:list={['macro-now-policy-node', index === 0 && 'is-policy', index === conditionPath.length && 'is-credit']}>
+            <small>{index === 0 ? '当前事件' : index === 1 ? '中间条件' : '实际融资'}</small>
+            <strong>{nodeLabel(id)}</strong>
+            {valueFor(id) && <span>{valueFor(id)}</span>}
+          </div>
+          {index < conditionPath.length && <div class="macro-now-policy-edge"><small>{relationLabel(edgeAt(conditionPath, index))}</small><b>→</b><span>{lagFor(edgeAt(conditionPath, index))}</span></div>}
+        </>)}
+      </div>
+    </article>
+  </div>
+
+  <div class="macro-now-policy-note">
+    <strong>当前读数在哪里？</strong>
+    <p>政策利率是一次次事件，LPR 是报价序列；真正的贷款利率还要看借款人、银行和合同何时重定价。</p>
+  </div>
+</section>
