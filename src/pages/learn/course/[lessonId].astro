@@ -49,6 +49,11 @@ const sections = headings.filter(item => item.depth === 2);
             <p>{lesson.data.recall}</p>
           </div>
         </section>
+        <section class="course-model" aria-labelledby={`${lesson.id}-model`}>
+          <p class="course-model-label">先记住一个基本方向</p>
+          <p id={`${lesson.id}-model`}>{lesson.data.model}</p>
+          <p class="course-model-note">这是方便开始思考的方向，正文会再看哪些条件会让它变慢、变弱或走向不同。</p>
+        </section>
         <Content />
         <section class="course-takeaways" aria-labelledby={`${lesson.id}-takeaways`}>
           <h2 id={`${lesson.id}-takeaways`}>学完后带走</h2>
