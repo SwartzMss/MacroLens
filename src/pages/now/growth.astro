@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import MacroNowComparisonNote from '../../components/MacroNowComparisonNote.astro';
 import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowRelationshipMap from '../../components/MacroNowRelationshipMap.astro';
+import MacroNowTrend from '../../components/MacroNowTrend.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation, getPmiReading } from '../../data/home';
 import '../../styles/macro-now.css';
@@ -19,7 +20,7 @@ const frequencyLabels: Record<string, string> = {
 };
 const evidenceRows = growth.evidence.map((evidence) => {
   const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
-  return { evidence, sources: indicators[indicatorId].sources };
+  return { evidence, indicator: indicators[indicatorId], sources: indicators[indicatorId].sources };
 });
 const evidenceById = new Map(growth.evidence.map((evidence) => [evidence.id, evidence]));
 const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
@@ -60,7 +61,7 @@ const readingText = (evidence: SnapshotEvidence) => evidence.id === 'pmi'
         <p>读数的对象、时间和比较方法不同，不能直接拼成一个结论。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
@@ -70,6 +71,7 @@ const readingText = (evidence: SnapshotEvidence) => evidence.id === 'pmi'
           </header>
           <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
           <MacroNowComparisonNote method={evidence.comparisonMethod} />
+          <MacroNowTrend indicator={indicator} seriesId={evidence.seriesId} />
           <dl>
             <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
             <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>

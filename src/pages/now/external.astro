@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import MacroNowComparisonNote from '../../components/MacroNowComparisonNote.astro';
 import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowExternalMap from '../../components/MacroNowExternalMap.astro';
+import MacroNowTrend from '../../components/MacroNowTrend.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
 import '../../styles/macro-now.css';
@@ -15,7 +16,7 @@ if (!external) throw new Error('Macro Now external page requires the external do
 const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件' };
 const evidenceRows = external.evidence.map((evidence) => {
   const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
-  return { evidence, sources: indicators[indicatorId].sources };
+  return { evidence, indicator: indicators[indicatorId], sources: indicators[indicatorId].sources };
 });
 const formatLatest = (evidence: SnapshotEvidence) => `${evidence.latest.toFixed(evidence.metric === 'rate' ? 2 : 1)}${evidence.unit === '%' ? '%' : ` ${evidence.unit}`}`;
 const formatRecentChange = (evidence: SnapshotEvidence) => evidence.change === null ? '暂无可比数据' : formatSignalChange(evidence);
@@ -56,7 +57,7 @@ const evidenceById = new Map(external.evidence.map((evidence) => [evidence.id, e
         <p>两条数据都是海关总署按人民币计价的全国货物贸易金额月度同比，不是数量、价格、服务贸易或国际收支数据。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence, indicator, sources }) => <article class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={evidence.conceptHref}>{evidence.name} →</a>
@@ -66,6 +67,7 @@ const evidenceById = new Map(external.evidence.map((evidence) => [evidence.id, e
           </header>
           <p class="macro-now-evidence-reading">{readingText(evidence)}</p>
           <MacroNowComparisonNote method={evidence.comparisonMethod} />
+          <MacroNowTrend indicator={indicator} seriesId={evidence.seriesId} />
           <dl>
             <div><dt>观测期</dt><dd>{evidence.observationPeriod}</dd></div>
             <div><dt>频率</dt><dd>{frequencyLabels[evidence.frequency] ?? evidence.frequency}</dd></div>

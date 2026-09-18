@@ -39,6 +39,7 @@ const questionNav = fileURLToPath(new URL('../src/components/MacroNowQuestionNav
 const conceptReader = fileURLToPath(new URL('../src/components/ConceptReader.astro', import.meta.url));
 const macroNowNode = fileURLToPath(new URL('../src/components/MacroNowNode.astro', import.meta.url));
 const comparisonNote = fileURLToPath(new URL('../src/components/MacroNowComparisonNote.astro', import.meta.url));
+const macroNowTrend = fileURLToPath(new URL('../src/components/MacroNowTrend.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -587,6 +588,20 @@ test('Macro Now evidence cards explain how each reading is compared', () => {
   for (const pagePath of pages) {
     assert.match(readFileSync(pagePath, 'utf8'), /MacroNowComparisonNote/);
     assert.match(readFileSync(pagePath, 'utf8'), /comparisonMethod/);
+  }
+});
+
+test('Macro Now evidence cards show a compact recent trend without replacing the source data', () => {
+  const trend = readFileSync(macroNowTrend, 'utf8');
+  const pages = [growthPage, pricesPage, creditPage, policyPage, externalPage, laborPage];
+
+  assert.match(trend, /近期走势/);
+  assert.match(trend, /slice\(-12\)/);
+  assert.match(trend, /完整数据和口径说明/);
+  for (const pagePath of pages) {
+    const page = readFileSync(pagePath, 'utf8');
+    assert.match(page, /MacroNowTrend/);
+    assert.match(page, /seriesId=/);
   }
 });
 

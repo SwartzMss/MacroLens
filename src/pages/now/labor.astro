@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import MacroNowComparisonNote from '../../components/MacroNowComparisonNote.astro';
 import MacroNowQuestionNav from '../../components/MacroNowQuestionNav.astro';
 import MacroNowLaborMap from '../../components/MacroNowLaborMap.astro';
+import MacroNowTrend from '../../components/MacroNowTrend.astro';
 import { buildMacroSnapshot, getMacroSnapshotIndicators, type MacroIndicatorId, type SnapshotEvidence } from '../../data/macroSnapshot';
 import { formatSignalChange, homeStateLabels, localizeExplanation } from '../../data/home';
 import '../../styles/macro-now.css';
@@ -15,7 +16,7 @@ if (!labor) throw new Error('Macro Now labor page requires the labor domain');
 const frequencyLabels: Record<string, string> = { monthly: '月度', quarterly: '季度', event: '事件' };
 const evidenceRows = labor.evidence.map((evidence) => {
   const indicatorId = evidence.id.split(':')[0] as MacroIndicatorId;
-  return { evidence, sources: indicators[indicatorId].sources };
+  return { evidence, indicator: indicators[indicatorId], sources: indicators[indicatorId].sources };
 });
 const evidence = evidenceRows[0].evidence;
 const formatLatest = (item: SnapshotEvidence) => `${item.latest.toFixed(item.metric === 'rate' ? 2 : 1)}${item.unit === '%' ? '%' : ` ${item.unit}`}`;
@@ -57,7 +58,7 @@ const evidenceById = new Map(labor.evidence.map((item) => [item.id, item]));
         <p>全国城镇调查失业率的分母是城镇劳动力，不是全部劳动年龄人口，也不是登记失业率。</p>
       </div>
       <div class="macro-now-evidence-grid">
-        {evidenceRows.map(({ evidence: item, sources }) => <article class="macro-now-evidence-card">
+        {evidenceRows.map(({ evidence: item, indicator, sources }) => <article class="macro-now-evidence-card">
           <header>
             <div>
               <a class="macro-now-evidence-name" href={item.conceptHref}>{item.name} →</a>
@@ -67,6 +68,7 @@ const evidenceById = new Map(labor.evidence.map((item) => [item.id, item]));
           </header>
           <p class="macro-now-evidence-reading">{readingText}</p>
           <MacroNowComparisonNote method={item.comparisonMethod} />
+          <MacroNowTrend indicator={indicator} seriesId={item.seriesId} />
           <dl>
             <div><dt>观测期</dt><dd>{item.observationPeriod}</dd></div>
             <div><dt>频率</dt><dd>{frequencyLabels[item.frequency] ?? item.frequency}</dd></div>

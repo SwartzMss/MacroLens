@@ -1,0 +1,49 @@
+---
+import type { IndicatorDataset } from '../domain/indicatorDataset';
+import '../styles/macro-now.css';
+
+const { indicator, seriesId } = Astro.props as {
+  indicator: IndicatorDataset;
+  seriesId?: string;
+};
+const series = seriesId
+  ? indicator.series?.find((item) => item.id === seriesId)
+  : undefined;
+const data = (series?.data ?? indicator.data).slice(-12);
+const label = series?.label ?? indicator.label;
+---
+
+<figure class="macro-now-trend">
+  <div class="macro-now-trend-head">
+    <span>近期走势</span>
+    <span>最近 {data.length} 期</span>
+  </div>
+  <div
+    class="macro-now-trend-chart"
+    data-chart={JSON.stringify({
+      series: [{ id: seriesId ?? indicator.id, label, data }],
+      unit: indicator.unit,
+      chartType: indicator.chartType,
+      verifiedThrough: indicator.verifiedThrough,
+      referenceValue: indicator.referenceValue,
+      referenceLabel: indicator.referenceLabel,
+    })}
+    role="img"
+    aria-label={`${label}最近${data.length}期走势`}
+  ></div>
+  <figcaption>只用来观察最近的变化方向，不能代替完整数据和口径说明。</figcaption>
+</figure>
+
+<script>
+  import * as echarts from 'echarts';
+  import { buildIndicatorChartOption, type IndicatorChartConfig } from '../data/indicatorChartOption';
+
+  document.querySelectorAll<HTMLElement>('.macro-now-trend-chart[data-chart]').forEach((element) => {
+    if (element.dataset.ready) return;
+    element.dataset.ready = 'true';
+    const config: IndicatorChartConfig = JSON.parse(element.dataset.chart || '{}');
+    const chart = echarts.init(element);
+    chart.setOption(buildIndicatorChartOption(config));
+    new ResizeObserver(() => chart.resize()).observe(element);
+  });
+</script>
