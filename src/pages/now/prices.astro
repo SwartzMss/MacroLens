@@ -82,7 +82,7 @@ const evidenceById = new Map(prices.evidence.map((evidence) => [evidence.id, evi
       </div>
     </section>
 
-    <MacroNowPriceMap consumerEvidence={evidenceRows.filter(({ evidence }) => evidence.id !== 'ppi').map(({ evidence }) => evidence)} />
+    <MacroNowPriceMap evidence={evidenceRows.map(({ evidence }) => evidence)} />
 
     <section class="macro-now-section" aria-labelledby="macro-now-prices-reading-title">
       <div class="macro-now-section-head">

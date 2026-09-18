@@ -1,10 +1,12 @@
 ---
 import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import MacroNowNode from './MacroNowNode.astro';
 import type { SnapshotEvidence } from '../data/macroSnapshot';
 
-const { consumerEvidence } = Astro.props as { consumerEvidence: SnapshotEvidence[] };
+const { evidence } = Astro.props as { evidence: SnapshotEvidence[] };
 const graph = getRelationData('macro');
 const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+const evidenceById = new Map(evidence.map((item) => [item.id, item]));
 const edge = (source: string, target: string) => graph.relations.find(
   (relation) => relation.source === source && relation.target === target,
 );
@@ -42,19 +44,19 @@ const limitations = [...new Set(chain.flatMap((relation) => relation.limitations
 
   <div class="macro-now-price-chain" aria-label="价格传导关系">
     {chain.map((relation, index) => <>
-      <div class:list={['macro-now-price-node', index === 0 && 'is-indicator', index === chain.length - 1 && 'is-consumer']}>
-        <small>{index === 0 ? '当前读数' : index === chain.length - 1 ? '居民端价格压力' : '中间环节'}</small>
-        <strong>{nodeLabel(relation.source)}</strong>
-      </div>
+      <MacroNowNode
+        className={['macro-now-price-node', index === 0 && 'is-indicator', index === chain.length - 1 && 'is-consumer'].filter(Boolean).join(' ')}
+        caption={index === 0 ? '当前读数' : index === chain.length - 1 ? '居民端价格压力' : '中间环节'}
+        label={nodeLabel(relation.source)}
+        value={evidenceById.get(relation.source)?.valueLabel}
+        href={evidenceById.get(relation.source)?.conceptHref}
+      />
       <div class="macro-now-price-edge" aria-hidden="true">
         <small>{relationLabel(relation)}</small>
         <b>→</b>
         <span>{relation.lag}</span>
       </div>
-      {index === chain.length - 1 && <div class="macro-now-price-node is-consumer">
-        <small>居民端价格压力</small>
-        <strong>{nodeLabel(relation.target)}</strong>
-      </div>}
+      {index === chain.length - 1 && <MacroNowNode className="macro-now-price-node is-consumer" caption="居民端价格压力" label={nodeLabel(relation.target)} />}
     </>)}
   </div>
 
@@ -64,7 +66,7 @@ const limitations = [...new Set(chain.flatMap((relation) => relation.limitations
       <p>CPI 看消费篮子的整体变化，核心 CPI 提供另一种观察消费价格底部变化的角度。</p>
     </div>
     <ul>
-      {consumerEvidence.map((evidence) => <li><a href={evidence.conceptHref}>{evidence.name} →</a><span>{evidence.valueLabel}</span></li>)}
+      {evidence.filter((item) => item.id !== 'ppi').map((item) => <li><a href={item.conceptHref}>{item.name} →</a><span>{item.valueLabel}</span></li>)}
     </ul>
   </div>
 

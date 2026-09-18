@@ -1,5 +1,6 @@
 ---
 import { getRelationData, isExplainableRelation, type Relation } from '../data/graphRegistry';
+import MacroNowNode from './MacroNowNode.astro';
 import type { SnapshotEvidence } from '../data/macroSnapshot';
 
 const { rows } = Astro.props as { rows: SnapshotEvidence[] };
@@ -25,6 +26,7 @@ const relationLabels: Record<string, string> = {
   transmission: '可能传导',
 };
 const nodeLabel = (id: string) => nodes.get(id)?.label ?? id;
+const conceptHrefFor = (id: string) => id === 'lpr' ? '/concepts/lpr' : evidenceById.get(id)?.conceptHref;
 const relationLabel = (relation: Relation) => isExplainableRelation(relation)
   ? relationLabels[relation.relation] ?? '关系'
   : '关系';
@@ -51,11 +53,7 @@ const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation)
       <header><strong>价格路径</strong><span>政策利率 → LPR → 信贷</span></header>
       <div class="macro-now-policy-steps">
         {nodeIds(pricePath).map((id, index) => <>
-          <div class:list={['macro-now-policy-node', index === 0 && 'is-policy', index === pricePath.length && 'is-credit']}>
-            <small>{index === 0 ? '政策框架' : index === 1 ? '当前事件' : index === 2 ? '当前报价' : '实际融资'}</small>
-            <strong>{nodeLabel(id)}</strong>
-            {valueFor(id) && <span>{valueFor(id)}</span>}
-          </div>
+          <MacroNowNode className={['macro-now-policy-node', index === 0 && 'is-policy', index === pricePath.length && 'is-credit'].filter(Boolean).join(' ')} caption={index === 0 ? '政策框架' : index === 1 ? '当前事件' : index === 2 ? '当前报价' : '实际融资'} label={nodeLabel(id)} value={valueFor(id)} href={conceptHrefFor(id)} />
           {index < pricePath.length && <div class="macro-now-policy-edge"><small>{relationLabel(edgeAt(pricePath, index))}</small><b>→</b><span>{lagFor(edgeAt(pricePath, index))}</span></div>}
         </>)}
       </div>
@@ -65,11 +63,7 @@ const nodeIds = (edges: Relation[]) => [edges[0].source, ...edges.map((relation)
       <header><strong>条件路径</strong><span>政策利率 → 融资条件 → 信贷</span></header>
       <div class="macro-now-policy-steps">
         {nodeIds(conditionPath).map((id, index) => <>
-          <div class:list={['macro-now-policy-node', index === 0 && 'is-policy', index === conditionPath.length && 'is-credit']}>
-            <small>{index === 0 ? '当前事件' : index === 1 ? '中间条件' : '实际融资'}</small>
-            <strong>{nodeLabel(id)}</strong>
-            {valueFor(id) && <span>{valueFor(id)}</span>}
-          </div>
+          <MacroNowNode className={['macro-now-policy-node', index === 0 && 'is-policy', index === conditionPath.length && 'is-credit'].filter(Boolean).join(' ')} caption={index === 0 ? '当前事件' : index === 1 ? '中间条件' : '实际融资'} label={nodeLabel(id)} value={valueFor(id)} href={conceptHrefFor(id)} />
           {index < conditionPath.length && <div class="macro-now-policy-edge"><small>{relationLabel(edgeAt(conditionPath, index))}</small><b>→</b><span>{lagFor(edgeAt(conditionPath, index))}</span></div>}
         </>)}
       </div>

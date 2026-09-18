@@ -301,6 +301,27 @@
   font-size: 12px;
 }
 
+.macro-now-map-node.is-link,
+.macro-now-price-node.is-link,
+.macro-now-credit-node.is-link,
+.macro-now-policy-node.is-link,
+.macro-now-external-node.is-link,
+.macro-now-labor-node.is-link {
+  color: var(--ink);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.macro-now-map-node.is-link:hover,
+.macro-now-price-node.is-link:hover,
+.macro-now-credit-node.is-link:hover,
+.macro-now-policy-node.is-link:hover,
+.macro-now-external-node.is-link:hover,
+.macro-now-labor-node.is-link:hover {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
 .macro-now-map-edge {
   display: flex;
   min-width: 0;
