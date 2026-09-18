@@ -8,6 +8,8 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const graph = JSON.parse(readFileSync(`${root}data/relations/macro.json`, 'utf8'));
 const graphPage = `${root}src/pages/graph.astro`;
 const explorerComponent = `${root}src/components/RelationshipExplorer.astro`;
+const transmissionPaths = `${root}src/components/TransmissionPaths.astro`;
+const transmissionPathData = `${root}src/data/transmissionPaths.ts`;
 const relationshipCards = `${root}src/components/RelationshipCards.astro`;
 const layout = `${root}src/layouts/BaseLayout.astro`;
 const homepage = `${root}src/pages/index.astro`;
@@ -186,12 +188,22 @@ test('keeps relationship metadata aligned with its source and target edge', () =
 test('keeps the relationship explorer discoverable from the primary product shell', () => {
   const page = readSource(graphPage);
   const component = readSource(explorerComponent);
+  const paths = readSource(transmissionPaths);
+  const pathData = readSource(transmissionPathData);
   const cards = readSource(relationshipCards);
   const nav = readSource(layout);
   const home = `${readSource(homepage)}\n${readSource(homeRelationshipPreview)}`;
 
   assert.match(page, /getRelationData/);
   assert.match(page, /RelationshipExplorer/);
+  assert.match(page, /TransmissionPaths/);
+  assert.match(page, /data-graph-explorer/);
+  assert.match(page, /按问题理解宏观关系/);
+  assert.match(page, /按节点查找（进阶）/);
+  assert.match(paths, /transmission-paths/);
+  assert.match(pathData, /政策怎样走到融资条件/);
+  assert.match(pathData, /价格压力怎样从生产端传到居民端/);
+  assert.match(pathData, /getTransmissionPaths/);
   assert.match(component, /data-explorer/);
   assert.match(component, /data-explorer-select/);
   assert.match(component, /data-explorer-panel/);
@@ -223,7 +235,7 @@ test('keeps the relationship explorer discoverable from the primary product shel
   assert.match(cards, /relationship-detail-endpoints/);
   assert.match(page, /关系类型|时间关系/);
   assert.match(page, /适用条件|局限|证据来源/);
-  assert.match(page, /直接查看|关系类型|关系详情/);
+  assert.match(`${page}\n${component}\n${paths}\n${cards}`, /直接查看|关系类型|关系详情/);
   assert.match(page, /不代表(?:确定)?因果|因果推断/);
   assert.match(nav, /href: ['"]\/learn['"]/);
   assert.match(nav, /label: ['"]学习['"]/);
@@ -262,5 +274,5 @@ test('does not reintroduce a node-link visualization', () => {
 
   assert.doesNotMatch(page, /echarts|RelationshipGraph|graph-canvas|force/i);
   assert.doesNotMatch(component, /echarts|Cytoscape|graph-canvas|force/i);
-  assert.match(page, /它受什么影响|它影响什么|与什么相关/);
+  assert.match(page, /按问题理解宏观关系|它受什么影响|它影响什么|与什么相关/);
 });

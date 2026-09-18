@@ -119,6 +119,9 @@
 .graph-disclaimer summary{cursor:pointer}
 .graph-disclaimer summary:focus-visible{outline:3px solid #a9d8c3;outline-offset:3px}
 .graph-disclaimer p{margin:10px 0 0}
+.graph-explorer-details { margin-top: 28px; border-top: 1px solid var(--line); }
+.graph-explorer-details > summary { padding: 18px 0; color: var(--green); cursor: pointer; font-size: 15px; font-weight: 800; }
+.graph-explorer-details > p { margin: 0 0 16px; color: var(--muted); font-size: 13px; }
 .explorer-shell .explorer-panel .relationship-block{margin:24px 0 0}
 .explorer-shell .explorer-panel .relationship-block>h2{font:700 24px/1.3 var(--serif)}
 @media(max-width:760px){.graph-page-head h1{font-size:32px}.graph-page-head .lead{font-size:15px}.graph-disclaimer{font-size:12px}.explorer-node-head h2{font-size:28px}.explorer-shell .explorer-panel .relationship-block{margin-top:20px}}
