@@ -45,6 +45,10 @@ for (const chapter of courseOutline) {
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
   assert.match(html, /data-course-complete/);
+  for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '学完后带走']) {
+    assert.match(html, new RegExp(phrase));
+  }
+  assert.match(html, /接下来：|主线先收束在这里/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
   const chapterIndex = courseOutline.indexOf(chapter);
   const previous = courseOutline[chapterIndex - 1];
