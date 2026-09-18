@@ -1,3 +1,5 @@
+import type { MacroDomainId } from './macroSnapshot/types';
+
 export const macroNowQuestions = [
   { id: 'growth', label: '经济活动', href: '/now/growth/', question: '在变快还是变慢？' },
   { id: 'prices', label: '价格变化', href: '/now/prices/', question: '上升、放缓，还是分化？' },
@@ -31,6 +33,15 @@ const macroNowConceptQuestionIds: Record<string, MacroNowQuestionId> = {
   imports: 'external',
 };
 
+const macroNowDomainQuestionIds: Record<MacroDomainId, MacroNowQuestionId> = {
+  growth: 'growth',
+  prices: 'prices',
+  'credit-liquidity': 'credit',
+  'policy-financial-conditions': 'policy',
+  labor: 'labor',
+  external: 'external',
+};
+
 const macroNowQuestionsById = new Map(macroNowQuestions.map(question => [question.id, question]));
 
 export function getMacroNowQuestion(id: MacroNowQuestionId): MacroNowQuestion {
@@ -40,4 +51,8 @@ export function getMacroNowQuestion(id: MacroNowQuestionId): MacroNowQuestion {
 export function getMacroNowQuestionForConcept(conceptId: string): MacroNowQuestion | null {
   const questionId = macroNowConceptQuestionIds[conceptId];
   return questionId ? getMacroNowQuestion(questionId) : null;
+}
+
+export function getMacroNowQuestionForDomain(domainId: MacroDomainId): MacroNowQuestion {
+  return getMacroNowQuestion(macroNowDomainQuestionIds[domainId]);
 }

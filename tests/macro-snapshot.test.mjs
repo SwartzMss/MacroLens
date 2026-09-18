@@ -10,7 +10,7 @@ import { analyzeLabor } from '../src/data/macroSnapshot/labor.ts';
 import { analyzePolicyFinancialConditions } from '../src/data/macroSnapshot/policyFinancialConditions.ts';
 import { analyzePrices } from '../src/data/macroSnapshot/prices.ts';
 import { deriveSynthesis } from '../src/data/macroSnapshot/synthesis.ts';
-import { getMacroNowQuestionForConcept, macroNowQuestions } from '../src/data/macroNow.ts';
+import { getMacroNowQuestionForConcept, getMacroNowQuestionForDomain, macroNowQuestions } from '../src/data/macroNow.ts';
 import {
   buildMacroSnapshot,
   getMacroSnapshotIndicators,
@@ -444,7 +444,8 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /当前状态的读法/);
   assert.match(component, /先找方向，再追到证据/);
   assert.match(component, /snapshot-reading-guide/);
-  assert.match(component, /domainHrefs/);
+  assert.match(component, /getMacroNowQuestionForDomain/);
+  assert.match(component, /问题：\{getMacroNowQuestionForDomain\(domain\.id\)\.question\}/);
   assert.doesNotMatch(component, /<div class="eyebrow">\{domain\.id\}<\/div>/);
   assert.doesNotMatch(component, /snapshot\.phase|snapshot\.signals|rulesVersion|Macro Score|confidence score/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
@@ -454,22 +455,16 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(now, /title="Macro Now｜当前宏观状态｜MacroLens"/);
   assert.match(now, /canonicalPath="\/now\/"/);
   assert.match(now, /MacroSnapshot/);
-  assert.match(component, /href="\/now\/growth\/"/);
   assert.match(growth, /经济活动在变快还是变慢/);
   assert.match(growth, /buildMacroSnapshot/);
   assert.match(growth, /getMacroSnapshotIndicators/);
   assert.match(growth, /查看数据来源/);
   assert.match(growth, /还缺什么证据/);
   assert.match(growth, /\/concepts\/employment/);
-  assert.match(component, /href="\/now\/prices\/"/);
   assert.match(readFileSync(pricesPage, 'utf8'), /价格现在是在上升、放缓，还是分化/);
-  assert.match(component, /href="\/now\/credit\/"/);
   assert.match(readFileSync(creditPage, 'utf8'), /钱在变多，融资就一定更容易吗/);
-  assert.match(component, /href="\/now\/policy\/"/);
   assert.match(readFileSync(policyPage, 'utf8'), /政策在放松，融资真的更容易了吗/);
-  assert.match(component, /href="\/now\/external\/"/);
   assert.match(readFileSync(externalPage, 'utf8'), /出口在增长，外贸真的更强了吗/);
-  assert.match(component, /href="\/now\/labor\/"/);
   assert.match(readFileSync(laborPage, 'utf8'), /失业率下降了，就业真的变好了吗/);
 });
 
@@ -622,6 +617,21 @@ test('indicator concepts can return to the matching Macro Now question', () => {
     assert.equal(getMacroNowQuestionForConcept(conceptId)?.id, questionId);
   }
   assert.equal(getMacroNowQuestionForConcept('household-consumption'), null);
+});
+
+test('Macro Now overview uses the same question registry as detail pages', () => {
+  const domainQuestionIds = {
+    growth: 'growth',
+    prices: 'prices',
+    'credit-liquidity': 'credit',
+    'policy-financial-conditions': 'policy',
+    labor: 'labor',
+    external: 'external',
+  };
+
+  for (const [domainId, questionId] of Object.entries(domainQuestionIds)) {
+    assert.equal(getMacroNowQuestionForDomain(domainId).id, questionId);
+  }
 });
 
 test('domain classifications do not depend on presentation labels', () => {
