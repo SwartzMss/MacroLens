@@ -63,6 +63,7 @@ test('homepage is a narrative entry point and full snapshot has its own route', 
   }
   assert.doesNotMatch(home, /MacroDashboard|<MacroSnapshot|TransmissionPaths|<NotableSignals/);
   assert.doesNotMatch(`${home}\n${homeComponents}`, /href=["']\/snapshot["']/);
+  assert.match(`${home}\n${homeComponents}`, /href=["']\/now\/["']/);
   assert.match(snapshot, /MacroSnapshot/);
   assert.match(snapshot, /buildMacroSnapshot/);
 

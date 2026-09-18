@@ -72,6 +72,9 @@ main {
 .nav a:hover {
   color: var(--green);
 }
+.nav a[aria-current="page"] {
+  color: var(--green);
+}
 .hero {
   padding: 88px 0 62px;
   display: grid;

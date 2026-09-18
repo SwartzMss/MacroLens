@@ -21,6 +21,7 @@ const data = observations => ({ data: observations });
 const snapshotComponent = fileURLToPath(new URL('../src/components/MacroSnapshot.astro', import.meta.url));
 const snapshotStyles = fileURLToPath(new URL('../src/styles/snapshot.css', import.meta.url));
 const snapshotPage = fileURLToPath(new URL('../src/pages/snapshot.astro', import.meta.url));
+const macroNowPage = fileURLToPath(new URL('../src/pages/now.astro', import.meta.url));
 const makeMacroIndicators = (overrides = {}) => {
   const base = getMacroSnapshotIndicators();
   return Object.fromEntries(macroIndicatorIds.map(id => {
@@ -414,16 +415,24 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   const component = readFileSync(snapshotComponent, 'utf8');
   const styles = readFileSync(snapshotStyles, 'utf8');
   const page = readFileSync(snapshotPage, 'utf8');
+  const now = readFileSync(macroNowPage, 'utf8');
 
   assert.match(component, /snapshot\.synthesis/);
   assert.match(component, /snapshot\.domains/);
   assert.match(component, /domain\.evidence/);
   assert.match(component, /observationPeriod/);
   assert.match(component, /updatedAt/);
+  assert.match(component, /Macro Now · 当前状态/);
+  assert.match(component, /各方面的变化和依据/);
+  assert.doesNotMatch(component, /<div class="eyebrow">\{domain\.id\}<\/div>/);
   assert.doesNotMatch(component, /snapshot\.phase|snapshot\.signals|rulesVersion|Macro Score|confidence score/);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/);
   assert.match(page, /MacroSnapshot/);
   assert.match(page, /buildMacroSnapshot/);
+  assert.match(page, /canonicalPath="\/now\/"/);
+  assert.match(now, /title="Macro Now｜当前宏观状态｜MacroLens"/);
+  assert.match(now, /canonicalPath="\/now\/"/);
+  assert.match(now, /MacroSnapshot/);
 });
 
 test('domain conclusions reference evidence from the same domain', () => {
