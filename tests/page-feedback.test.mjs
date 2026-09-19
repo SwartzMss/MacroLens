@@ -208,10 +208,11 @@ test('renders feedback on independent courses, not concept pages', () => {
   assert.match(course, /lesson\.id === ['"]reading-news['"]/);
   assert.match(course, /LearningSelfCheck/);
   assert.ok(course.indexOf('LearningSelfCheck') < course.indexOf('class="course-actions"'));
+  assert.ok(course.indexOf('LearningSelfCheck') < course.indexOf('<PageFeedback'));
   const exploration = readFileSync(`${root}src/pages/learn/explore/[explorationId].astro`, 'utf8');
   assert.match(exploration, /PageFeedback pageId=\{`learn:exploration-[^`]+`\} mode="exploration"/);
   assert.doesNotMatch(exploration, /LearningSelfCheck/);
-  assert.ok(course.indexOf('class="course-actions"') < course.indexOf('<PageFeedback'));
+  assert.ok(course.indexOf('<PageFeedback') < course.indexOf('class="course-actions"'));
   assert.ok(exploration.indexOf('class="course-actions"') < exploration.indexOf('<PageFeedback'));
   assert.match(api, /parseVisitorCookie/);
   assert.match(api, /FEEDBACK_DB/);

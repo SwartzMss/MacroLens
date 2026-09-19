@@ -64,6 +64,7 @@ const isFinalLesson = lesson.id === 'reading-news';
           </ul>
         </section>
         {isFinalLesson && <LearningSelfCheck />}
+        <PageFeedback pageId={`learn:course-${lesson.id}`} mode="course" />
         <section class="course-actions" aria-label="阅读进度">
           {previous?.published && <a href={courseLessonHref(previous.id)}>上一章：{previous.title}</a>}
           {next && <div class="course-next">
@@ -79,7 +80,6 @@ const isFinalLesson = lesson.id === 'reading-news';
           </div>}
           <a class="course-action-secondary" href="/learn/">返回主线，查看完整大纲</a>
         </section>
-        <PageFeedback pageId={`learn:course-${lesson.id}`} mode="course" />
       </article>
       <nav class="course-toc" aria-label="本章目录">
         <strong>这一章我们聊什么</strong>
