@@ -5,6 +5,7 @@ import { explorations, explorationHref } from '../../src/data/explorations.ts';
 const dist = new URL('../../dist/', import.meta.url);
 const read = path => readFileSync(new URL(path, dist), 'utf8');
 const index = read('learn/index.html');
+assert.ok(existsSync(new URL('404.html', dist)));
 assert.equal(existsSync(new URL('learn/macro-foundations/employment/index.html', dist)), false);
 assert.match(index, /问题探索/);
 if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正在编写/);
