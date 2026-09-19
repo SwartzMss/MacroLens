@@ -14,7 +14,6 @@ import ConceptTableOfContents from '../components/ConceptTableOfContents.astro';
 import CreditUnderstanding from '../components/CreditUnderstanding.astro';
 import MonetaryPolicyUnderstanding from '../components/MonetaryPolicyUnderstanding.astro';
 import ConceptUnderstanding from '../components/ConceptUnderstanding.astro';
-import ContentLayerGuide from '../components/ContentLayerGuide.astro';
 import { buildConceptCatalog } from '../data/conceptCatalog';
 import { buildConceptKnowledge } from '../data/conceptKnowledge';
 import { topicRegistry } from '../data/topics';
@@ -67,11 +66,6 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
         <h1 class="concept-title">{entry.data.name}</h1>
         <p class="lead">{entry.data.subtitle}</p>
         <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
-        <ContentLayerGuide
-          mode="concept"
-          learningHref="/learn/"
-          conceptHref={`/concepts/${entry.data.id}/`}
-        />
         {macroNowQuestion && <a class="concept-macro-now-context" href={macroNowQuestion.href}>
           <span class="eyebrow">Macro Now · 当前宏观</span>
           <strong>{macroNowQuestion.label}：{macroNowQuestion.question}</strong>

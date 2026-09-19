@@ -108,6 +108,7 @@ test('knowledge library and global search stay separate', () => {
   assert.match(index, /concept-filter-panel/);
   assert.match(index, /index-card-tags/);
   assert.match(index, /data-category-section/);
+  assert.doesNotMatch(reader, /ContentLayerGuide|进入学习路线|learningHref/);
   assert.doesNotMatch(search, /triggerFilters\(\{content:'concept'\}\)/);
   assert.match(search, /triggerSearch\(query\)/);
   assert.match(search, /搜索 MacroLens/);
