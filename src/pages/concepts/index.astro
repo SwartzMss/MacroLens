@@ -32,14 +32,13 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
     </div>
   </header>
   <div class="shell concept-index">
-    <details class="concept-filter-panel" data-filter-panel open>
-      <summary>筛选</summary>
+    <div class="concept-filter-panel" data-filter-panel>
       <form class="concept-filters" data-concept-filters>
         <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
         <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
         <div class="filter-field filter-topic"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
       </form>
-    </details>
+    </div>
     <div class="filter-empty" data-filter-empty hidden>
       <h2>暂无匹配的概念</h2>
       <p>试试调整领域、难度或主题，或清除筛选查看全部概念。</p>
