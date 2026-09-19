@@ -47,7 +47,7 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
       <header><div><h2>{group.label}</h2><p>{group.description}</p></div></header>
       <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
-        <div class="index-card-tags"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
+        <div class="index-card-tags"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m0','m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
         <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">查看定义与数据 →</b>
       </a>)}</div>
     </section>)}
