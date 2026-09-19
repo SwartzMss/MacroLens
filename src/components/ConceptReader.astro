@@ -62,7 +62,7 @@ const articleHeadings = headings.filter(heading => heading.depth === 2);
   <div class="concept-detail-page">
     <header class="page-head detail-header" id={`${entry.data.id}-overview`}>
       <div class="shell">
-        <div class="breadcrumbs"><a href="/">首页</a> / <a href={`/concepts#${entry.data.category}`}>{categoryLabel}</a> / {entry.data.name}</div>
+        <div class="breadcrumbs"><a href="/concepts">知识库</a> / <a href={`/concepts#${entry.data.category}`}>{categoryLabel}</a> / {entry.data.name}</div>
         <h1 class="concept-title">{entry.data.name}</h1>
         <p class="lead">{entry.data.subtitle}</p>
         <div class="meta"><span>来源：{entry.data.source}</span><span>国家/地区：{entry.data.country === 'CN' ? '中国' : entry.data.country}</span></div>
