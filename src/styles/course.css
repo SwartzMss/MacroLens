@@ -335,6 +335,32 @@
   display:inline-block;
   margin:12px 0;
 }
+.course-actions .course-action-primary,
+.course-actions .course-action-secondary {
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding:10px 16px;
+  border-radius:9px;
+  font-weight:700;
+  text-decoration:none;
+}
+.course-actions .course-action-primary {
+  background:var(--green);
+  color:#fff;
+}
+.course-actions .course-action-primary:hover {
+  background:#096b56;
+}
+.course-actions .course-action-secondary {
+  border:1px solid var(--line);
+  background:var(--paper);
+  color:var(--green);
+}
+.course-actions .course-action-secondary:hover {
+  border-color:#9fc2b4;
+  background:#e8f1ec;
+}
 .course-shell a:focus-visible,.course-shell button:focus-visible,.course-shell summary:focus-visible {
   outline:3px solid var(--green);
   outline-offset:4px;

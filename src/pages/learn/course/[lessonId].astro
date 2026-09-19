@@ -72,14 +72,14 @@ const isFinalLesson = lesson.id === 'reading-news';
             <strong>接下来：{next.title}</strong>
             <p>{nextReason}</p>
             {next.published
-              ? <a href={courseLessonHref(next.id)}>继续下一章</a>
+              ? <a class="course-action-primary" href={courseLessonHref(next.id)}>继续下一章</a>
               : <p class="course-note">这一章正在编写，完成后会在入门主线开放。</p>}
           </div>}
           {!next && <div class="course-next">
             <strong>主线先收束在这里</strong>
             <p>{nextReason}</p>
           </div>}
-          <a href="/learn/">返回主线，查看完整大纲</a>
+          <a class="course-action-secondary" href="/learn/">返回主线，查看完整大纲</a>
         </section>
         <PageFeedback pageId={`learn:course-${lesson.id}`} mode="course" />
       </article>
