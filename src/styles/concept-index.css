@@ -9,7 +9,7 @@
 .concept-search button { padding: 14px 32px; border: 0; border-radius: 8px; background: var(--green); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .concept-index { padding-bottom: 64px; }
 .concept-filter-panel { text-align: right; }
-.concept-filters { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 16px 0; text-align: left; }
+.concept-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 16px 0; text-align: left; }
 .filter-field { display: grid; gap: 6px; min-width: 0; }
 .filter-field label { font-size: 13px; color: var(--muted); }
 .filter-field select { width: 100%; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; }
@@ -38,7 +38,6 @@
   .index-card { min-height: 56px; padding: 12px; }
   .index-card h3 { font-size: 15px; }
   .concept-filters { grid-template-columns: 1fr 1fr; }
-  .filter-topic { grid-column: 1 / -1; }
 }
 
 .concept-index { padding-top: 30px; }
