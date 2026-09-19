@@ -3,7 +3,6 @@ const cards = [...document.querySelectorAll<HTMLElement>('[data-concept-card]')]
 const sections = [...document.querySelectorAll<HTMLElement>('[data-category-section]')];
 const empty = document.querySelector<HTMLElement>('[data-filter-empty]');
 const filterNames = ['category', 'level', 'topic'] as const;
-const filterPanel = document.querySelector<HTMLDetailsElement>('[data-filter-panel]');
 
 function selected(name: string) {
   return form?.elements.namedItem(name) as HTMLSelectElement | null;
@@ -16,7 +15,6 @@ function readUrl() {
     const value = params.get(name);
     if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
   }
-  if (filterPanel && filterNames.some((name) => params.get(name) && params.get(name) !== 'all')) filterPanel.open = true;
 }
 
 function writeUrl() {

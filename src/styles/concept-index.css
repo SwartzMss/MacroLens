@@ -9,17 +9,10 @@
 .concept-search button { padding: 14px 32px; border: 0; border-radius: 8px; background: var(--green); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .concept-index { padding-bottom: 64px; }
 .concept-filter-panel { text-align: right; }
-.concept-filter-panel summary { display: inline-block; padding: 0 4px 8px; color: var(--green); cursor: pointer; font-size: 13px; }
-.concept-filter-panel summary::after { content: ' ＋'; }
-.concept-filter-panel[open] summary::after { content: ' −'; }
 .concept-filters { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 16px 0; text-align: left; }
 .filter-field { display: grid; gap: 6px; min-width: 0; }
 .filter-field label { font-size: 13px; color: var(--muted); }
 .filter-field select { width: 100%; min-height: 44px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--ink); font: inherit; }
-.concept-quick-nav { margin: 4px 0 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
-.concept-quick-links { display: flex; flex-wrap: wrap; gap: 8px 18px; }
-.concept-quick-links a { display: inline-flex; gap: 6px; padding: 4px 0; font-size: 13px; color: var(--muted); text-decoration: none; }
-.concept-quick-links a:hover { color: var(--green); }
 .category-section { padding: 0 0 28px; scroll-margin-top: 90px; }
 .category-section > header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .category-section h2 { margin: 0; font-size: 16px; }
