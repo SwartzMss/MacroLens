@@ -10,6 +10,7 @@ assert.match(index, /问题探索/);
 if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正在编写/);
 else assert.doesNotMatch(index, /正在编写/);
 assert.doesNotMatch(index, /data-learning-card|graph\?node/);
+assert.doesNotMatch(index, /data-course-status|进度保存在当前浏览器|开启 JavaScript 后可以保存阅读进度/);
 assert.ok(index.includes(`目前已开放 ${courseOutline.filter(chapter => chapter.published).length} 章`));
 for (const exploration of explorations) {
   const route = `learn/explore/${exploration.id}/index.html`;
@@ -45,17 +46,27 @@ for (const chapter of courseOutline) {
   assert.ok(index.includes(`href="${courseLessonHref(chapter.id)}"`));
   const html = read(route);
   assert.match(html, /data-pagefind-body/);
+  assert.match(html, /class="course-back-link"[^>]*>返回入门主线</);
+  assert.doesNotMatch(html, /← 入门主线/);
+  assert.doesNotMatch(html, /data-course-status|进度保存在当前浏览器|开启 JavaScript 后可以保存阅读进度/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
-  assert.match(html, /data-course-complete/);
+  assert.doesNotMatch(html, /data-course-complete/);
   assert.match(html, /读完这一章，你能解释开头的问题了吗/);
   assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
   assert.doesNotMatch(html, /图表不够清楚/);
-  for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '先记住一个基本方向', '学完后带走']) {
+  for (const phrase of ['这一章要弄明白什么', '先记住一个基本方向', '学完后带走']) {
     assert.match(html, new RegExp(phrase));
   }
-  assert.match(html, /接下来：|主线先收束在这里/);
+  if (chapter.id === 'connected-economy') {
+    assert.doesNotMatch(html, /先把前面的问题接回来|这是第一章，先从一份早餐开始/);
+  } else {
+    const recallPosition = html.indexOf('先把前面的问题接回来');
+    const goalsPosition = html.indexOf('这一章要弄明白什么');
+    assert.ok(recallPosition >= 0 && recallPosition < goalsPosition, `${chapter.id}: recall should precede goals`);
+  }
+  assert.match(html, /class="course-chapter-nav"/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
   const chapterIndex = courseOutline.indexOf(chapter);
   const previous = courseOutline[chapterIndex - 1];
@@ -63,6 +74,7 @@ for (const chapter of courseOutline) {
   if (previous?.published) assert.ok(html.includes(`href="${courseLessonHref(previous.id)}"`));
   if (next?.published) assert.ok(html.includes(`href="${courseLessonHref(next.id)}"`));
   if (next && !next.published) assert.ok(!html.includes(`href="${courseLessonHref(next.id)}"`));
+  if (next?.published) assert.match(html, /data-course-next/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length);
   for (const match of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(decodeURIComponent(match[1])), `Missing anchor: ${match[1]}`);
