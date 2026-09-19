@@ -19,7 +19,6 @@ const { Content, headings } = await render(lesson);
 const index = courseOutline.findIndex(item => item.id === lesson.id);
 const previous = courseOutline[index - 1];
 const next = courseOutline[index + 1];
-const nextReason = courseOutline[index]?.nextReason;
 const sections = headings.filter(item => item.depth === 2);
 const isFinalLesson = lesson.id === 'reading-news';
 ---
@@ -65,19 +64,11 @@ const isFinalLesson = lesson.id === 'reading-news';
         </section>
         {isFinalLesson && <LearningSelfCheck />}
         <PageFeedback pageId={`learn:course-${lesson.id}`} mode="course" />
-        <section class="course-actions" aria-label="阅读进度">
-          {previous?.published && <a href={courseLessonHref(previous.id)}>上一章：{previous.title}</a>}
-          {next && <div class="course-next">
-            <strong>接下来：{next.title}</strong>
-            <p>{nextReason}</p>
-            {next.published
-              ? <a class="course-action-primary" data-course-next href={courseLessonHref(next.id)}>继续下一章</a>
-              : <p class="course-note">这一章正在编写，完成后会在入门主线开放。</p>}
-          </div>}
-          {!next && <div class="course-next">
-            <strong>主线先收束在这里</strong>
-            <p>{nextReason}</p>
-          </div>}
+        <section class="course-actions" aria-label="章节导航">
+          <nav class="course-chapter-nav" aria-label="章节导航">
+            {previous?.published && <a class="course-chapter-link previous" href={courseLessonHref(previous.id)}><span>上一章</span><strong>{previous.title}</strong></a>}
+            {next?.published && <a class="course-chapter-link next" data-course-next href={courseLessonHref(next.id)}><span>下一章</span><strong>{next.title}</strong></a>}
+          </nav>
           <a class="course-action-secondary" href="/learn/">返回主线，查看完整大纲</a>
         </section>
       </article>

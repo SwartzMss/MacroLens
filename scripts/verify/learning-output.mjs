@@ -66,7 +66,7 @@ for (const chapter of courseOutline) {
     const goalsPosition = html.indexOf('这一章要弄明白什么');
     assert.ok(recallPosition >= 0 && recallPosition < goalsPosition, `${chapter.id}: recall should precede goals`);
   }
-  assert.match(html, /接下来：|主线先收束在这里/);
+  assert.match(html, /class="course-chapter-nav"/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
   const chapterIndex = courseOutline.indexOf(chapter);
   const previous = courseOutline[chapterIndex - 1];
