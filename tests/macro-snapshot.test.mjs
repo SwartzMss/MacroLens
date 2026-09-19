@@ -448,9 +448,7 @@ test('snapshot UI renders domain evidence without exposing implementation metada
   assert.match(component, /frequencyLabels\[evidence\.frequency\]/);
   assert.match(component, /Macro Now · 当前宏观/);
   assert.match(component, /各方面的变化和依据/);
-  assert.match(component, /当前宏观的读法/);
-  assert.match(component, /先找方向，再追到证据/);
-  assert.match(component, /snapshot-reading-guide/);
+  assert.doesNotMatch(component, /当前宏观的读法|先找方向，再追到证据|snapshot-reading-guide/);
   assert.match(component, /getMacroNowQuestionForDomain/);
   assert.match(component, /问题：\{getMacroNowQuestionForDomain\(domain\.id\)\.question\}/);
   assert.doesNotMatch(component, /<div class="eyebrow">\{domain\.id\}<\/div>/);
