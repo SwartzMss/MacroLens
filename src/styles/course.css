@@ -16,6 +16,22 @@
   letter-spacing:.14em;
   text-transform:uppercase;
 }
+.course-back-link {
+  display:inline-flex;
+  align-items:center;
+  margin-bottom:22px;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:#faf9f3;
+  color:var(--green);
+  font-size:13px;
+  font-weight:700;
+}
+.course-back-link:hover {
+  border-color:#9fc2b4;
+  background:#e8f1ec;
+}
 .course-shell h1 {
   text-wrap: balance;
   font:800 clamp(32px, 4vw, 48px)/1.2 var(--serif);

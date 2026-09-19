@@ -45,6 +45,8 @@ for (const chapter of courseOutline) {
   assert.ok(index.includes(`href="${courseLessonHref(chapter.id)}"`));
   const html = read(route);
   assert.match(html, /data-pagefind-body/);
+  assert.match(html, /class="course-back-link"[^>]*>返回入门主线</);
+  assert.doesNotMatch(html, /← 入门主线/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);

@@ -26,7 +26,7 @@ const isFinalLesson = lesson.id === 'reading-news';
 <BaseLayout title={`${lesson.data.title}｜学习经济｜MacroLens`} description={lesson.data.description}>
   <div class="course-shell" data-course-lesson={lesson.id} data-pagefind-body>
     <header>
-      <a href="/learn/">← 入门主线</a>
+      <a class="course-back-link" href="/learn/">返回入门主线</a>
       <p class="course-kicker">第 {index + 1} 章 · 约 {lesson.data.minutes} 分钟</p>
       <h1>{lesson.data.title}</h1>
       <p class="course-lead">{lesson.data.description}</p>
