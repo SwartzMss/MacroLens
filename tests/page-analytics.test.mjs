@@ -57,7 +57,8 @@ test('parses page aggregates and combines today counts by stable article ID', ()
 
 test('module stats classify the current product entry paths', () => {
   const queries = moduleStatsQueries('2026-09-06');
-  assert.match(queries.total, /CASE/i);
+  assert.match(queries.total, /if\s*\(/i);
+  assert.doesNotMatch(queries.total, /\bCASE\b/i);
   assert.match(queries.total, /blob3\s*=\s*'\/now'/i);
   assert.match(queries.total, /blob3\s+LIKE\s+'\/concepts\/%'/i);
   assert.match(queries.today, /blob2\s*=\s*'2026-09-06'/i);
