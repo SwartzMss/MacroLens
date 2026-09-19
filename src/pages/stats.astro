@@ -1,19 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { courseOutline, courseLessonHref } from '../data/courseOutline';
 import { explorations, explorationHref } from '../data/explorations';
-import { learningArticles } from '../data/learningArticles';
 import { productModules } from '../data/productModules';
 import '../styles/stats.css';
 
-const concepts = (await getCollection('concepts'))
-  .sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id));
-const conceptsById = new Map(concepts.map(concept => [concept.data.id, concept]));
-const legacyArticles = learningArticles
-  .map(article => ({ ...article, concept: conceptsById.get(article.conceptId) }))
-  .filter(article => article.concept)
-  .sort((a, b) => a.concept!.data.order - b.concept!.data.order || a.conceptId.localeCompare(b.conceptId));
 const articles = [
   ...courseOutline.filter(chapter => chapter.published).map(chapter => ({
     pageId: `learn:course-${chapter.id}`, title: chapter.title, label: '独立课程', paths: [courseLessonHref(chapter.id).replace(/\/$/, '')],
@@ -21,7 +12,6 @@ const articles = [
   ...explorations.filter(exploration => exploration.published).map(exploration => ({
     pageId: `learn:exploration-${exploration.id}`, title: exploration.title, label: '问题探索', paths: [explorationHref(exploration.id).replace(/\/$/, '')],
   })),
-  ...legacyArticles.map(article => ({ pageId: article.pageId, title: article.concept!.data.name, label: '旧版导读 · 历史记录', paths: article.paths })),
 ];
 const feedbackReasons = [
   { value: 'too_complex', label: '概念太难' },
@@ -99,7 +89,7 @@ const feedbackReasons = [
       <header class="stats-panel-head">
         <div>
           <h2 id="learning-stats-title">学习文章表现</h2>
-          <p>新课程与旧版导读分别统计，历史反馈不会算入新课程。这里的反馈是内容筛选信号，不代表用户已经学会；少于 5 条时只标记“待观察”。</p>
+          <p>独立课程与问题探索分别统计。这里的反馈是内容筛选信号，不代表用户已经学会；少于 5 条时只标记“待观察”。</p>
         </div>
       </header>
 
@@ -150,7 +140,7 @@ const feedbackReasons = [
         </table>
       </div>
 
-      <p class="stats-note">学习文章 UV 按文章 ID 和访客去重。旧版导读保留历史记录；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
+      <p class="stats-note">学习文章 UV 按文章 ID 和访客去重；全站访客仍按匿名访客 ID 去重，不能把文章 UV 相加当成全站访客数。</p>
     </section>
 
     <section class="stats-panel" aria-labelledby="feedback-reasons-title">

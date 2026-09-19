@@ -16,10 +16,9 @@ test('normalizes pathname identity without query, fragment, duplicate, or traili
   assert.equal(normalizeConceptPath('/concepts/m2/'), '/concepts/m2');
   assert.equal(normalizeConceptPath('/topics/money'), null);
   assert.equal(normalizeConceptPath('/concepts/'), null);
-  assert.equal(learningArticleIdForPath('/learn/macro-foundations/gdp/'), 'learn:gdp');
   assert.equal(learningArticleIdForPath('/learn/explore/why-rate-cuts-dont-boost-loans/'), 'learn:exploration-why-rate-cuts-dont-boost-loans');
-  assert.equal(learningArticleIdForPath('/learn/money-credit/m2/?from=route'), 'learn:m2');
-  assert.equal(learningArticleIdForPath('/learn/money-credit/recap/'), null);
+  assert.equal(learningArticleIdForPath('/learn/course/connected-economy/?from=route'), 'learn:course-connected-economy');
+  assert.equal(learningArticleIdForPath('/learn/money-credit/m2/?from=route'), null);
 });
 
 test('writes learning-article queries with distinct visitors and Shanghai date', () => {

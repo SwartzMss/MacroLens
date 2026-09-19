@@ -1,9 +1,0 @@
----
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { publishedLearningPaths } from '../../../data/learningPaths';
-import '../../../styles/course.css';
-export function getStaticPaths() { return publishedLearningPaths.map(path => ({ params: { pathId: path.id } })); }
----
-<BaseLayout title="学习内容已调整｜MacroLens" description="新的独立课程已开放，旧概念导读不再作为学习课程。" noindex>
-  <div class="course-shell" data-learning-migration><p class="course-kicker">学习内容已调整</p><h1>我们重新编写了学习课程</h1><p class="course-lead">你打开的是旧版概念导读的地址。新版课程从生活中的问题讲起，有自己的正文和阅读顺序。</p><p>旧阅读记录不会换算成新课程的完成进度。你可以从第一章重新开始，也可以先看看课程大纲。</p><a class="course-start" href="/learn/">查看新的学习主线 →</a></div>
-</BaseLayout>
