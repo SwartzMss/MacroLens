@@ -132,11 +132,13 @@
 
 .snapshot-domain-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 14px;
 }
 
 .snapshot-domain {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.34fr) minmax(0, 1fr);
+  column-gap: 24px;
   min-width: 0;
   padding: 20px;
   background: var(--card);
@@ -153,6 +155,8 @@
 }
 
 .snapshot-domain-head {
+  grid-column: 1;
+  grid-row: 1;
   align-items: start;
 }
 
@@ -180,15 +184,20 @@
 }
 
 .snapshot-domain-explanation {
+  grid-column: 1;
+  grid-row: 2;
   margin-top: 12px;
   font-size: 13px;
   line-height: 1.55;
 }
 
 .snapshot-domain-evidence {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
-  margin-top: 18px;
+  align-content: start;
 }
 
 .snapshot-evidence {
@@ -250,6 +259,7 @@
 }
 
 .snapshot-domain-conclusions {
+  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
@@ -310,8 +320,8 @@
 }
 
 @media (max-width: 1000px) {
-  .snapshot-domain-grid {
-    grid-template-columns: 1fr;
+  .snapshot-domain {
+    grid-template-columns: minmax(180px, 0.35fr) minmax(0, 1fr);
   }
 }
 
@@ -329,7 +339,20 @@
 
   .snapshot-synthesis,
   .snapshot-reading-guide,
-  .snapshot-domain-conclusions {
+  .snapshot-domain-conclusions,
+  .snapshot-domain {
     grid-template-columns: 1fr;
+  }
+
+  .snapshot-domain-evidence,
+  .snapshot-domain-head,
+  .snapshot-domain-explanation,
+  .snapshot-domain-conclusions {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .snapshot-domain-evidence {
+    margin-top: 18px;
   }
 }
