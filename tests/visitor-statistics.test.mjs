@@ -57,17 +57,17 @@ test('reuses an existing valid visitor cookie without setting another one', asyn
   assert.equal(response.headers.has('set-cookie'), false);
 });
 
-test('records a stable learning article ID for learning routes', async () => {
+test('records a stable learning article ID for current course routes', async () => {
   const binding = analytics();
   await onVisitorRequest({
-    request: new Request('https://macrolens.example/learn/money-credit/m2/?from=route', {
+    request: new Request('https://macrolens.example/learn/course/connected-economy/?from=route', {
       headers: { accept: 'text/html' },
     }),
     env: { ANALYTICS: binding },
     next: async () => htmlResponse(),
   });
-  assert.equal(learningArticleIdForPath('/learn/money-credit/m2/'), 'learn:m2');
-  assert.equal(binding.points[0].blobs[3], 'learn:m2');
+  assert.equal(learningArticleIdForPath('/learn/course/connected-economy/'), 'learn:course-connected-economy');
+  assert.equal(binding.points[0].blobs[3], 'learn:course-connected-economy');
   assert.equal(binding.points[0].blobs.length, 4);
 });
 

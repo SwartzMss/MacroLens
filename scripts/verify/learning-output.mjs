@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { publishedLearningPaths } from '../../src/data/learningPaths.ts';
 import { courseOutline, courseLessonHref } from '../../src/data/courseOutline.ts';
 import { explorations, explorationHref } from '../../src/data/explorations.ts';
 const dist = new URL('../../dist/', import.meta.url);
 const read = path => readFileSync(new URL(path, dist), 'utf8');
 const index = read('learn/index.html');
+assert.equal(existsSync(new URL('learn/macro-foundations/employment/index.html', dist)), false);
 assert.match(index, /问题探索/);
 if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正在编写/);
 else assert.doesNotMatch(index, /正在编写/);
@@ -83,15 +83,6 @@ const capstone = read('learn/course/reading-news/index.html');
 for (const phrase of ['完整的假设新闻', '经济活动', '就业与收入', '信用与利率', '政策动作', '综合练习']) {
   assert.match(capstone, new RegExp(phrase));
 }
-for (const path of publishedLearningPaths) {
-  for (const route of [`learn/${path.id}/index.html`, ...path.steps.map(step => `learn/${path.id}/${step.id}/index.html`)]) {
-    const html = read(route);
-    assert.match(html, /data-learning-migration/);
-    assert.match(html, /noindex/);
-    assert.match(html, /href="\/learn\/"/);
-    assert.doesNotMatch(html, /concept-long-form|data-course-complete/);
-  }
-}
 if (process.env.PUBLIC_SITE_URL) {
   const sitemap = read('sitemap-0.xml');
   for (const chapter of courseOutline.filter(chapter => chapter.published)) {
@@ -102,6 +93,5 @@ if (process.env.PUBLIC_SITE_URL) {
     assert.ok(sitemap.includes(explorationHref(exploration.id)));
     assert.ok(read(`learn/explore/${exploration.id}/index.html`).includes(`rel="canonical" href="${new URL(explorationHref(exploration.id), process.env.PUBLIC_SITE_URL)}"`));
   }
-  for (const path of publishedLearningPaths) assert.ok(!sitemap.includes(`/learn/${path.id}/`));
 }
-console.log('Verified independent courses, unpublished boundaries, anchors and all legacy migration pages.');
+console.log('Verified independent courses, unpublished boundaries and anchors.');

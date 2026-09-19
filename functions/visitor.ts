@@ -61,9 +61,7 @@ export function learningArticleIdForPath(pathname: string): string | null {
   if (course) return `learn:course-${course[1]}`;
   const exploration = normalizePathname(pathname).match(/^\/learn\/explore\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
   if (exploration) return `learn:exploration-${exploration[1]}`;
-  const match = normalizePathname(pathname).match(/^\/learn\/[a-z0-9]+(?:-[a-z0-9]+)*\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-  if (!match || match[1] === 'recap') return null;
-  return `learn:${match[1]}`;
+  return null;
 }
 
 export function visitorDataPoint(visitorId: string, shanghaiDate: string, pathname: string) {
