@@ -21,7 +21,6 @@ const categoryGroups = [...grouped.entries()]
   .map(([id, items]) => ({ id, ...getCategory(id), items: items.sort((a, b) => a.data.order - b.data.order || a.data.id.localeCompare(b.data.id)) }))
   .sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 const categoryOptions = categoryIds.filter(id => grouped.has(id)).map(id => ({ id, ...categories[id] }));
-const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 ---
 <BaseLayout title="知识库｜MacroLens" description="按领域浏览 MacroLens 已收录的宏观经济概念。">
   <header class="index-head concept-library-head">
@@ -36,17 +35,16 @@ const topicOptions = [...topicRegistry].sort((a, b) => a.order - b.order || a.id
       <form class="concept-filters" data-concept-filters>
         <div class="filter-field"><label for="concept-category">领域</label><select id="concept-category" name="category"><option value="all">全部领域</option>{categoryOptions.map(option => <option value={option.id}>{option.label}</option>)}</select></div>
         <div class="filter-field"><label for="concept-level">难度</label><select id="concept-level" name="level"><option value="all">全部难度</option><option value="basic">基础</option><option value="advanced">进阶</option></select></div>
-        <div class="filter-field filter-topic"><label for="concept-topic">主题</label><select id="concept-topic" name="topic"><option value="all">全部主题</option>{topicOptions.map(option => <option value={option.id} data-topic-category={option.category}>{option.label}</option>)}</select></div>
       </form>
     </div>
     <div class="filter-empty" data-filter-empty hidden>
       <h2>暂无匹配的概念</h2>
-      <p>试试调整领域、难度或主题，或清除筛选查看全部概念。</p>
+      <p>试试调整领域或难度，或清除筛选查看全部概念。</p>
       <button type="button" data-filter-reset>清除筛选</button>
     </div>
     {categoryGroups.map(group => <section class="category-section" id={group.id} data-category-section={group.id}>
       <header><div><h2>{group.label}</h2><p>{group.description}</p></div></header>
-      <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-topics={concept.data.topics.join(' ')} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
+      <div class="index-grid">{group.items.map(concept => <a class="index-card" data-concept-card data-category={concept.data.category} data-level={concept.data.level} href={`/concepts/${concept.data.id}`}>
         <div class="index-card-tags"><span class="level-chip">{concept.data.level === 'basic' ? '基础' : '进阶'}</span>{['m0','m1','m2'].includes(concept.data.id) && <span class="start-chip">推荐起点</span>}</div>
         <h3>{concept.data.name}</h3><p>{concept.data.subtitle}</p><b aria-hidden="true">查看定义与数据 →</b>
       </a>)}</div>

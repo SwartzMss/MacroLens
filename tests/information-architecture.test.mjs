@@ -80,15 +80,17 @@ test('homepage remains a curated entry point', () => {
   assert.doesNotMatch(homepage, /topicRegistry|topics\.map/);
 });
 
-test('concept index will expose all three browsing dimensions', () => {
+test('concept index will expose domain and difficulty browsing', () => {
   const source = readFileSync(conceptsIndex, 'utf8');
   const filters = readFileSync(`${root}src/scripts/concept-filters.ts`, 'utf8');
   assert.match(source, /concept-library-head/);
   assert.match(source, /<div class="eyebrow">知识库<\/div>/);
   assert.match(source, /按领域认识宏观概念/);
   assert.doesNotMatch(source, /(?:01|02|03)\s*\//);
-  for (const name of ['category', 'topic', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
-  for (const attribute of ['data-category', 'data-topics', 'data-level', 'data-topic-category']) assert.match(source, new RegExp(attribute));
+  for (const name of ['category', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
+  assert.doesNotMatch(source, /name=["']topic["']/);
+  for (const attribute of ['data-category', 'data-level']) assert.match(source, new RegExp(attribute));
+  assert.doesNotMatch(source, /data-topics|data-topic-category/);
   assert.match(source, /concept-filters/);
   assert.match(source, /class="concept-filter-panel"/);
   assert.doesNotMatch(source, /<summary>筛选<\/summary>/);
@@ -97,9 +99,11 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(filters, /history\.pushState/);
   assert.match(filters, /history\.replaceState/);
   assert.match(filters, /popstate/);
-  assert.match(filters, /syncTopicOptions/);
+  assert.match(filters, /filterNames = \['category', 'level'\]/);
+  assert.match(filters, /syncLevelOptions/);
   assert.match(filters, /option\.hidden/);
   assert.match(filters, /option\.disabled/);
+  assert.match(filters, /searchParams\.delete\('topic'\)/);
 });
 
 test('knowledge library and global search stay separate', () => {
