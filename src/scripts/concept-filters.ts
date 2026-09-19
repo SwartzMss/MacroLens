@@ -8,6 +8,20 @@ function selected(name: string) {
   return form?.elements.namedItem(name) as HTMLSelectElement | null;
 }
 
+function syncTopicOptions() {
+  const category = selected('category')?.value ?? 'all';
+  const topic = selected('topic');
+  if (!topic) return;
+
+  for (const option of [...topic.options]) {
+    const topicCategory = option.dataset.topicCategory;
+    option.disabled = option.value !== 'all' && category !== 'all' && topicCategory !== category;
+  }
+
+  const current = topic.selectedOptions[0];
+  if (current?.disabled) topic.value = 'all';
+}
+
 function readUrl() {
   const params = new URLSearchParams(window.location.search);
   for (const name of filterNames) {
@@ -15,9 +29,11 @@ function readUrl() {
     const value = params.get(name);
     if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
   }
+  syncTopicOptions();
+  writeUrl({ replace: true });
 }
 
-function writeUrl() {
+function writeUrl({ replace = false } = {}) {
   const url = new URL(window.location.href);
   for (const name of filterNames) {
     const value = selected(name)?.value ?? 'all';
@@ -26,7 +42,9 @@ function writeUrl() {
   }
   const next = `${url.pathname}${url.search}${url.hash}`;
   const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-  if (current !== next) window.history.pushState(null, '', next);
+  if (current === next) return;
+  if (replace) window.history.replaceState(null, '', next);
+  else window.history.pushState(null, '', next);
 }
 
 function apply({ syncUrl = false } = {}) {
@@ -50,13 +68,17 @@ function apply({ syncUrl = false } = {}) {
   if (syncUrl) writeUrl();
 }
 
-form?.addEventListener('change', () => apply({ syncUrl: true }));
+form?.addEventListener('change', (event) => {
+  if ((event.target as HTMLSelectElement | null)?.name === 'category') syncTopicOptions();
+  apply({ syncUrl: true });
+});
 window.addEventListener('popstate', () => {
   readUrl();
   apply();
 });
 document.querySelector<HTMLButtonElement>('[data-filter-reset]')?.addEventListener('click', () => {
   form?.reset();
+  syncTopicOptions();
   apply({ syncUrl: true });
   selected('category')?.focus();
 });
