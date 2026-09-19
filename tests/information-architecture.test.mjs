@@ -100,6 +100,9 @@ test('concept index will expose domain and difficulty browsing', () => {
   assert.match(filters, /history\.replaceState/);
   assert.match(filters, /popstate/);
   assert.match(filters, /filterNames = \['category', 'level'\]/);
+  assert.match(filters, /syncLevelOptions/);
+  assert.match(filters, /option\.hidden/);
+  assert.match(filters, /option\.disabled/);
   assert.match(filters, /searchParams\.delete\('topic'\)/);
 });
 

@@ -8,6 +8,21 @@ function selected(name: string) {
   return form?.elements.namedItem(name) as HTMLSelectElement | null;
 }
 
+function syncLevelOptions() {
+  const category = selected('category')?.value ?? 'all';
+  const level = selected('level');
+  if (!level) return;
+
+  for (const option of [...level.options]) {
+    if (option.value === 'all') continue;
+    const available = cards.some(card => (category === 'all' || card.dataset.category === category) && card.dataset.level === option.value);
+    option.hidden = !available;
+    option.disabled = !available;
+  }
+
+  if (level.selectedOptions[0]?.disabled) level.value = 'all';
+}
+
 function readUrl() {
   const params = new URLSearchParams(window.location.search);
   for (const name of filterNames) {
@@ -15,6 +30,7 @@ function readUrl() {
     const value = params.get(name);
     if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
   }
+  syncLevelOptions();
   writeUrl({ replace: true });
 }
 
@@ -52,13 +68,17 @@ function apply({ syncUrl = false } = {}) {
   if (syncUrl) writeUrl();
 }
 
-form?.addEventListener('change', () => apply({ syncUrl: true }));
+form?.addEventListener('change', (event) => {
+  if ((event.target as HTMLSelectElement | null)?.name === 'category') syncLevelOptions();
+  apply({ syncUrl: true });
+});
 window.addEventListener('popstate', () => {
   readUrl();
   apply();
 });
 document.querySelector<HTMLButtonElement>('[data-filter-reset]')?.addEventListener('click', () => {
   form?.reset();
+  syncLevelOptions();
   apply({ syncUrl: true });
   selected('category')?.focus();
 });
