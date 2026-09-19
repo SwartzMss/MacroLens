@@ -88,7 +88,7 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(source, /按领域认识宏观概念/);
   assert.doesNotMatch(source, /(?:01|02|03)\s*\//);
   for (const name of ['category', 'topic', 'level']) assert.match(source, new RegExp(`name=["']${name}["']`));
-  for (const attribute of ['data-category', 'data-topics', 'data-level']) assert.match(source, new RegExp(attribute));
+  for (const attribute of ['data-category', 'data-topics', 'data-level', 'data-topic-category']) assert.match(source, new RegExp(attribute));
   assert.match(source, /concept-filters/);
   assert.match(source, /class="concept-filter-panel"/);
   assert.doesNotMatch(source, /<summary>筛选<\/summary>/);
@@ -96,6 +96,8 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(filters, /URLSearchParams/);
   assert.match(filters, /history\.pushState/);
   assert.match(filters, /popstate/);
+  assert.match(filters, /syncTopicOptions/);
+  assert.match(filters, /option\.disabled/);
 });
 
 test('knowledge library and global search stay separate', () => {
