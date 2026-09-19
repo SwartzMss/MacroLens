@@ -13,7 +13,10 @@ function moduleCondition(module: typeof productModules[number]): string {
 }
 
 function moduleCase(): string {
-  return `CASE ${productModules.map(module => `WHEN ${moduleCondition(module)} THEN '${module.id}'`).join(' ')} END`;
+  return productModules.reduceRight<string>(
+    (fallback, module) => `if(${moduleCondition(module)}, '${module.id}', ${fallback})`,
+    "''",
+  );
 }
 
 function moduleScope(): string {
