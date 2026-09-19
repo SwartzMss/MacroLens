@@ -65,7 +65,6 @@ const isFinalLesson = lesson.id === 'reading-news';
         </section>
         {isFinalLesson && <LearningSelfCheck />}
         <section class="course-actions" aria-label="阅读进度">
-          <p class="course-note" data-course-status aria-live="polite">开启 JavaScript 后可以保存阅读进度。</p>
           {previous?.published && <a href={courseLessonHref(previous.id)}>上一章：{previous.title}</a>}
           {next && <div class="course-next">
             <strong>接下来：{next.title}</strong>

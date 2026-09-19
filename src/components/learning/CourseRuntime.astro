@@ -2,13 +2,10 @@
   import { courseStorageKey, parseCourseProgress, toggleCourseCompletion, saveCourseProgress, courseResumeTarget } from '../../data/courseProgress';
   import { courseLessonHref } from '../../data/courseOutline';
   let progress = parseCourseProgress(null);
-  let persistent = true;
-  try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch { persistent = false; }
+  try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch {}
   const lesson = document.querySelector<HTMLElement>('[data-course-lesson]')?.dataset.courseLesson;
   const nextLink = document.querySelector<HTMLAnchorElement>('[data-course-next]');
-  const status = document.querySelector<HTMLElement>('[data-course-status]');
   function render() {
-    if (status) status.textContent = persistent ? (progress.completed.length ? `已读完 ${progress.completed.length} 章。进度保存在当前浏览器。` : '进度保存在当前浏览器。') : '浏览器暂时无法保存进度，你仍可以正常阅读。';
     const resume = document.querySelector<HTMLAnchorElement>('[data-course-resume]');
     if (resume) {
       const target = courseResumeTarget(progress);
@@ -17,7 +14,7 @@
     }
   }
   function save() {
-    try { persistent = saveCourseProgress(localStorage, progress); } catch { persistent = false; }
+    try { saveCourseProgress(localStorage, progress); } catch {}
     render();
   }
   if (lesson) { progress.lastVisited = lesson; save(); }
@@ -28,7 +25,7 @@
   });
   render();
   function refresh() {
-    try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch { persistent = false; }
+    try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch {}
     render();
   }
   window.addEventListener('pageshow', event => { if (event.persisted) refresh(); });

@@ -10,6 +10,7 @@ assert.match(index, /问题探索/);
 if (courseOutline.some(chapter => !chapter.published)) assert.match(index, /正在编写/);
 else assert.doesNotMatch(index, /正在编写/);
 assert.doesNotMatch(index, /data-learning-card|graph\?node/);
+assert.doesNotMatch(index, /data-course-status|进度保存在当前浏览器|开启 JavaScript 后可以保存阅读进度/);
 assert.ok(index.includes(`目前已开放 ${courseOutline.filter(chapter => chapter.published).length} 章`));
 for (const exploration of explorations) {
   const route = `learn/explore/${exploration.id}/index.html`;
@@ -47,6 +48,7 @@ for (const chapter of courseOutline) {
   assert.match(html, /data-pagefind-body/);
   assert.match(html, /class="course-back-link"[^>]*>返回入门主线</);
   assert.doesNotMatch(html, /← 入门主线/);
+  assert.doesNotMatch(html, /data-course-status|进度保存在当前浏览器|开启 JavaScript 后可以保存阅读进度/);
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
