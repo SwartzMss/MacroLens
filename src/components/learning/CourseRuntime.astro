@@ -5,15 +5,9 @@
   let persistent = true;
   try { progress = parseCourseProgress(localStorage.getItem(courseStorageKey)); } catch { persistent = false; }
   const lesson = document.querySelector<HTMLElement>('[data-course-lesson]')?.dataset.courseLesson;
-  const button = document.querySelector<HTMLButtonElement>('[data-course-complete]');
+  const nextLink = document.querySelector<HTMLAnchorElement>('[data-course-next]');
   const status = document.querySelector<HTMLElement>('[data-course-status]');
   function render() {
-    if (button && lesson) {
-      const completed = progress.completed.includes(lesson);
-      button.hidden = false;
-      button.textContent = completed ? '已完成 · 取消标记' : '完成本章';
-      button.setAttribute('aria-pressed', String(completed));
-    }
     if (status) status.textContent = persistent ? (progress.completed.length ? `已读完 ${progress.completed.length} 章。进度保存在当前浏览器。` : '进度保存在当前浏览器。') : '浏览器暂时无法保存进度，你仍可以正常阅读。';
     const resume = document.querySelector<HTMLAnchorElement>('[data-course-resume]');
     if (resume) {
@@ -27,8 +21,8 @@
     render();
   }
   if (lesson) { progress.lastVisited = lesson; save(); }
-  button?.addEventListener('click', () => {
-    if (!lesson) return;
+  nextLink?.addEventListener('click', () => {
+    if (!lesson || progress.completed.includes(lesson)) return;
     progress = toggleCourseCompletion(progress, lesson);
     save();
   });

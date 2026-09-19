@@ -326,11 +326,6 @@
   padding-top:24px;
   border-top:1px solid var(--line);
 }
-.course-actions button {
-  font:inherit;
-  cursor:pointer;
-  border:0;
-}
 .course-actions a {
   display:inline-block;
   margin:12px 0;

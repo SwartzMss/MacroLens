@@ -50,7 +50,7 @@ for (const chapter of courseOutline) {
   assert.doesNotMatch(html, /noindex|concept-long-form|data-learning-graph-bridge|learnPath=/);
   assert.match(html, /假设(?:故事|贷款|新闻)/);
   assert.match(html, /正文参考来源/);
-  assert.match(html, /data-course-complete/);
+  assert.doesNotMatch(html, /data-course-complete/);
   assert.match(html, /读完这一章，你能解释开头的问题了吗/);
   assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
   assert.doesNotMatch(html, /图表不够清楚/);
@@ -72,6 +72,7 @@ for (const chapter of courseOutline) {
   if (previous?.published) assert.ok(html.includes(`href="${courseLessonHref(previous.id)}"`));
   if (next?.published) assert.ok(html.includes(`href="${courseLessonHref(next.id)}"`));
   if (next && !next.published) assert.ok(!html.includes(`href="${courseLessonHref(next.id)}"`));
+  if (next?.published) assert.match(html, /data-course-next/);
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length);
   for (const match of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(decodeURIComponent(match[1])), `Missing anchor: ${match[1]}`);
