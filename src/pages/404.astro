@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="页面不存在｜MacroLens"
+  description="这个页面不存在或已经下线。"
+  noindex={true}
+>
+  <section class="not-found shell">
+    <p class="eyebrow">404</p>
+    <h1>这个页面已经下线了</h1>
+    <p>你可以从学习、当前宏观或知识库继续浏览。</p>
+    <nav class="not-found-links" aria-label="继续浏览">
+      <a class="button button-primary" href="/learn/">学习</a>
+      <a class="button button-secondary" href="/now/">当前宏观</a>
+      <a class="button button-secondary" href="/concepts/">知识库</a>
+    </nav>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    min-height: 70vh;
+    padding: 120px 0;
+  }
+
+  .not-found h1 {
+    max-width: 720px;
+    margin: 16px 0 20px;
+    font: 800 clamp(42px, 7vw, 76px)/1.06 var(--serif);
+    letter-spacing: -0.04em;
+  }
+
+  .not-found > p:not(.eyebrow) {
+    margin: 0;
+    color: var(--muted);
+    font-size: 20px;
+  }
+
+  .not-found-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 18px;
+    border: 1px solid var(--green);
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .button-primary {
+    background: var(--green);
+    color: white;
+  }
+
+  .button-secondary {
+    color: var(--green);
+  }
+
+  .button:hover {
+    background: var(--mint);
+  }
+</style>
