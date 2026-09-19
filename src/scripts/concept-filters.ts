@@ -30,9 +30,10 @@ function readUrl() {
     if (control) control.value = value && [...control.options].some(option => option.value === value) ? value : 'all';
   }
   syncTopicOptions();
+  writeUrl({ replace: true });
 }
 
-function writeUrl() {
+function writeUrl({ replace = false } = {}) {
   const url = new URL(window.location.href);
   for (const name of filterNames) {
     const value = selected(name)?.value ?? 'all';
@@ -41,7 +42,9 @@ function writeUrl() {
   }
   const next = `${url.pathname}${url.search}${url.hash}`;
   const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-  if (current !== next) window.history.pushState(null, '', next);
+  if (current === next) return;
+  if (replace) window.history.replaceState(null, '', next);
+  else window.history.pushState(null, '', next);
 }
 
 function apply({ syncUrl = false } = {}) {

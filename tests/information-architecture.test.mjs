@@ -95,6 +95,7 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.doesNotMatch(source, /concept-quick-nav|concept-quick-links/);
   assert.match(filters, /URLSearchParams/);
   assert.match(filters, /history\.pushState/);
+  assert.match(filters, /history\.replaceState/);
   assert.match(filters, /popstate/);
   assert.match(filters, /syncTopicOptions/);
   assert.match(filters, /option\.disabled/);
