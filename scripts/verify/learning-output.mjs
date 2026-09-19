@@ -55,8 +55,13 @@ for (const chapter of courseOutline) {
   for (const phrase of ['这一章要弄明白什么', '先记住一个基本方向', '学完后带走']) {
     assert.match(html, new RegExp(phrase));
   }
-  if (chapter.id === 'connected-economy') assert.doesNotMatch(html, /先把前面的问题接回来|这是第一章，先从一份早餐开始/);
-  else assert.match(html, /先把前面的问题接回来/);
+  if (chapter.id === 'connected-economy') {
+    assert.doesNotMatch(html, /先把前面的问题接回来|这是第一章，先从一份早餐开始/);
+  } else {
+    const recallPosition = html.indexOf('先把前面的问题接回来');
+    const goalsPosition = html.indexOf('这一章要弄明白什么');
+    assert.ok(recallPosition >= 0 && recallPosition < goalsPosition, `${chapter.id}: recall should precede goals`);
+  }
   assert.match(html, /接下来：|主线先收束在这里/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
   const chapterIndex = courseOutline.indexOf(chapter);
