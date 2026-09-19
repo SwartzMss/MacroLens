@@ -98,6 +98,7 @@ test('concept index will expose all three browsing dimensions', () => {
   assert.match(filters, /history\.replaceState/);
   assert.match(filters, /popstate/);
   assert.match(filters, /syncTopicOptions/);
+  assert.match(filters, /option\.hidden/);
   assert.match(filters, /option\.disabled/);
 });
 

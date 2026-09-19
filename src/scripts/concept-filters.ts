@@ -15,7 +15,9 @@ function syncTopicOptions() {
 
   for (const option of [...topic.options]) {
     const topicCategory = option.dataset.topicCategory;
-    option.disabled = option.value !== 'all' && category !== 'all' && topicCategory !== category;
+    const hidden = option.value !== 'all' && category !== 'all' && topicCategory !== category;
+    option.hidden = hidden;
+    option.disabled = hidden;
   }
 
   const current = topic.selectedOptions[0];
