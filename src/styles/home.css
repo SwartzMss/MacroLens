@@ -735,14 +735,6 @@
   font-weight: 700;
 }
 .home-learning-promo-primary:hover { background: var(--ink); }
-.home-learning-promo-secondary {
-  align-self: flex-start;
-  margin-top: 14px;
-  color: var(--green);
-  font-size: 13px;
-  font-weight: 700;
-}
-.home-learning-promo-secondary:hover { text-decoration: underline; text-underline-offset: 4px; }
 .home-state { border-top: 1px solid var(--line); }
 @media (max-width: 760px) {
   .home-landing {

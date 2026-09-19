@@ -34,6 +34,7 @@ test('homepage relationship preview resolves canonical graph edges', () => {
 test('homepage learning entry opens an independent course', () => {
   const source = readFileSync(`${homeDirectory}/LearningPaths.astro`, 'utf8');
   assert.match(source, /courseLessonHref/);
+  assert.doesNotMatch(source, /查看学习主线|home-learning-promo-secondary/);
   assert.doesNotMatch(source, /LearningCard|conceptId/);
 });
 
