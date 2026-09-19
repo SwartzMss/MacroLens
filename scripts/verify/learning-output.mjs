@@ -52,9 +52,11 @@ for (const chapter of courseOutline) {
   assert.match(html, /读完这一章，你能解释开头的问题了吗/);
   assert.doesNotMatch(html, /这篇解释对你有帮助吗/);
   assert.doesNotMatch(html, /图表不够清楚/);
-  for (const phrase of ['这一章要弄明白什么', '先把前面的问题接回来', '先记住一个基本方向', '学完后带走']) {
+  for (const phrase of ['这一章要弄明白什么', '先记住一个基本方向', '学完后带走']) {
     assert.match(html, new RegExp(phrase));
   }
+  if (chapter.id === 'connected-economy') assert.doesNotMatch(html, /先把前面的问题接回来|这是第一章，先从一份早餐开始/);
+  else assert.match(html, /先把前面的问题接回来/);
   assert.match(html, /接下来：|主线先收束在这里/);
   assert.ok(html.includes(`data-page-id="learn:course-${chapter.id}"`));
   const chapterIndex = courseOutline.indexOf(chapter);

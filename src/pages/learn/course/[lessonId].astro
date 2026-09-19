@@ -46,10 +46,10 @@ const isFinalLesson = lesson.id === 'reading-news';
               {lesson.data.goals.map(goal => <li>{goal}</li>)}
             </ul>
           </div>
-          <div>
+          {lesson.data.recall && <div>
             <h2 id={`${lesson.id}-recall`}>先把前面的问题接回来</h2>
             <p>{lesson.data.recall}</p>
-          </div>
+          </div>}
         </section>
         <section class="course-model" aria-labelledby={`${lesson.id}-model`}>
           <p class="course-model-label">先记住一个基本方向</p>

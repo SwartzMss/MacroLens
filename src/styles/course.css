@@ -179,9 +179,12 @@
   margin-bottom:34px;
 }
 .course-overview {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:24px;
+  display:block;
+}
+.course-overview > div + div {
+  border-top:1px solid var(--line);
+  margin-top:18px;
+  padding-top:18px;
 }
 .course-overview + h2 {
   margin-top:0;
@@ -384,11 +387,6 @@
   .course-overview {
     display:block;
     padding:18px 20px;
-  }
-  .course-overview > div + div {
-    border-top:1px solid var(--line);
-    margin-top:18px;
-    padding-top:18px;
   }
   .course-outline li {
     grid-template-columns:34px minmax(0, 1fr);
