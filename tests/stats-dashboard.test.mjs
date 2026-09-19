@@ -82,7 +82,7 @@ test('feedback stats endpoint fails closed and stays GET-only', async () => {
   assert.deepEqual(await failed.json(), { available: false });
 });
 
-test('stats page is noindex, Pagefind-ignored, and uses all three aggregate APIs', async () => {
+test('stats page is noindex, hides public navigation, and uses all four aggregate APIs', async () => {
   const [page, layout] = await Promise.all([
     readFile(new URL('../src/pages/stats.astro', import.meta.url), 'utf8'),
     readFile(new URL('../src/layouts/BaseLayout.astro', import.meta.url), 'utf8'),
@@ -93,6 +93,10 @@ test('stats page is noindex, Pagefind-ignored, and uses all three aggregate APIs
   assert.match(page, /\/api\/visitor-stats/);
   assert.match(page, /\/api\/page-stats/);
   assert.match(page, /\/api\/feedback-stats/);
+  assert.match(page, /\/api\/module-stats/);
+  assert.match(page, /模块访问概览/);
+  assert.match(page, /data-module-id/);
+  assert.match(page, /hideNavigation=\{true\}/);
   assert.match(page, /feedbackCount\s*<\s*5/);
   assert.match(page, /helpfulRate\s*<\s*70/);
   assert.match(page, /helpfulRate\s*>=\s*85/);
@@ -102,6 +106,7 @@ test('stats page is noindex, Pagefind-ignored, and uses all three aggregate APIs
   assert.match(page, /当前反馈少于 5 条，仅作待观察/);
   assert.match(page, /原因数量用于定位内容问题，不代表学习得分/);
   assert.match(layout, /name="robots"\s+content="noindex,nofollow"/);
+  assert.match(layout, /hideNavigation/);
 });
 
 test('README records the operational stats viewing workflow', async () => {

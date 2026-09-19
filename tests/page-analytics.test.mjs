@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { onRequest as onModuleStatsRequest } from '../functions/api/module-stats.ts';
 import { onRequest as onPageStatsRequest } from '../functions/api/page-stats.ts';
+import { combineModuleStats, moduleStatsQueries, parseModuleStats } from '../functions/module-stats.ts';
 import { learningArticleIdForPath, normalizeConceptPath, normalizePathname } from '../functions/visitor.ts';
 import { combinePageStats, pageStatsQueries, parsePageStats, visitorStatsQueries } from '../functions/visitor-stats.ts';
 
@@ -52,6 +54,62 @@ test('parses page aggregates and combines today counts by stable article ID', ()
     { pageId: 'learn:gdp', total: 2, today: 1 },
     { pageId: 'learn:m2', total: 1, today: 0 },
   ]);
+});
+
+test('module stats classify the current product entry paths', () => {
+  const queries = moduleStatsQueries('2026-09-06');
+  assert.match(queries.total, /CASE/i);
+  assert.match(queries.total, /blob3\s*=\s*'\/now'/i);
+  assert.match(queries.total, /blob3\s+LIKE\s+'\/concepts\/%'/i);
+  assert.match(queries.today, /blob2\s*=\s*'2026-09-06'/i);
+
+  const total = parseModuleStats({ data: [
+    { module_id: 'home', total: '4' },
+    { module_id: 'learn', total: 3 },
+  ] }, 'total');
+  const today = parseModuleStats({ data: [
+    { module_id: 'home', today: 2 },
+  ] }, 'today');
+  assert.deepEqual(combineModuleStats(total, today), [
+    { moduleId: 'home', total: 4, today: 2 },
+    { moduleId: 'learn', total: 3, today: 0 },
+    { moduleId: 'now', total: 0, today: 0 },
+    { moduleId: 'concepts', total: 0, today: 0 },
+    { moduleId: 'search', total: 0, today: 0 },
+  ]);
+  assert.equal(parseModuleStats({ data: [{ module_id: 'unknown', total: 1 }] }, 'total'), null);
+});
+
+test('module stats endpoint returns a complete module overview without visitor IDs', async () => {
+  const originalFetch = globalThis.fetch;
+  const queries = [];
+  globalThis.fetch = async (_input, init) => {
+    const sql = String(init.body);
+    queries.push(sql);
+    if (/AS total/i.test(sql)) return Response.json({ data: [{ module_id: 'home', total: '2' }] });
+    return Response.json({ data: [{ module_id: 'home', today: '1' }] });
+  };
+  try {
+    const response = await onModuleStatsRequest({
+      request: new Request('https://macrolens.example/api/module-stats'),
+      env: { CLOUDFLARE_ACCOUNT_ID: 'account', CLOUDFLARE_API_TOKEN: 'token' },
+    });
+    const body = await response.json();
+    assert.equal(body.available, true);
+    assert.deepEqual(body.modules, [
+      { moduleId: 'home', total: 2, today: 1 },
+      { moduleId: 'learn', total: 0, today: 0 },
+      { moduleId: 'now', total: 0, today: 0 },
+      { moduleId: 'concepts', total: 0, today: 0 },
+      { moduleId: 'search', total: 0, today: 0 },
+    ]);
+    assert.equal(response.headers.get('cache-control'), 'public, max-age=60, s-maxage=300');
+    assert.equal(queries.length, 2);
+    assert.ok(queries.every(sql => /COUNT\s*\(DISTINCT\s+blob1\)/i.test(sql)));
+    assert.ok(queries.every(sql => !/visitor_id|ip|user-agent|referrer/i.test(sql)));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test('fails closed for missing pathname, invalid counts, and duplicate normalized paths', () => {
